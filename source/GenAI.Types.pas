@@ -195,6 +195,20 @@ type
 
   {$ENDREGION}
 
+  {$REGION 'GenAI.Embeddings'}
+
+  TEncodingFormat = (
+    float,
+    base64
+  );
+
+  TEncodingFormatHelper = record Helper for TEncodingFormat
+    function ToString: string;
+    class function Create(const Value: string): TEncodingFormat; static;
+  end;
+
+  {$ENDREGION}
+
 implementation
 
 uses
@@ -528,6 +542,24 @@ begin
       Exit('verbose_json');
     tr_vtt:
       Exit('vtt');
+  end;
+end;
+
+{ TEncodingFormatHelper }
+
+class function TEncodingFormatHelper.Create(
+  const Value: string): TEncodingFormat;
+begin
+  Result := TEnumValueRecovery.TypeRetrieve<TEncodingFormat>(Value, ['float', 'base64']);
+end;
+
+function TEncodingFormatHelper.ToString: string;
+begin
+  case Self of
+    float:
+      Exit('float');
+    base64:
+      Exit('base64');
   end;
 end;
 

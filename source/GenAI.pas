@@ -258,6 +258,117 @@ type
 
   {$ENDREGION}
 
+  {$REGION 'GenAI.Embeddings'}
+
+  /// <summary>
+  /// Represents the parameters required to create embeddings using the OpenAI API.
+  /// </summary>
+  /// <remarks>
+  /// This class provides methods to specify different parameters for generating embeddings.
+  /// The input can be a single string or an array of strings. You can also specify the model,
+  /// encoding format, dimensions, and a user identifier. These parameters are used to configure
+  /// the request to the OpenAI API to obtain embeddings that can be consumed by machine learning
+  /// models and algorithms.
+  /// </remarks>
+  TEmbeddingsParams = GenAI.Embeddings.TEmbeddingsParams;
+
+  /// <summary>
+  /// Represents a single embedding vector returned by the OpenAI API.
+  /// </summary>
+  /// <remarks>
+  /// This class encapsulates the details of an embedding, including its index in the list of returned embeddings,
+  /// the embedding vector itself, and the object type. It inherits from TJSONFingerprint to utilize JSON serialization
+  /// capabilities.
+  /// </remarks>
+  TEmbedding = GenAI.Embeddings.TEmbedding;
+
+  /// <summary>
+  /// Represents a collection of embedding vectors returned by the OpenAI API.
+  /// </summary>
+  /// <remarks>
+  /// This class holds a list of TEmbedding objects, each representing an individual embedding vector.
+  /// It includes methods for managing the lifecycle of these objects, including destruction. The class
+  /// also inherits from TJSONFingerprint to leverage JSON serialization capabilities.
+  /// </remarks>
+  TEmbeddings = GenAI.Embeddings.TEmbeddings;
+
+  /// <summary>
+  /// Manages asynchronous chat callBacks for a chat request using <c>TEmbeddings</c> as the response type.
+  /// </summary>
+  /// <remarks>
+  /// The <c>TAsynEmbeddings</c> type extends the <c>TAsynParams&lt;TEmbeddings&gt;</c> record to handle the lifecycle of an asynchronous chat operation.
+  /// It provides event handlers that trigger at various stages, such as when the operation starts, completes successfully, or encounters an error.
+  /// This structure facilitates non-blocking chat operations and is specifically tailored for scenarios where multiple choices from a chat model are required.
+  /// </remarks>
+  TAsynEmbeddings = GenAI.Embeddings.TAsynEmbeddings;
+
+  {$ENDREGION}
+
+  {$REGION 'GenAI.Models'}
+
+  /// <summary>
+  /// Represents an OpenAI model, encapsulating key information about a specific API model.
+  /// </summary>
+  /// <remarks>
+  /// The TModel class stores attributes such as the unique identifier, creation timestamp,
+  /// object type, and ownership details of the model. This class is typically used to handle
+  /// and manipulate data related to models provided by OpenAI's API.
+  /// </remarks>
+  TModel = GenAI.Models.TModel;
+
+  /// <summary>
+  /// Represents a collection of OpenAI models, providing a list structure for managing multiple model instances.
+  /// </summary>
+  /// <remarks>
+  /// The TModels class encapsulates a list of TModel objects, each representing detailed information about
+  /// individual models. This collection is useful for operations that require handling multiple models,
+  /// such as listing all available models from the OpenAI API.
+  /// </remarks>
+  TModels = GenAI.Models.TModels;
+
+  /// <summary>
+  /// Represents the deletion status of an OpenAI model.
+  /// </summary>
+  /// <remarks>
+  /// The TModelDeletion class encapsulates the outcome of a deletion request for a model,
+  /// including identification and deletion status. It is used to confirm the removal of
+  /// a fine-tuned model instance from the OpenAI API.
+  /// </remarks>
+  TModelDeletion = GenAI.Models.TModelDeletion;
+
+  /// <summary>
+  /// Manages asynchronous chat callBacks for a chat request using <c>TModel</c> as the response type.
+  /// </summary>
+  /// <remarks>
+  /// The <c>TAsynModel</c> type extends the <c>TAsynParams&lt;TModel&gt;</c> record to handle the lifecycle of an asynchronous chat operation.
+  /// It provides event handlers that trigger at various stages, such as when the operation starts, completes successfully, or encounters an error.
+  /// This structure facilitates non-blocking chat operations and is specifically tailored for scenarios where multiple choices from a chat model are required.
+  /// </remarks>
+  TAsynModel = GenAI.Models.TAsynModel;
+
+  /// <summary>
+  /// Manages asynchronous chat callBacks for a chat request using <c>TModels</c> as the response type.
+  /// </summary>
+  /// <remarks>
+  /// The <c>TAsynModels</c> type extends the <c>TAsynParams&lt;TModels&gt;</c> record to handle the lifecycle of an asynchronous chat operation.
+  /// It provides event handlers that trigger at various stages, such as when the operation starts, completes successfully, or encounters an error.
+  /// This structure facilitates non-blocking chat operations and is specifically tailored for scenarios where multiple choices from a chat model are required.
+  /// </remarks>
+  TAsynModels = GenAI.Models.TAsynModels;
+
+  /// <summary>
+  /// Manages asynchronous chat callBacks for a chat request using <c>TModelDeletion</c> as the response type.
+  /// </summary>
+  /// <remarks>
+  /// The <c>TAsynModelDeletion</c> type extends the <c>TAsynParams&lt;TModelDeletion&gt;</c> record to handle the lifecycle of an asynchronous chat operation.
+  /// It provides event handlers that trigger at various stages, such as when the operation starts, completes successfully, or encounters an error.
+  /// This structure facilitates non-blocking chat operations and is specifically tailored for scenarios where multiple choices from a chat model are required.
+  /// </remarks>
+  TAsynModelDeletion = GenAI.Models.TAsynModelDeletion;
+
+  {$ENDREGION}
+
+
 function FromDeveloper(const Content: string; const Name: string = ''):TMessagePayload;
 function FromSystem(const Content: string; const Name: string = ''):TMessagePayload;
 function FromUser(const Content: string; const Name: string = ''):TMessagePayload; overload;
