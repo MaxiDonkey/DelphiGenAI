@@ -514,7 +514,7 @@ begin
 end;
 
 class function TMessagePayload.User(const Docs: TArray<string>;
-  const Name: string = ''): TMessagePayload;
+  const Name: string): TMessagePayload;
 begin
   var JSONArray := TJSONArray.Create;
   for var Item in Docs do
