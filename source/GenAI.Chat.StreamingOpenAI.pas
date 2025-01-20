@@ -44,7 +44,7 @@ class function TOpenAIStream<T>.CreateInstance(AResponse: TStringStream;
   AEvent: TStreamCallbackEvent<T>; AParser: TParserMethod<T>): IStreamCallback;
 begin
   if not Assigned(AParser) then
-    raise Exception.Create('Initialization failed. The parser instance cannot be undefined or null.');
+    raise Exception.Create('Streaming failed. The "parser" instance cannot be null.');
   Result := TOpenAIStream<T>.Create(AResponse, AEvent, AParser);
 end;
 
