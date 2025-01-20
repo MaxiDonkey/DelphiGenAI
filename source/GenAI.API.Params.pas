@@ -11,7 +11,8 @@ interface
 
 uses
   System.Classes, System.JSON, System.SysUtils, System.RTTI, REST.Json.Interceptors,
-  REST.JsonReflect, System.Generics.Collections, System.Threading, System.TypInfo;
+  REST.JsonReflect, System.Generics.Collections, System.Threading, System.TypInfo,
+  GenAI.Consts;
 
 type
   /// <summary>
@@ -420,11 +421,6 @@ implementation
 
 uses
   System.DateUtils, System.NetEncoding;
-
-const
-  DATE_FORMAT = 'yyyy-MM-dd';
-  TIME_FORMAT = 'hh:nn:ss';
-  DATE_TIME_FORMAT = DATE_FORMAT + ' ' + TIME_FORMAT;
 
 { TJSONInterceptorStringToString }
 
