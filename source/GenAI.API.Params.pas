@@ -503,6 +503,8 @@ begin
 end;
 
 function TUrlParam.GetValue: string;
+var
+  Params: TArray<string>;
 begin
   var Items := FValue.Split(['&']);
   for var Item in Items do
@@ -510,12 +512,9 @@ begin
       var SubStr := Item.Split(['=']);
       if Length(SubStr) <> 2 then
         raise Exception.CreateFmt('%s: Ivalid URL parameter.', [SubStr]);
-
-      var S := TNetEncoding.URL.Encode(SubStr[0]) + '=' + TNetEncoding.URL.Encode(SubStr[1]);
-      if Result.IsEmpty then
-        Result := S else
-        Result := Result + '&' + S;
+      Params := Params + [TNetEncoding.URL.Encode(SubStr[0]) + '=' + TNetEncoding.URL.Encode(SubStr[1])];
     end;
+  Result := string.Join('&', Params);
   if not Result.IsEmpty then
     Result := '?' + Result;
 end;
