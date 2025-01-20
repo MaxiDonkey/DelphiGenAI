@@ -33,6 +33,24 @@ uses
   GenAI.HttpClientInterface, GenAI.HttpClientAPI;
 
 type
+  /// <summary>
+  /// Represents a delegate function for parsing a response string into a strongly-typed object.
+  /// </summary>
+  /// <typeparam name="T">
+  /// The type of the object to be returned by the parser function.
+  /// This type must be a class with a parameterless constructor.
+  /// </typeparam>
+  /// <param name="ResponseText">
+  /// A string containing the API response data to be parsed.
+  /// </param>
+  /// <returns>
+  /// An instance of type <c>T</c> created from the parsed <c>ResponseText</c>.
+  /// </returns>
+  /// <remarks>
+  /// The delegate provides a flexible mechanism for converting API response strings
+  /// (usually in JSON format) into strongly-typed objects. It is commonly used for
+  /// deserialization processes in HTTP client operations.
+  /// </remarks>
   TParserMethod<T: class, constructor> = reference to function(const ResponseText: string): T;
 
   /// <summary>
