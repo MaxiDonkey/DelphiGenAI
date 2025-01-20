@@ -7,18 +7,20 @@ unit GenAI.API;
 
 
 NOTE:
-  The GenAI.HttpClientInterface unit defines an IHttpClientAPI interface, which allows for decoupling
-  the specific implementation of the HTTP client used for web requests. This introduces an abstraction
-  that enhances flexibility, improves testability, and simplifies code maintenance.
+  The GenAI.HttpClientInterface unit defines an IHttpClientAPI interface, which
+  allows for decoupling the specific implementation of the HTTP client used for
+  web requests. This introduces an abstraction that enhances flexibility, improves
+  testability, and simplifies code maintenance.
 
-  The IHttpClientAPI interface ensures that client code can interact with the web without being
-  dependent on a specific class, thus facilitating the replacement or modification of the underlying
-  HTTP implementation details without impacting the rest of the application. It also enables easy
-  mocking during unit testing, offering the ability to test HTTP request behaviors in an isolated and
-  controlled manner.
+  The IHttpClientAPI interface ensures that client code can interact with the web
+  without being dependent on a specific class, thus facilitating the replacement
+  or modification of the underlying HTTP implementation details without impacting
+  the rest of the application. It also enables easy mocking during unit testing,
+  offering the ability to test HTTP request behaviors in an isolated and controlled
+  manner.
 
-  This approach adheres to the SOLID principles of dependency inversion, contributing to a
-  robust, modular, and adaptable software architecture.
+  This approach adheres to the SOLID principles of dependency inversion, contributing
+  to a robust, modular, and adaptable software architecture.
 
 
  ------------------------------------------------------------------------------}
