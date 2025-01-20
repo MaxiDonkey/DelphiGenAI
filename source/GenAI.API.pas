@@ -239,6 +239,10 @@ type
   /// are inherited from the <c>TGenAIConfiguration</c> class.
   /// </remarks>
   TGenAIAPI = class(TApiDeserializer)
+  private
+    function MockJsonResponse(const FieldName: string; Response: TStringStream): string;
+    function MockJsonFile(const FieldName: string; Response: TStringStream): string;
+  public
     /// <summary>
     /// Initializes a new instance of the <c>TGenAIAPI</c> class with an API key.
     /// </summary>
@@ -477,7 +481,8 @@ begin
   APIKey := AAPIKey;
 end;
 
-function TGenAIAPI.Post<TResult, TParams>(const Endpoint: string; ParamProc: TProc<TParams>; const RawByteFieldName: string): TResult;
+function TGenAIAPI.Post<TResult, TParams>(const Endpoint: string; ParamProc: TProc<TParams>;
+  const RawByteFieldName: string): TResult;
 begin
   var Response := TStringStream.Create('', TEncoding.UTF8);
   var Params := TParams.Create;
@@ -489,9 +494,9 @@ begin
       200..299:
         begin
           if RawByteFieldName.IsEmpty then
-            Result := Deserialize<TResult>(Code, Response.DataString)
-          else
-            Result := Deserialize<TResult>(Code, Format('{"%s":"%s"}', [RawByteFieldName, BytesToBase64(Response.Bytes)]));
+            Result := Deserialize<TResult>(Code, Response.DataString) else
+            {--- When a raw byte file is sent as the sole response }
+            Result := Deserialize<TResult>(Code, MockJsonResponse(RawByteFieldName, Response));
         end;
       else
         Result := Deserialize<TResult>(Code, Response.DataString)
@@ -599,13 +604,7 @@ begin
   var Stream := TStringStream.Create;
   try
     var Code := GetFile(Endpoint, Stream);
-    Stream.Position := 0;
-    var Temp := TStringStream.Create(BytesToString(Stream.Bytes).TrimRight([#0]));
-    try
-      Result := Deserialize<TResult>(Code, Format('{"%s":"%s"}', [JSONFieldName, EncodeBase64(Temp)]));
-    finally
-      Temp.Free;
-    end;
+    Result := Deserialize<TResult>(Code, MockJsonFile(JSONFieldName, Stream));
   finally
     Stream.Free;
   end;
@@ -630,6 +629,24 @@ begin
         end;
       end;
   end;
+end;
+
+function TGenAIAPI.MockJsonFile(const FieldName: string;
+  Response: TStringStream): string;
+begin
+  Response.Position := 0;
+  var Data := TStringStream.Create(BytesToString(Response.Bytes).TrimRight([#0]));
+  try
+    Result := Format('{"%s":"%s"}', [FieldName, EncodeBase64(Data)]);
+  finally
+    Data.Free;
+  end;
+end;
+
+function TGenAIAPI.MockJsonResponse(const FieldName: string;
+  Response: TStringStream): string;
+begin
+  Result := Format('{"%s":"%s"}', [FieldName, BytesToBase64(Response.Bytes)]);
 end;
 
 function TGenAIAPI.Patch<TResult, TParams>(const Endpoint: string;
