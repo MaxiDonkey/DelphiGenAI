@@ -20,7 +20,7 @@ type
   /// This interface outlines the basic properties and methods that any function implementation must include.
   /// </remarks>
   IFunctionCore = interface
-    ['{2D8EA8C5-1E60-481D-B95F-2EFFE2CF6A7D}']
+    ['{586B30A0-4C30-47BA-87F1-88A14BCD6F4B}']
     /// <summary>
     /// Retrieves the description of the function.
     /// </summary>

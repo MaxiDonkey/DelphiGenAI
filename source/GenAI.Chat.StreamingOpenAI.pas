@@ -14,23 +14,23 @@ uses
   GenAI.API;
 
 type
-  TStreamCallback<T: class, constructor> = class(TInterfacedObject, IStreamCallback)
+  TOpenAIStream<T: class, constructor> = class(TInterfacedObject, IStreamCallback)
   private
     FResponse: TStringStream;
     FLineFeedPosition: Integer;
-    FEvent: TStreamCallbackEvent<T>;
+    FEvent: TOpenAIStreamEvent<T>;
     FParser: TParserMethod<T>;
     function GetOnStream: TReceiveDataCallback;
   public
-    constructor Create(AResponse: TStringStream; AEvent: TStreamCallbackEvent<T>; AParser: TParserMethod<T>);
-    class function CreateInstance(AResponse: TStringStream; AEvent: TStreamCallbackEvent<T>; AParser: TParserMethod<T>): IStreamCallback;
+    constructor Create(AResponse: TStringStream; AEvent: TOpenAIStreamEvent<T>; AParser: TParserMethod<T>);
+    class function CreateInstance(AResponse: TStringStream; AEvent: TOpenAIStreamEvent<T>; AParser: TParserMethod<T>): IStreamCallback;
   end;
 
 implementation
 
-{ TStreamCallback<T> }
+{ TOpenAIStream<T> }
 
-constructor TStreamCallback<T>.Create(AResponse: TStringStream; AEvent: TStreamCallbackEvent<T>;
+constructor TOpenAIStream<T>.Create(AResponse: TStringStream; AEvent: TOpenAIStreamEvent<T>;
   AParser: TParserMethod<T>);
 begin
   inherited Create;
@@ -40,13 +40,13 @@ begin
   FParser := AParser;
 end;
 
-class function TStreamCallback<T>.CreateInstance(AResponse: TStringStream;
-  AEvent: TStreamCallbackEvent<T>; AParser: TParserMethod<T>): IStreamCallback;
+class function TOpenAIStream<T>.CreateInstance(AResponse: TStringStream;
+  AEvent: TOpenAIStreamEvent<T>; AParser: TParserMethod<T>): IStreamCallback;
 begin
-  Result := TStreamCallback<T>.Create(AResponse, AEvent, AParser);
+  Result := TOpenAIStream<T>.Create(AResponse, AEvent, AParser);
 end;
 
-function TStreamCallback<T>.GetOnStream: TReceiveDataCallback;
+function TOpenAIStream<T>.GetOnStream: TReceiveDataCallback;
 begin
   Result :=
     procedure (const Sender: TObject; AContentLength,

@@ -42,7 +42,7 @@ type
   /// The type of the parameters.
   /// </typeparam>
   IUseParams<T> = interface
-    ['{18566F2C-F2D9-4257-A460-D9AE8F053357}']
+    ['{D7C1F3AC-CA7C-49E5-9250-8E898B28EC97}']
     /// <summary>
     /// Sets the parameters.
     /// </summary>

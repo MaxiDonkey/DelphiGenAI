@@ -2895,7 +2895,7 @@ begin
   try
     Result := API.Post<TChatParams>('chat/completions', ParamProc, Response,
       {--- Please refer to the header note for detailed information on the processing of streamed messages. }
-      TStreamCallback<TChat>.CreateInstance(Response, Event, TApiDeserializer.Parse<TChat>).OnStream);
+      TOpenAIStream<TChat>.CreateInstance(Response, Event, TApiDeserializer.Parse<TChat>).OnStream);
   finally
     Response.Free;
   end;
