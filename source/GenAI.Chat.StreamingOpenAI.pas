@@ -18,19 +18,19 @@ type
   private
     FResponse: TStringStream;
     FLineFeedPosition: Integer;
-    FEvent: TOpenAIStreamEvent<T>;
+    FEvent: TStreamCallbackEvent<T>;
     FParser: TParserMethod<T>;
     function GetOnStream: TReceiveDataCallback;
   public
-    constructor Create(AResponse: TStringStream; AEvent: TOpenAIStreamEvent<T>; AParser: TParserMethod<T>);
-    class function CreateInstance(AResponse: TStringStream; AEvent: TOpenAIStreamEvent<T>; AParser: TParserMethod<T>): IStreamCallback;
+    constructor Create(AResponse: TStringStream; AEvent: TStreamCallbackEvent<T>; AParser: TParserMethod<T>);
+    class function CreateInstance(AResponse: TStringStream; AEvent: TStreamCallbackEvent<T>; AParser: TParserMethod<T>): IStreamCallback;
   end;
 
 implementation
 
 { TOpenAIStream<T> }
 
-constructor TOpenAIStream<T>.Create(AResponse: TStringStream; AEvent: TOpenAIStreamEvent<T>;
+constructor TOpenAIStream<T>.Create(AResponse: TStringStream; AEvent: TStreamCallbackEvent<T>;
   AParser: TParserMethod<T>);
 begin
   inherited Create;
@@ -41,12 +41,20 @@ begin
 end;
 
 class function TOpenAIStream<T>.CreateInstance(AResponse: TStringStream;
-  AEvent: TOpenAIStreamEvent<T>; AParser: TParserMethod<T>): IStreamCallback;
+  AEvent: TStreamCallbackEvent<T>; AParser: TParserMethod<T>): IStreamCallback;
 begin
   Result := TOpenAIStream<T>.Create(AResponse, AEvent, AParser);
 end;
 
 function TOpenAIStream<T>.GetOnStream: TReceiveDataCallback;
+
+{--- Refer to https://platform.openai.com/docs/api-reference/chat/streaming }
+
+// The chat completion chunk object
+// data: {"id":"chatcmpl-123","object":"chat.completion.chunk","created":1694268190,"model":"gpt-4o-mini", "system_fingerprint": "fp_44709d6fcb", "choices":[{"index":0,"delta":{"role":"assistant","content":""},"logprobs":null,"finish_reason":null}]}
+// data: {"id":"chatcmpl-123","object":"chat.completion.chunk","created":1694268190,"model":"gpt-4o-mini", "system_fingerprint": "fp_44709d6fcb", "choices":[{"index":0,"delta":{"content":"Hello"},"logprobs":null,"finish_reason":null}]}
+// ...
+
 begin
   Result :=
     procedure (const Sender: TObject; AContentLength,
