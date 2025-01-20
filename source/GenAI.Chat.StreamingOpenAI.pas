@@ -19,7 +19,7 @@ type
     FResponse: TStringStream;
     FLineFeedPosition: Integer;
     FEvent: TStreamCallbackEvent<T>;
-    FParseFunc: TParserMethod<T>;
+    Parse: TParserMethod<T>;
     function GetOnStream: TReceiveDataCallback;
   public
     constructor Create(AResponse: TStringStream; AEvent: TStreamCallbackEvent<T>; AParser: TParserMethod<T>);
@@ -37,12 +37,14 @@ begin
   FResponse := AResponse;
   FLineFeedPosition := 0;
   FEvent := AEvent;
-  FParseFunc := AParser;
+  Parse := AParser;
 end;
 
 class function TOpenAIStream<T>.CreateInstance(AResponse: TStringStream;
   AEvent: TStreamCallbackEvent<T>; AParser: TParserMethod<T>): IStreamCallback;
 begin
+  if not Assigned(AParser) then
+    raise Exception.Create('Initialization with an undefined or null parser instance is strictly prohibited.');
   Result := TOpenAIStream<T>.Create(AResponse, AEvent, AParser);
 end;
 
@@ -63,7 +65,7 @@ begin
       ResponseBuffer: string;
       CurrentLine: string;
       IsDone: Boolean;
-      ParsedData: string;
+      Data: string;
       Chunk: T;
       LineFeed: Integer;
     begin
@@ -87,14 +89,14 @@ begin
                 Continue;
               end;
 
-            ParsedData := CurrentLine.Replace('data: ', '').Trim([' ', #13, #10]);
-            IsDone := ParsedData.ToUpper = '[DONE]';
+            Data := CurrentLine.Replace('data: ', '').Trim([' ', #13, #10]);
+            IsDone := Data.ToUpper = '[DONE]';
 
             Chunk := nil;
             if not IsDone then
               begin
                 try
-                  Chunk := FParseFunc(ParsedData);
+                  Chunk := Parse(Data);
                 except
                   on E: Exception do
                   Chunk := nil;
