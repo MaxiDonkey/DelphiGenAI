@@ -483,18 +483,17 @@ begin
 end;
 
 procedure TUrlParam.Check(const Name: string);
+var
+  Params: TArray<string>;
 begin
   var Items := FValue.Split(['&']);
   FValue := EmptyStr;
   for var Item in Items do
     begin
       if not Item.StartsWith(Name + '=') then
-        begin
-          if FValue.IsEmpty then
-            FValue := Item else
-            FValue := FValue + '&' + Item;
-        end;
+        Params := Params + [Item];
     end;
+  FValue := string.Join('&', Params);
 end;
 
 constructor TUrlParam.Create;
