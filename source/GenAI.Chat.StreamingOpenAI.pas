@@ -19,7 +19,7 @@ type
     FResponse: TStringStream;
     FLineFeedPosition: Integer;
     FEvent: TStreamCallbackEvent<T>;
-    FParser: TParserMethod<T>;
+    FParseFunc: TParserMethod<T>;
     function GetOnStream: TReceiveDataCallback;
   public
     constructor Create(AResponse: TStringStream; AEvent: TStreamCallbackEvent<T>; AParser: TParserMethod<T>);
@@ -37,7 +37,7 @@ begin
   FResponse := AResponse;
   FLineFeedPosition := 0;
   FEvent := AEvent;
-  FParser := AParser;
+  FParseFunc := AParser;
 end;
 
 class function TOpenAIStream<T>.CreateInstance(AResponse: TStringStream;
@@ -94,7 +94,7 @@ begin
             if not IsDone then
               begin
                 try
-                  Chunk := FParser(ParsedData);
+                  Chunk := FParseFunc(ParsedData);
                 except
                   on E: Exception do
                   Chunk := nil;
