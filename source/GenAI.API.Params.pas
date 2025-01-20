@@ -621,6 +621,7 @@ end;
 constructor TJSONParam.Create;
 begin
   FJSON := TJSONObject.Create;
+  FIsDetached := False;
 end;
 
 procedure TJSONParam.Delete(const Key: string);
