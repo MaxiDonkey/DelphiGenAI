@@ -1,5 +1,12 @@
 unit GenAI.Exceptions;
 
+{-------------------------------------------------------------------------------
+
+      Github repository :  https://github.com/MaxiDonkey/DelphiGenAI
+      Visit the Github repository for the documentation and use examples
+
+ ------------------------------------------------------------------------------}
+
 interface
 
 uses

@@ -1,5 +1,12 @@
 unit GenAI.NetEncoding.Base64;
 
+{-------------------------------------------------------------------------------
+
+      Github repository :  https://github.com/MaxiDonkey/DelphiGenAI
+      Visit the Github repository for the documentation and use examples
+
+ ------------------------------------------------------------------------------}
+
 interface
 
 uses
@@ -98,6 +105,27 @@ uses
   /// </remarks>
   function EncodeBase64(FileLocation : string) : string; overload;
 
+  /// <summary>
+  /// Encodes the content of a specified file into a Base64 string and retrieves its MIME type.
+  /// </summary>
+  /// <param name="FileLocation">
+  /// The full path to the file that will be encoded. This path must be valid and the file must exist.
+  /// </param>
+  /// <param name="MimeType">
+  /// Outputs the MIME type of the file as a string. This parameter is passed by reference and will be updated to reflect the MIME type of the file.
+  /// </param>
+  /// <returns>
+  /// A string representing the Base64-encoded content of the file.
+  /// </returns>
+  /// <exception cref="System.Exception">
+  /// Thrown if the specified file does not exist at the provided location.
+  /// </exception>
+  /// <remarks>
+  /// This function first verifies the existence of the file specified by the path in the <paramref name="FileLocation"/>. If the file exists,
+  /// it reads the file's contents into a stream and encodes it into a Base64 string. Simultaneously, it determines the file's MIME type
+  /// using the built-in MIME type resolution functionality, updating the <paramref name="MimeType"/> parameter with the result.
+  /// This function is useful for converting file data into a format suitable for data transmission or as a data URI.
+  /// </remarks>
   function EncodeBase64(FileLocation : string; var MimeType: string) : string; overload;
 
   /// <summary>

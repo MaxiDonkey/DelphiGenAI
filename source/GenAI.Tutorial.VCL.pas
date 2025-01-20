@@ -16,7 +16,7 @@ uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes,
   Vcl.Graphics, Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.ExtCtrls,
   System.UITypes, Vcl.MPlayer,
-  GenAI, GenAI.Types, GenAI.Functions.Core, GenAI.Chat;
+  GenAI, GenAI.Types, GenAI.Functions.Core;
 
 type
   TToolProc = procedure (const Value: string) of object;
@@ -444,8 +444,8 @@ begin
     begin
       Params.Model('gpt-4o');
       Params.Messages([
-          Payload.System('Tu es un présentateur météo sur une chaîne télé de grande écoute.'),
-          Payload.User(Value)]);
+          FromSystem('Tu es un présentateur météo sur une chaîne télé de grande écoute.'),
+          FromUser(Value)]);
       Params.MaxCompletionTokens(1024);
       Params.Stream;
     end,
