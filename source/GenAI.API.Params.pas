@@ -21,7 +21,8 @@ type
   /// The type of the argument that the referenced procedure will accept.
   /// </param>
   /// <remarks>
-  /// This type is useful for defining callbacks or procedures that operate on a variable of type T, allowing for more flexible and reusable code.
+  /// This type is useful for defining callbacks or procedures that operate on a variable of type T,
+  /// allowing for more flexible and reusable code.
   /// </remarks>
   TProcRef<T> = reference to procedure(var Arg: T);
 
