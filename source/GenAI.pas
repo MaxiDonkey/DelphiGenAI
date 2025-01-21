@@ -11,7 +11,7 @@ interface
 
 uses
   System.SysUtils, System.Classes, GenAI.API, GenAI.API.Params, GenAI.Models,
-  GenAI.Embeddings, GenAI.Audio, GenAI.Chat;
+  GenAI.Functions.Core, GenAI.Embeddings, GenAI.Audio, GenAI.Chat, GenAI.Moderation;
 
 type
   /// <summary>
@@ -33,21 +33,51 @@ type
     procedure SetBaseUrl(const Value: string);
 
     function GetAudioRoute: TAudioRoute;
+    function GetChatRoute: TChatRoute;
     function GetEmbeddingsRoute: TEmbeddingsRoute;
     function GetModelsRoute: TModelsRoute;
-    function GetChatRoute: TChatRoute;
+    function GetModerationRoute: TModerationRoute;
 
-    property Audio: TAudioRoute read GetAudioRoute;
-    property Embeddings: TEmbeddingsRoute read GetEmbeddingsRoute;
-    property Models: TModelsRoute read GetModelsRoute;
     /// <summary>
-    /// Provides access to the chat completion API.
-    /// Allows for interaction with models fine-tuned for instruction-based dialogue.
+    /// Provides routes to handle audio-related requests including speech generation, transcription, and translation.
     /// </summary>
-    /// <returns>
-    /// An instance of TChatRoute for chat-related operations.
-    /// </returns>
+    /// <remarks>
+    /// This class offers a set of methods to interact with OpenAI's API for generating speech from text,
+    /// transcribing audio into text, and translating audio into English. It supports both synchronous and asynchronous
+    /// operations to accommodate different application needs.
+    /// </remarks>
+    property Audio: TAudioRoute read GetAudioRoute;
+    /// <summary>
+    /// Handles the routing and execution of chat-related API requests within the application,
+    /// facilitating interaction with AI models for generating chat completions.
+    /// </summary>
+    /// <remarks>
+    /// TChatRoute is designed to manage chat interaction requests and responses, providing
+    /// methods for both synchronous and asynchronous operations. This class plays a pivotal
+    /// role in integrating and managing the AI-driven chat functionalities within diverse
+    /// software architectures.
+    /// </remarks>
     property Chat: TChatRoute read GetChatRoute;
+    /// <summary>
+    /// Provides routes for creating embeddings via the OpenAI API.
+    /// </summary>
+    /// <remarks>
+    /// This class offers methods to asynchronously or synchronously create embeddings based on the parameters
+    /// provided by the caller. It utilizes TGenAIRoute as a base to inherit API communication capabilities.
+    /// </remarks>
+    property Embeddings: TEmbeddingsRoute read GetEmbeddingsRoute;
+    /// <summary>
+    /// Provides routes for managing model data via API calls, including listing, retrieving, and deleting models.
+    /// </summary>
+    /// <remarks>
+    /// The TModelsRoute class includes methods that facilitate asynchronous and synchronous operations
+    /// to list, delete, and retrieve OpenAI models through the API. It acts as a controller for the
+    /// interaction with the OpenAI model endpoints.
+    /// </remarks>
+    property Models: TModelsRoute read GetModelsRoute;
+
+
+    property Moderation: TModerationRoute read GetModerationRoute;
 
     /// <summary>
     /// the main API object used for making requests.
@@ -104,9 +134,10 @@ type
     FAPI: TGenAIAPI;
 
     FAudioRoute: TAudioRoute;
+    FChatRoute: TChatRoute;
     FEmbeddingsRoute: TEmbeddingsRoute;
     FModelsRoute: TModelsRoute;
-    FChatRoute: TChatRoute;
+    FModerationRoute: TModerationRoute;
 
     function GetAPI: TGenAIAPI;
     function GetAPIKey: string;
@@ -115,9 +146,10 @@ type
     procedure SetBaseUrl(const Value: string);
 
     function GetAudioRoute: TAudioRoute;
+    function GetChatRoute: TChatRoute;
     function GetEmbeddingsRoute: TEmbeddingsRoute;
     function GetModelsRoute: TModelsRoute;
-    function GetChatRoute: TChatRoute;
+    function GetModerationRoute: TModerationRoute;
   public
     /// <summary>
     /// the main API object used for making requests.
@@ -152,6 +184,60 @@ type
     constructor Create(const AAPIKey: string); overload;
     destructor Destroy; override;
   end;
+
+  {$REGION 'GenAI.API.Params'}
+
+  /// <summary>
+  /// Represents a utility class for managing URL parameters and constructing query strings.
+  /// </summary>
+  /// <remarks>
+  /// This class allows the addition of key-value pairs to construct a query string,
+  /// which can be appended to a URL for HTTP requests. It provides overloads for adding
+  /// various types of values, including strings, integers, booleans, doubles, and arrays.
+  /// </remarks>
+  TUrlParam = GenAI.API.Params.TUrlParam;
+
+  /// <summary>
+  /// Represents a utility class for managing JSON objects and constructing JSON structures dynamically.
+  /// </summary>
+  /// <remarks>
+  /// This class provides methods to add, remove, and manipulate key-value pairs in a JSON object.
+  /// It supports various data types, including strings, integers, booleans, dates, arrays, and nested JSON objects.
+  /// </remarks>
+  TJSONParam = GenAI.API.Params.TJSONParam;
+
+  /// <summary>
+  /// Represents a base class for all classes obtained after deserialization.
+  /// </summary>
+  /// <remarks>
+  /// This class is designed to store the raw JSON string returned by the API,
+  /// allowing applications to access the original JSON response if needed.
+  /// </remarks>
+  TJSONFingerprint = GenAI.API.Params.TJSONFingerprint;
+
+  /// <summary>
+  /// A custom JSON interceptor for handling string-to-string conversions in JSON serialization and deserialization.
+  /// </summary>
+  /// <remarks>
+  /// This interceptor is designed to override the default behavior of JSON serialization
+  /// and deserialization for string values, ensuring compatibility with specific formats
+  /// or custom requirements.
+  /// </remarks>
+  TJSONInterceptorStringToString = GenAI.API.Params.TJSONInterceptorStringToString;
+
+  {$ENDREGION}
+
+  {$REGION 'GenAI.Functions.Core'}
+
+  /// <summary>
+  /// Interface defining the core structure and functionality of a function in the system.
+  /// </summary>
+  /// <remarks>
+  /// This interface outlines the basic properties and methods that any function implementation must include.
+  /// </remarks>
+  IFunctionCore = GenAI.Functions.Core.IFunctionCore;
+
+  {$ENDREGION}
 
   {$REGION 'GenAI.Audio'}
 
@@ -687,6 +773,132 @@ type
 
   {$ENDREGION}
 
+  {$REGION 'GenAI.Moderation'}
+
+  /// <summary>
+  /// Represents a text moderation parameter for a JSON object, enabling the configuration
+  /// of text inputs to be classified for moderation purposes.
+  /// </summary>
+  /// <remarks>
+  /// This class provides methods to define the type and content of text data to be
+  /// analyzed for potentially harmful content. It is specifically designed for use
+  /// in moderation APIs to assess textual content.
+  /// </remarks>
+  TTextModerationParams = GenAI.Moderation.TTextModerationParams;
+
+  /// <summary>
+  /// Represents a URL moderation parameter for a JSON object, enabling the configuration
+  /// of URLs to be classified for moderation purposes.
+  /// </summary>
+  /// <remarks>
+  /// This class provides methods to define and handle URLs as input for moderation.
+  /// It supports both direct web URLs and local file paths that can be encoded into
+  /// base64 format for evaluation by the moderation API.
+  /// </remarks>
+  TUrlModerationParams = GenAI.Moderation.TUrlModerationParams;
+
+  /// <summary>
+  /// Represents an image moderation parameter for a JSON object, enabling the configuration
+  /// of image inputs to be classified for moderation purposes.
+  /// </summary>
+  /// <remarks>
+  /// This class provides methods to define the type and content of image data, either
+  /// via direct URLs or base64-encoded strings, to be analyzed for potentially harmful content.
+  /// It is specifically designed for use in moderation APIs to assess image content.
+  /// </remarks>
+  TImageModerationParams = GenAI.Moderation.TImageModerationParams;
+
+  /// <summary>
+  /// Represents the parameters for moderation requests, enabling configuration
+  /// for input data and model selection to classify content for moderation purposes.
+  /// </summary>
+  /// <remarks>
+  /// This class provides methods to configure and handle inputs for moderation,
+  /// such as text, image URLs, or an array of mixed inputs. It also allows
+  /// specifying the moderation model to use.
+  /// </remarks>
+  TModerationParams = GenAI.Moderation.TModerationParams;
+
+  /// <summary>
+  /// Represents the moderation categories used to classify content as potentially harmful.
+  /// Each category indicates a specific type of harmful content, such as harassment,
+  /// violence, or hate speech.
+  /// </summary>
+  /// <remarks>
+  /// This class provides properties for each moderation category. These properties
+  /// are boolean values indicating whether the corresponding category is flagged
+  /// for the given input.
+  /// </remarks>
+  TModerationCategories = GenAI.Moderation.TModerationCategories;
+
+  /// <summary>
+  /// Represents the scores for various moderation categories, providing numerical
+  /// values that indicate the likelihood of content falling into specific harmful
+  /// categories.
+  /// </summary>
+  /// <remarks>
+  /// This class defines properties to store scores for multiple categories, such as
+  /// hate, harassment, violence, and others. The scores range from 0 to 1, where
+  /// higher values indicate a stronger likelihood of the content being flagged for
+  /// the respective category.
+  /// </remarks>
+  TModerationCategoryScores = GenAI.Moderation.TModerationCategoryScores;
+
+  /// <summary>
+  /// Represents a moderation category applied to various input types, providing
+  /// details on how different moderation categories are assigned based on input.
+  /// </summary>
+  /// <remarks>
+  /// This class provides properties to retrieve the specific input types (e.g., text or image)
+  /// that are associated with each moderation category. It is useful for identifying
+  /// the sources of flagged content within a moderation request.
+  /// </remarks>
+  TModerationCategoryApplied = GenAI.Moderation.TModerationCategoryApplied;
+
+  /// <summary>
+  /// Represents a flagged item that contains information about a harmful content category
+  /// and its associated score as determined by a moderation model.
+  /// </summary>
+  /// <remarks>
+  /// This record is used to store details about content that has been flagged during
+  /// moderation, including the category of harm and its confidence score. It is
+  /// typically part of a collection of flagged items in moderation results.
+  /// </remarks>
+  TFlaggedItem = GenAI.Moderation.TFlaggedItem;
+
+  /// <summary>
+  /// Represents the result of a moderation process, including information about
+  /// flagged categories, their confidence scores, and the associated input types.
+  /// </summary>
+  /// <remarks>
+  /// This class provides a detailed overview of the moderation analysis, including
+  /// which categories were flagged, the confidence scores for each category, and
+  /// the types of inputs (e.g., text or image) associated with flagged categories.
+  /// </remarks>
+  TModerationResult = GenAI.Moderation.TModerationResult;
+
+  /// <summary>
+  /// Represents the overall moderation response, including results, model information,
+  /// and a unique identifier for the moderation request.
+  /// </summary>
+  /// <remarks>
+  /// This class serves as the main container for moderation data, encapsulating
+  /// results from the moderation process, the model used, and the unique request ID.
+  /// </remarks>
+  TModeration = GenAI.Moderation.TModeration;
+
+  /// <summary>
+  /// Manages asynchronous chat callBacks for a chat request using <c>TModeration</c> as the response type.
+  /// </summary>
+  /// <remarks>
+  /// The <c>TAsynModeration</c> type extends the <c>TAsynParams&lt;TModeration&gt;</c> record to handle the lifecycle of an asynchronous chat operation.
+  /// It provides event handlers that trigger at various stages, such as when the operation starts, completes successfully, or encounters an error.
+  /// This structure facilitates non-blocking chat operations and is specifically tailored for scenarios where multiple choices from a chat model are required.
+  /// </remarks>
+  TAsynModeration = GenAI.Moderation.TAsynModeration;
+
+  {$ENDREGION}
+
 function FromDeveloper(const Content: string; const Name: string = ''):TMessagePayload;
 function FromSystem(const Content: string; const Name: string = ''):TMessagePayload;
 function FromUser(const Content: string; const Name: string = ''):TMessagePayload; overload;
@@ -778,6 +990,7 @@ begin
   FEmbeddingsRoute.Free;
   FModelsRoute.Free;
   FChatRoute.Free;
+  FModerationRoute.Free;
   FAPI.Free;
   inherited;
 end;
@@ -811,6 +1024,13 @@ begin
   if not Assigned(FModelsRoute) then
     FModelsRoute := TModelsRoute.CreateRoute(API);
   Result := FModelsRoute;
+end;
+
+function TGenAI.GetModerationRoute: TModerationRoute;
+begin
+  if not Assigned(FModerationRoute) then
+    FModerationRoute := TModerationRoute.CreateRoute(API);
+  Result := FModerationRoute;
 end;
 
 function TGenAI.GetChatRoute: TChatRoute;

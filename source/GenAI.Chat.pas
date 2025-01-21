@@ -2919,7 +2919,7 @@ end;
 procedure TAudio.SaveToFile(const FileName: string);
 begin
   if FileName.Trim.IsEmpty then
-    raise Exception.Create('File record aborted. SaveToFile requires a filename.');
+    raise Exception.Create('Operation aborted: SaveToFile requires a filename.');
 
   try
     Self.FFileName := FileName;

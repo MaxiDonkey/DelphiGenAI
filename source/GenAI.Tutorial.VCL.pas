@@ -15,8 +15,8 @@ interface
 uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes,
   Vcl.Graphics, Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.ExtCtrls,
-  System.UITypes, Vcl.MPlayer,
-  GenAI, GenAI.Types, GenAI.Functions.Core;
+  System.UITypes, Vcl.MPlayer, system.JSON,
+  GenAI, GenAI.Types;
 
 type
   TToolProc = procedure (const Value: string) of object;
@@ -28,6 +28,8 @@ type
   TVCLTutorialHub = class
   private
     FMemo1: TMemo;
+    FMemo2: TMemo;
+    FMemo3: TMemo;
     FButton: TButton;
     FModelId: string;
     FFileName: string;
@@ -40,6 +42,10 @@ type
     procedure SetButton(const Value: TButton);
     procedure SetMemo1(const Value: TMemo);
     procedure SetFileName(const Value: string);
+    procedure SetMemo2(const Value: TMemo);
+    procedure SetMemo3(const Value: TMemo);
+    procedure SetJSONRequest(const Value: string);
+    procedure SetJSONResponse(const Value: string);
   public
     procedure PlayAudio;
     property Client: IGenAI read FClient write FClient;
@@ -49,6 +55,22 @@ type
     /// Gets or sets the first memo component for displaying messages or data.
     /// </summary>
     property Memo1: TMemo read FMemo1 write SetMemo1;
+    /// <summary>
+    /// Gets or sets the second memo component for displaying messages or data.
+    /// </summary>
+    property Memo2: TMemo read FMemo2 write SetMemo2;
+    /// <summary>
+    /// Gets or sets the third memo component for displaying messages or data.
+    /// </summary>
+    property Memo3: TMemo read FMemo3 write SetMemo3;
+    /// <summary>
+    /// Sets text for displaying JSON request.
+    /// </summary>
+    property JSONRequest: string write SetJSONRequest;
+    /// <summary>
+    /// Sets text for displaying JSON response.
+    /// </summary>
+    property JSONResponse: string write SetJSONResponse;
     /// <summary>
     /// Gets or sets the button component used to trigger actions or handle cancellation.
     /// </summary>
@@ -78,7 +100,9 @@ type
     procedure DisplayWeatherStream(const Value: string);
     procedure DisplayWeatherAudio(const Value: string);
     procedure SpeechChat(const  Value: string);
-    constructor Create(const AClient: IGenAI; const AMemo1: TMemo; const AButton: TButton; const AMediaPlayer: TMediaPlayer);
+    procedure JSONRequestClear;
+    procedure JSONResponseClear;
+    constructor Create(const AClient: IGenAI; const AMemo1, AMemo2, AMemo3: TMemo; const AButton: TButton; const AMediaPlayer: TMediaPlayer);
   end;
 
   procedure Cancellation(Sender: TObject);
@@ -97,9 +121,13 @@ type
   procedure Display(Sender: TObject; Value: TTranscription); overload;
   procedure Display(Sender: TObject; Value: TTranslation); overload;
   procedure Display(Sender: TObject; Value: TChat); overload;
+  procedure Display(Sender: TObject; Value: TModeration); overload;
+  procedure Display(Sender: TObject; Value: TModerationResult); overload;
 
   procedure DisplayStream(Sender: TObject; Value: string); overload;
   procedure DisplayStream(Sender: TObject; Value: TChat); overload;
+
+  procedure DisplayChunk(Value: TChat);
 
   procedure DisplayAudio(Sender: TObject; Value: TChat);
   procedure DisplayAudioEx(Sender: TObject; Value: TChat);
@@ -155,6 +183,7 @@ begin
   Display(Sender, 'Please wait...');
   Display(Sender);
   TutorialHub.Cancel := False;
+  TutorialHub.JSONResponseClear;
 end;
 
 procedure Display(Sender: TObject; Value: string);
@@ -201,6 +230,8 @@ end;
 
 procedure Display(Sender: TObject; Value: TModel);
 begin
+  if not Value.JSONResponse.IsEmpty then
+    TutorialHub.JSONResponse := Value.JSONResponse;
   Display(Sender, [
     EmptyStr,
     F('id', Value.Id),
@@ -209,11 +240,11 @@ begin
     F('created', UnixDateTimeToString(Value.Created))
   ]);
   Display(Sender, EmptyStr);
-  Display(Sender, Value.JSONResponse);
 end;
 
 procedure Display(Sender: TObject; Value: TModels);
 begin
+  TutorialHub.JSONResponse := Value.JSONResponse;
   Display(Sender, 'Models list');
   if System.Length(Value.Data) = 0 then
     begin
@@ -226,11 +257,11 @@ begin
       Application.ProcessMessages;
     end;
   Display(Sender);
-  Display(Sender, Value.JSONResponse);
 end;
 
 procedure Display(Sender: TObject; Value: TModelDeletion);
 begin
+  TutorialHub.JSONResponse := Value.JSONResponse;
   Display(Sender, [
     EmptyStr,
     F('id', Value.Id),
@@ -238,11 +269,12 @@ begin
     F('deleted', BoolToStr(Value.Deleted, True))
   ]);
   Display(Sender);
-  Display(Sender, Value.JSONResponse);
 end;
 
 procedure Display(Sender: TObject; Value: TEmbedding);
 begin
+  if not Value.JSONResponse.IsEmpty then
+    TutorialHub.JSONResponse := Value.JSONResponse;
   var index := 1;
   for var Item in Value.Embedding do
     begin
@@ -254,12 +286,14 @@ end;
 
 procedure Display(Sender: TObject; Value: TEmbeddings);
 begin
+  TutorialHub.JSONResponse := Value.JSONResponse;
   for var Item in Value.Data do
     Display(Sender, Item);
 end;
 
 procedure Display(Sender: TObject; Value: TSpeechResult);
 begin
+  TutorialHub.JSONResponse := Value.JSONResponse;
   if TutorialHub.FileName.IsEmpty then
     raise Exception.Create('Set filename value in HFTutorial instance');
   Value.SaveToFile(TutorialHub.FileName);
@@ -268,18 +302,21 @@ end;
 
 procedure Display(Sender: TObject; Value: TTranscription);
 begin
+  TutorialHub.JSONResponse := Value.JSONResponse;
   Display(Sender, Value.Text);
   Display(Sender);
 end;
 
 procedure Display(Sender: TObject; Value: TTranslation);
 begin
+  TutorialHub.JSONResponse := Value.JSONResponse;
   Display(Sender, Value.Text);
   Display(Sender);
 end;
 
 procedure Display(Sender: TObject; Value: TChat);
 begin
+  TutorialHub.JSONResponse := Value.JSONResponse;
   for var Item in Value.Choices do
     if Item.FinishReason = TFinishReason.fr_tool_calls then
       begin
@@ -300,7 +337,24 @@ begin
         Display(Sender, Item.Message.Content);
       end;
   Display(Sender, sLineBreak);
-  Display(Sender, Value.JSONResponse);
+end;
+
+procedure Display(Sender: TObject; Value: TModeration);
+begin
+  TutorialHub.JSONResponse := Value.JSONResponse;
+  for var Item in Value.Results do
+    Display(Sender, Item);
+  Display(Sender);
+end;
+
+procedure Display(Sender: TObject; Value: TModerationResult);
+begin
+  for var Item in Value.FlaggedDetail do
+    Display(Sender, [
+      EmptyStr,
+      F(Item.Category.ToString, Item.Score.ToString(ffNumber, 3, 3))
+    ]);
+  Display(Sender);
 end;
 
 procedure DisplayStream(Sender: TObject; Value: string);
@@ -347,27 +401,43 @@ end;
 procedure DisplayStream(Sender: TObject; Value: TChat);
 begin
   if Assigned(Value) then
-    for var Item in Value.Choices do
-      begin
-        DisplayStream(Sender, Item.Delta.Content);
-      end;
+    begin
+      for var Item in Value.Choices do
+        begin
+          DisplayStream(Sender, Item.Delta.Content);
+        end;
+      DisplayChunk(Value);
+    end;
+end;
+
+procedure DisplayChunk(Value: TChat);
+begin
+  var JSONValue := TJSONObject.ParseJSONValue(Value.JSONResponse);
+  TutorialHub.Memo3.Lines.BeginUpdate;
+  try
+    Display(TutorialHub.Memo3, JSONValue.ToString);
+  finally
+    TutorialHub.Memo3.Lines.EndUpdate;
+    JSONValue.Free;
+  end;
 end;
 
 procedure DisplayAudio(Sender: TObject; Value: TChat);
 begin
+  TutorialHub.JSONResponse := Value.JSONResponse;
   if TutorialHub.FileName.IsEmpty then
     raise Exception.Create('Set filename value in HFTutorial instance');
   Value.Choices[0].Message.Audio.SaveToFile(TutorialHub.FileName);
   Display(Sender, Value.Choices[0].Message.Audio.Transcript);
   TutorialHub.PlayAudio;
   Display(Sender, sLineBreak);
-  Display(Sender, Value.JSONResponse);
 end;
 
 procedure DisplayAudioEx(Sender: TObject; Value: TChat);
 begin
+  TutorialHub.JSONResponse := Value.JSONResponse;
   DisplayStream(Sender, Value.Choices[0].Message.Content);
-  TutorialHub.SpeechChat(Value.Choices[0].Message.Content)
+  TutorialHub.SpeechChat(Value.Choices[0].Message.Content);
 end;
 
 function F(const Name, Value: string): string;
@@ -400,11 +470,13 @@ end;
 
 { TVCLTutorialHub }
 
-constructor TVCLTutorialHub.Create(const AClient: IGenAI; const AMemo1: TMemo;
+constructor TVCLTutorialHub.Create(const AClient: IGenAI; const AMemo1, AMemo2, AMemo3: TMemo;
   const AButton: TButton; const AMediaPlayer: TMediaPlayer);
 begin
   inherited Create;
   Memo1 := AMemo1;
+  Memo2 := AMemo2;
+  Memo3 := AMemo3;
   Button := AButton;
   FMediaPlayer := AMediaPlayer;
   Client := AClient;
@@ -459,6 +531,16 @@ begin
     end);
 end;
 
+procedure TVCLTutorialHub.JSONRequestClear;
+begin
+  Memo2.Clear;
+end;
+
+procedure TVCLTutorialHub.JSONResponseClear;
+begin
+  Memo3.Clear;
+end;
+
 procedure TVCLTutorialHub.OnButtonClick(Sender: TObject);
 begin
   Cancel := True;
@@ -487,10 +569,36 @@ begin
   FMediaPlayer.Close;
 end;
 
+procedure TVCLTutorialHub.SetJSONRequest(const Value: string);
+begin
+  Memo2.Lines.Text := Value;
+  Memo2.SelStart := 0;
+  Application.ProcessMessages;
+end;
+
+procedure TVCLTutorialHub.SetJSONResponse(const Value: string);
+begin
+  Memo3.Lines.Text := Value;
+  Memo2.SelStart := 0;
+  Application.ProcessMessages;
+end;
+
 procedure TVCLTutorialHub.SetMemo1(const Value: TMemo);
 begin
   FMemo1 := Value;
   FMemo1.ScrollBars := TScrollStyle.ssVertical;
+end;
+
+procedure TVCLTutorialHub.SetMemo2(const Value: TMemo);
+begin
+  FMemo2 := Value;
+  FMemo2.ScrollBars := TScrollStyle.ssBoth;
+end;
+
+procedure TVCLTutorialHub.SetMemo3(const Value: TMemo);
+begin
+  FMemo3 := Value;
+  FMemo3.ScrollBars := TScrollStyle.ssBoth;
 end;
 
 procedure TVCLTutorialHub.SpeechChat(const Value: string);

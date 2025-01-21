@@ -216,6 +216,31 @@ type
 
   {$ENDREGION}
 
+  {$REGION 'GenAI.Moderation'}
+
+  THarmCategories = (
+    hate,
+    hateThreatening,
+    harassment,
+    harassmentThreatening,
+    illicit,
+    illicitViolent,
+    selfHarm,
+    selfHarmIntent,
+    selfHarmInstructions,
+    sexual,
+    sexualMinors,
+    violence,
+    violenceGraphic
+  );
+
+  THarmCategoriesHelper = record Helper for THarmCategories
+    function ToString: string;
+    class function Create(const Value: string): TEncodingFormat; static;
+  end;
+
+  {$ENDREGION}
+
 implementation
 
 uses
@@ -567,6 +592,51 @@ begin
       Exit('float');
     base64:
       Exit('base64');
+  end;
+end;
+
+{ THarmCategoriesHelper }
+
+class function THarmCategoriesHelper.Create(
+  const Value: string): TEncodingFormat;
+begin
+  Result := TEnumValueRecovery.TypeRetrieve<TEncodingFormat>(Value,
+    ['hate', 'hate threatening', 'harassment', 'harassment threatening',
+     'illicit', 'illicit violent', 'self harm', 'self harm intent',
+     'self harm instructions', 'sexual', 'sexual minors', 'violence',
+     'violence graphic'
+    ]);
+end;
+
+function THarmCategoriesHelper.ToString: string;
+begin
+  case Self of
+    hate:
+      Exit('hate');
+    hateThreatening:
+      Exit('hate threatening');
+    harassment:
+      Exit('harassment');
+    harassmentThreatening:
+      Exit('harassment threatening');
+    illicit:
+      Exit('illicit');
+    illicitViolent:
+      Exit('illicit violent');
+    selfHarm:
+      Exit('self harm');
+    selfHarmIntent:
+      Exit('self harm intent');
+    selfHarmInstructions:
+      Exit('self harm instructions');
+    sexual:
+      Exit('sexual');
+    sexualMinors:
+      Exit('sexual minors');
+    violence:
+      Exit('violence');
+    violenceGraphic:
+      Exit('violence graphic');
   end;
 end;
 

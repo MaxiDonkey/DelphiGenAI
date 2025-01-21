@@ -44,7 +44,7 @@ class function TOpenAIStream<T>.CreateInstance(AResponse: TStringStream;
   AEvent: TStreamCallbackEvent<T>; AParser: TParserMethod<T>): IStreamCallback;
 begin
   if not Assigned(AParser) then
-    raise Exception.Create('Broadcast failed. An analysis method must be defined.');
+    raise Exception.Create('Streaming failed. A deserialization method is required.');
   Result := TOpenAIStream<T>.Create(AResponse, AEvent, AParser);
 end;
 

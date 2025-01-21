@@ -386,17 +386,15 @@ type
   /// </remarks>
   TJSONFingerprint = class
   private
-    FJSONResponse: TArray<string>;
+    FJSONResponse: string;
   public
     /// <summary>
-    /// Gets or sets the raw JSON string array returned by the API.
+    /// Gets or sets the raw JSON string returned by the API.
     /// </summary>
     /// <remarks>
     /// Typically, the API returns a single JSON string, which is stored in this property.
-    /// However, if the API response is streamed, this property will contain all the chunks
-    /// received during the streaming process, allowing for complete reconstruction of the response.
     /// </remarks>
-    property JSONResponse: TArray<string> read FJSONResponse write FJSONResponse;
+    property JSONResponse: string read FJSONResponse write FJSONResponse;
   end;
 
   /// <summary>

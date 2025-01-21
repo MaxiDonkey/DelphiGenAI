@@ -789,8 +789,12 @@ begin
   {--- Add JSON response if class inherits from TJSONFingerprint class. }
   if Assigned(Result) and T.InheritsFrom(TJSONFingerprint) then
     begin
-      var JSONFingerprint := (Result as TJSONFingerprint);
-      JSONFingerprint.JSONResponse := JSONFingerprint.JSONResponse + [ResponseText];
+      var JSONValue := TJSONObject.ParseJSONValue(ResponseText);
+      try
+        (Result as TJSONFingerprint).JSONResponse := JSONValue.Format();
+      finally
+        JSONValue.Free;
+      end;
     end;
 end;
 
