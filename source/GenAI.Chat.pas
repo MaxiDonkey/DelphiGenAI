@@ -2467,7 +2467,7 @@ end;
 
 class function TImageUrl.New(const PathLocation: string; const Detail: TImageDetail): TImageUrl;
 begin
-  Result := TImageUrl.Create.Url( ProcessUrlOrEncodeData(PathLocation) );
+  Result := TImageUrl.Create.Url( GetUrlOrEncodeData(PathLocation) );
   if Detail <> id_auto then
     Result := Result.Detail(Detail);
 end;
