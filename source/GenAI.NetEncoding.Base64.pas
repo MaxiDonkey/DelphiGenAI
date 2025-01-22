@@ -215,7 +215,7 @@ begin
   Result := Result.ToLower;
 end;
 
-function GetUrlOrEncodeData(const Value: string): string;
+function GetUrlOrEncodeBase64(const Value: string): string;
 begin
   if Value.StartsWith('http') then
     Exit(Value);
