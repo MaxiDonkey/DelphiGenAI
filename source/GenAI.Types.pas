@@ -241,6 +241,43 @@ type
 
   {$ENDREGION}
 
+  {$REGION 'GenAI.Images'}
+
+  TResponseFormat = (
+    url,
+    b64_json
+  );
+
+  TResponseFormatHelper = record Helper for TResponseFormat
+    function ToString: string;
+    class function Create(const Value: string): TResponseFormat; static;
+  end;
+
+  TImageSize = (
+    s256x256,
+    s512x512,
+    s1024x1024,
+    s1792x1024,
+    s1024x1792
+  );
+
+  TImageSizeHelper = record Helper for TImageSize
+    function ToString: string;
+    class function Create(const Value: string): TImageSize; static;
+  end;
+
+  TImageStyle = (
+    vivid,
+    natural
+  );
+
+  TImageStyleHelper = record Helper for TImageStyle
+    function ToString: string;
+    class function Create(const Value: string): TImageStyle; static;
+  end;
+
+  {$ENDREGION}
+
 implementation
 
 uses
@@ -637,6 +674,65 @@ begin
       Exit('violence');
     violenceGraphic:
       Exit('violence graphic');
+  end;
+end;
+
+{ TResponseFormatHelper }
+
+class function TResponseFormatHelper.Create(
+  const Value: string): TResponseFormat;
+begin
+  Result := TEnumValueRecovery.TypeRetrieve<TResponseFormat>(Value, ['url', 'b64_json']);
+end;
+
+function TResponseFormatHelper.ToString: string;
+begin
+  case Self of
+    url:
+      Exit('url');
+    b64_json:
+      Exit('b64_json');
+  end;
+end;
+
+{ TImageSizeHelper }
+
+class function TImageSizeHelper.Create(const Value: string): TImageSize;
+begin
+  Result := TEnumValueRecovery.TypeRetrieve<TImageSize>(Value,
+    ['256x256', '512x512', '1024x1024', '1792x1024', '1024x1792']);
+end;
+
+function TImageSizeHelper.ToString: string;
+begin
+  case Self of
+    s256x256:
+      Exit('256x256');
+    s512x512:
+      Exit('512x512');
+    s1024x1024:
+      Exit('1024x1024');
+    s1792x1024:
+      Exit('1792x1024');
+    s1024x1792:
+      Exit('1024x1792');
+  end;
+end;
+
+{ TImageStyleHelper }
+
+class function TImageStyleHelper.Create(const Value: string): TImageStyle;
+begin
+  Result := TEnumValueRecovery.TypeRetrieve<TImageStyle>(Value, ['vivid', 'natural']);
+end;
+
+function TImageStyleHelper.ToString: string;
+begin
+  case Self of
+    vivid:
+      Exit('vivid');
+    natural:
+      Exit('natural');
   end;
 end;
 

@@ -30,6 +30,7 @@ type
     FMemo1: TMemo;
     FMemo2: TMemo;
     FMemo3: TMemo;
+    FImage: TImage;
     FButton: TButton;
     FModelId: string;
     FFileName: string;
@@ -63,6 +64,8 @@ type
     /// Gets or sets the third memo component for displaying messages or data.
     /// </summary>
     property Memo3: TMemo read FMemo3 write SetMemo3;
+
+    property Image: TImage read FImage write FImage;
     /// <summary>
     /// Sets text for displaying JSON request.
     /// </summary>
@@ -97,12 +100,15 @@ type
     property ToolCall: TToolProc read FToolCall write FToolCall;
 
     property MediaPlayer: TMediaPlayer read FMediaPlayer write FMediaPlayer;
+
+
     procedure DisplayWeatherStream(const Value: string);
     procedure DisplayWeatherAudio(const Value: string);
     procedure SpeechChat(const  Value: string);
     procedure JSONRequestClear;
     procedure JSONResponseClear;
-    constructor Create(const AClient: IGenAI; const AMemo1, AMemo2, AMemo3: TMemo; const AButton: TButton; const AMediaPlayer: TMediaPlayer);
+    constructor Create(const AClient: IGenAI; const AMemo1, AMemo2, AMemo3: TMemo;
+      const AImage: TImage; const AButton: TButton; const AMediaPlayer: TMediaPlayer);
   end;
 
   procedure Cancellation(Sender: TObject);
@@ -123,6 +129,7 @@ type
   procedure Display(Sender: TObject; Value: TChat); overload;
   procedure Display(Sender: TObject; Value: TModeration); overload;
   procedure Display(Sender: TObject; Value: TModerationResult); overload;
+  procedure Display(Sender: TObject; Value: TGeneratedImages); overload;
 
   procedure DisplayStream(Sender: TObject; Value: string); overload;
   procedure DisplayStream(Sender: TObject; Value: TChat); overload;
@@ -357,6 +364,24 @@ begin
   Display(Sender);
 end;
 
+procedure Display(Sender: TObject; Value: TGeneratedImages);
+begin
+  if not TutorialHub.FileName.IsEmpty then
+    begin
+      if not Value.Data[0].Url.IsEmpty then
+        Value.Data[0].Download(TutorialHub.FileName) else
+        Value.Data[0].SaveToFile(TutorialHub.FileName);
+    end;
+  var Stream := Value.Data[0].GetStream;
+  try
+    TutorialHub.JSONResponse := Value.JSONResponse;
+    Display(Sender, Value.Data[0].RevisedPrompt);
+    TutorialHub.Image.Picture.LoadFromStream(Stream);
+  finally
+    Stream.Free;
+  end;
+end;
+
 procedure DisplayStream(Sender: TObject; Value: string);
 var
   M: TMemo;
@@ -471,12 +496,13 @@ end;
 { TVCLTutorialHub }
 
 constructor TVCLTutorialHub.Create(const AClient: IGenAI; const AMemo1, AMemo2, AMemo3: TMemo;
-  const AButton: TButton; const AMediaPlayer: TMediaPlayer);
+  const AImage: TImage; const AButton: TButton; const AMediaPlayer: TMediaPlayer);
 begin
   inherited Create;
   Memo1 := AMemo1;
   Memo2 := AMemo2;
   Memo3 := AMemo3;
+  Image := AImage;
   Button := AButton;
   FMediaPlayer := AMediaPlayer;
   Client := AClient;

@@ -11,7 +11,8 @@ interface
 
 uses
   System.SysUtils, System.Classes, GenAI.API, GenAI.API.Params, GenAI.Models,
-  GenAI.Functions.Core, GenAI.Embeddings, GenAI.Audio, GenAI.Chat, GenAI.Moderation;
+  GenAI.Functions.Core, GenAI.Embeddings, GenAI.Audio, GenAI.Chat, GenAI.Moderation,
+  GenAI.Images;
 
 type
   /// <summary>
@@ -35,6 +36,7 @@ type
     function GetAudioRoute: TAudioRoute;
     function GetChatRoute: TChatRoute;
     function GetEmbeddingsRoute: TEmbeddingsRoute;
+    function GetImagesRoute: TImagesRoute;
     function GetModelsRoute: TModelsRoute;
     function GetModerationRoute: TModerationRoute;
 
@@ -67,6 +69,15 @@ type
     /// </remarks>
     property Embeddings: TEmbeddingsRoute read GetEmbeddingsRoute;
     /// <summary>
+    /// Represents the route handler for image-related operations using the OpenAI API.
+    /// </summary>
+    /// <remarks>
+    /// This class provides methods for creating, editing, and generating variations of images.
+    /// It supports both synchronous and asynchronous operations, making it suitable for
+    /// diverse use cases involving image generation and manipulation.
+    /// </remarks>
+    property Images: TImagesRoute read GetImagesRoute;
+    /// <summary>
     /// Provides routes for managing model data via API calls, including listing, retrieving, and deleting models.
     /// </summary>
     /// <remarks>
@@ -75,8 +86,16 @@ type
     /// interaction with the OpenAI model endpoints.
     /// </remarks>
     property Models: TModelsRoute read GetModelsRoute;
-
-
+    /// <summary>
+    /// Represents a route for handling moderation requests in the GenAI framework.
+    /// This class provides methods for evaluating moderation parameters both
+    /// synchronously and asynchronously.
+    /// </summary>
+    /// <remarks>
+    /// This class is designed to manage moderation requests by interfacing with
+    /// the GenAI API. It supports both synchronous and asynchronous operations
+    /// for evaluating content against moderation models.
+    /// </remarks>
     property Moderation: TModerationRoute read GetModerationRoute;
 
     /// <summary>
@@ -136,6 +155,7 @@ type
     FAudioRoute: TAudioRoute;
     FChatRoute: TChatRoute;
     FEmbeddingsRoute: TEmbeddingsRoute;
+    FImagesRoute: TImagesRoute;
     FModelsRoute: TModelsRoute;
     FModerationRoute: TModerationRoute;
 
@@ -150,6 +170,9 @@ type
     function GetEmbeddingsRoute: TEmbeddingsRoute;
     function GetModelsRoute: TModelsRoute;
     function GetModerationRoute: TModerationRoute;
+
+    function GetImagesRoute: TImagesRoute;
+
   public
     /// <summary>
     /// the main API object used for making requests.
@@ -899,6 +922,84 @@ type
 
   {$ENDREGION}
 
+  {$REGION 'GenAI.Images'}
+
+  /// <summary>
+  /// Represents a parameter class for creating images through the OpenAI API, enabling
+  /// the configuration of prompts, models, and other settings for image generation.
+  /// </summary>
+  /// <remarks>
+  /// This class provides methods to specify various parameters required for generating images,
+  /// such as the text prompt, model, output size, and response format. It is designed
+  /// for use with the image creation API to streamline the construction of requests.
+  /// </remarks>
+  TImageCreateParams = GenAI.Images.TImageCreateParams;
+
+  /// <summary>
+  /// Represents a parameter class for editing images through the OpenAI API, enabling
+  /// the configuration of images, masks, prompts, and other settings for image editing.
+  /// </summary>
+  /// <remarks>
+  /// This class provides methods to specify various parameters required for editing images,
+  /// such as the image file, mask, text prompt, model, output size, and response format.
+  /// It is designed for use with the image editing API to streamline the construction of requests.
+  /// </remarks>
+  TImageEditParams = GenAI.Images.TImageEditParams;
+
+  /// <summary>
+  /// Represents a parameter class for creating image variations through the OpenAI API, enabling
+  /// the configuration of images, models, and other settings for variation generation.
+  /// </summary>
+  /// <remarks>
+  /// This class provides methods to specify various parameters required for generating image variations,
+  /// such as the base image, model, output size, and response format. It is designed
+  /// for use with the image variation API to streamline the construction of requests.
+  /// </remarks>
+  TImageVariationParams = GenAI.Images.TImageVariationParams;
+
+  /// <summary>
+  /// Represents the data object for an image created through the OpenAI API.
+  /// </summary>
+  /// <remarks>
+  /// This class contains the properties of the generated image, including its URL,
+  /// base64-encoded content, and the revised prompt (if applicable).
+  /// </remarks>
+  TImageCreateData = GenAI.Images.TImageCreateData;
+
+  /// <summary>
+  /// Represents a part of the generated image, extending the <c>TImageCreateData</c> class
+  /// to include file management functionality.
+  /// </summary>
+  /// <remarks>
+  /// This class provides additional methods for handling the generated image, such as
+  /// saving it to a file or retrieving it as a stream. It is designed for scenarios where
+  /// the generated image needs to be manipulated or stored locally.
+  /// </remarks>
+  TImagePart = GenAI.Images.TImagePart;
+
+  /// <summary>
+  /// Represents the response object containing a collection of generated images
+  /// and metadata about the creation process.
+  /// </summary>
+  /// <remarks>
+  /// This class encapsulates the data returned by the OpenAI API for image generation,
+  /// including the timestamp of creation and the list of generated images. It provides
+  /// functionality for managing the lifecycle of these objects.
+  /// </remarks>
+  TGeneratedImages = GenAI.Images.TGeneratedImages;
+
+  /// <summary>
+  /// Manages asynchronous chat callBacks for a chat request using <c>TGeneratedImages</c> as the response type.
+  /// </summary>
+  /// <remarks>
+  /// The <c>TAsynImagesCreate</c> type extends the <c>TAsynParams&lt;TGeneratedImages&gt;</c> record to handle the lifecycle of an asynchronous chat operation.
+  /// It provides event handlers that trigger at various stages, such as when the operation starts, completes successfully, or encounters an error.
+  /// This structure facilitates non-blocking chat operations and is specifically tailored for scenarios where multiple choices from a chat model are required.
+  /// </remarks>
+  TAsynGeneratedImages = GenAI.Images.TAsynGeneratedImages;
+
+  {$ENDREGION}
+
 function FromDeveloper(const Content: string; const Name: string = ''):TMessagePayload;
 function FromSystem(const Content: string; const Name: string = ''):TMessagePayload;
 function FromUser(const Content: string; const Name: string = ''):TMessagePayload; overload;
@@ -988,6 +1089,7 @@ destructor TGenAI.Destroy;
 begin
   FAudioRoute.Free;
   FEmbeddingsRoute.Free;
+  FImagesRoute.Free;
   FModelsRoute.Free;
   FChatRoute.Free;
   FModerationRoute.Free;
@@ -1017,6 +1119,13 @@ begin
   if not Assigned(FEmbeddingsRoute) then
     FEmbeddingsRoute := TEmbeddingsRoute.CreateRoute(API);
   Result := FEmbeddingsRoute;
+end;
+
+function TGenAI.GetImagesRoute: TImagesRoute;
+begin
+  if not Assigned(FImagesRoute) then
+    FImagesRoute := TImagesRoute.CreateRoute(API);
+  Result := FImagesRoute;
 end;
 
 function TGenAI.GetModelsRoute: TModelsRoute;

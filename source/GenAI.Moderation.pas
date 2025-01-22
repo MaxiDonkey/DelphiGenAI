@@ -65,6 +65,7 @@ type
   /// base64 format for evaluation by the moderation API.
   /// </remarks>
   TUrlModerationParams = class(TJSONParam)
+  public
     /// <summary>
     /// Sets the URL of the resource to be moderated. This can be a direct web link
     /// or a file path for base64 encoding.
