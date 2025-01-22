@@ -707,7 +707,7 @@ end;
 
 function TUrlModerationParams.Url(const Value: string): TUrlModerationParams;
 begin
-  Result := TUrlModerationParams(Add('url', GetUrlOrEncodeData(Value)));
+  Result := TUrlModerationParams(Add('url', GetUrlOrEncodeBase64(Value)));
 end;
 
 { TModeration }
