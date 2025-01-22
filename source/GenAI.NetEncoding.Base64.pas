@@ -52,7 +52,7 @@ uses
   /// <para>If the input is a file path, resolves its MIME type and verifies if it is a supported image format.</para>
   /// <para>Encodes the file content as a Base64 data URI if it is a supported image.</para>
   /// </remarks>
-  function GetUrlOrEncodeData(const Value: string): string;
+  function GetUrlOrEncodeBase64(const Value: string): string;
 
   /// <summary>
   /// Converts a byte array into a Base64-encoded string.
