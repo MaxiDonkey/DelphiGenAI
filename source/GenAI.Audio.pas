@@ -86,14 +86,27 @@ type
     /// <exception cref="Exception">Raises an exception if the data conversion fails.</exception>
     function GetStream: TStream;
     /// <summary>
-    /// Saves the generated audio content to a specified file.
+    /// Saves the generated image to the specified file path.
     /// </summary>
-    /// <param name="FileName">The path where the audio file will be saved.</param>
+    /// <param name="FileName">
+    /// A string specifying the file path where the image will be saved.
+    /// </param>
+    /// <param name="RaiseError">
+    /// A boolean value indicating whether to raise an exception if the <c>FileName</c> is empty.
+    /// <para>
+    /// - If set to <c>True</c>, an exception will be raised for an empty file path.
+    /// </para>
+    /// <para>
+    /// - If set to <c>False</c>, the method will exit silently without saving.
+    /// </para>
+    /// </param>
     /// <remarks>
-    /// This method decodes the base64-encoded audio data from the response and writes it to a file
-    /// at the specified location. An exception is thrown if no filename is provided or if the saving process fails.
+    /// This method saves the base64-encoded image content to the specified file. Ensure that
+    /// the <c>FileName</c> parameter is valid if <c>RaiseError</c> is set to <c>True</c>.
+    /// If the <c>FileName</c> is empty and <c>RaiseError</c> is <c>False</c>, the method
+    /// will terminate without performing any operation.
     /// </remarks>
-    procedure SaveToFile(const FileName: string);
+    procedure SaveToFile(const FileName: string; const RaiseError: Boolean = True);
     /// <summary>
     /// Contains the base64-encoded string of the audio data.
     /// </summary>
@@ -648,10 +661,16 @@ begin
   end;
 end;
 
-procedure TSpeechResult.SaveToFile(const FileName: string);
+procedure TSpeechResult.SaveToFile(const FileName: string; const RaiseError: Boolean);
 begin
-  if FileName.Trim.IsEmpty then
-    raise Exception.Create('File record aborted. SaveToFile requires a filename.');
+  case RaiseError of
+    True :
+      if FileName.Trim.IsEmpty then
+        raise Exception.Create('File record aborted. SaveToFile requires a filename.');
+    else
+      if FileName.Trim.IsEmpty then
+        Exit;
+  end;
 
   try
     Self.FFileName := FileName;
