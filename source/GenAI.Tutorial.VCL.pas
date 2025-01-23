@@ -130,6 +130,9 @@ type
   procedure Display(Sender: TObject; Value: TModeration); overload;
   procedure Display(Sender: TObject; Value: TModerationResult); overload;
   procedure Display(Sender: TObject; Value: TGeneratedImages); overload;
+  procedure Display(Sender: TObject; Value: TFile); overload;
+  procedure Display(Sender: TObject; Value: TFiles); overload;
+  procedure Display(Sender: TObject; Value: TFileContent); overload;
 
   procedure DisplayStream(Sender: TObject; Value: string); overload;
   procedure DisplayStream(Sender: TObject; Value: TChat); overload;
@@ -156,19 +159,6 @@ var
   TutorialHub: TVCLTutorialHub = nil;
 
 implementation
-
-uses
-  System.DateUtils;
-
-function UnixIntToDateTime(const Value: Int64): TDateTime;
-begin
-  Result := TTimeZone.Local.ToLocalTime(UnixToDateTime(Value));
-end;
-
-function UnixDateTimeToString(const Value: Int64): string;
-begin
-  Result := DateTimeToStr(UnixIntToDateTime(Value))
-end;
 
 procedure Cancellation(Sender: TObject);
 begin
@@ -244,7 +234,7 @@ begin
     F('id', Value.Id),
     F('object', Value.&Object),
     F('owned_by', Value.OwnedBy),
-    F('created', UnixDateTimeToString(Value.Created))
+    F('created', IntUnixDateTimeToString(Value.Created))
   ]);
   Display(Sender, EmptyStr);
 end;
@@ -380,6 +370,36 @@ begin
   finally
     Stream.Free;
   end;
+end;
+
+procedure Display(Sender: TObject; Value: TFile);
+begin
+  if not Value.JSONResponse.IsEmpty then
+    TutorialHub.JSONResponse := Value.JSONResponse;
+  Display(Sender, [
+    Value.Filename,
+    F('id', [
+      Value.Id,
+      F('purpose', Value.Purpose.ToString),
+      F('created_at', IntUnixDateTimeToString(Value.CreatedAt))
+    ])
+  ]);
+  Display(Sender);
+end;
+
+procedure Display(Sender: TObject; Value: TFiles);
+begin
+  TutorialHub.JSONResponse := Value.JSONResponse;
+  for var Item in Value.Data do
+    Display(Sender, Item);
+  Display(Sender);
+end;
+
+procedure Display(Sender: TObject; Value: TFileContent);
+begin
+  TutorialHub.JSONResponse := Value.JSONResponse;
+  Display(Sender, Value.Content);
+  Display(Sender);
 end;
 
 procedure DisplayStream(Sender: TObject; Value: string);

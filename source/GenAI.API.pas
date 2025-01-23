@@ -303,6 +303,9 @@ type
     function GetFile(const Endpoint: string; Response: TStream): Integer; overload;
     /// <summary>
     /// Sends a GET request to retrieve a file and deserializes it into a strongly typed object.
+    /// <para>
+    /// - The result data is encoded in Base64 format.
+    /// </para>
     /// </summary>
     /// <typeparam name="TResult">
     /// The type of the object to deserialize into.

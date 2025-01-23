@@ -12,7 +12,7 @@ interface
 uses
   System.SysUtils, System.Classes, GenAI.API, GenAI.API.Params, GenAI.Models,
   GenAI.Functions.Core, GenAI.Embeddings, GenAI.Audio, GenAI.Chat, GenAI.Moderation,
-  GenAI.Images;
+  GenAI.Images, GenAI.Files;
 
 type
   /// <summary>
@@ -36,6 +36,7 @@ type
     function GetAudioRoute: TAudioRoute;
     function GetChatRoute: TChatRoute;
     function GetEmbeddingsRoute: TEmbeddingsRoute;
+    function GetFilesRoute: TFilesRoute;
     function GetImagesRoute: TImagesRoute;
     function GetModelsRoute: TModelsRoute;
     function GetModerationRoute: TModerationRoute;
@@ -68,6 +69,8 @@ type
     /// provided by the caller. It utilizes TGenAIRoute as a base to inherit API communication capabilities.
     /// </remarks>
     property Embeddings: TEmbeddingsRoute read GetEmbeddingsRoute;
+
+    property Files: TFilesRoute read GetFilesRoute;
     /// <summary>
     /// Represents the route handler for image-related operations using the OpenAI API.
     /// </summary>
@@ -158,6 +161,7 @@ type
     FImagesRoute: TImagesRoute;
     FModelsRoute: TModelsRoute;
     FModerationRoute: TModerationRoute;
+    FFilesRoute: TFilesRoute;
 
     function GetAPI: TGenAIAPI;
     function GetAPIKey: string;
@@ -168,6 +172,7 @@ type
     function GetAudioRoute: TAudioRoute;
     function GetChatRoute: TChatRoute;
     function GetEmbeddingsRoute: TEmbeddingsRoute;
+    function GetFilesRoute: TFilesRoute;
     function GetModelsRoute: TModelsRoute;
     function GetModerationRoute: TModerationRoute;
 
@@ -1000,6 +1005,88 @@ type
 
   {$ENDREGION}
 
+  {$REGION 'GenAI.Files'}
+
+  /// <summary>
+  /// Represents a class for constructing URL parameters specifically for file-related operations in the API.
+  /// </summary>
+  /// <remarks>
+  /// This class provides methods to configure URL parameters such as purpose, limit, order, and pagination.
+  /// It is designed to simplify the creation of query strings for file operations like listing files or filtering them by specific criteria.
+  /// </remarks>
+  TFileUrlParams = GenAI.Files.TFileUrlParams;
+
+  /// <summary>
+  /// Represents a class for constructing parameters for uploading files to the API.
+  /// </summary>
+  /// <remarks>
+  /// This class provides methods to configure multipart form data for file uploads,
+  /// including setting the file path and specifying its purpose.
+  /// It is designed to facilitate file uploads for various use cases such as fine-tuning, batch processing, or assistants.
+  /// </remarks>
+  TFileUploadParams = GenAI.Files.TFileUploadParams;
+
+  /// <summary>
+  /// Represents a file object in the API, containing metadata and attributes of the uploaded file.
+  /// </summary>
+  /// <remarks>
+  /// This class provides properties to access file metadata such as ID, size, creation timestamp, filename,
+  /// purpose, and type. It is used for operations that involve file management within the API.
+  /// </remarks>
+  TFile = GenAI.Files.TFile;
+
+  /// <summary>
+  /// Represents a collection of file objects retrieved from the API.
+  /// </summary>
+  /// <remarks>
+  /// This class provides properties to access the metadata of a collection of files,
+  /// including the list of files, pagination information, and object type.
+  /// It is used for operations that involve listing or retrieving multiple files.
+  /// </remarks>
+  TFiles = GenAI.Files.TFiles;
+
+  /// <summary>
+  /// Represents the content of a file retrieved from the API.
+  /// </summary>
+  /// <remarks>
+  /// This class provides properties to access the base64-encoded content of a file
+  /// and a method to decode it into a readable string. It is used for operations that involve
+  /// retrieving and processing the actual content of files.
+  /// </remarks>
+  TFileContent = GenAI.Files.TFileContent;
+
+  /// <summary>
+  /// Manages asynchronous chat callBacks for a chat request using <c>TFile</c> as the response type.
+  /// </summary>
+  /// <remarks>
+  /// The <c>TAsynFile</c> type extends the <c>TAsynParams&lt;TFile&gt;</c> record to handle the lifecycle of an asynchronous chat operation.
+  /// It provides event handlers that trigger at various stages, such as when the operation starts, completes successfully, or encounters an error.
+  /// This structure facilitates non-blocking chat operations and is specifically tailored for scenarios where multiple choices from a chat model are required.
+  /// </remarks>
+  TAsynFile = GenAI.Files.TAsynFile;
+
+  /// <summary>
+  /// Manages asynchronous chat callBacks for a chat request using <c>TFiles</c> as the response type.
+  /// </summary>
+  /// <remarks>
+  /// The <c>TAsynFiles</c> type extends the <c>TAsynParams&lt;TFiles&gt;</c> record to handle the lifecycle of an asynchronous chat operation.
+  /// It provides event handlers that trigger at various stages, such as when the operation starts, completes successfully, or encounters an error.
+  /// This structure facilitates non-blocking chat operations and is specifically tailored for scenarios where multiple choices from a chat model are required.
+  /// </remarks>
+  TAsynFiles = GenAI.Files.TAsynFiles;
+
+  /// <summary>
+  /// Manages asynchronous chat callBacks for a chat request using <c>TFiles</c> as the response type.
+  /// </summary>
+  /// <remarks>
+  /// The <c>TAsynFiles</c> type extends the <c>TAsynParams&lt;TFiles&gt;</c> record to handle the lifecycle of an asynchronous chat operation.
+  /// It provides event handlers that trigger at various stages, such as when the operation starts, completes successfully, or encounters an error.
+  /// This structure facilitates non-blocking chat operations and is specifically tailored for scenarios where multiple choices from a chat model are required.
+  /// </remarks>
+  TAsynFileContent = GenAI.Files.TAsynFileContent;
+
+  {$ENDREGION}
+
 function FromDeveloper(const Content: string; const Name: string = ''):TMessagePayload;
 function FromSystem(const Content: string; const Name: string = ''):TMessagePayload;
 function FromUser(const Content: string; const Name: string = ''):TMessagePayload; overload;
@@ -1013,7 +1100,25 @@ function ToolCall(const Id: string; const Name: string; const Arguments: string)
 function PredictionPart(const AType: string; const Text: string): TPredictionPartParams;
 function ToolName(const Name: string): TToolChoiceParams;
 
+{--- Convert the file's timestamp from Unix seconds to a datetime in the local timezone. }
+
+function UnixIntToDateTime(const Value: Int64): TDateTime;
+function IntUnixDateTimeToString(const Value: Int64): string;
+
 implementation
+
+uses
+  System.DateUtils;
+
+function UnixIntToDateTime(const Value: Int64): TDateTime;
+begin
+  Result := TTimeZone.Local.ToLocalTime(UnixToDateTime(Value));
+end;
+
+function IntUnixDateTimeToString(const Value: Int64): string;
+begin
+  Result := DateTimeToStr(UnixIntToDateTime(Value))
+end;
 
 function FromDeveloper(const Content: string; const Name: string = ''):TMessagePayload;
 begin
@@ -1089,6 +1194,7 @@ destructor TGenAI.Destroy;
 begin
   FAudioRoute.Free;
   FEmbeddingsRoute.Free;
+  FFilesRoute.Free;
   FImagesRoute.Free;
   FModelsRoute.Free;
   FChatRoute.Free;
@@ -1119,6 +1225,13 @@ begin
   if not Assigned(FEmbeddingsRoute) then
     FEmbeddingsRoute := TEmbeddingsRoute.CreateRoute(API);
   Result := FEmbeddingsRoute;
+end;
+
+function TGenAI.GetFilesRoute: TFilesRoute;
+begin
+  if not Assigned(FFilesRoute) then
+    FFilesRoute := TFilesRoute.CreateRoute(API);
+  Result := FFilesRoute;
 end;
 
 function TGenAI.GetImagesRoute: TImagesRoute;

@@ -98,19 +98,6 @@ var
 
 implementation
 
-uses
-  System.DateUtils;
-
-function UnixIntToDateTime(const Value: Int64): TDateTime;
-begin
-  Result := TTimeZone.Local.ToLocalTime(UnixToDateTime(Value));
-end;
-
-function UnixDateTimeToString(const Value: Int64): string;
-begin
-  Result := DateTimeToStr(UnixIntToDateTime(Value))
-end;
-
 procedure Cancellation(Sender: TObject);
 begin
   Display(Sender, 'The operation was cancelled' + sLineBreak);

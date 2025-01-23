@@ -167,13 +167,13 @@ type
     /// <param name="Value">
     /// A <c>TStream</c> object containing the image data.
     /// </param>
-    /// <param name="FilePath">
+    /// <param name="FileName">
     /// A string representing the file path for the image, used for reference purposes.
     /// </param>
     /// <returns>
     /// Returns an instance of <c>TImageEditParams</c> with the specified image stream.
     /// </returns>
-    function Image(const Value: TStream; const FilePath: string): TImageEditParams; overload;
+    function Image(const Value: TStream; const FileName: string): TImageEditParams; overload;
     /// <summary>
     /// Sets the text prompt for the image editing process.
     /// </summary>
@@ -812,12 +812,12 @@ begin
   inherited Create(true);
 end;
 
-function TImageEditParams.Image(const Value: TStream; const FilePath: string): TImageEditParams;
+function TImageEditParams.Image(const Value: TStream; const FileName: string): TImageEditParams;
 begin
   {$IF RTLVersion >= 35.0}
-    AddStream('image', Value, True, FilePath);
+    AddStream('image', Value, True, FileName);
   {$ELSE}
-    AddStream('image', Value, FilePath);
+    AddStream('image', Value, FileName);
   {$ENDIF}
   Result := Self;
 end;

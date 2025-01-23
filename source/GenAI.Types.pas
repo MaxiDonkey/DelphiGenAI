@@ -278,6 +278,30 @@ type
 
   {$ENDREGION}
 
+  {$REGION 'GenAI.Files'}
+
+  TFilesPurpose = (
+    fp_assistants,
+    fp_assistants_output,
+    fp_batch,
+    fp_batch_output,
+    fp_finetune,
+    fp_finetune_results,
+    fp_vision
+  );
+
+  TFilesPurposeHelper = record Helper for TFilesPurpose
+    function ToString: string;
+    class function Create(const Value: string): TFilesPurpose; static;
+  end;
+
+  TFilesPurposeInterceptor = class(TJSONInterceptorStringToString)
+    function StringConverter(Data: TObject; Field: string): string; override;
+    procedure StringReverter(Data: TObject; Field: string; Arg: string); override;
+  end;
+
+  {$ENDREGION}
+
 implementation
 
 uses
@@ -734,6 +758,49 @@ begin
     natural:
       Exit('natural');
   end;
+end;
+
+{ TFilesPurposeHelper }
+
+class function TFilesPurposeHelper.Create(const Value: string): TFilesPurpose;
+begin
+  Result := TEnumValueRecovery.TypeRetrieve<TFilesPurpose>(Value,
+    ['assistants', 'assistants_output', 'batch', 'batch_output',
+     'fine-tune', 'fine-tune-results', 'vision']);
+end;
+
+function TFilesPurposeHelper.ToString: string;
+begin
+  case Self of
+    fp_assistants:
+      Exit('assistants');
+    fp_assistants_output:
+      Exit('assistants_output');
+    fp_batch:
+      Exit('batch');
+    fp_batch_output:
+      Exit('batch_output');
+    fp_finetune:
+      Exit('fine-tune');
+    fp_finetune_results:
+      Exit('fine-tune-results');
+    fp_vision:
+      Exit('vision');
+  end;
+end;
+
+{ TFilesPurposeInterceptor }
+
+function TFilesPurposeInterceptor.StringConverter(Data: TObject;
+  Field: string): string;
+begin
+  Result := RTTI.GetType(Data.ClassType).GetField(Field).GetValue(Data).AsType<TFilesPurpose>.ToString;
+end;
+
+procedure TFilesPurposeInterceptor.StringReverter(Data: TObject; Field,
+  Arg: string);
+begin
+  RTTI.GetType(Data.ClassType).GetField(Field).SetValue(Data, TValue.From(TFilesPurpose.Create(Arg)));
 end;
 
 end.
