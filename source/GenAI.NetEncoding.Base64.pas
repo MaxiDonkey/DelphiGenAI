@@ -171,11 +171,29 @@ uses
   /// Ensure that the stream is properly managed and freed after use to avoid memory leaks.
   /// </remarks>
   procedure DecodeBase64ToStream(const Base64Str: string; const Stream: TStream);
+  /// <summary>
+  /// Retrieves the size of the specified file in bytes.
+  /// </summary>
+  /// <param name="FileLocation">
+  /// The full path to the file whose size is to be determined.
+  /// </param>
+  /// <returns>
+  /// An <c>Int64</c> value representing the file size in bytes.
+  /// </returns>
+  /// <exception cref="Exception">
+  /// Raised if the specified file cannot be accessed or does not exist at the provided location.
+  /// </exception>
+  /// <remarks>
+  /// This function verifies the existence of the specified file and, if accessible, retrieves its size
+  /// using the <c>TFile.GetSize</c> method. Ensure that the file path is valid and accessible
+  /// before calling this function.
+  /// </remarks>
+  function FileSize(const FileLocation: string): Int64;
 
 implementation
 
 uses
-  System.StrUtils;
+  System.StrUtils, System.IOUtils;
 
 function EncodeBase64(FileLocation : string): string;
 begin
@@ -305,6 +323,15 @@ begin
     finally
       InputStream.Free;
     end;
+end;
+
+function FileSize(const FileLocation: string): Int64;
+begin
+  try
+    FileSize := TFile.GetSize(FileLocation);
+  except
+    raise;
+  end;
 end;
 
 end.

@@ -39,6 +39,7 @@ type
     FCancel: Boolean;
     FMediaPlayer: TMediaPlayer;
     FClient: IGenAI;
+    FId: string;
     procedure OnButtonClick(Sender: TObject);
     procedure SetButton(const Value: TButton);
     procedure SetMemo1(const Value: TMemo);
@@ -99,6 +100,8 @@ type
     /// </summary>
     property ToolCall: TToolProc read FToolCall write FToolCall;
 
+    property Id: string read FId write FId;
+
     property MediaPlayer: TMediaPlayer read FMediaPlayer write FMediaPlayer;
 
 
@@ -133,6 +136,8 @@ type
   procedure Display(Sender: TObject; Value: TFile); overload;
   procedure Display(Sender: TObject; Value: TFiles); overload;
   procedure Display(Sender: TObject; Value: TFileContent); overload;
+  procedure Display(Sender: TObject; Value: TUpload); overload;
+  procedure Display(Sender: TObject; Value: TUploadPart); overload;
 
   procedure DisplayStream(Sender: TObject; Value: string); overload;
   procedure DisplayStream(Sender: TObject; Value: TChat); overload;
@@ -399,6 +404,31 @@ procedure Display(Sender: TObject; Value: TFileContent);
 begin
   TutorialHub.JSONResponse := Value.JSONResponse;
   Display(Sender, Value.Content);
+  Display(Sender);
+end;
+
+procedure Display(Sender: TObject; Value: TUpload);
+begin
+  TutorialHub.JSONResponse := Value.JSONResponse;
+  Display(TutorialHub, [
+      F(Value.Id, Value.&Object),
+      F(Value.Filename, Value.Bytes.ToString),
+      Value.Purpose.ToString,
+      Value.Status,
+      IntUnixDateTimeToString(Value.CreatedAt),
+      IntUnixDateTimeToString(Value.ExpiresAt)
+    ]);
+  Display(Sender);
+end;
+
+procedure Display(Sender: TObject; Value: TUploadPart);
+begin
+  TutorialHub.JSONResponse := Value.JSONResponse;
+  Display(TutorialHub, [
+      Value.Id,
+      F(Value.&Object, F('upload_id', Value.UploadId)),
+      IntUnixDateTimeToString(Value.CreatedAt)
+    ]);
   Display(Sender);
 end;
 

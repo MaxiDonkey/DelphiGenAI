@@ -159,6 +159,19 @@ type
     /// </returns>
     function Add(const Key: string; const Value: Integer): TJSONParam; overload; virtual;
     /// <summary>
+    /// Adds a key-value pair to the JSON object, where the value is an integer 64.
+    /// </summary>
+    /// <param name="Key">
+    /// The key of the pair to add.
+    /// </param>
+    /// <param name="Value">
+    /// The integer value to associate with the key.
+    /// </param>
+    /// <returns>
+    /// The current instance of <c>TJSONParam</c>, allowing for method chaining.
+    /// </returns>
+    function Add(const Key: string; const Value: Int64): TJSONParam; overload; virtual;
+    /// <summary>
     /// Adds a key-value pair to the JSON object, where the value is an extended (floating-point number).
     /// </summary>
     /// <param name="Key">
@@ -255,6 +268,19 @@ type
     /// The current instance of <c>TJSONParam</c>, allowing for method chaining.
     /// </returns>
     function Add(const Key: string; Value: TArray<Integer>): TJSONParam; overload; virtual;
+    /// <summary>
+    /// Adds a key-value pair to the JSON object, where the value is an array of integer 64.
+    /// </summary>
+    /// <param name="Key">
+    /// The key of the pair to add.
+    /// </param>
+    /// <param name="Value">
+    /// An array of string to associate with the key.
+    /// </param>
+    /// <returns>
+    /// The current instance of <c>TJSONParam</c>, allowing for method chaining.
+    /// </returns>
+    function Add(const Key: string; Value: TArray<Int64>): TJSONParam; overload; virtual;
     /// <summary>
     /// Adds a key-value pair to the JSON object, where the value is an array of extended.
     /// </summary>
@@ -579,6 +605,21 @@ begin
   var JSONArray := TJSONArray.Create;
   Fetch<TJSONValue>.All(Value, JSONArray.AddElement);
   Add(Key, JSONArray);
+  Result := Self;
+end;
+
+function TJSONParam.Add(const Key: string; Value: TArray<Int64>): TJSONParam;
+begin
+  var JSONArray := TJSONArray.Create;
+  for var Item in Value do
+    JSONArray.Add(Item);
+  Add(Key, JSONArray);
+  Result := Self;
+end;
+
+function TJSONParam.Add(const Key: string; const Value: Int64): TJSONParam;
+begin
+  Add(Key, TJSONNumber.Create(Value));
   Result := Self;
 end;
 

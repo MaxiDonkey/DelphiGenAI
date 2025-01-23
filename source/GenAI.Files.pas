@@ -405,6 +405,17 @@ begin
   Result := Self;
 end;
 
+function TFileUploadParams.&File(const Value: TStream;
+  const FileName: string): TFileUploadParams;
+begin
+  {$IF RTLVersion >= 35.0}
+    AddStream('file', Value, True, FileName);
+  {$ELSE}
+    AddStream('file', Value, FileName);
+  {$ENDIF}
+  Result := Self;
+end;
+
 function TFileUploadParams.Purpose(
   const Value: TFilesPurpose): TFileUploadParams;
 begin
@@ -415,17 +426,6 @@ end;
 function TFileUploadParams.Purpose(const Value: string): TFileUploadParams;
 begin
   AddField('purpose', TFilesPurpose.Create(Value).ToString);
-  Result := Self;
-end;
-
-function TFileUploadParams.&File(const Value: TStream;
-  const FileName: string): TFileUploadParams;
-begin
-  {$IF RTLVersion >= 35.0}
-    AddStream('file', Value, True, FileName);
-  {$ELSE}
-    AddStream('file', Value, FileName);
-  {$ENDIF}
   Result := Self;
 end;
 

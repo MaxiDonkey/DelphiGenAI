@@ -12,7 +12,7 @@ interface
 uses
   System.SysUtils, System.Classes, GenAI.API, GenAI.API.Params, GenAI.Models,
   GenAI.Functions.Core, GenAI.Embeddings, GenAI.Audio, GenAI.Chat, GenAI.Moderation,
-  GenAI.Images, GenAI.Files;
+  GenAI.Images, GenAI.Files, GenAI.Uploads;
 
 type
   /// <summary>
@@ -40,6 +40,7 @@ type
     function GetImagesRoute: TImagesRoute;
     function GetModelsRoute: TModelsRoute;
     function GetModerationRoute: TModerationRoute;
+    function GetUploadsRoute: TUploadsRoute;
 
     /// <summary>
     /// Provides routes to handle audio-related requests including speech generation, transcription, and translation.
@@ -69,7 +70,14 @@ type
     /// provided by the caller. It utilizes TGenAIRoute as a base to inherit API communication capabilities.
     /// </remarks>
     property Embeddings: TEmbeddingsRoute read GetEmbeddingsRoute;
-
+    /// <summary>
+    /// Represents a route for managing file operations in the API.
+    /// </summary>
+    /// <remarks>
+    /// This class provides methods for performing file-related operations, including uploading files,
+    /// listing files, retrieving specific file details or content, and deleting files.
+    /// It supports both synchronous and asynchronous operations for efficient file management.
+    /// </remarks>
     property Files: TFilesRoute read GetFilesRoute;
     /// <summary>
     /// Represents the route handler for image-related operations using the OpenAI API.
@@ -100,6 +108,14 @@ type
     /// for evaluating content against moderation models.
     /// </remarks>
     property Moderation: TModerationRoute read GetModerationRoute;
+    /// <summary>
+    /// Manages routes for handling file uploads, including creating uploads, adding parts, completing uploads, and canceling uploads.
+    /// </summary>
+    /// <remarks>
+    /// This class provides methods to interact with the upload API endpoints. It supports asynchronous and synchronous
+    /// operations for creating an upload, adding parts to it, completing the upload, and canceling an upload.
+    /// </remarks>
+    property Uploads: TUploadsRoute read GetUploadsRoute;
 
     /// <summary>
     /// the main API object used for making requests.
@@ -162,6 +178,7 @@ type
     FModelsRoute: TModelsRoute;
     FModerationRoute: TModerationRoute;
     FFilesRoute: TFilesRoute;
+    FUploadsRoute: TUploadsRoute;
 
     function GetAPI: TGenAIAPI;
     function GetAPIKey: string;
@@ -173,10 +190,10 @@ type
     function GetChatRoute: TChatRoute;
     function GetEmbeddingsRoute: TEmbeddingsRoute;
     function GetFilesRoute: TFilesRoute;
+    function GetImagesRoute: TImagesRoute;
     function GetModelsRoute: TModelsRoute;
     function GetModerationRoute: TModerationRoute;
-
-    function GetImagesRoute: TImagesRoute;
+    function GetUploadsRoute: TUploadsRoute;
 
   public
     /// <summary>
@@ -1087,6 +1104,78 @@ type
 
   {$ENDREGION}
 
+  {$REGION 'GenAI.Uploads'}
+
+  /// <summary>
+  /// Represents the parameters required for creating an upload object in the OpenAI API.
+  /// </summary>
+  /// <remarks>
+  /// This class provides methods to configure the necessary fields for initiating an upload.
+  /// An upload is used to prepare a file for adding multiple parts and eventually creating
+  /// a File object that can be utilized within the platform.
+  /// </remarks>
+  TUploadCreateParams = GenAI.Uploads.TUploadCreateParams;
+
+  /// <summary>
+  /// Represents parameters for creating an upload part in a multipart form-data request.
+  /// </summary>
+  /// <remarks>
+  /// This class provides methods to add data to the form-data structure, allowing the uploading
+  /// of individual parts (chunks) of a file. It is specifically designed for use with APIs
+  /// that handle large file uploads by splitting the file into smaller parts.
+  /// </remarks>
+  TUploadPartParams = GenAI.Uploads.TUploadPartParams;
+
+  /// <summary>
+  /// Represents parameters for completing an upload by specifying the order of parts and optional checksum validation.
+  /// </summary>
+  /// <remarks>
+  /// This class provides methods to configure the finalization of a multipart upload by
+  /// specifying the part IDs in the correct order and verifying the file's integrity using an MD5 checksum.
+  /// </remarks>
+  TUploadCompleteParams = GenAI.Uploads.TUploadCompleteParams;
+
+  /// <summary>
+  /// Represents the metadata and details of an upload, including its status, purpose, and associated file.
+  /// </summary>
+  /// <remarks>
+  /// This class provides properties to access information about an upload object, such as its ID,
+  /// filename, size, purpose, status, and expiration time. It also includes a reference to the
+  /// associated file object once the upload is completed.
+  /// </remarks>
+  TUpload = GenAI.Uploads.TUpload;
+
+  /// <summary>
+  /// Represents metadata and details of a single upload part, including its ID, creation timestamp, and associated upload.
+  /// </summary>
+  /// <remarks>
+  /// This class provides properties to access information about an upload part, such as its unique ID,
+  /// creation time, and the ID of the parent upload to which it belongs.
+  /// </remarks>
+  TUploadPart = GenAI.Uploads.TUploadPart;
+
+  /// <summary>
+  /// Manages asynchronous chat callBacks for a chat request using <c>TUpload</c> as the response type.
+  /// </summary>
+  /// <remarks>
+  /// The <c>TAsynUpload</c> type extends the <c>TAsynParams&lt;TUpload&gt;</c> record to handle the lifecycle of an asynchronous chat operation.
+  /// It provides event handlers that trigger at various stages, such as when the operation starts, completes successfully, or encounters an error.
+  /// This structure facilitates non-blocking chat operations and is specifically tailored for scenarios where multiple choices from a chat model are required.
+  /// </remarks>
+  TAsynUpload = GenAI.Uploads.TAsynUpload;
+
+  /// <summary>
+  /// Manages asynchronous chat callBacks for a chat request using <c>TUploadPart</c> as the response type.
+  /// </summary>
+  /// <remarks>
+  /// The <c>TAsynUploadPart</c> type extends the <c>TAsynParams&lt;TUploadPart&gt;</c> record to handle the lifecycle of an asynchronous chat operation.
+  /// It provides event handlers that trigger at various stages, such as when the operation starts, completes successfully, or encounters an error.
+  /// This structure facilitates non-blocking chat operations and is specifically tailored for scenarios where multiple choices from a chat model are required.
+  /// </remarks>
+  TAsynUploadPart = GenAI.Uploads.TAsynUploadPart;
+
+  {$ENDREGION}
+
 function FromDeveloper(const Content: string; const Name: string = ''):TMessagePayload;
 function FromSystem(const Content: string; const Name: string = ''):TMessagePayload;
 function FromUser(const Content: string; const Name: string = ''):TMessagePayload; overload;
@@ -1199,6 +1288,7 @@ begin
   FModelsRoute.Free;
   FChatRoute.Free;
   FModerationRoute.Free;
+  FUploadsRoute.Free;
   FAPI.Free;
   inherited;
 end;
@@ -1253,6 +1343,13 @@ begin
   if not Assigned(FModerationRoute) then
     FModerationRoute := TModerationRoute.CreateRoute(API);
   Result := FModerationRoute;
+end;
+
+function TGenAI.GetUploadsRoute: TUploadsRoute;
+begin
+  if not Assigned(FUploadsRoute) then
+    FUploadsRoute := TUploadsRoute.CreateRoute(API);
+  Result := FUploadsRoute;
 end;
 
 function TGenAI.GetChatRoute: TChatRoute;
