@@ -91,7 +91,7 @@ type
     /// <returns>
     /// Returns a newly instantiated object of TImageUrl.
     /// </returns>
-    class function New(const PathLocation: string; const Detail: TImageDetail = id_auto): TImageUrl;
+    class function New(const PathLocation: string; const Detail: TImageDetail = TImageDetail.auto): TImageUrl;
   end;
 
   /// <summary>
@@ -2436,7 +2436,7 @@ end;
 class function TContentParams.Extract(const Value: string;
   var Detail: TImageDetail): string;
 begin
-  Detail := id_auto;
+  Detail := TImageDetail.auto;
   var index := Value.Trim.Tolower.IndexOf('detail');
   if index > -1 then
     begin
@@ -2481,7 +2481,7 @@ end;
 class function TImageUrl.New(const PathLocation: string; const Detail: TImageDetail): TImageUrl;
 begin
   Result := TImageUrl.Create.Url( GetUrlOrEncodeBase64(PathLocation) );
-  if Detail <> id_auto then
+  if Detail <> TImageDetail.auto then
     Result := Result.Detail(Detail);
 end;
 
@@ -2514,7 +2514,7 @@ begin
   if PathLocation.ToLower.StartsWith('http') then
     Result := TInputAudio.Create.Data(THttpx.LoadDataToBase64(PathLocation, MimeType)) else
     Result := TInputAudio.Create.Data(EncodeBase64(PathLocation, MimeType));
-  Result := Result.Format(TAudioFormat.InputMimeType(MimeType));
+  Result := Result.Format(TAudioFormat.MimeTypeInput(MimeType));
 end;
 
 { TToolCallsParams }
@@ -2544,7 +2544,7 @@ end;
 class function TToolCallsParams.New(const Id, Name,
   Arguments: string): TToolCallsParams;
 begin
-  Result := TToolCallsParams.Create.Id(Id).&Type(tc_function).&Function(Name, Arguments);
+  Result := TToolCallsParams.Create.Id(Id).&Type(TToolCalls.tfunction).&Function(Name, Arguments);
 end;
 
 { TFunctionParams }

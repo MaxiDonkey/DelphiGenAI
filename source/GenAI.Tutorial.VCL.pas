@@ -320,7 +320,7 @@ procedure Display(Sender: TObject; Value: TChat);
 begin
   TutorialHub.JSONResponse := Value.JSONResponse;
   for var Item in Value.Choices do
-    if Item.FinishReason = TFinishReason.fr_tool_calls then
+    if Item.FinishReason = TFinishReason.tool_calls then
       begin
         if Assigned(TutorialHub.ToolCall) then
           begin
@@ -336,6 +336,7 @@ begin
       end
     else
       begin
+        Display(Sender, Item.Message.Role.ToString);
         Display(Sender, Item.Message.Content);
       end;
   Display(Sender, sLineBreak);

@@ -738,31 +738,31 @@ begin
     Exit;
 
   if Categories.Hate then
-    Result := Result + [TFlaggedItem.Create(hate, CategoryScores.Hate)];
+    Result := Result + [TFlaggedItem.Create(THarmCategories.hate, CategoryScores.Hate)];
   if Categories.HateThreatening then
-    Result := Result + [TFlaggedItem.Create(hateThreatening, CategoryScores.HateThreatening)];
+    Result := Result + [TFlaggedItem.Create(THarmCategories.hateThreatening, CategoryScores.HateThreatening)];
   if Categories.Harassment then
-    Result := Result + [TFlaggedItem.Create(harassment, CategoryScores.Harassment)];
+    Result := Result + [TFlaggedItem.Create(THarmCategories.harassment, CategoryScores.Harassment)];
   if Categories.HarassmentThreatening then
-    Result := Result + [TFlaggedItem.Create(harassmentThreatening, CategoryScores.HarassmentThreatening)];
+    Result := Result + [TFlaggedItem.Create(THarmCategories.harassmentThreatening, CategoryScores.HarassmentThreatening)];
   if Categories.Illicit then
-    Result := Result + [TFlaggedItem.Create(illicit, CategoryScores.Illicit)];
+    Result := Result + [TFlaggedItem.Create(THarmCategories.illicit, CategoryScores.Illicit)];
   if Categories.IllicitViolent then
-    Result := Result + [TFlaggedItem.Create(illicitViolent, CategoryScores.IllicitViolent)];
+    Result := Result + [TFlaggedItem.Create(THarmCategories.illicitViolent, CategoryScores.IllicitViolent)];
   if Categories.SelfHarm then
-    Result := Result + [TFlaggedItem.Create(selfHarm, CategoryScores.SelfHarm)];
+    Result := Result + [TFlaggedItem.Create(THarmCategories.selfHarm, CategoryScores.SelfHarm)];
   if Categories.SelfHarmIntent then
-    Result := Result + [TFlaggedItem.Create(selfHarmIntent, CategoryScores.SelfHarmIntent)];
+    Result := Result + [TFlaggedItem.Create(THarmCategories.selfHarmIntent, CategoryScores.SelfHarmIntent)];
   if Categories.SelfHarmInstructions then
-    Result := Result + [TFlaggedItem.Create(selfHarmInstructions, CategoryScores.SelfHarmInstructions)];
+    Result := Result + [TFlaggedItem.Create(THarmCategories.selfHarmInstructions, CategoryScores.SelfHarmInstructions)];
   if Categories.Sexual then
-    Result := Result + [TFlaggedItem.Create(sexual, CategoryScores.Sexual)];
+    Result := Result + [TFlaggedItem.Create(THarmCategories.sexual, CategoryScores.Sexual)];
   if Categories.SexualMinors then
-    Result := Result + [TFlaggedItem.Create(sexualMinors, CategoryScores.SexualMinors)];
+    Result := Result + [TFlaggedItem.Create(THarmCategories.sexualMinors, CategoryScores.SexualMinors)];
   if Categories.Violence then
-    Result := Result + [TFlaggedItem.Create(violence, CategoryScores.Violence)];
+    Result := Result + [TFlaggedItem.Create(THarmCategories.violence, CategoryScores.Violence)];
   if Categories.ViolenceGraphic then
-    Result := Result + [TFlaggedItem.Create(violenceGraphic, CategoryScores.ViolenceGraphic)];
+    Result := Result + [TFlaggedItem.Create(THarmCategories.violenceGraphic, CategoryScores.ViolenceGraphic)];
 end;
 
 { TModerationRoute }
