@@ -142,6 +142,8 @@ type
     FObject: string;
     [JsonReflectAttribute(ctString, rtString, TFilesPurposeInterceptor)]
     FPurpose: TFilesPurpose;
+  private
+    function GetCreatedAtAsString: string;
   public
     /// <summary>
     /// Gets or sets the unique identifier of the file.
@@ -155,6 +157,10 @@ type
     /// Gets or sets the creation timestamp of the file in Unix seconds.
     /// </summary>
     property CreatedAt: Int64 read FCreatedAt write FCreatedAt;
+    /// <summary>
+    /// Gets the creation timestamp of the file as string.
+    /// </summary>
+    property CreatedAtAsString: string read GetCreatedAtAsString;
     /// <summary>
     /// Gets or sets the name of the file.
     /// </summary>
@@ -620,6 +626,13 @@ end;
 function TFileContent.GetContent: string;
 begin
   Result :=  TNetEncoding.Base64.Decode(Base64);
+end;
+
+{ TFile }
+
+function TFile.GetCreatedAtAsString: string;
+begin
+  Result := TimestampToString(CreatedAt, UTCtimestamp);
 end;
 
 end.

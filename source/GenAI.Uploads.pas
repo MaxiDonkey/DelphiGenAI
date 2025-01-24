@@ -169,6 +169,9 @@ type
     FExpiresAt: Int64;
     FObject: string;
     FFile: TFile;
+  private
+    function GetCreatedAtAsString: string;
+    function GetExpiresAtAsString: string;
   public
     /// <summary>
     /// Gets or sets the unique identifier of the upload.
@@ -178,6 +181,10 @@ type
     /// Gets or sets the Unix timestamp (in seconds) indicating when the upload was created.
     /// </summary>
     property CreatedAt: Int64 read FCreatedAt write FCreatedAt;
+    /// <summary>
+    /// Gets the Unix timestamp a a string, indicating when the upload was created.
+    /// </summary>
+    property CreatedAtAsString: string read GetCreatedAtAsString;
     /// <summary>
     /// Gets or sets the name of the file being uploaded.
     /// </summary>
@@ -198,6 +205,10 @@ type
     /// Gets or sets the Unix timestamp (in seconds) indicating when the upload will expire.
     /// </summary>
     property ExpiresAt: Int64 read FExpiresAt write FExpiresAt;
+    /// <summary>
+    /// Gets the Unix timestamp as a string, indicating when the upload will expire.
+    /// </summary>
+    property ExpiresAtAsString: string read GetExpiresAtAsString;
     /// <summary>
     /// Gets or sets the object type, which is always "upload".
     /// </summary>
@@ -407,6 +418,16 @@ begin
   if Assigned(FFile) then
     FFile.Free;
   inherited;
+end;
+
+function TUpload.GetCreatedAtAsString: string;
+begin
+  Result := TimestampToString(CreatedAt, UTCtimestamp);
+end;
+
+function TUpload.GetExpiresAtAsString: string;
+begin
+  Result := TimestampToString(ExpiresAt, UTCtimestamp);
 end;
 
 { TUploadsRoute }

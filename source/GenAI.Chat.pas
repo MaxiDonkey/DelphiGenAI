@@ -1449,6 +1449,8 @@ type
     FExpiresAt: Int64;
     FData: string;
     FTranscript: string;
+  private
+    function GetExpiresAtAsString: string;
   public
     /// <summary>
     /// Gets or sets the unique identifier for the audio data, used for tracking
@@ -1460,6 +1462,10 @@ type
     /// data may no longer be available.
     /// </summary>
     property ExpiresAt: Int64 read FExpiresAt write FExpiresAt;
+    /// <summary>
+    /// Gets the expiration timestamp for the audio data as string
+    /// </summary>
+    property ExpiresAtAsString: string read GetExpiresAtAsString;
     /// <summary>
     /// Gets or sets the base64-encoded audio data.
     /// </summary>
@@ -1873,6 +1879,8 @@ type
     FSystemFingerprint: string;
     FObject: string;
     FUsage: TUsage;
+  private
+    function GetCreatedAsString: string;
   public
     /// <summary>
     /// The unique identifier for the chat completion.
@@ -1895,6 +1903,16 @@ type
     /// An Int64 value representing the creation time of the chat completion.
     /// </returns>
     property Created: Int64 read FCreated write FCreated;
+    /// <summary>
+    /// A string representation of the Unix timestamp indicating when the chat completion was created.
+    /// </summary>
+    /// <remarks>
+    /// This property converts the Unix timestamp from the <c>Created</c> property into a human-readable string format using UTC.
+    /// </remarks>
+    /// <returns>
+    /// A <c>string</c> representing the creation time of the chat completion in a readable format.
+    /// </returns>
+    property CreatedAsString: string read GetCreatedAsString;
     /// <summary>
     /// The model identifier used to generate the chat completion.
     /// </summary>
@@ -2692,6 +2710,11 @@ begin
   inherited;
 end;
 
+function TChat.GetCreatedAsString: string;
+begin
+  Result := TimestampToString(Created, UTCtimestamp);
+end;
+
 { TUsage }
 
 destructor TUsage.Destroy;
@@ -2947,6 +2970,13 @@ begin
   except
     raise;
   end;
+end;
+
+{ TAudioData }
+
+function TAudioData.GetExpiresAtAsString: string;
+begin
+  Result := TimestampToString(ExpiresAt, UTCtimestamp);
 end;
 
 end.

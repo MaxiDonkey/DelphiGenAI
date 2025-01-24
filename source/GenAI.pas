@@ -12,7 +12,7 @@ interface
 uses
   System.SysUtils, System.Classes, GenAI.API, GenAI.API.Params, GenAI.Models,
   GenAI.Functions.Core, GenAI.Embeddings, GenAI.Audio, GenAI.Chat, GenAI.Moderation,
-  GenAI.Images, GenAI.Files, GenAI.Uploads;
+  GenAI.Images, GenAI.Files, GenAI.Uploads, GenAI.Batch;
 
 type
   /// <summary>
@@ -34,6 +34,7 @@ type
     procedure SetBaseUrl(const Value: string);
 
     function GetAudioRoute: TAudioRoute;
+    function GetBatchRoute: TBatchRoute;
     function GetChatRoute: TChatRoute;
     function GetEmbeddingsRoute: TEmbeddingsRoute;
     function GetFilesRoute: TFilesRoute;
@@ -51,6 +52,8 @@ type
     /// operations to accommodate different application needs.
     /// </remarks>
     property Audio: TAudioRoute read GetAudioRoute;
+
+    property Batch: TBatchRoute read GetBatchRoute;
     /// <summary>
     /// Handles the routing and execution of chat-related API requests within the application,
     /// facilitating interaction with AI models for generating chat completions.
@@ -172,6 +175,7 @@ type
     FAPI: TGenAIAPI;
 
     FAudioRoute: TAudioRoute;
+    FBatchRoute: TBatchRoute;
     FChatRoute: TChatRoute;
     FEmbeddingsRoute: TEmbeddingsRoute;
     FImagesRoute: TImagesRoute;
@@ -187,6 +191,7 @@ type
     procedure SetBaseUrl(const Value: string);
 
     function GetAudioRoute: TAudioRoute;
+    function GetBatchRoute: TBatchRoute;
     function GetChatRoute: TChatRoute;
     function GetEmbeddingsRoute: TEmbeddingsRoute;
     function GetFilesRoute: TFilesRoute;
@@ -1189,25 +1194,7 @@ function ToolCall(const Id: string; const Name: string; const Arguments: string)
 function PredictionPart(const AType: string; const Text: string): TPredictionPartParams;
 function ToolName(const Name: string): TToolChoiceParams;
 
-{--- Convert the file's timestamp from Unix seconds to a datetime in the local timezone. }
-
-function UnixIntToDateTime(const Value: Int64): TDateTime;
-function IntUnixDateTimeToString(const Value: Int64): string;
-
 implementation
-
-uses
-  System.DateUtils;
-
-function UnixIntToDateTime(const Value: Int64): TDateTime;
-begin
-  Result := TTimeZone.Local.ToLocalTime(UnixToDateTime(Value));
-end;
-
-function IntUnixDateTimeToString(const Value: Int64): string;
-begin
-  Result := DateTimeToStr(UnixIntToDateTime(Value))
-end;
 
 function FromDeveloper(const Content: string; const Name: string = ''):TMessagePayload;
 begin
@@ -1282,6 +1269,7 @@ end;
 destructor TGenAI.Destroy;
 begin
   FAudioRoute.Free;
+  FBatchRoute.Free;
   FEmbeddingsRoute.Free;
   FFilesRoute.Free;
   FImagesRoute.Free;
@@ -1308,6 +1296,13 @@ end;
 function TGenAI.GetBaseUrl: string;
 begin
   Result := FAPI.BaseURL;
+end;
+
+function TGenAI.GetBatchRoute: TBatchRoute;
+begin
+  if not Assigned(FBatchRoute) then
+    FBatchRoute := TBatchRoute.CreateRoute(API);
+  Result := FBatchRoute;
 end;
 
 function TGenAI.GetEmbeddingsRoute: TEmbeddingsRoute;

@@ -16,7 +16,8 @@ uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes,
   Vcl.Graphics, Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.ExtCtrls,
   System.UITypes, Vcl.MPlayer, system.JSON,
-  GenAI, GenAI.Types;
+  GenAI, GenAI.Types, GenAI.API,
+  GenAI.Batch;
 
 type
   TToolProc = procedure (const Value: string) of object;
@@ -138,6 +139,8 @@ type
   procedure Display(Sender: TObject; Value: TFileContent); overload;
   procedure Display(Sender: TObject; Value: TUpload); overload;
   procedure Display(Sender: TObject; Value: TUploadPart); overload;
+  procedure Display(Sender: TObject; Value: TBatch); overload;
+  procedure Display(Sender: TObject; Value: TBatches); overload;
 
   procedure DisplayStream(Sender: TObject; Value: string); overload;
   procedure DisplayStream(Sender: TObject; Value: TChat); overload;
@@ -239,7 +242,7 @@ begin
     F('id', Value.Id),
     F('object', Value.&Object),
     F('owned_by', Value.OwnedBy),
-    F('created', IntUnixDateTimeToString(Value.Created))
+    F('created', TimestampToString(Value.Created))
   ]);
   Display(Sender, EmptyStr);
 end;
@@ -387,7 +390,7 @@ begin
     F('id', [
       Value.Id,
       F('purpose', Value.Purpose.ToString),
-      F('created_at', IntUnixDateTimeToString(Value.CreatedAt))
+      F('created_at', TimestampToString(Value.CreatedAt))
     ])
   ]);
   Display(Sender);
@@ -416,8 +419,8 @@ begin
       F(Value.Filename, Value.Bytes.ToString),
       Value.Purpose.ToString,
       Value.Status,
-      IntUnixDateTimeToString(Value.CreatedAt),
-      IntUnixDateTimeToString(Value.ExpiresAt)
+      TimestampToString(Value.CreatedAt),
+      TimestampToString(Value.ExpiresAt)
     ]);
   Display(Sender);
 end;
@@ -428,8 +431,38 @@ begin
   Display(TutorialHub, [
       Value.Id,
       F(Value.&Object, F('upload_id', Value.UploadId)),
-      IntUnixDateTimeToString(Value.CreatedAt)
+      TimestampToString(Value.CreatedAt)
     ]);
+  Display(Sender);
+end;
+
+procedure Display(Sender: TObject; Value: TBatch);
+begin
+  if not Value.JSONResponse.IsEmpty then
+    TutorialHub.JSONResponse := Value.JSONResponse;
+
+  Display(Sender, [
+      Value.Id,
+      F('endpoint', Value.Endpoint),
+      F('output_file_id', Value.OutputFileId),
+      F('Status', Value.Status),
+      F('in_progress_at', Value.InProgressAtAsString),
+      F('expires_at', Value.ExpiresAtAsString),
+      F('metadata', Value.Metadata)
+    ]);
+  Display(Sender);
+end;
+
+procedure Display(Sender: TObject; Value: TBatches);
+begin
+  TutorialHub.JSONResponse := Value.JSONResponse;
+  for var Item in Value.Data do
+    Display(Sender, Item);
+  Display(Sender, [
+    F('has more', BoolToStr(Value.HasMore, True)),
+    F('first_id', Value.FirstId),
+    F('last_id', Value.LastId)
+  ]);
   Display(Sender);
 end;
 

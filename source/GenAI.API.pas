@@ -30,7 +30,7 @@ interface
 uses
   System.SysUtils, System.Classes, System.Net.HttpClient, System.Net.URLClient,
   System.Net.Mime, System.JSON, GenAI.API.Params, GenAI.Errors, GenAI.Exceptions,
-  GenAI.HttpClientInterface, GenAI.HttpClientAPI;
+  GenAI.HttpClientInterface, GenAI.HttpClientAPI, GenAI.API.DeserializerToString;
 
 type
   /// <summary>
@@ -149,7 +149,7 @@ type
     /// </summary>
     FHttpClient: IHttpClientAPI;
   public
-    constructor Create; overload;
+    constructor Create;
     /// <summary>
     /// The HTTP client used to send requests to the API.
     /// </summary>
@@ -167,6 +167,7 @@ type
   /// by parsing error data and raising appropriate exceptions.
   /// </remarks>
   TApiDeserializer = class(TApiHttpHandler)
+  class var MetadataHandler: IDeserializeToString;
   protected
     /// <summary>
     /// Parses the error data from the API response.
@@ -211,6 +212,7 @@ type
     /// </exception>
     function Deserialize<T: class, constructor>(const Code: Int64; const ResponseText: string): T;
   public
+    class constructor Create;
     /// <summary>
     /// Deserializes the API response into a strongly typed object.
     /// </summary>
@@ -226,7 +228,7 @@ type
     /// <exception cref="GenAIInvalidResponseError">
     /// Raised if the response is non-compliant or deserialization fails.
     /// </exception>
-    class function Parse<T: class, constructor>(const ResponseText: string): T;
+    class function Parse<T: class, constructor>(const Value: string): T;
   end;
 
   /// <summary>
@@ -473,10 +475,30 @@ type
     constructor CreateRoute(AAPI: TGenAIAPI); reintroduce;
   end;
 
+function TimestampToDateTime(const Value: Int64; const UTC: Boolean = False): TDateTime;
+function TimestampToString(const Value: Int64; const UTC: Boolean = False): string;
+
+var
+  UTCtimestamp: Boolean = False;
+  MetadataAsObject: Boolean = False;
+
 implementation
 
 uses
-  System.StrUtils, REST.Json, GenAI.NetEncoding.Base64;
+  System.StrUtils, REST.Json, GenAI.NetEncoding.Base64, System.DateUtils;
+
+function TimestampToDateTime(const Value: Int64; const UTC: Boolean): TDateTime;
+begin
+  Result := UnixToDateTime(Value, UTC);
+end;
+
+function TimestampToString(const Value: Int64; const UTC: Boolean): string;
+begin
+  {--- null date before 01/01/1970 }
+  if Value <= 0 then
+    Result := '' else
+    Result := DateTimeToStr(TimestampToDateTime(Value, UTC))
+end;
 
 constructor TGenAIAPI.Create(const AAPIKey: string);
 begin
@@ -744,6 +766,11 @@ end;
 
 { TApiDeserializer }
 
+class constructor TApiDeserializer.Create;
+begin
+  MetadataHandler := TDeserializeToString.CreateInstance;
+end;
+
 function TApiDeserializer.Deserialize<T>(const Code: Int64;
   const ResponseText: string): T;
 begin
@@ -785,14 +812,19 @@ begin
   end;
 end;
 
-class function TApiDeserializer.Parse<T>(const ResponseText: string): T;
+class function TApiDeserializer.Parse<T>(const Value: string): T;
 begin
-  Result := TJson.JsonToObject<T>(ResponseText);
+  case MetadataAsObject of
+    True:
+      Result := TJson.JsonToObject<T>(Value);
+    else
+      Result := TJson.JsonToObject<T>(MetadataHandler.Replace(Value));
+  end;
 
   {--- Add JSON response if class inherits from TJSONFingerprint class. }
   if Assigned(Result) and T.InheritsFrom(TJSONFingerprint) then
     begin
-      var JSONValue := TJSONObject.ParseJSONValue(ResponseText);
+      var JSONValue := TJSONObject.ParseJSONValue(Value);
       try
         (Result as TJSONFingerprint).JSONResponse := JSONValue.Format();
       finally

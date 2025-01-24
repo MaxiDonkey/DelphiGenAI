@@ -497,20 +497,20 @@ type
   private
     FCreated: Int64;
     FData: TArray<TImagePart>;
+  private
+    function GetCreatedAsString: string;
   public
     /// <summary>
     /// Gets or sets the timestamp indicating when the images were created.
     /// </summary>
-    /// <value>
-    /// An <c>Int64</c> representing the creation timestamp in Unix time format.
-    /// </value>
     property Created: Int64 read FCreated write FCreated;
+    /// <summary>
+    /// Gets the timestamp as string, indicating when the images were created.
+    /// </summary>
+    property CreatedAsString: string read GetCreatedAsString;
     /// <summary>
     /// Gets or sets the collection of generated images.
     /// </summary>
-    /// <value>
-    /// An array of <c>TImagePart</c> objects, each representing a generated image.
-    /// </value>
     property Data: TArray<TImagePart> read FData write FData;
     destructor Destroy; override;
   end;
@@ -797,6 +797,11 @@ begin
   for var Item in FData do
     Item.Free;
   inherited;
+end;
+
+function TGeneratedImages.GetCreatedAsString: string;
+begin
+  Result := TimestampToString(Created, UTCtimestamp);
 end;
 
 { TImageEditParams }

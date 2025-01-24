@@ -29,6 +29,8 @@ type
     FObject: string;
     [JsonNameAttribute('owned_by')]
     FOwnedBy: string;
+  private
+    function GetCreatedAsString: string;
   public
     /// <summary>
     /// Gets or sets the unique identifier of the model.
@@ -38,6 +40,10 @@ type
     /// Gets or sets the creation timestamp of the model, represented as a Unix timestamp.
     /// </summary>
     property Created: Int64 read FCreated write FCreated;
+    /// <summary>
+    /// Gets the creation timestamp of the model as a string.
+    /// </summary>
+    property CreatedAsString: string read GetCreatedAsString;
     /// <summary>
     /// Gets or sets the object type, which is consistently set to "model".
     /// </summary>
@@ -260,6 +266,13 @@ end;
 function TModelsRoute.Retrieve(const ModelId: string): TModel;
 begin
   Result := API.Get<TModel>(Format('models/%s', [ModelId]));
+end;
+
+{ TModel }
+
+function TModel.GetCreatedAsString: string;
+begin
+  Result := TimestampToString(Created, UTCtimestamp);
 end;
 
 end.

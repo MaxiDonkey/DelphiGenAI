@@ -68,6 +68,19 @@ type
     /// </returns>
     function Add(const Name: string; Value: Integer): TUrlParam; overload; virtual;
     /// <summary>
+    /// Adds an integer 64 parameter to the query string.
+    /// </summary>
+    /// <param name="Name">
+    /// The name of the parameter.
+    /// </param>
+    /// <param name="Value">
+    /// The integer 64 value of the parameter.
+    /// </param>
+    /// <returns>
+    /// The current instance of <c>TUrlParam</c>, allowing for method chaining.
+    /// </returns>
+    function Add(const Name: string; Value: Int64): TUrlParam; overload; virtual;
+    /// <summary>
     /// Adds a boolean parameter to the query string.
     /// </summary>
     /// <param name="Name">
@@ -488,6 +501,11 @@ begin
 end;
 
 function TUrlParam.Add(const Name: string; Value: Integer): TUrlParam;
+begin
+  Result := Add(Name, Value.ToString);
+end;
+
+function TUrlParam.Add(const Name: string; Value: Int64): TUrlParam;
 begin
   Result := Add(Name, Value.ToString);
 end;

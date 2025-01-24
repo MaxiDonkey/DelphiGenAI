@@ -16,6 +16,11 @@ uses
 
 type
 
+  TMetadataInterceptor = class(TJSONInterceptorStringToString)
+  public
+    procedure StringReverter(Data: TObject; Field: string; Arg: string); override;
+  end;
+
   {$REGION 'GenAI.Chat'}
 
   /// <summary>
@@ -1439,6 +1444,16 @@ procedure TFilesPurposeInterceptor.StringReverter(Data: TObject; Field,
   Arg: string);
 begin
   RTTI.GetType(Data.ClassType).GetField(Field).SetValue(Data, TValue.From(TFilesPurpose.Create(Arg)));
+end;
+
+{ TMetadataInterceptor }
+
+procedure TMetadataInterceptor.StringReverter(Data: TObject; Field,
+  Arg: string);
+begin
+  Arg := Format('{%s}', [Trim(Arg.Replace('`', '"').Replace(#10, ''))]);
+  while Arg.Contains(', ') do Arg := Arg.Replace(', ', ',');
+  RTTI.GetType(Data.ClassType).GetField(Field).SetValue(Data, Arg.Replace(',', ', '));
 end;
 
 end.
