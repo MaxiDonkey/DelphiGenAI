@@ -29,8 +29,8 @@ interface
 
 uses
   System.SysUtils, System.Classes, System.Net.HttpClient, System.Net.URLClient,
-  System.Net.Mime, System.JSON, GenAI.API.Params, GenAI.Errors, GenAI.Exceptions,
-  GenAI.HttpClientInterface, GenAI.HttpClientAPI, GenAI.API.DeserializerToString;
+  System.Net.Mime, System.JSON, GenAI.API.Params, GenAI.API.Utils, GenAI.Errors,
+  GenAI.Exceptions, GenAI.HttpClientInterface, GenAI.HttpClientAPI;
 
 type
   /// <summary>
@@ -167,7 +167,7 @@ type
   /// by parsing error data and raising appropriate exceptions.
   /// </remarks>
   TApiDeserializer = class(TApiHttpHandler)
-  class var MetadataHandler: IDeserializeToString;
+  class var MetadataHandler: ICustomFields;
   protected
     /// <summary>
     /// Parses the error data from the API response.
@@ -768,7 +768,7 @@ end;
 
 class constructor TApiDeserializer.Create;
 begin
-  MetadataHandler := TDeserializeToString.CreateInstance;
+  MetadataHandler := TCustomDeserialization.CreateInstance;
 end;
 
 function TApiDeserializer.Deserialize<T>(const Code: Int64;
