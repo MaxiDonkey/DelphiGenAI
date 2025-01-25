@@ -6,28 +6,28 @@ uses
   System.SysUtils;
 
 const
-  FieldsAsString : TArray<string> = ['"metadata": {', '"metadata":{'];
+  FIELDSASSTRING : TArray<string> = ['"metadata": {', '"metadata":{'];
 
 type
-  ICustomFields = interface
+  ICustomFieldsPrepare = interface
     ['{60B0EAB1-3C74-4ACE-8B33-6DA2B40485F9}']
-    function Replace(const Value: string): string; overload;
+    function Convert(const Value: string): string; overload;
   end;
 
-  TDeserializeToString = class(TInterfacedObject, ICustomFields)
+  TDeserializationPrepare = class(TInterfacedObject, ICustomFieldsPrepare)
   private
-    function FieldAsString(const Value, Field: string): string; overload;
-    function FieldAsString(const Value: string; const Field: TArray<string>): string; overload;
+    function UpdateFieldValue(const Value, Field: string): string; overload;
+    function UpdateFieldValue(const Value: string; const Field: TArray<string>): string; overload;
   public
-    function Replace(const Value: string): string; overload;
-    class function CreateInstance: ICustomFields;
+    function Convert(const Value: string): string;
+    class function CreateInstance: ICustomFieldsPrepare;
   end;
 
 implementation
 
-{ TDeserializeToString }
+{ TDeserializationPrepare }
 
-function TDeserializeToString.FieldAsString(const Value,
+function TDeserializationPrepare.UpdateFieldValue(const Value,
   Field: string): string;
 begin
   Result := Value;
@@ -57,24 +57,24 @@ begin
     end;
 end;
 
-class function TDeserializeToString.CreateInstance: ICustomFields;
+class function TDeserializationPrepare.CreateInstance: ICustomFieldsPrepare;
 begin
-  Result := TDeserializeToString.Create;
+  Result := TDeserializationPrepare.Create;
 end;
 
-function TDeserializeToString.Replace(const Value: string): string;
+function TDeserializationPrepare.Convert(const Value: string): string;
 begin
-  Result := FieldAsString(Value, FieldsAsString);
+  Result := UpdateFieldValue(Value, FIELDSASSTRING);
 end;
 
-function TDeserializeToString.FieldAsString(const Value: string;
+function TDeserializationPrepare.UpdateFieldValue(const Value: string;
   const Field: TArray<string>): string;
 begin
   Result := Value;
   if Length(Field) > 0 then
     begin
       for var Item in Field do
-        Result := FieldAsString(Result, Item);
+        Result := UpdateFieldValue(Result, Item);
     end;
 end;
 

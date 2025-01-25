@@ -167,7 +167,7 @@ type
   /// by parsing error data and raising appropriate exceptions.
   /// </remarks>
   TApiDeserializer = class(TApiHttpHandler)
-  class var MetadataHandler: ICustomFields;
+  class var Metadata: ICustomFieldsPrepare;
   protected
     /// <summary>
     /// Parses the error data from the API response.
@@ -768,7 +768,7 @@ end;
 
 class constructor TApiDeserializer.Create;
 begin
-  MetadataHandler := TCustomDeserialization.CreateInstance;
+  Metadata := TDeserializationPrepare.CreateInstance;
 end;
 
 function TApiDeserializer.Deserialize<T>(const Code: Int64;
@@ -814,11 +814,22 @@ end;
 
 class function TApiDeserializer.Parse<T>(const Value: string): T;
 begin
+  {--- NOTE
+    - If Metadata are to be treated  as objects, a dedicated  TMetadata class is required, containing
+    all the properties corresponding to the specified JSON fields.
+
+    - However, if Metadata are  not treated  as objects, they will be temporarily handled as a string
+    and subsequently converted back into a valid JSON string during the deserialization process using
+    the Revert method of the interceptor.
+
+    By default, Metadata are  treated as strings rather  than objects to handle  cases where multiple
+    classes to be deserialized may contain variable data structures.
+    Refer to the global variable MetadataAsObject. }
   case MetadataAsObject of
     True:
       Result := TJson.JsonToObject<T>(Value);
     else
-      Result := TJson.JsonToObject<T>(MetadataHandler.Replace(Value));
+      Result := TJson.JsonToObject<T>(Metadata.Convert(Value));
   end;
 
   {--- Add JSON response if class inherits from TJSONFingerprint class. }
