@@ -944,6 +944,67 @@ type
 
   {$ENDREGION}
 
+  {$REGION 'GenAI.Batch'}
+
+  /// <summary>
+  /// Enumerates the possible statuses of a batch operation, describing each stage
+  /// from validation to completion or cancellation.
+  /// </summary>
+  TBatchStatus = (
+    /// <summary>
+    /// The input file is being validated before the batch can begin.
+    /// This is the initial stage where inputs are checked for correctness.
+    /// </summary>
+    validating,
+    /// <summary>
+    /// The input file has failed the validation process.
+    /// This status indicates an error in the input data that prevents the batch from proceeding.
+    /// </summary>
+    failed,
+    /// <summary>
+    /// The input file was successfully validated and the batch is currently being run.
+    /// Processing of the batch data is underway.
+    /// </summary>
+    in_progress,
+    /// <summary>
+    /// The batch has completed and the results are being prepared.
+    /// This stage signifies that the main processing is done but the output is not yet finalized.
+    /// </summary>
+    finalizing,
+    /// <summary>
+    /// The batch has been completed and the results are ready.
+    /// Indicates that all processing has concluded successfully and the outputs are available for use.
+    /// </summary>
+    completed,
+    /// <summary>
+    /// The batch was not able to be completed within the 24-hour time window.
+    /// This status is used when the processing time exceeds the maximum allowed duration.
+    /// </summary>
+    expired,
+    /// <summary>
+    /// The batch is being cancelled (may take up to 10 minutes).
+    /// During this time, the system is terminating any ongoing operations related to the batch.
+    /// </summary>
+    cancelling,
+    /// <summary>
+    /// The batch was cancelled.
+    /// This final status confirms that the batch has been successfully stopped before completion.
+    /// </summary>
+    cancelled
+  );
+
+  TBatchStatusHelper = record Helper for TBatchStatus
+    constructor Create(const Value: string);
+    function ToString: string;
+  end;
+
+  TBatchStatusInterceptor = class(TJSONInterceptorStringToString)
+    function StringConverter(Data: TObject; Field: string): string; override;
+    procedure StringReverter(Data: TObject; Field: string; Arg: string); override;
+  end;
+
+  {$ENDREGION}
+
 implementation
 
 uses
@@ -1454,6 +1515,51 @@ begin
   Arg := Format('{%s}', [Trim(Arg.Replace('`', '"').Replace(#10, ''))]);
   while Arg.Contains(', ') do Arg := Arg.Replace(', ', ',');
   RTTI.GetType(Data.ClassType).GetField(Field).SetValue(Data, Arg.Replace(',', ', '));
+end;
+
+{ TBatchStatusHelper }
+
+constructor TBatchStatusHelper.Create(const Value: string);
+begin
+  Self := TEnumValueRecovery.TypeRetrieve<TBatchStatus>(Value,
+            ['validating', 'failed', 'in_progress', 'finalizing',
+             'completed', 'expired', 'cancelling', 'cancelled']);
+end;
+
+function TBatchStatusHelper.ToString: string;
+begin
+  case Self of
+    TBatchStatus.validating:
+      Exit('validating');
+    TBatchStatus.failed:
+      Exit('failed');
+    TBatchStatus.in_progress:
+      Exit('in_progress');
+    TBatchStatus.finalizing:
+      Exit('finalizing');
+    TBatchStatus.completed:
+      Exit('completed');
+    TBatchStatus.expired:
+      Exit('expired');
+    TBatchStatus.cancelling:
+      Exit('cancelling');
+    TBatchStatus.cancelled:
+      Exit('cancelled');
+  end;
+end;
+
+{ TBatchStatusInterceptor }
+
+function TBatchStatusInterceptor.StringConverter(Data: TObject;
+  Field: string): string;
+begin
+  Result := RTTI.GetType(Data.ClassType).GetField(Field).GetValue(Data).AsType<TBatchStatus>.ToString;
+end;
+
+procedure TBatchStatusInterceptor.StringReverter(Data: TObject; Field,
+  Arg: string);
+begin
+  RTTI.GetType(Data.ClassType).GetField(Field).SetValue(Data, TValue.From(TBatchStatus.Create(Arg)));
 end;
 
 end.

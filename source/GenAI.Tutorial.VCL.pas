@@ -16,8 +16,7 @@ uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes,
   Vcl.Graphics, Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.ExtCtrls,
   System.UITypes, Vcl.MPlayer, system.JSON,
-  GenAI, GenAI.Types, GenAI.API,
-  GenAI.Batch;
+  GenAI, GenAI.Types, GenAI.API;
 
 type
   TToolProc = procedure (const Value: string) of object;
@@ -141,11 +140,14 @@ type
   procedure Display(Sender: TObject; Value: TUploadPart); overload;
   procedure Display(Sender: TObject; Value: TBatch); overload;
   procedure Display(Sender: TObject; Value: TBatches); overload;
+  procedure Display(Sender: TObject; Value: TCompletion); overload;
 
   procedure DisplayStream(Sender: TObject; Value: string); overload;
   procedure DisplayStream(Sender: TObject; Value: TChat); overload;
+  procedure DisplayStream(Sender: TObject; Value: TCompletion); overload;
 
-  procedure DisplayChunk(Value: TChat);
+  procedure DisplayChunk(Value: TChat); overload;
+  procedure DisplayChunk(Value: TCompletion); overload;
 
   procedure DisplayAudio(Sender: TObject; Value: TChat);
   procedure DisplayAudioEx(Sender: TObject; Value: TChat);
@@ -445,7 +447,7 @@ begin
       Value.Id,
       F('endpoint', Value.Endpoint),
       F('output_file_id', Value.OutputFileId),
-      F('Status', Value.Status),
+      F('Status', Value.Status.ToString),
       F('in_progress_at', Value.InProgressAtAsString),
       F('expires_at', Value.ExpiresAtAsString),
       F('metadata', Value.Metadata)
@@ -463,6 +465,14 @@ begin
     F('first_id', Value.FirstId),
     F('last_id', Value.LastId)
   ]);
+  Display(Sender);
+end;
+
+procedure Display(Sender: TObject; Value: TCompletion);
+begin
+  TutorialHub.JSONResponse := Value.JSONResponse;
+  for var Item in Value.Choices do
+    Display(Sender, Item.Text);
   Display(Sender);
 end;
 
@@ -519,7 +529,28 @@ begin
     end;
 end;
 
+procedure DisplayStream(Sender: TObject; Value: TCompletion);
+begin
+  if Assigned(Value) then
+    begin
+      DisplayStream(Sender, Value.Choices[0].Text);
+      DisplayChunk(Value);
+    end;
+end;
+
 procedure DisplayChunk(Value: TChat);
+begin
+  var JSONValue := TJSONObject.ParseJSONValue(Value.JSONResponse);
+  TutorialHub.Memo3.Lines.BeginUpdate;
+  try
+    Display(TutorialHub.Memo3, JSONValue.ToString);
+  finally
+    TutorialHub.Memo3.Lines.EndUpdate;
+    JSONValue.Free;
+  end;
+end;
+
+procedure DisplayChunk(Value: TCompletion);
 begin
   var JSONValue := TJSONObject.ParseJSONValue(Value.JSONResponse);
   TutorialHub.Memo3.Lines.BeginUpdate;
