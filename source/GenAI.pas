@@ -13,7 +13,7 @@ uses
   System.SysUtils, System.Classes, GenAI.API, GenAI.API.Params, GenAI.Models,
   GenAI.Functions.Core, GenAI.Embeddings, GenAI.Audio, GenAI.Chat, GenAI.Moderation,
   GenAI.Images, GenAI.Files, GenAI.Uploads, GenAI.Batch, GenAI.Batch.Support,
-  GenAI.Completions;
+  GenAI.Completions, GenAI.Batch.Writer;
 
 type
   /// <summary>
@@ -1354,8 +1354,9 @@ function PredictionPart(const AType: string; const Text: string): TPredictionPar
 function ToolName(const Name: string): TToolChoiceParams;
 
 var
-  JSONLChatReader: IJSONLReader<TChat>;
-  JSONLEmbeddingReader: IJSONLReader<TEmbeddings>;
+  JSONLChatReader: GenAI.Batch.Support.IJSONLReader<TChat>;
+  JSONLEmbeddingReader: GenAI.Batch.Support.IJSONLReader<TEmbeddings>;
+  BatchBuilder: GenAI.Batch.Writer.IBatchJSONBuilder;
 
 implementation
 
@@ -1550,4 +1551,5 @@ end;
 initialization
   JSONLChatReader := TJSONLReader<TChat>.CreateInstance;
   JSONLEmbeddingReader := TJSONLReader<TEmbeddings>.CreateInstance;
+  BatchBuilder := TBatchJSONBuilder.Create;
 end.

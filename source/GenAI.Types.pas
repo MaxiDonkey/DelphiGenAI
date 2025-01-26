@@ -21,6 +21,16 @@ type
     procedure StringReverter(Data: TObject; Field: string; Arg: string); override;
   end;
 
+  TBatchUrl = (
+    chat_completions,
+    embeddings
+  );
+
+  TBatchUrlHelper = record Helper for TBatchUrl
+    constructor Create(const Value: string);
+    function ToString: string;
+  end;
+
   {$REGION 'GenAI.Chat'}
 
   /// <summary>
@@ -1560,6 +1570,24 @@ procedure TBatchStatusInterceptor.StringReverter(Data: TObject; Field,
   Arg: string);
 begin
   RTTI.GetType(Data.ClassType).GetField(Field).SetValue(Data, TValue.From(TBatchStatus.Create(Arg)));
+end;
+
+{ TBatchUrlHelper }
+
+constructor TBatchUrlHelper.Create(const Value: string);
+begin
+  Self := TEnumValueRecovery.TypeRetrieve<TBatchUrl>(Value,
+            ['/v1/chat/completions', '/v1/embeddings']);
+end;
+
+function TBatchUrlHelper.ToString: string;
+begin
+  case Self of
+    TBatchUrl.chat_completions:
+      Exit('/v1/chat/completions');
+    TBatchUrl.embeddings:
+      Exit('/v1/embeddings');
+  end;
 end;
 
 end.

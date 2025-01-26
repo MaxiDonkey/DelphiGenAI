@@ -37,7 +37,13 @@ type
     function InputFileId(const Value: string): TBatchCreateParams;
     /// <summary>
     /// Specifies the API endpoint to be used for all requests within the batch.
-    /// This is a required parameter and must be one of the supported endpoints such as /v1/chat/completions, /v1/embeddings, or /v1/completions.
+    /// This is a required parameter and must be one of the supported endpoints such as :
+    /// <para>
+    /// - <c>/v1/chat/completions</c>
+    /// </para>
+    /// <para>
+    /// - <c>/v1/embeddings</c>
+    /// </para>
     /// </summary>
     /// <param name="Value">The API endpoint as a string.</param>
     /// <returns>The instance of TBatchCreateParams for method chaining.</returns>
