@@ -13,7 +13,7 @@ uses
   System.SysUtils, System.Classes, GenAI.API, GenAI.API.Params, GenAI.Models,
   GenAI.Functions.Core, GenAI.Batch.Interfaces, GenAI.Embeddings, GenAI.Audio,
   GenAI.Chat, GenAI.Moderation, GenAI.Images, GenAI.Files, GenAI.Uploads, GenAI.Batch,
-  GenAI.Batch.Support, GenAI.Completions, GenAI.Batch.Writer;
+  GenAI.Batch.Reader, GenAI.Batch.Builder, GenAI.Completions;
 
 type
   /// <summary>

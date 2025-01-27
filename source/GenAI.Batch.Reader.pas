@@ -67,20 +67,17 @@ begin
 end;
 
 function TJSONLReader<T>.Output: TArray<TBatchOutput<T>>;
-var
-  Line: string;
 begin
-  var FStringReader := TStringReader.Create(FInput);
+  var StringReader := TStringReader.Create(FInput);
   try
-    repeat
-      Line := FStringReader.ReadLine;
-      if not Line.Trim.IsEmpty then
-        begin
-          Result := Result + [TApiDeserializer.Parse<TBatchOutput<T>>(Line)];
-        end;
-    until Line.Trim.IsEmpty;
+    var Line := StringReader.ReadLine;
+    while not Line.Trim.IsEmpty do
+      begin
+        Result := Result + [TApiDeserializer.Parse<TBatchOutput<T>>(Line)];
+        Line := StringReader.ReadLine;
+      end;
   finally
-    FStringReader.Free;
+    StringReader.Free;
   end;
 end;
 
