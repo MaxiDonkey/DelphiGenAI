@@ -255,7 +255,7 @@ begin
   if Assigned(ParamProc) then
     begin
       ParamProc(Result);
-    end;
+    end
 end;
 
 function TSchemaParams.Nullable(const Value: Boolean): TSchemaParams;

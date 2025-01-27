@@ -11,7 +11,6 @@ interface
 
 uses
   System.SysUtils, GenAI.Functions.Core, GenAI.Schema, GenAI.Types;
-
 type
   TWeatherReportFunction = class(TFunctionCore)
   protected
@@ -113,29 +112,48 @@ begin
 //  '}';
 
   {--- If we use the TSchemaParams class defined in the MistralAI.Schema.pas unit }
-  var Schema := TSchemaParams.New(
-    procedure (var Params: TSchemaParams)
-    begin
-      Params.&Type(TSchemaType.object);
-      Params.Properties('properties',
-        procedure (var Params: TSchemaParams)
-        begin
-          Params.Properties('location',
-            procedure (var Params: TSchemaParams)
-            begin
-              Params.&Type(TSchemaType.string);
-              Params.Description('The city and state, e.g. San Francisco, CA');
-            end);
-          Params.Properties('unit',
-            procedure (var Params: TSchemaParams)
-            begin
-              Params.&Type(TSchemaType.string);
-              Params.Enum(['celsius', 'fahrenheit']);
-            end);
-        end);
-      Params.Required(['location', 'unit']);
-      Params.Add('additionalProperties', false);
-    end);
+//  var Schema := TSchemaParams.New(
+//    procedure (var Params: TSchemaParams)
+//    begin
+//      Params.&Type(TSchemaType.object);
+//      Params.Properties('properties',
+//        procedure (var Params: TSchemaParams)
+//        begin
+//          Params.Properties('location',
+//            procedure (var Params: TSchemaParams)
+//            begin
+//              Params.&Type(TSchemaType.string);
+//              Params.Description('The city and state, e.g. San Francisco, CA');
+//            end);
+//          Params.Properties('unit',
+//            procedure (var Params: TSchemaParams)
+//            begin
+//              Params.&Type(TSchemaType.string);
+//              Params.Enum(['celsius', 'fahrenheit']);
+//            end);
+//        end);
+//      Params.Required(['location', 'unit']);
+//      Params.Add('additionalProperties', false);
+//    end);
+//  Result := Schema.ToJsonString(True);
+
+  var Schema := TSchemaParams.Create
+        .&Type(TSchemaType.object)
+        .Properties('properties',
+          TSchemaParams.Create
+            .Properties('location',
+               TSchemaParams.Create
+                 .&Type(TSchemaType.string)
+                 .Description('The city and state, e.g. San Francisco, CA')
+               )
+            .Properties('unit',
+               TSchemaParams.Create
+                 .&Type(TSchemaType.string)
+                 .Enum(['celsius', 'fahrenheit'])
+               )
+            )
+        .Required(['location', 'unit'])
+        .Add('additionalProperties', false);
   Result := Schema.ToJsonString(True);
 end;
 
