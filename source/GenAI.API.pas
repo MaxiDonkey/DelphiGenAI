@@ -15,7 +15,7 @@ unit GenAI.API;
   The IHttpClientAPI interface  ensures that  client code can interact  with  the web
   without  being  dependent  on a specific class, thus  facilitating  the replacement
   or modification  of the  underlying  HTTP implementation  details without impacting
-  the rest  of  the application. It also  enables  easy mocking  during u nit testing,
+  the rest  of  the application. It also  enables  easy mocking  during unit testing,
   offering the ability to test  HTTP request behaviors in an isolated  and controlled
   manner.
 
