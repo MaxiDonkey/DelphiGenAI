@@ -32,10 +32,6 @@ const
 //        RTTI.GetType(Data.ClassType).GetField(Field).SetValue(Data, Arg.Replace(',', ', '));
 //      end;
 
-
-
-
-
 type
   /// <summary>
   /// Provides a mechanism for converting or transforming specific JSON fields in a string
