@@ -7,8 +7,8 @@ unit GenAI.Batch;
 
   WARNING
     The documentation references the capability to execute a batch through the /v1/completions endpoint.
-    However, it is important to clarify that batch processing is not feasible with this endpoint.
-    This limitation arises because not all models available for the completion mechanism support batch
+    However, it  is  important to  clarify  that batch  processing is  not feasible  with this endpoint.
+    This limitation arises because not all models available  for the completion mechanism support batch
     operations.
 
  ------------------------------------------------------------------------------}
