@@ -14,17 +14,77 @@ uses
   System.Net.Mime, System.JSON, GenAI.Errors;
 
 type
+  /// <summary>
+  /// The <c>TGenAIException</c> class represents a base exception for the GenAI library.
+  /// It is designed to handle error codes and messages returned by the GenAI API or other internal errors.
+  /// </summary>
+  /// <remarks>
+  /// This class is a foundation for more specific exception classes in the GenAI library.
+  /// It provides additional properties and methods to facilitate detailed error handling.
+  /// </remarks>
   TGenAIException = class(Exception)
   private
     FCode: Int64;
     FErrorMessage: string;
     FParam: string;
   public
+    /// <summary>
+    /// Creates an instance of the <c>TGenAIException</c> class with an error code and a <c>TErrorCore</c> object.
+    /// </summary>
+    /// <param name="ACode">
+    /// The error code associated with the exception.
+    /// </param>
+    /// <param name="AError">
+    /// A <c>TErrorCore</c> object containing details of the error.
+    /// </param>
+    /// <remarks>
+    /// This constructor initializes the exception with a code, error message, and optional parameter
+    /// from the <c>TErrorCore</c> object.
+    /// </remarks>
     constructor Create(const ACode: Int64; const AError: TErrorCore); reintroduce; overload;
+    /// <summary>
+    /// Creates an instance of the <c>TGenAIException</c> class with an error code and a custom error message.
+    /// </summary>
+    /// <param name="ACode">
+    /// The error code associated with the exception.
+    /// </param>
+    /// <param name="Value">
+    /// A custom error message describing the issue.
+    /// </param>
+    /// <remarks>
+    /// This constructor initializes the exception with a code and a custom error message.
+    /// </remarks>
     constructor Create(const ACode: Int64; const Value: string); reintroduce; overload;
+    /// <summary>
+    /// Formats the error message with the code and description.
+    /// </summary>
+    /// <returns>
+    /// A formatted string in the format: "error {Code}: {ErrorMessage}".
+    /// </returns>
+    /// <remarks>
+    /// Use this method to obtain a user-friendly error description for logging or debugging purposes.
+    /// </remarks>
     function FormatErrorMessage: string;
+    /// <summary>
+    /// The error code associated with the exception.
+    /// </summary>
+    /// <value>
+    /// An <c>Int64</c> representing the error code.
+    /// </value>
     property Code: Int64 read FCode write FCode;
+    /// <summary>
+    /// The detailed error message describing the issue.
+    /// </summary>
+    /// <value>
+    /// A <c>string</c> containing the error message.
+    /// </value>
     property ErrorMessage: string read FErrorMessage write FErrorMessage;
+    /// <summary>
+    /// An optional parameter related to the error, providing additional context.
+    /// </summary>
+    /// <value>
+    /// A <c>string</c> containing the parameter, or an empty string if no parameter is provided.
+    /// </value>
     property Param: string read FParam write FParam;
   end;
 
