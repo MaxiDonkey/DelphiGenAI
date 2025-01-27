@@ -37,7 +37,7 @@ unit GenAI.Batch.Interfaces;
            ]}
        }
 
-    - For <c>/v1/embeddings</c>:
+    - For /v1/embeddings:
         {
          "custom_id": "request-p",
          "method": "POST",
