@@ -7,44 +7,46 @@ unit GenAI.Batch.Interfaces;
 
 --------------------------------------------------------------------------------}
 
-//  NOTE :
-//   This unit provides the  <c>IBatchJSONBuilder</c>  interface, designed to construct a batch  body for
-//   submission to OpenAI's batch processing API. The interface methods enable you to:
-//
-//    - Generate a JSONL file from a text file containing JSON strings (one per line), where each line is
-//      used as the <c>Body</c> parameter in a batch request.
-//    - Build the JSONL from an array of JSON objects, assigning each object to the <c>Body</c> parameter
-//      of a request.
-//
-//   Depending on the specified URL, <c>IBatchJSONBuilder</c> produces the JSONL lines as follows:
-//    - For /v1/chat/completions:
-//       {
-//        "custom_id": "request-n",
-//        "method": "POST",
-//        "url": "/v1/chat/completions",
-//        "body":
-//         {"model": "gpt-4o-mini",
-//          "messages": [
-//              {"role": "system",
-//               "content": "You are a helpful assistant."
-//              }
-//              {"role": "user", "content": "What is 2+2?"
-//              }
-//           ]}
-//       }
-//
-//    - For <c>/v1/embeddings</c>:
-//        {
-//         "custom_id": "request-p",
-//         "method": "POST",
-//         "url": "/v1/embeddings",
-//         "body": {
-//           "input": "I hate computers....",
-//           "model": "text-embedding-3-large",
-//           "encoding_format": "float"
-//          }
-//         }
-//
+(*
+  --- NOTE ---
+   This unit provides the  <c>IBatchJSONBuilder</c>  interface, designed to construct a batch  body for
+   submission to OpenAI's batch processing API. The interface methods enable you to:
+
+    - Generate a JSONL file from a text file containing JSON strings (one per line), where each line is
+      used as the <c>Body</c> parameter in a batch request.
+    - Build the JSONL from an array of JSON objects, assigning each object to the <c>Body</c> parameter
+      of a request.
+
+   Depending on the specified URL, <c>IBatchJSONBuilder</c> produces the JSONL lines as follows:
+    - For /v1/chat/completions:
+       {
+        "custom_id": "request-n",
+        "method": "POST",
+        "url": "/v1/chat/completions",
+        "body":
+         {"model": "gpt-4o-mini",
+          "messages": [
+              {"role": "system",
+               "content": "You are a helpful assistant."
+              }
+              {"role": "user", "content": "What is 2+2?"
+              }
+           ]}
+       }
+
+    - For <c>/v1/embeddings</c>:
+        {
+         "custom_id": "request-p",
+         "method": "POST",
+         "url": "/v1/embeddings",
+         "body": {
+           "input": "I hate computers....",
+           "model": "text-embedding-3-large",
+           "encoding_format": "float"
+          }
+         }
+
+*)
 
 interface
 
