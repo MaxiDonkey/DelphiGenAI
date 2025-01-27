@@ -14,15 +14,61 @@ uses
   GenAI.API;
 
 type
+  /// <summary>
+  /// Represents a streaming callback handler for OpenAI chat completions.
+  /// </summary>
+  /// <typeparam name="T">
+  /// The type of the class that will be used to parse the streaming data.
+  /// Must be a class with a parameterless constructor.
+  /// </typeparam>
   TOpenAIStream<T: class, constructor> = class(TInterfacedObject, IStreamCallback)
   private
     FResponse: TStringStream;
     FLineFeedPosition: Integer;
     FEvent: TStreamCallbackEvent<T>;
     Parse: TParserMethod<T>;
+    /// <summary>
+    /// Gets the callback method that processes received streaming data.
+    /// </summary>
+    /// <returns>
+    /// A <see cref="TReceiveDataCallback"/> delegate that handles the streaming data.
+    /// </returns>
     function GetOnStream: TReceiveDataCallback;
   public
+    /// <summary>
+    /// Initializes a new instance of the <see cref="TOpenAIStream{T}"/> class.
+    /// </summary>
+    /// <param name="AResponse">
+    /// A <see cref="TStringStream"/> that contains the streaming response data.
+    /// </param>
+    /// <param name="AEvent">
+    /// A callback event that is triggered when a new chunk of data is received.
+    /// </param>
+    /// <param name="AParser">
+    /// A method used to parse the incoming JSON data into an instance of type <typeparamref name="T"/>.
+    /// </param>
+    /// <exception cref="Exception">
+    /// Thrown if the <paramref name="AParser"/> parameter is not assigned.
+    /// </exception>
     constructor Create(AResponse: TStringStream; AEvent: TStreamCallbackEvent<T>; AParser: TParserMethod<T>);
+    /// <summary>
+    /// Creates a new instance of <see cref="TOpenAIStream{T}"/> and returns it as an <see cref="IStreamCallback"/>.
+    /// </summary>
+    /// <param name="AResponse">
+    /// A <see cref="TStringStream"/> that contains the streaming response data.
+    /// </param>
+    /// <param name="AEvent">
+    /// A callback event that is triggered when a new chunk of data is received.
+    /// </param>
+    /// <param name="AParser">
+    /// A method used to parse the incoming JSON data into an instance of type <typeparamref name="T"/>.
+    /// </param>
+    /// <returns>
+    /// An instance of <see cref="IStreamCallback"/> that handles the streaming data.
+    /// </returns>
+    /// <exception cref="Exception">
+    /// Thrown if the <paramref name="AParser"/> parameter is not assigned.
+    /// </exception>
     class function CreateInstance(AResponse: TStringStream; AEvent: TStreamCallbackEvent<T>; AParser: TParserMethod<T>): IStreamCallback;
   end;
 
