@@ -6,7 +6,7 @@ unit GenAI.API;
       Visit the Github repository for the documentation and use examples
 
 
-NOTE:
+--- NOTE ---
   The  GenAI.HttpClientInterface  unit  defines  an  IHttpClientAPI  interface, which
   allows  for decoupling  the specific implementation  of  the HTTP  client used  for
   web requests. This introduces  an abstraction  that  enhances flexibility, improves
