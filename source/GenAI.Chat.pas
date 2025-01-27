@@ -5,29 +5,30 @@ unit GenAI.Chat;
       Github repository :  https://github.com/MaxiDonkey/DelphiGenAI
       Visit the Github repository for the documentation and use examples
 
-  NOTE: Regarding the management of streamed messages.
+  --- NOTE ---
+    Regarding the management of streamed messages.
 
-    This unit provides an abstraction for managing streaming data from APIs such
-    as OpenAI or Anthropic. The "GenAI.Chat.StreamingInterface" defines a flexible
+    This unit provides  an abstraction  for managing streaming  data from APIs such
+    as OpenAI  or Anthropic. The "GenAI.Chat.StreamingInterface" defines a flexible
     interface for handling real-time data chunks, enabling the application to react
     to incoming data dynamically and efficiently.
 
     Key Features:
-      - Streaming Management: Processes data in real-time by handling chunks as
+      - Streaming Management: Processes  data  in real-time  by  handling chunks as
         they arrive.
 
-      - Event-driven Design: Utilizes callback mechanisms to provide flexible and
+      - Event-driven Design: Utilizes  callback mechanisms  to provide flexible and
         dynamic responses to streaming events.
 
-      - Adaptable Architecture: Supports experimentation with different streaming
+      - Adaptable Architecture: Supports experimentation  with  different streaming
         techniques, such as OpenAI's sequential streaming or Anthropic's contextual
         approaches, allowing easy integration of various streaming models.
 
       - Control and Flexibility: Enables custom chunk processing, flow control, and
-        integration with user-defined logic, improving user experience and system
+        integration with  user-defined logic, improving  user experience and system
         responsiveness.
 
-    This interface lays the groundwork for implementing and comparing alternative
+    This interface lays the groundwork  for implementing and  comparing alternative
     streaming techniques while maintaining a clean, modular, and extensible
     architecture.
 
