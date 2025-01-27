@@ -21,8 +21,24 @@ type
     procedure StringReverter(Data: TObject; Field: string; Arg: string); override;
   end;
 
+  {$REGION 'GenAI.Batch.Interfaces'}
+
+  /// <summary>
+  /// Enumerates the supported relative URLs for OpenAI's batch processing API.
+  /// </summary>
+  /// <remarks>
+  /// The <c>TBatchUrl</c> type defines the specific endpoints that can be used when constructing
+  /// batch requests to OpenAI's API. Each enumeration value corresponds to a relative URL path
+  /// for a particular API functionality.
+  /// </remarks>
   TBatchUrl = (
+    /// <summary>
+    /// Represents the relative URL for the Chat Completions endpoint.
+    /// </summary>
     chat_completions,
+    /// <summary>
+    /// Represents the relative URL for the Embeddings endpoint.
+    /// </summary>
     embeddings
   );
 
@@ -30,6 +46,8 @@ type
     constructor Create(const Value: string);
     function ToString: string;
   end;
+
+  {$ENDREGION}
 
   {$REGION 'GenAI.Schema'}
 
