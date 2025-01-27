@@ -22,6 +22,19 @@ const
     listed here must have a dedicated interceptor  that transforms the string
     back into a well-formed JSON object. }
 
+//    Example: TMetadataInterceptor
+//
+//      procedure TMetadataInterceptor.StringReverter(Data: TObject; Field,
+//        Arg: string);
+//      begin
+//        Arg := Format('{%s}', [Trim(Arg.Replace('`', '"').Replace(#10, ''))]);
+//        while Arg.Contains(', ') do Arg := Arg.Replace(', ', ',');
+//        RTTI.GetType(Data.ClassType).GetField(Field).SetValue(Data, Arg.Replace(',', ', '));
+//      end;
+
+
+
+
 
 type
   /// <summary>
