@@ -11,57 +11,9 @@ interface
 
 uses
   System.SysUtils, System.Classes, REST.JsonReflect, System.JSON, REST.Json.Types,
-  GenAI.API.Params;
+  GenAI.API.Params, GenAI.Types;
 
 type
-  /// <summary>
-  /// Type contains the list of OpenAPI data types as defined by https://spec.openapis.org/oas/v3.0.3#data-types
-  /// </summary>
-  TSchemaType = (
-    /// <summary>
-    /// Not specified, should not be used.
-    /// </summary>
-    TYPE_UNSPECIFIED,
-    /// <summary>
-    /// String type.
-    /// </summary>
-    stSTRING,
-    /// <summary>
-    /// Number type.
-    /// </summary>
-    stNUMBER,
-    /// <summary>
-    /// Integer type.
-    /// </summary>
-    stINTEGER,
-    /// <summary>
-    /// Boolean type.
-    /// </summary>
-    stBOOLEAN,
-    /// <summary>
-    /// Array type.
-    /// </summary>
-    stARRAY,
-    /// <summary>
-    /// Object type.
-    /// </summary>
-    stOBJECT
-  );
-
-  /// <summary>
-  /// Helper record for the <c>TSchemaType</c> enumeration, providing utility methods for converting
-  /// between <c>TSchemaType</c> values and their string representations.
-  /// </summary>
-  TSchemaTypeHelper = record helper for TSchemaType
-    /// <summary>
-    /// Converts the current <c>TSchemaType</c> value to its corresponding string representation.
-    /// </summary>
-    /// <returns>
-    /// A string representing the current <c>TSchemaType</c> value.
-    /// </returns>
-    function ToString: string;
-  end;
-
   TSchemaParams = class;
 
   /// <summary>
@@ -246,28 +198,6 @@ implementation
 
 uses
   System.StrUtils, System.Rtti, Rest.Json;
-
-{ TSchemaTypeHelper }
-
-function TSchemaTypeHelper.ToString: string;
-begin
-  case Self of
-    TYPE_UNSPECIFIED:
-      Exit('type_unspecified');
-    stSTRING:
-      Exit('string');
-    stNUMBER:
-      Exit('number');
-    stINTEGER:
-      Exit('integer');
-    stBOOLEAN:
-      Exit('boolean');
-    stARRAY:
-      Exit('array');
-    stOBJECT:
-      Exit('object');
-  end;
-end;
 
 { TSchemaParams }
 

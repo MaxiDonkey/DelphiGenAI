@@ -11,9 +11,9 @@ interface
 
 uses
   System.SysUtils, System.Classes, GenAI.API, GenAI.API.Params, GenAI.Models,
-  GenAI.Functions.Core, GenAI.Batch.Interfaces, GenAI.Embeddings, GenAI.Audio,
-  GenAI.Chat, GenAI.Moderation, GenAI.Images, GenAI.Files, GenAI.Uploads, GenAI.Batch,
-  GenAI.Batch.Reader, GenAI.Batch.Builder, GenAI.Completions;
+  GenAI.Functions.Core, GenAI.Batch.Interfaces, GenAI.Schema, GenAI.Embeddings,
+  GenAI.Audio, GenAI.Chat, GenAI.Moderation, GenAI.Images, GenAI.Files, GenAI.Uploads,
+  GenAI.Batch, GenAI.Batch.Reader, GenAI.Batch.Builder, GenAI.Completions;
 
 type
   /// <summary>
@@ -314,6 +314,30 @@ type
   /// This interface outlines the basic properties and methods that any function implementation must include.
   /// </remarks>
   IFunctionCore = GenAI.Functions.Core.IFunctionCore;
+
+  {$ENDREGION}
+
+  {$REGION 'GenAI.Schema'}
+
+  /// <summary>
+  /// Provides helper methods for creating property items in OpenAPI schema definitions.
+  /// </summary>
+  /// <remarks>
+  /// This record simplifies the creation of property entries when building schema objects,
+  /// particularly for object properties in OpenAPI specifications.
+  /// </remarks>
+  TPropertyItem = GenAI.Schema.TPropertyItem;
+
+  /// <summary>
+  /// Represents the Schema Object in OpenAPI, enabling the definition of input and output data types.
+  /// These types can be objects, primitives, or arrays. This class provides methods to build and
+  /// configure schema definitions as per the OpenAPI 3.0 Specification.
+  /// </summary>
+  /// <remarks>
+  /// The Schema Object allows the definition of input and output data types in the OpenAPI Specification.
+  /// This class provides a fluent interface to construct schema definitions programmatically.
+  /// </remarks>
+  TSchemaParams = GenAI.Schema.TSchemaParams;
 
   {$ENDREGION}
 

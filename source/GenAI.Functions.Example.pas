@@ -10,7 +10,7 @@ unit GenAI.Functions.Example;
 interface
 
 uses
-  System.SysUtils, GenAI.Functions.Core, GenAI.Schema;
+  System.SysUtils, GenAI.Functions.Core, GenAI.Schema, GenAI.Types;
 
 type
   TWeatherReportFunction = class(TFunctionCore)
@@ -116,20 +116,20 @@ begin
   var Schema := TSchemaParams.New(
     procedure (var Params: TSchemaParams)
     begin
-      Params.&Type(stOBJECT);
+      Params.&Type(TSchemaType.object);
       Params.Properties('properties',
         procedure (var Params: TSchemaParams)
         begin
           Params.Properties('location',
             procedure (var Params: TSchemaParams)
             begin
-              Params.&Type(stSTRING);
+              Params.&Type(TSchemaType.string);
               Params.Description('The city and state, e.g. San Francisco, CA');
             end);
           Params.Properties('unit',
             procedure (var Params: TSchemaParams)
             begin
-              Params.&Type(stSTRING);
+              Params.&Type(TSchemaType.string);
               Params.Enum(['celsius', 'fahrenheit']);
             end);
         end);

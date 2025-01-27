@@ -31,6 +31,52 @@ type
     function ToString: string;
   end;
 
+  {$REGION 'GenAI.Schema'}
+
+  /// <summary>
+  /// Type contains the list of OpenAPI data types as defined by :
+  /// <para>
+  /// - https://spec.openapis.org/oas/v3.0.3#data-types
+  /// </para>
+  /// </summary>
+  TSchemaType = (
+    /// <summary>
+    /// Not specified, should not be used.
+    /// </summary>
+    unspecified,
+    /// <summary>
+    /// String type.
+    /// </summary>
+    &string,
+    /// <summary>
+    /// Number type.
+    /// </summary>
+    number,
+    /// <summary>
+    /// Integer type.
+    /// </summary>
+    &integer,
+    /// <summary>
+    /// Boolean type.
+    /// </summary>
+    &boolean,
+    /// <summary>
+    /// Array type.
+    /// </summary>
+    &array,
+    /// <summary>
+    /// Object type.
+    /// </summary>
+    &object
+  );
+
+  TSchemaTypeHelper = record Helper for TSchemaType
+    constructor Create(const Value: string);
+    function ToString: string;
+  end;
+
+  {$ENDREGION}
+
   {$REGION 'GenAI.Chat'}
 
   /// <summary>
@@ -1587,6 +1633,35 @@ begin
       Exit('/v1/chat/completions');
     TBatchUrl.embeddings:
       Exit('/v1/embeddings');
+  end;
+end;
+
+{ TSchemaTypeHelper }
+
+constructor TSchemaTypeHelper.Create(const Value: string);
+begin
+  Self := TEnumValueRecovery.TypeRetrieve<TSchemaType>(Value,
+            ['unspecified', 'string', 'number', 'integer',
+             'boolean', 'array', 'object']);
+end;
+
+function TSchemaTypeHelper.ToString: string;
+begin
+  case self of
+    TSchemaType.unspecified:
+      Exit('unspecified');
+    TSchemaType.string:
+      Exit('string');
+    TSchemaType.number:
+      Exit('number');
+    TSchemaType.integer:
+      Exit('integer');
+    TSchemaType.boolean:
+      Exit('boolean');
+    TSchemaType.array:
+      Exit('array');
+    TSchemaType.object:
+      Exit('object');
   end;
 end;
 
