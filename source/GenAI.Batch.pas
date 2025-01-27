@@ -23,8 +23,9 @@ uses
 type
   /// <summary>
   /// Represents the parameters required to create a batch operation within the OpenAI API.
-  /// This class encapsulates the settings and metadata necessary to initiate a batch process, including the input file, endpoint specification,
-  /// completion window, and any optional metadata associated with the batch.
+  /// This class encapsulates the settings and metadata necessary to initiate a batch process, including the
+  /// input file, endpoint specification, completion window, and any optional metadata associated with the
+  /// batch.
   /// </summary>
   TBatchCreateParams = class(TJSONParam)
   public
