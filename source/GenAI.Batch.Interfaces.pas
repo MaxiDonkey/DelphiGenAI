@@ -48,7 +48,6 @@ unit GenAI.Batch.Interfaces;
            "encoding_format": "float"
           }
          }
-
 *)
 
 interface
