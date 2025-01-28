@@ -13,7 +13,8 @@ uses
   System.SysUtils, System.Classes, GenAI.API, GenAI.API.Params, GenAI.Models,
   GenAI.Functions.Core, GenAI.Batch.Interfaces, GenAI.Schema, GenAI.Embeddings,
   GenAI.Audio, GenAI.Chat, GenAI.Moderation, GenAI.Images, GenAI.Files, GenAI.Uploads,
-  GenAI.Batch, GenAI.Batch.Reader, GenAI.Batch.Builder, GenAI.Completions;
+  GenAI.Batch, GenAI.Batch.Reader, GenAI.Batch.Builder, GenAI.Completions,
+  GenAI.FineTuning;
 
 type
   /// <summary>
@@ -40,6 +41,7 @@ type
     function GetCompletionRoute: TCompletionRoute;
     function GetEmbeddingsRoute: TEmbeddingsRoute;
     function GetFilesRoute: TFilesRoute;
+    function GetFineTuningRoute: TFineTuningRoute;
     function GetImagesRoute: TImagesRoute;
     function GetModelsRoute: TModelsRoute;
     function GetModerationRoute: TModerationRoute;
@@ -95,6 +97,14 @@ type
     /// It supports both synchronous and asynchronous operations for efficient file management.
     /// </remarks>
     property Files: TFilesRoute read GetFilesRoute;
+    /// <summary>
+    /// Provides methods to interact with the OpenAI fine-tuning API routes.
+    /// </summary>
+    /// <remarks>
+    /// This class includes methods for creating, retrieving, listing, canceling, and managing fine-tuning jobs,
+    /// as well as accessing associated events and checkpoints.
+    /// </remarks>
+    property FineTuning: TFineTuningRoute read GetFineTuningRoute;
     /// <summary>
     /// Represents the route handler for image-related operations using the OpenAI API.
     /// </summary>
@@ -192,10 +202,11 @@ type
     FChatRoute: TChatRoute;
     FCompletionRoute: TCompletionRoute;
     FEmbeddingsRoute: TEmbeddingsRoute;
+    FFilesRoute: TFilesRoute;
+    FFineTuningRoute: TFineTuningRoute;
     FImagesRoute: TImagesRoute;
     FModelsRoute: TModelsRoute;
     FModerationRoute: TModerationRoute;
-    FFilesRoute: TFilesRoute;
     FUploadsRoute: TUploadsRoute;
 
     function GetAPI: TGenAIAPI;
@@ -210,6 +221,7 @@ type
     function GetCompletionRoute: TCompletionRoute;
     function GetEmbeddingsRoute: TEmbeddingsRoute;
     function GetFilesRoute: TFilesRoute;
+    function GetFineTuningRoute: TFineTuningRoute;
     function GetImagesRoute: TImagesRoute;
     function GetModelsRoute: TModelsRoute;
     function GetModerationRoute: TModerationRoute;
@@ -1462,6 +1474,7 @@ begin
   FCompletionRoute.Free;
   FEmbeddingsRoute.Free;
   FFilesRoute.Free;
+  FFineTuningRoute.Free;
   FImagesRoute.Free;
   FModelsRoute.Free;
   FModerationRoute.Free;
@@ -1506,6 +1519,13 @@ begin
   if not Assigned(FFilesRoute) then
     FFilesRoute := TFilesRoute.CreateRoute(API);
   Result := FFilesRoute;
+end;
+
+function TGenAI.GetFineTuningRoute: TFineTuningRoute;
+begin
+  if not Assigned(FFineTuningRoute) then
+    FFineTuningRoute := TFineTuningRoute.CreateRoute(API);
+  Result := FFineTuningRoute;
 end;
 
 function TGenAI.GetImagesRoute: TImagesRoute;

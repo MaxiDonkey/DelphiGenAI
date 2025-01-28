@@ -1079,6 +1079,44 @@ type
 
   {$ENDREGION}
 
+  {$REGION 'GenAI.FineTuning'}
+
+  TJobMethodType = (
+    supervised,
+    dpo
+  );
+
+  TJobMethodTypeHHelper = record Helper for TJobMethodType
+    constructor Create(const Value: string);
+    function ToString: string;
+  end;
+
+  TJobMethodTypeInterceptor = class(TJSONInterceptorStringToString)
+    function StringConverter(Data: TObject; Field: string): string; override;
+    procedure StringReverter(Data: TObject; Field: string; Arg: string); override;
+  end;
+
+  TFineTunedStatus = (
+    validating_files,
+    queued,
+    running,
+    succeeded,
+    failed,
+    cancelled
+  );
+
+  TFineTunedStatusHelper = record Helper for TFineTunedStatus
+    constructor Create(const Value: string);
+    function ToString: string;
+  end;
+
+  TFineTunedStatusInterceptor = class(TJSONInterceptorStringToString)
+    function StringConverter(Data: TObject; Field: string): string; override;
+    procedure StringReverter(Data: TObject; Field: string; Arg: string); override;
+  end;
+
+  {$ENDREGION}
+
 implementation
 
 uses
@@ -1681,6 +1719,78 @@ begin
     TSchemaType.object:
       Exit('object');
   end;
+end;
+
+{ TJobMethodTypeHHelper }
+
+constructor TJobMethodTypeHHelper.Create(const Value: string);
+begin
+  Self := TEnumValueRecovery.TypeRetrieve<TJobMethodType>(Value, ['supervised', 'dpo']);
+end;
+
+function TJobMethodTypeHHelper.ToString: string;
+begin
+  case self of
+    TJobMethodType.supervised:
+      Exit('supervised');
+    TJobMethodType.dpo:
+      Exit('dpo');
+  end;
+end;
+
+{ TJobMethodTypeInterceptor }
+
+function TJobMethodTypeInterceptor.StringConverter(Data: TObject;
+  Field: string): string;
+begin
+  Result := RTTI.GetType(Data.ClassType).GetField(Field).GetValue(Data).AsType<TJobMethodType>.ToString;
+end;
+
+procedure TJobMethodTypeInterceptor.StringReverter(Data: TObject; Field,
+  Arg: string);
+begin
+  RTTI.GetType(Data.ClassType).GetField(Field).SetValue(Data, TValue.From(TJobMethodType.Create(Arg)));
+end;
+
+{ TFineTunedStatusHelper }
+
+constructor TFineTunedStatusHelper.Create(const Value: string);
+begin
+  Self := TEnumValueRecovery.TypeRetrieve<TFineTunedStatus>(Value,
+            ['validating_files', 'queued', 'running', 'succeeded',
+             'failed', 'cancelled']);
+end;
+
+function TFineTunedStatusHelper.ToString: string;
+begin
+  case self of
+    TFineTunedStatus.validating_files:
+      Exit('validating_files');
+    TFineTunedStatus.queued:
+      Exit('queued');
+    TFineTunedStatus.running:
+      Exit('running');
+    TFineTunedStatus.succeeded:
+      Exit('succeeded');
+    TFineTunedStatus.failed:
+      Exit('failed');
+    TFineTunedStatus.cancelled:
+      Exit('cancelled');
+  end;
+end;
+
+{ TFineTunedStatusInterceptor }
+
+function TFineTunedStatusInterceptor.StringConverter(Data: TObject;
+  Field: string): string;
+begin
+  Result := RTTI.GetType(Data.ClassType).GetField(Field).GetValue(Data).AsType<TFineTunedStatus>.ToString;
+end;
+
+procedure TFineTunedStatusInterceptor.StringReverter(Data: TObject; Field,
+  Arg: string);
+begin
+  RTTI.GetType(Data.ClassType).GetField(Field).SetValue(Data, TValue.From(TFineTunedStatus.Create(Arg)));
 end;
 
 end.
