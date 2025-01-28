@@ -4,6 +4,9 @@ unit GenAI.Batch;
 
       Github repository :  https://github.com/MaxiDonkey/DelphiGenAI
       Visit the Github repository for the documentation and use examples
+-------------------------------------------------------------------------------}
+
+(*
 
   -- WARNING --
     The documentation references the capability to execute a batch through the /v1/completions endpoint.
@@ -11,7 +14,7 @@ unit GenAI.Batch;
     This limitation arises because not all models available  for the completion mechanism support batch
     operations.
 
- ------------------------------------------------------------------------------}
+*)
 
 interface
 
