@@ -110,7 +110,6 @@ unit GenAI.FineTuning;
 
   In summary, the  supervised method  is ideal for  well-defined tasks, while  DPO is more suitable
   when human preferences or subjective criteria are central to your project.
-
 *)
 
 interface
