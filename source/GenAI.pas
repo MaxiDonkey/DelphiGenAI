@@ -1376,6 +1376,229 @@ type
 
   {$ENDREGION}
 
+  {$REGION 'GenAI.FineTuning'}
+
+  /// <summary>
+  /// Represents the URL parameters for fine-tuning-related API requests.
+  /// This class provides methods for setting pagination parameters
+  /// such as "after" and "limit" to filter and retrieve fine-tuning jobs
+  /// or related events.
+  /// </summary>
+  TFineTuningURLParams = GenAI.FineTuning.TFineTuningURLParams;
+
+  /// <summary>
+  /// Represents the configuration parameters for Weights and Biases (WandB) integration
+  /// in fine-tuning jobs. These parameters specify project details, run names, entities,
+  /// and tags associated with WandB.
+  /// </summary>
+  TWandbParams = GenAI.FineTuning.TWandbParams;
+
+  /// <summary>
+  /// Represents the configuration parameters for integrating external services
+  /// into fine-tuning jobs. This class supports defining the type of integration
+  /// (e.g., Weights and Biases) and its associated configuration details.
+  /// </summary>
+  TJobIntegrationParams = GenAI.FineTuning.TJobIntegrationParams;
+
+  /// <summary>
+  /// Represents the configuration of hyperparameters for fine-tuning jobs.
+  /// This class provides methods to set parameters such as batch size,
+  /// learning rate, number of epochs, and beta (for DPO).
+  /// </summary>
+  THyperparametersParams = GenAI.FineTuning.THyperparametersParams;
+
+  /// <summary>
+  /// Represents the configuration parameters for the supervised fine-tuning method.
+  /// This class allows specifying hyperparameters to be used in supervised learning tasks.
+  /// </summary>
+  TSupervisedMethodParams = GenAI.FineTuning.TSupervisedMethodParams;
+
+  /// <summary>
+  /// Represents the configuration parameters for the DPO (Direct Preference Optimization)
+  /// fine-tuning method. This class allows specifying hyperparameters to be used
+  /// in DPO-based learning tasks.
+  /// </summary>
+  TDpoMethodParams = GenAI.FineTuning.TDpoMethodParams;
+
+  /// <summary>
+  /// Represents the configuration for the fine-tuning method to be used in a job.
+  /// This class supports multiple methods, such as supervised learning or
+  /// Direct Preference Optimization (DPO), and allows setting their respective parameters.
+  /// </summary>
+  TJobMethodParams = GenAI.FineTuning.TJobMethodParams;
+
+  /// <summary>
+  /// Represents the configuration parameters for creating a fine-tuning job.
+  /// This class allows setting various properties, such as the model to fine-tune,
+  /// training and validation files, hyperparameters, and optional metadata.
+  /// </summary>
+  TFineTuningJobParams = GenAI.FineTuning.TFineTuningJobParams;
+
+  /// <summary>
+  /// Represents detailed error information for a fine-tuning job that has failed.
+  /// This class contains information about the error code, message, and the parameter
+  /// that caused the failure.
+  /// </summary>
+  TFineTuningJobError = GenAI.FineTuning.TFineTuningJobError;
+
+  /// <summary>
+  /// Represents the hyperparameters used for a fine-tuning job in OpenAI's fine-tuning API.
+  /// </summary>
+  /// <remarks>
+  /// The hyperparameters include options to control the training process, such as the batch size,
+  /// learning rate, number of epochs, and beta (used in specific fine-tuning methods like DPO).
+  /// These parameters allow customization of the model's fine-tuning behavior for optimal performance.
+  /// </remarks>
+  THyperparameters = GenAI.FineTuning.THyperparameters;
+
+  /// <summary>
+  /// Represents the configuration for integrating with Weights and Biases (WandB) in a fine-tuning job.
+  /// </summary>
+  /// <remarks>
+  /// This class provides methods to set project details, display names, entities, and tags
+  /// for runs tracked in WandB during the fine-tuning process.
+  /// </remarks>
+  TWanDB = GenAI.FineTuning.TWanDB;
+
+  /// <summary>
+  /// Represents the integration settings for a fine-tuning job, including integration with tools
+  /// like Weights and Biases (WandB).
+  /// </summary>
+  /// <remarks>
+  /// This class allows configuration of the type of integration and specific settings for each tool,
+  /// such as WandB.
+  /// </remarks>
+  FineTuningJobIntegration = GenAI.FineTuning.FineTuningJobIntegration;
+
+  /// <summary>
+  /// Represents the configuration for supervised fine-tuning in a fine-tuning job.
+  /// </summary>
+  /// <remarks>
+  /// This class contains the hyperparameters that define the supervised fine-tuning process.
+  /// </remarks>
+  TSupervised = GenAI.FineTuning.TSupervised;
+
+  /// <summary>
+  /// Represents the configuration for the DPO (Direct Preference Optimization) fine-tuning method
+  /// in a fine-tuning job.
+  /// </summary>
+  /// <remarks>
+  /// This class contains the hyperparameters that define the DPO fine-tuning process.
+  /// </remarks>
+  TDpo = GenAI.FineTuning.TDpo;
+
+  /// <summary>
+  /// Represents the method configuration for fine-tuning in a fine-tuning job.
+  /// </summary>
+  /// <remarks>
+  /// This class defines the type of fine-tuning method (e.g., supervised or DPO) and includes the
+  /// specific configurations for each method.
+  /// </remarks>
+  TFineTuningMethod = GenAI.FineTuning.TFineTuningMethod;
+
+  /// <summary>
+  /// Represents a fine-tuning job in OpenAI's fine-tuning API.
+  /// </summary>
+  /// <remarks>
+  /// This class contains details about a fine-tuning job, including its status, configuration, and results.
+  /// </remarks>
+  TFineTuningJob = GenAI.FineTuning.TFineTuningJob;
+
+  /// <summary>
+  /// Represents a list of fine-tuning jobs in OpenAI's fine-tuning API.
+  /// </summary>
+  /// <remarks>
+  /// This class extends <c>TJobList</c> to provide a collection of fine-tuning jobs and their details.
+  /// </remarks>
+  TFineTuningJobs = GenAI.FineTuning.TFineTuningJobs;
+
+  /// <summary>
+  /// Represents an event associated with a fine-tuning job in OpenAI's fine-tuning API.
+  /// </summary>
+  /// <remarks>
+  /// This class provides information about a specific event, including its type, timestamp,
+  /// message, and associated data.
+  /// </remarks>
+  TJobEvent = GenAI.FineTuning.TJobEvent;
+
+  /// <summary>
+  /// Represents a list of events associated with a fine-tuning job in OpenAI's fine-tuning API.
+  /// </summary>
+  /// <remarks>
+  /// This class extends <c>TJobList</c> to provide a collection of events for a specific fine-tuning job,
+  /// including their details such as type, message, and timestamps.
+  /// </remarks>
+  TJobEvents = GenAI.FineTuning.TJobEvents;
+
+  /// <summary>
+  /// Represents the metrics collected during a fine-tuning job in OpenAI's fine-tuning API.
+  /// </summary>
+  /// <remarks>
+  /// This class contains various metrics related to the training and validation process,
+  /// including loss values and token accuracy.
+  /// </remarks>
+  TMetrics = GenAI.FineTuning.TMetrics;
+
+  /// <summary>
+  /// Represents a model checkpoint for a fine-tuning job in OpenAI's fine-tuning API.
+  /// </summary>
+  /// <remarks>
+  /// This class contains details about a specific checkpoint, including the step number, metrics,
+  /// and the fine-tuned model checkpoint identifier.
+  /// </remarks>
+  TJobCheckpoint = GenAI.FineTuning.TJobCheckpoint;
+
+  /// <summary>
+  /// Represents a list of checkpoints for a fine-tuning job in OpenAI's fine-tuning API.
+  /// </summary>
+  /// <remarks>
+  /// This class extends <c>TJobList</c> to provide a collection of checkpoints generated during
+  /// a fine-tuning job. Each checkpoint includes details such as step number, metrics, and associated model data.
+  /// </remarks>
+  TJobCheckpoints = GenAI.FineTuning.TJobCheckpoints;
+
+  /// <summary>
+  /// Manages asynchronous chat callBacks for a chat request using <c>TFineTuningJob</c> as the response type.
+  /// </summary>
+  /// <remarks>
+  /// The <c>TAsynFineTuningJob</c> type extends the <c>TAsynParams&lt;TFineTuningJob&gt;</c> record to handle the lifecycle of an asynchronous chat operation.
+  /// It provides event handlers that trigger at various stages, such as when the operation starts, completes successfully, or encounters an error.
+  /// This structure facilitates non-blocking chat operations and is specifically tailored for scenarios where multiple choices from a chat model are required.
+  /// </remarks>
+  TAsynFineTuningJob = GenAI.FineTuning.TAsynFineTuningJob;
+
+  /// <summary>
+  /// Manages asynchronous chat callBacks for a chat request using <c>TFineTuningJobs</c> as the response type.
+  /// </summary>
+  /// <remarks>
+  /// The <c>TAsynFineTuningJobs</c> type extends the <c>TAsynParams&lt;TFineTuningJobs&gt;</c> record to handle the lifecycle of an asynchronous chat operation.
+  /// It provides event handlers that trigger at various stages, such as when the operation starts, completes successfully, or encounters an error.
+  /// This structure facilitates non-blocking chat operations and is specifically tailored for scenarios where multiple choices from a chat model are required.
+  /// </remarks>
+  TAsynFineTuningJobs = GenAI.FineTuning.TAsynFineTuningJobs;
+
+  /// <summary>
+  /// Manages asynchronous chat callBacks for a chat request using <c>TJobEvents</c> as the response type.
+  /// </summary>
+  /// <remarks>
+  /// The <c>TAsynJobEvents</c> type extends the <c>TAsynParams&lt;TJobEvents&gt;</c> record to handle the lifecycle of an asynchronous chat operation.
+  /// It provides event handlers that trigger at various stages, such as when the operation starts, completes successfully, or encounters an error.
+  /// This structure facilitates non-blocking chat operations and is specifically tailored for scenarios where multiple choices from a chat model are required.
+  /// </remarks>
+  TAsynJobEvents = GenAI.FineTuning.TAsynJobEvents;
+
+  /// <summary>
+  /// Manages asynchronous chat callBacks for a chat request using <c>TJobCheckpoints</c> as the response type.
+  /// </summary>
+  /// <remarks>
+  /// The <c>TAsynFineJobCheckpoints</c> type extends the <c>TAsynParams&lt;TJobCheckpoints&gt;</c> record to handle the lifecycle of an asynchronous chat operation.
+  /// It provides event handlers that trigger at various stages, such as when the operation starts, completes successfully, or encounters an error.
+  /// This structure facilitates non-blocking chat operations and is specifically tailored for scenarios where multiple choices from a chat model are required.
+  /// </remarks>
+  TAsynJobCheckpoints = GenAI.FineTuning.TAsynJobCheckpoints;
+
+  {$ENDREGION}
+
 function FromDeveloper(const Content: string; const Name: string = ''):TMessagePayload;
 function FromSystem(const Content: string; const Name: string = ''):TMessagePayload;
 function FromUser(const Content: string; const Name: string = ''):TMessagePayload; overload;
