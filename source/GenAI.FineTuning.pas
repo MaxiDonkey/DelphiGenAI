@@ -1621,10 +1621,8 @@ begin
   case AType of
     TJobMethodType.supervised:
       Result := Method(TJobMethodParams.NewSupervised(Value));
-
     TJobMethodType.dpo:
       Result := Method(TJobMethodParams.NewDpo(Value));
-
     else
       Result := Self;
   end;
