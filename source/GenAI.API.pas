@@ -5,8 +5,10 @@ unit GenAI.API;
       Github repository :  https://github.com/MaxiDonkey/DelphiGenAI
       Visit the Github repository for the documentation and use examples
 
+ ------------------------------------------------------------------------------}
 
---- NOTE ---
+(*
+  --- NOTE ---
   The  GenAI.HttpClientInterface  unit  defines  an  IHttpClientAPI  interface, which
   allows  for decoupling  the specific implementation  of  the HTTP  client used  for
   web requests. This introduces  an abstraction  that  enhances flexibility, improves
@@ -21,9 +23,7 @@ unit GenAI.API;
 
   This approach adheres to the SOLID principles of dependency inversion, contributing
   to a robust, modular, and adaptable software architecture.
-
-
- ------------------------------------------------------------------------------}
+*)
 
 interface
 
