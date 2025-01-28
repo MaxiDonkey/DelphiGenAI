@@ -92,7 +92,7 @@ unit GenAI.FineTuning;
  +                   +                                  +                                          +
  + Primary Use Cases + Well-defined, objective tasks    + Subjective tasks or those requiring      +
  +                   +                                  + fine-tuned alignment                     +
- +-------------------+-----------------------------------------------------------------------------+
+ +-------------------+----------------------------------+------------------------------------------+
 
 
     3. Recommendation
