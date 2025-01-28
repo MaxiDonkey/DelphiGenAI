@@ -5,6 +5,9 @@ unit GenAI.Chat;
       Github repository :  https://github.com/MaxiDonkey/DelphiGenAI
       Visit the Github repository for the documentation and use examples
 
+ ------------------------------------------------------------------------------}
+
+(*
   --- NOTE ---
     Regarding the management of streamed messages.
 
@@ -31,8 +34,7 @@ unit GenAI.Chat;
     This interface lays the groundwork  for implementing and  comparing alternative
     streaming techniques while maintaining a clean, modular, and extensible
     architecture.
-
- ------------------------------------------------------------------------------}
+*)
 
 interface
 
