@@ -250,6 +250,17 @@ type
     property Content: string read GetContent;
   end;
 
+  TFileDeletion = class
+  private
+    FId: string;
+    FObject: string;
+    FDeleted: Boolean;
+  public
+    property Id: string read FId write FId;
+    property &Object: string read FObject write FObject;
+    property Deleted: Boolean read FDeleted write FDeleted;
+  end;
+
   /// <summary>
   /// Manages asynchronous chat callBacks for a chat request using <c>TFile</c> as the response type.
   /// </summary>
@@ -279,6 +290,16 @@ type
   /// This structure facilitates non-blocking chat operations and is specifically tailored for scenarios where multiple choices from a chat model are required.
   /// </remarks>
   TAsynFileContent = TAsynCallBack<TFileContent>;
+
+  /// <summary>
+  /// Manages asynchronous chat callBacks for a chat request using <c>TFileDeletion</c> as the response type.
+  /// </summary>
+  /// <remarks>
+  /// The <c>TAsynFileDeletion</c> type extends the <c>TAsynParams&lt;TFileDeletion&gt;</c> record to handle the lifecycle of an asynchronous chat operation.
+  /// It provides event handlers that trigger at various stages, such as when the operation starts, completes successfully, or encounters an error.
+  /// This structure facilitates non-blocking chat operations and is specifically tailored for scenarios where multiple choices from a chat model are required.
+  /// </remarks>
+  TAsynFileDeletion = TAsynCallBack<TFileDeletion>;
 
   /// <summary>
   /// Represents a route for managing file operations in the API.
@@ -345,7 +366,7 @@ type
     /// <param name="CallBacks">
     /// A function that defines callbacks to handle events like success, failure, or progress during the deletion process.
     /// </param>
-    procedure AsynDelete(const FileId: string; const CallBacks: TFunc<TAsynFile>);
+    procedure AsynDelete(const FileId: string; const CallBacks: TFunc<TAsynFileDeletion>);
     /// <summary>
     /// Uploads a file to the API synchronously.
     /// </summary>
@@ -400,9 +421,9 @@ type
     /// The unique identifier of the file to delete.
     /// </param>
     /// <returns>
-    /// Returns an instance of TFile representing the deleted file.
+    /// Returns an instance of TFileDeletion representing the deleted file.
     /// </returns>
-    function Delete(const FileId: string): TFile;
+    function Delete(const FileId: string): TFileDeletion;
   end;
 
 implementation
@@ -486,16 +507,16 @@ end;
 { TFilesRoute }
 
 procedure TFilesRoute.AsynDelete(const FileId: string;
-  const CallBacks: TFunc<TAsynFile>);
+  const CallBacks: TFunc<TAsynFileDeletion>);
 begin
-  with TAsynCallBackExec<TAsynFile, TFile>.Create(CallBacks) do
+  with TAsynCallBackExec<TAsynFileDeletion, TFileDeletion>.Create(CallBacks) do
   try
     Sender := Use.Param.Sender;
     OnStart := Use.Param.OnStart;
     OnSuccess := Use.Param.OnSuccess;
     OnError := Use.Param.OnError;
     Run(
-      function: TFile
+      function: TFileDeletion
       begin
         Result := Self.Delete(FileId);
       end);
@@ -598,9 +619,9 @@ begin
   end;
 end;
 
-function TFilesRoute.Delete(const FileId: string): TFile;
+function TFilesRoute.Delete(const FileId: string): TFileDeletion;
 begin
-  Result := API.Delete<TFile>('files/' + FileId);
+  Result := API.Delete<TFileDeletion>('files/' + FileId);
 end;
 
 function TFilesRoute.List: TFiles;

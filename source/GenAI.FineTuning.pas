@@ -121,38 +121,6 @@ uses
 
 type
   /// <summary>
-  /// Represents the URL parameters for fine-tuning-related API requests.
-  /// This class provides methods for setting pagination parameters
-  /// such as "after" and "limit" to filter and retrieve fine-tuning jobs
-  /// or related events.
-  /// </summary>
-  TFineTuningURLParams = class(TUrlParam)
-  public
-    /// <summary>
-    /// Specifies the identifier of the last job from the previous pagination request.
-    /// This parameter allows fetching the next set of results after the given identifier.
-    /// </summary>
-    /// <param name="Value">
-    /// The identifier of the last job from the previous pagination request.
-    /// </param>
-    /// <returns>
-    /// Returns the current instance of <c>TFineTuningURLParams</c> to allow method chaining.
-    /// </returns>
-    function After(const Value: string): TFineTuningURLParams;
-    /// <summary>
-    /// Sets the limit on the number of results to retrieve in a single API request.
-    /// The limit specifies the maximum number of fine-tuning jobs or events to fetch.
-    /// </summary>
-    /// <param name="Value">
-    /// An integer representing the maximum number of results to retrieve.
-    /// </param>
-    /// <returns>
-    /// Returns the current instance of <c>TFineTuningURLParams</c> to allow method chaining.
-    /// </returns>
-    function Limit(const Value: Int64): TFineTuningURLParams;
-  end;
-
-  /// <summary>
   /// Represents the configuration parameters for Weights and Biases (WandB) integration
   /// in fine-tuning jobs. These parameters specify project details, run names, entities,
   /// and tags associated with WandB.
@@ -569,7 +537,7 @@ type
   /// <typeparam name="T">
   /// The type of objects stored in the list. It must be a class and have a default constructor.
   /// </typeparam>
-  TJobList<T: class, constructor> = class(TJSONFingerprint)
+  TPaginatedList<T: class, constructor> = class(TJSONFingerprint)
     FObject: string;
     FData: TArray<T>;
     [JsonNameAttribute('has_more')]
@@ -589,7 +557,7 @@ type
     /// </summary>
     property HasMore: Boolean read FHasMore write FHasMore;
     /// <summary>
-    /// Destructor for the <c>TJobList</c> class.
+    /// Destructor for the <c>TPaginatedList</c> class.
     /// Frees all objects stored in the <c>Data</c> property to release memory.
     /// </summary>
     destructor Destroy; override;
@@ -1038,9 +1006,9 @@ type
   /// Represents a list of fine-tuning jobs in OpenAI's fine-tuning API.
   /// </summary>
   /// <remarks>
-  /// This class extends <c>TJobList</c> to provide a collection of fine-tuning jobs and their details.
+  /// This class extends <c>TPaginatedList</c> to provide a collection of fine-tuning jobs and their details.
   /// </remarks>
-  TFineTuningJobs = TJobList<TFineTuningJob>;
+  TFineTuningJobs = TPaginatedList<TFineTuningJob>;
 
   TEventData = class
   private
@@ -1130,10 +1098,10 @@ type
   /// Represents a list of events associated with a fine-tuning job in OpenAI's fine-tuning API.
   /// </summary>
   /// <remarks>
-  /// This class extends <c>TJobList</c> to provide a collection of events for a specific fine-tuning job,
+  /// This class extends <c>TPaginatedList</c> to provide a collection of events for a specific fine-tuning job,
   /// including their details such as type, message, and timestamps.
   /// </remarks>
-  TJobEvents = TJobList<TJobEvent>;
+  TJobEvents = TPaginatedList<TJobEvent>;
 
   /// <summary>
   /// Represents the metrics collected during a fine-tuning job in OpenAI's fine-tuning API.
@@ -1295,10 +1263,10 @@ type
   /// Represents a list of checkpoints for a fine-tuning job in OpenAI's fine-tuning API.
   /// </summary>
   /// <remarks>
-  /// This class extends <c>TJobList</c> to provide a collection of checkpoints generated during
+  /// This class extends <c>TPaginatedList</c> to provide a collection of checkpoints generated during
   /// a fine-tuning job. Each checkpoint includes details such as step number, metrics, and associated model data.
   /// </remarks>
-  TJobCheckpoints = TJobList<TJobCheckpoint>;
+  TJobCheckpoints = TPaginatedList<TJobCheckpoint>;
 
   /// <summary>
   /// Manages asynchronous chat callBacks for a chat request using <c>TFineTuningJob</c> as the response type.
@@ -1396,7 +1364,7 @@ type
     /// <remarks>
     /// This method retrieves fine-tuning jobs using the specified parameters and invokes the callbacks when complete.
     /// </remarks>
-    procedure AsynList(const ParamProc: TProc<TFineTuningURLParams>; const CallBacks: TFunc<TAsynFineTuningJobs>); overload;
+    procedure AsynList(const ParamProc: TProc<TUrlPaginationParams>; const CallBacks: TFunc<TAsynFineTuningJobs>); overload;
     /// <summary>
     /// Asynchronously retrieves events for a specific fine-tuning job.
     /// </summary>
@@ -1426,7 +1394,7 @@ type
     /// This method retrieves status updates and events for the specified fine-tuning job
     /// with additional parameters for customization.
     /// </remarks>
-    procedure AsynEvents(const JobId: string; const ParamProc: TProc<TFineTuningURLParams>;
+    procedure AsynEvents(const JobId: string; const ParamProc: TProc<TUrlPaginationParams>;
       const CallBacks: TFunc<TAsynJobEvents>); overload;
     /// <summary>
     /// Asynchronously retrieves checkpoints for a specific fine-tuning job.
@@ -1457,7 +1425,7 @@ type
     /// This method retrieves checkpoints generated during the specified fine-tuning job
     /// with additional parameters for customization.
     /// </remarks>
-    procedure AsynCheckpoints(const JobId: string; const ParamProc: TProc<TFineTuningURLParams>;
+    procedure AsynCheckpoints(const JobId: string; const ParamProc: TProc<TUrlPaginationParams>;
       const CallBacks: TFunc<TAsynJobCheckpoints>); overload;
     /// <summary>
     /// Asynchronously retrieves details about a specific fine-tuning job.
@@ -1520,7 +1488,7 @@ type
     /// <remarks>
     /// This method synchronously retrieves fine-tuning jobs using the specified parameters.
     /// </remarks>
-    function List(const ParamProc: TProc<TFineTuningURLParams>): TFineTuningJobs; overload;
+    function List(const ParamProc: TProc<TUrlPaginationParams>): TFineTuningJobs; overload;
     /// <summary>
     /// Retrieves events for a specific fine-tuning job.
     /// </summary>
@@ -1550,7 +1518,7 @@ type
     /// This method synchronously retrieves status updates and events for the specified fine-tuning job
     /// with additional parameters for customization.
     /// </remarks>
-    function Events(const JobId: string; const ParamProc: TProc<TFineTuningURLParams>): TJobEvents; overload;
+    function Events(const JobId: string; const ParamProc: TProc<TUrlPaginationParams>): TJobEvents; overload;
     /// <summary>
     /// Retrieves checkpoints for a specific fine-tuning job.
     /// </summary>
@@ -1580,7 +1548,7 @@ type
     /// This method synchronously retrieves checkpoints for the specified fine-tuning job
     /// with additional parameters for customization.
     /// </remarks>
-    function Checkpoints(const JobId: string; const ParamProc: TProc<TFineTuningURLParams>): TJobCheckpoints; overload;
+    function Checkpoints(const JobId: string; const ParamProc: TProc<TUrlPaginationParams>): TJobCheckpoints; overload;
     /// <summary>
     /// Retrieves details about a specific fine-tuning job.
     /// </summary>
@@ -1891,7 +1859,7 @@ begin
 end;
 
 procedure TFineTuningRoute.AsynCheckpoints(const JobId: string;
-  const ParamProc: TProc<TFineTuningURLParams>;
+  const ParamProc: TProc<TUrlPaginationParams>;
   const CallBacks: TFunc<TAsynJobCheckpoints>);
 begin
   with TAsynCallBackExec<TAsynJobCheckpoints, TJobCheckpoints>.Create(CallBacks) do
@@ -1950,7 +1918,7 @@ begin
 end;
 
 procedure TFineTuningRoute.AsynEvents(const JobId: string;
-  const ParamProc: TProc<TFineTuningURLParams>;
+  const ParamProc: TProc<TUrlPaginationParams>;
   const CallBacks: TFunc<TAsynJobEvents>);
 begin
   with TAsynCallBackExec<TAsynJobEvents, TJobEvents>.Create(CallBacks) do
@@ -1989,7 +1957,7 @@ begin
 end;
 
 procedure TFineTuningRoute.AsynList(
-  const ParamProc: TProc<TFineTuningURLParams>;
+  const ParamProc: TProc<TUrlPaginationParams>;
   const CallBacks: TFunc<TAsynFineTuningJobs>);
 begin
   with TAsynCallBackExec<TAsynFineTuningJobs, TFineTuningJobs>.Create(CallBacks) do
@@ -2038,9 +2006,9 @@ begin
 end;
 
 function TFineTuningRoute.Checkpoints(const JobId: string;
-  const ParamProc: TProc<TFineTuningURLParams>): TJobCheckpoints;
+  const ParamProc: TProc<TUrlPaginationParams>): TJobCheckpoints;
 begin
-  Result := API.Get<TJobCheckpoints, TFineTuningURLParams>('jobs/' + JobId + '/checkpoints', ParamProc);
+  Result := API.Get<TJobCheckpoints, TUrlPaginationParams>('jobs/' + JobId + '/checkpoints', ParamProc);
 end;
 
 function TFineTuningRoute.Create(
@@ -2055,9 +2023,9 @@ begin
 end;
 
 function TFineTuningRoute.Events(const JobId: string;
-  const ParamProc: TProc<TFineTuningURLParams>): TJobEvents;
+  const ParamProc: TProc<TUrlPaginationParams>): TJobEvents;
 begin
-  Result := API.Get<TJobEvents, TFineTuningURLParams>('jobs/'+ JobId + '/events', ParamProc);
+  Result := API.Get<TJobEvents, TUrlPaginationParams>('jobs/'+ JobId + '/events', ParamProc);
 end;
 
 function TFineTuningRoute.List: TFineTuningJobs;
@@ -2066,26 +2034,14 @@ begin
 end;
 
 function TFineTuningRoute.List(
-  const ParamProc: TProc<TFineTuningURLParams>): TFineTuningJobs;
+  const ParamProc: TProc<TUrlPaginationParams>): TFineTuningJobs;
 begin
-  Result := API.Get<TFineTuningJobs, TFineTuningURLParams>('fine_tuning/jobs', ParamProc);
+  Result := API.Get<TFineTuningJobs, TUrlPaginationParams>('fine_tuning/jobs', ParamProc);
 end;
 
 function TFineTuningRoute.Retrieve(const JobId: string): TFineTuningJob;
 begin
   Result := API.Get<TFineTuningJob>('fine_tuning/jobs/' + JobId);
-end;
-
-{ TFineTuningURLParams }
-
-function TFineTuningURLParams.After(const Value: string): TFineTuningURLParams;
-begin
-  Result := TFineTuningURLParams(Add('after', Value));
-end;
-
-function TFineTuningURLParams.Limit(const Value: Int64): TFineTuningURLParams;
-begin
-  Result := TFineTuningURLParams(Add('limit', Value));
 end;
 
 { TJobEvent }
@@ -2116,9 +2072,9 @@ begin
   Result := TimestampToString(CreatedAt, UTCtimestamp);
 end;
 
-{ TJobList<T> }
+{ TPaginatedList<T> }
 
-destructor TJobList<T>.Destroy;
+destructor TPaginatedList<T>.Destroy;
 begin
   for var Item in FData do
     Item.Free;

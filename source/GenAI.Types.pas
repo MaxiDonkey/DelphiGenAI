@@ -1117,6 +1117,48 @@ type
 
   {$ENDREGION}
 
+  {$REGION 'GenAI.Assistants'}
+
+  TAssistantsToolsType = (
+    code_interpreter,
+    file_search,
+    &function
+  );
+
+  TAssistantsToolsTypeInterceptor = class(TJSONInterceptorStringToString)
+    function StringConverter(Data: TObject; Field: string): string; override;
+    procedure StringReverter(Data: TObject; Field: string; Arg: string); override;
+  end;
+
+  TAssistantsToolsTypeHelper = record Helper for TAssistantsToolsType
+    constructor Create(const Value: string);
+    function ToString: string;
+  end;
+
+  TChunkingStrategyType = (
+    auto,
+    &static
+  );
+
+  TChunkingStrategyTypeHelper = record Helper for TChunkingStrategyType
+    constructor Create(const Value: string);
+    function ToString: string;
+  end;
+
+  TResponseFormatType = (
+    auto,
+    text,
+    json_object,
+    json_schema
+  );
+
+  TResponseFormatTypeHelper = record Helper for TResponseFormatType
+    constructor Create(const Value: string);
+    function ToString: string;
+  end;
+
+  {$ENDREGION}
+
 implementation
 
 uses
@@ -1791,6 +1833,79 @@ procedure TFineTunedStatusInterceptor.StringReverter(Data: TObject; Field,
   Arg: string);
 begin
   RTTI.GetType(Data.ClassType).GetField(Field).SetValue(Data, TValue.From(TFineTunedStatus.Create(Arg)));
+end;
+
+{ TAssistantsToolsTypeHelper }
+
+constructor TAssistantsToolsTypeHelper.Create(const Value: string);
+begin
+  Self := TEnumValueRecovery.TypeRetrieve<TAssistantsToolsType>(Value,
+            ['code_interpreter', 'file_search', 'function']);
+end;
+
+function TAssistantsToolsTypeHelper.ToString: string;
+begin
+  case self of
+    TAssistantsToolsType.code_interpreter:
+      Exit('code_interpreter');
+    TAssistantsToolsType.file_search:
+      Exit('file_search');
+    TAssistantsToolsType.function:
+      Exit('function');
+  end;
+end;
+
+{ TAssistantsToolsTypeInterceptor }
+
+function TAssistantsToolsTypeInterceptor.StringConverter(Data: TObject;
+  Field: string): string;
+begin
+  Result := RTTI.GetType(Data.ClassType).GetField(Field).GetValue(Data).AsType<TAssistantsToolsType>.ToString;
+end;
+
+procedure TAssistantsToolsTypeInterceptor.StringReverter(Data: TObject; Field,
+  Arg: string);
+begin
+  RTTI.GetType(Data.ClassType).GetField(Field).SetValue(Data, TValue.From(TAssistantsToolsType.Create(Arg)));
+end;
+
+{ TChunkingStrategyTypeHelper }
+
+constructor TChunkingStrategyTypeHelper.Create(const Value: string);
+begin
+  Self := TEnumValueRecovery.TypeRetrieve<TChunkingStrategyType>(Value, ['auto', 'static']);
+end;
+
+function TChunkingStrategyTypeHelper.ToString: string;
+begin
+  case self of
+    TChunkingStrategyType.auto:
+      Exit('auto');
+    TChunkingStrategyType.static:
+      Exit('static');
+  end;
+end;
+
+{ TResponseFormatTypeHelper }
+
+constructor TResponseFormatTypeHelper.Create(const Value: string);
+begin
+  Self := TEnumValueRecovery.TypeRetrieve<TResponseFormatType>(Value,
+            ['auto', 'text', 'json_object', 'json_schema']);
+end;
+
+function TResponseFormatTypeHelper.ToString: string;
+begin
+  case self of
+    TResponseFormatType.auto:
+      Exit('auto');
+    TResponseFormatType.text:
+      Exit('text');
+    TResponseFormatType.json_object:
+      Exit('json_object');
+    TResponseFormatType.json_schema:
+      Exit('json_schema');
+  end;
 end;
 
 end.

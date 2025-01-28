@@ -130,6 +130,57 @@ type
   end;
 
   /// <summary>
+  /// Represents the parameters for listing.
+  /// This class provides the functionality to control pagination and set limits on the number of objects retrieved.
+  /// It is useful for efficiently managing and navigating through large sets of objects.
+  /// </summary>
+  TUrlPaginationParams = class(TUrlParam)
+  public
+    /// <summary>
+    /// A limit on the number of objects to be returned. Limit can range between 1 and 100,
+    /// and the default is 20.
+    /// </summary>
+    /// <param name="Value">The limit on the number of objects, ranging from 1 to 100.</param>
+    /// <returns>The instance of TUrlPaginationParams for method chaining.</returns>
+    function Limit(const Value: Integer): TUrlPaginationParams;
+    /// <summary>
+    /// A cursor for use in pagination. after is an object ID that defines your place in the list.
+    /// For instance, if you make a list request and receive 100 objects, ending with obj_foo, your
+    /// subsequent call can include after=obj_foo in order to fetch the next page of the list.
+    /// </summary>
+    /// <param name="Value">The object ID that defines the starting point for pagination.</param>
+    /// <returns>The instance of TUrlPaginationParams for method chaining.</returns>
+    function After(const Value: string): TUrlPaginationParams;
+  end;
+
+  /// <summary>
+  /// Represents the advanced parameters for listing and filtering data.
+  /// This class extends <see cref="TUrlPaginationParams"/> to provide additional functionality for
+  /// sorting and navigating through paginated data.
+  /// It is designed to manage more complex scenarios where both pagination and sorting are required.
+  /// </summary>
+  TUrlAdvancedParams = class(TUrlPaginationParams)
+  public
+    /// <summary>
+    /// Specifies the sort order of the retrieved objects based on their creation timestamp.
+    /// This allows you to customize the order in which objects are returned, either in ascending
+    /// or descending order.
+    /// </summary>
+    /// <param name="Value">"Asc" for ascending order or "Desc" for descending order.</param>
+    /// <returns>The instance of TUrlAdvancedParams for method chaining.</returns>
+    function Order(const Value: string): TUrlAdvancedParams;
+    /// <summary>
+    /// A cursor for use in pagination. This parameter allows you to specify an object ID that defines
+    /// your place in the list when navigating to the previous set of results.
+    /// For instance, if you receive a list of objects starting with obj_foo, a subsequent call can
+    /// include before=obj_foo to fetch the previous page of results.
+    /// </summary>
+    /// <param name="Value">The object ID that defines the ending point for pagination.</param>
+    /// <returns>The instance of TUrlAdvancedParams for method chaining.</returns>
+    function Before(const Value: string): TUrlAdvancedParams;
+  end;
+
+  /// <summary>
   /// Represents a utility class for managing JSON objects and constructing JSON structures dynamically.
   /// </summary>
   /// <remarks>
@@ -788,6 +839,30 @@ function TJSONParam.ToStringPairs: TArray<TPair<string, string>>;
 begin
   for var Pair in FJSON do
     Result := Result + [TPair<string, string>.Create(Pair.JsonString.Value, Pair.JsonValue.ToString)];
+end;
+
+{ TUrlAdvancedParams  }
+
+function TUrlAdvancedParams.Before(const Value: string): TUrlAdvancedParams;
+begin
+  Result := TUrlAdvancedParams (Add('before', Value));
+end;
+
+function TUrlAdvancedParams.Order(const Value: string): TUrlAdvancedParams;
+begin
+  Result := TUrlAdvancedParams (Add('order', Value));
+end;
+
+{ TUrlPaginationParams }
+
+function TUrlPaginationParams.After(const Value: string): TUrlPaginationParams;
+begin
+  Result := TUrlPaginationParams(Add('after', Value));
+end;
+
+function TUrlPaginationParams.Limit(const Value: Integer): TUrlPaginationParams;
+begin
+  Result := TUrlPaginationParams(Add('limit', Value));
 end;
 
 end.

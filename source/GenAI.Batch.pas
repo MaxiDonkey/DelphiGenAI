@@ -68,30 +68,6 @@ type
   end;
 
   /// <summary>
-  /// Represents the parameters for listing batches in the OpenAI API.
-  /// This class provides the functionality to control pagination and set limits on the number of batch objects retrieved.
-  /// It is useful for efficiently managing and navigating through large sets of batches.
-  /// </summary>
-  TBatchListParams = class(TURLParam)
-  public
-    /// <summary>
-    /// Sets the cursor for pagination. This is an optional parameter used to specify a starting point for the listing operation.
-    /// The 'after' parameter should be the ID of the batch object from which to continue listing subsequent batches.
-    /// </summary>
-    /// <param name="Value">The object ID that defines the starting point for pagination.</param>
-    /// <returns>The instance of TBatchListParams for method chaining.</returns>
-    function After(const Value: string): TBatchListParams;
-    /// <summary>
-    /// Specifies the maximum number of batch objects to return in the response. This is an optional parameter.
-    /// If not set, the default value is 20. The limit can be set between 1 and 100, allowing for customization of data retrieval volume
-    /// based on application needs and performance considerations.
-    /// </summary>
-    /// <param name="Value">The limit on the number of batch objects, ranging from 1 to 100.</param>
-    /// <returns>The instance of TBatchListParams for method chaining.</returns>
-    function Limit(const Value: Integer): TBatchListParams;
-  end;
-
-  /// <summary>
   /// Represents the error details associated with a specific request within a batch operation.
   /// This class holds detailed information about an error, including a machine-readable code, a human-readable message,
   /// and the specific parameter or line that caused the error. This facilitates debugging and error handling in batch processing.
@@ -519,7 +495,7 @@ type
     /// </summary>
     /// <param name="ParamProc">An optional procedure to configure listing parameters such as pagination.</param>
     /// <param name="CallBacks">A function that returns an instance of TAsynBatches for handling callback events.</param>
-    procedure AsynList(const ParamProc: TProc<TBatchListParams>; const CallBacks: TFunc<TAsynBatches>); overload;
+    procedure AsynList(const ParamProc: TProc<TUrlPaginationParams>; const CallBacks: TFunc<TAsynBatches>); overload;
     /// <summary>
     /// Synchronously creates a batch with the specified parameters.
     /// This method provides a direct way to create a batch, blocking until the operation is complete.
@@ -555,7 +531,7 @@ type
     /// </summary>
     /// <param name="ParamProc">A procedure to configure listing parameters such as pagination.</param>
     /// <returns>An instance of TBatches containing the list of batches.</returns>
-    function List(const ParamProc: TProc<TBatchListParams>): TBatches; overload;
+    function List(const ParamProc: TProc<TUrlPaginationParams>): TBatches; overload;
   end;
 
 implementation
@@ -690,7 +666,7 @@ begin
   end;
 end;
 
-procedure TBatchRoute.AsynList(const ParamProc: TProc<TBatchListParams>;
+procedure TBatchRoute.AsynList(const ParamProc: TProc<TUrlPaginationParams>;
   const CallBacks: TFunc<TAsynBatches>);
 begin
   with TAsynCallBackExec<TAsynBatches, TBatches>.Create(CallBacks) do
@@ -761,26 +737,14 @@ begin
   Result := API.Get<TBatches>('batches');
 end;
 
-function TBatchRoute.List(const ParamProc: TProc<TBatchListParams>): TBatches;
+function TBatchRoute.List(const ParamProc: TProc<TUrlPaginationParams>): TBatches;
 begin
-  Result := API.Get<TBatches, TBatchListParams>('batches', ParamProc);
+  Result := API.Get<TBatches, TUrlPaginationParams>('batches', ParamProc);
 end;
 
 function TBatchRoute.Retrieve(const BatchId: string): TBatch;
 begin
   Result := API.Get<TBatch>('batches/' + BatchId);
-end;
-
-{ TBatchListParams }
-
-function TBatchListParams.After(const Value: string): TBatchListParams;
-begin
-  Result := TBatchListParams(Add('after', Value));
-end;
-
-function TBatchListParams.Limit(const Value: Integer): TBatchListParams;
-begin
-  Result := TBatchListParams(Add('limit', Value));
 end;
 
 { TBatches }

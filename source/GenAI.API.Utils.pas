@@ -13,7 +13,10 @@ uses
   System.SysUtils;
 
 const
-  FIELDSASSTRING : TArray<string> = ['"metadata": {', '"metadata":{'];
+  FIELDSASSTRING : TArray<string> = [
+    '"metadata": {', '"metadata":{', '"response_format": {', '"response_format":{',
+    '"parameters": {', '"parameters":{'
+  ];
 
 (*
    --- NOTE ---

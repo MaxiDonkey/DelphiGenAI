@@ -14,7 +14,7 @@ uses
   GenAI.Functions.Core, GenAI.Batch.Interfaces, GenAI.Schema, GenAI.Embeddings,
   GenAI.Audio, GenAI.Chat, GenAI.Moderation, GenAI.Images, GenAI.Files, GenAI.Uploads,
   GenAI.Batch, GenAI.Batch.Reader, GenAI.Batch.Builder, GenAI.Completions,
-  GenAI.FineTuning;
+  GenAI.FineTuning, GenAI.Assistants;
 
 type
   /// <summary>
@@ -35,6 +35,7 @@ type
     function GetBaseUrl: string;
     procedure SetBaseUrl(const Value: string);
 
+    function GetAssistantsRoute: TAssistantsRoute;
     function GetAudioRoute: TAudioRoute;
     function GetBatchRoute: TBatchRoute;
     function GetChatRoute: TChatRoute;
@@ -47,6 +48,8 @@ type
     function GetModerationRoute: TModerationRoute;
     function GetUploadsRoute: TUploadsRoute;
 
+    // Todo
+    property Assistants: TAssistantsRoute read GetAssistantsRoute;
     /// <summary>
     /// Provides routes to handle audio-related requests including speech generation, transcription, and translation.
     /// </summary>
@@ -197,6 +200,7 @@ type
   private
     FAPI: TGenAIAPI;
 
+    FAssistantsRoute: TAssistantsRoute;
     FAudioRoute: TAudioRoute;
     FBatchRoute: TBatchRoute;
     FChatRoute: TChatRoute;
@@ -215,6 +219,7 @@ type
     function GetBaseUrl: string;
     procedure SetBaseUrl(const Value: string);
 
+    function GetAssistantsRoute: TAssistantsRoute;
     function GetAudioRoute: TAudioRoute;
     function GetBatchRoute: TBatchRoute;
     function GetChatRoute: TChatRoute;
@@ -276,6 +281,21 @@ type
   {$ENDREGION}
 
   {$REGION 'GenAI.API.Params'}
+
+  /// <summary>
+  /// Represents the parameters for listing.
+  /// This class provides the functionality to control pagination and set limits on the number of objects retrieved.
+  /// It is useful for efficiently managing and navigating through large sets of objects.
+  /// </summary>
+  TUrlPaginationParams = GenAI.API.Params.TUrlPaginationParams;
+
+  /// <summary>
+  /// Represents the advanced parameters for listing and filtering data.
+  /// This class extends <see cref="TUrlPaginationParams"/> to provide additional functionality for
+  /// sorting and navigating through paginated data.
+  /// It is designed to manage more complex scenarios where both pagination and sorting are required.
+  /// </summary>
+  TUrlAdvancedParams = GenAI.API.Params.TUrlAdvancedParams;
 
   /// <summary>
   /// Represents a utility class for managing URL parameters and constructing query strings.
@@ -1313,13 +1333,6 @@ type
   TBatchCreateParams = GenAI.Batch.TBatchCreateParams;
 
   /// <summary>
-  /// Represents the parameters for listing batches in the OpenAI API.
-  /// This class provides the functionality to control pagination and set limits on the number of batch objects retrieved.
-  /// It is useful for efficiently managing and navigating through large sets of batches.
-  /// </summary>
-  TBatchListParams = GenAI.Batch.TBatchListParams;
-
-  /// <summary>
   /// Represents the error details associated with a specific request within a batch operation.
   /// This class holds detailed information about an error, including a machine-readable code, a human-readable message,
   /// and the specific parameter or line that caused the error. This facilitates debugging and error handling in batch processing.
@@ -1377,14 +1390,6 @@ type
   {$ENDREGION}
 
   {$REGION 'GenAI.FineTuning'}
-
-  /// <summary>
-  /// Represents the URL parameters for fine-tuning-related API requests.
-  /// This class provides methods for setting pagination parameters
-  /// such as "after" and "limit" to filter and retrieve fine-tuning jobs
-  /// or related events.
-  /// </summary>
-  TFineTuningURLParams = GenAI.FineTuning.TFineTuningURLParams;
 
   /// <summary>
   /// Represents the configuration parameters for Weights and Biases (WandB) integration
@@ -1691,6 +1696,7 @@ end;
 
 destructor TGenAI.Destroy;
 begin
+  FAssistantsRoute.Free;
   FAudioRoute.Free;
   FBatchRoute.Free;
   FChatRoute.Free;
@@ -1796,6 +1802,13 @@ end;
 function TGenAI.GetAPIKey: string;
 begin
   Result := FAPI.APIKey;
+end;
+
+function TGenAI.GetAssistantsRoute: TAssistantsRoute;
+begin
+  if not Assigned(FAssistantsRoute) then
+    FAssistantsRoute := TAssistantsRoute.CreateRoute(API);
+  Result := FAssistantsRoute;
 end;
 
 procedure TGenAI.SetBaseUrl(const Value: string);
