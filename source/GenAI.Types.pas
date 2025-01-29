@@ -1159,6 +1159,21 @@ type
 
   {$ENDREGION}
 
+  {$REGION 'GenAI.Assistants'}
+
+  TThreadsContentType = (
+    text,
+    image_url,
+    image_file
+  );
+
+  TThreadsContentTypeHelper = record Helper for TThreadsContentType
+    constructor Create(const Value: string);
+    function ToString: string;
+  end;
+
+  {$ENDREGION}
+
 implementation
 
 uses
@@ -1905,6 +1920,26 @@ begin
       Exit('json_object');
     TResponseFormatType.json_schema:
       Exit('json_schema');
+  end;
+end;
+
+{ TThreadsContentTypeHelper }
+
+constructor TThreadsContentTypeHelper.Create(const Value: string);
+begin
+  Self := TEnumValueRecovery.TypeRetrieve<TThreadsContentType>(Value,
+            ['text', 'image_url', 'image_file']);
+end;
+
+function TThreadsContentTypeHelper.ToString: string;
+begin
+  case self of
+    TThreadsContentType.text:
+      Exit('text');
+    TThreadsContentType.image_url:
+      Exit('image_url');
+    TThreadsContentType.image_file:
+      Exit('image_file');
   end;
 end;
 

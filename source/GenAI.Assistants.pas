@@ -156,7 +156,7 @@ type
   /// This class provides methods to set the function's name, description, parameters,
   /// and strict mode. It extends <c>TJSONParam</c> to enable JSON serialization.
   /// </remarks>
-  TFunctionParams = class(TJSONParam)
+  TAssistantsFunctionParams = class(TJSONParam)
   public
     /// <summary>
     /// Sets the description of the function.
@@ -166,9 +166,9 @@ type
     /// when and how to call the function.
     /// </param>
     /// <returns>
-    /// The <c>TFunctionParams</c> instance, allowing for method chaining.
+    /// The <c>TAssistantsFunctionParams</c> instance, allowing for method chaining.
     /// </returns>
-    function Description(const Value: string): TFunctionParams;
+    function Description(const Value: string): TAssistantsFunctionParams;
     /// <summary>
     /// Sets the name of the function.
     /// </summary>
@@ -177,9 +177,9 @@ type
     /// underscores and dashes, with a maximum length of 64 characters.
     /// </param>
     /// <returns>
-    /// The <c>TFunctionParams</c> instance, allowing for method chaining.
+    /// The <c>TAssistantsFunctionParams</c> instance, allowing for method chaining.
     /// </returns>
-    function Name(const Value: string): TFunctionParams;
+    function Name(const Value: string): TAssistantsFunctionParams;
     /// <summary>
     /// Sets the parameters schema for the function.
     /// </summary>
@@ -188,9 +188,9 @@ type
     /// following the JSON Schema format.
     /// </param>
     /// <returns>
-    /// The <c>TFunctionParams</c> instance, allowing for method chaining.
+    /// The <c>TAssistantsFunctionParams</c> instance, allowing for method chaining.
     /// </returns>
-    function Parameters(const Value: TSchemaParams): TFunctionParams; overload;
+    function Parameters(const Value: TSchemaParams): TAssistantsFunctionParams; overload;
     /// <summary>
     /// Sets the parameters schema for the function using a JSON object.
     /// </summary>
@@ -198,9 +198,9 @@ type
     /// A <c>TJSONObject</c> instance specifying the function parameters in JSON format.
     /// </param>
     /// <returns>
-    /// The <c>TFunctionParams</c> instance, allowing for method chaining.
+    /// The <c>TAssistantsFunctionParams</c> instance, allowing for method chaining.
     /// </returns>
-    function Parameters(const Value: TJSONObject): TFunctionParams; overload;
+    function Parameters(const Value: TJSONObject): TAssistantsFunctionParams; overload;
     /// <summary>
     /// Enables or disables strict mode for function parameters.
     /// </summary>
@@ -209,9 +209,9 @@ type
     /// the assistant strictly follows the defined schema when generating function calls.
     /// </param>
     /// <returns>
-    /// The <c>TFunctionParams</c> instance, allowing for method chaining.
+    /// The <c>TAssistantsFunctionParams</c> instance, allowing for method chaining.
     /// </returns>
-    function &Strict(const Value: Boolean): TFunctionParams;
+    function &Strict(const Value: Boolean): TAssistantsFunctionParams;
   end;
 
   /// <summary>
@@ -260,13 +260,13 @@ type
     /// Configures a custom function tool.
     /// </summary>
     /// <param name="Value">
-    /// A <c>TFunctionParams</c> instance defining the function's properties, including
+    /// A <c>TAssistantsFunctionParams</c> instance defining the function's properties, including
     /// its name, description, and parameter schema.
     /// </param>
     /// <returns>
     /// The <c>TAssistantsToolsParams</c> instance, allowing for method chaining.
     /// </returns>
-    function &Function(const Value: TFunctionParams): TAssistantsToolsParams;
+    function &Function(const Value: TAssistantsFunctionParams): TAssistantsToolsParams;
   end;
 
   /// <summary>
@@ -862,7 +862,7 @@ type
   /// This class provides properties to define a function's name, description, parameters,
   /// and strict mode. Functions allow the assistant to execute predefined operations.
   /// </remarks>
-  TFunction = class
+  TAssistantsFunction = class
   private
     FDescription: string;
     FName: string;
@@ -916,7 +916,7 @@ type
     FType: TAssistantsToolsType;
     [JsonNameAttribute('file_search')]
     FFileSearch: TAssistantsFileSearch;
-    FFunction: TFunction;
+    FFunction: TAssistantsFunction;
   public
     /// <summary>
     /// Specifies the type of tool.
@@ -941,7 +941,7 @@ type
     /// This property is applicable only if the tool type is "function". It defines the
     /// function's name, description, parameters, and strict mode.
     /// </remarks>
-    property &Function: TFunction read FFunction write FFunction;
+    property &Function: TAssistantsFunction read FFunction write FFunction;
     destructor Destroy; override;
   end;
 
@@ -1445,7 +1445,7 @@ begin
 end;
 
 function TAssistantsToolsParams.&Function(
-  const Value: TFunctionParams): TAssistantsToolsParams;
+  const Value: TAssistantsFunctionParams): TAssistantsToolsParams;
 begin
   Result := TAssistantsToolsParams(Add('function', Value));
 end;
@@ -1490,32 +1490,32 @@ begin
   Result := TRankingOptionsParams(Add('score_threshold', Value));
 end;
 
-{ TFunctionParams }
+{ TAssistantsFunctionParams }
 
-function TFunctionParams.Description(const Value: string): TFunctionParams;
+function TAssistantsFunctionParams.Description(const Value: string): TAssistantsFunctionParams;
 begin
-  Result := TFunctionParams(Add('description', Value));
+  Result := TAssistantsFunctionParams(Add('description', Value));
 end;
 
-function TFunctionParams.Name(const Value: string): TFunctionParams;
+function TAssistantsFunctionParams.Name(const Value: string): TAssistantsFunctionParams;
 begin
-  Result := TFunctionParams(Add('name', Value));
+  Result := TAssistantsFunctionParams(Add('name', Value));
 end;
 
-function TFunctionParams.Parameters(const Value: TJSONObject): TFunctionParams;
+function TAssistantsFunctionParams.Parameters(const Value: TJSONObject): TAssistantsFunctionParams;
 begin
-  Result := TFunctionParams(Add('parameters', Value));
+  Result := TAssistantsFunctionParams(Add('parameters', Value));
 end;
 
-function TFunctionParams.&Strict(const Value: Boolean): TFunctionParams;
+function TAssistantsFunctionParams.&Strict(const Value: Boolean): TAssistantsFunctionParams;
 begin
-  Result := TFunctionParams(Add('strict', Value));
+  Result := TAssistantsFunctionParams(Add('strict', Value));
 end;
 
-function TFunctionParams.Parameters(
-  const Value: TSchemaParams): TFunctionParams;
+function TAssistantsFunctionParams.Parameters(
+  const Value: TSchemaParams): TAssistantsFunctionParams;
 begin
-  Result := TFunctionParams(Add('parameters', Value.Detach));
+  Result := TAssistantsFunctionParams(Add('parameters', Value.Detach));
 end;
 
 { TToolResourcesParams }

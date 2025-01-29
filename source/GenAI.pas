@@ -15,7 +15,7 @@ uses
   GenAI.Batch.Interfaces, GenAI.Schema, GenAI.Embeddings, GenAI.Audio, GenAI.Chat,
   GenAI.Moderation, GenAI.Images, GenAI.Files, GenAI.Uploads, GenAI.Batch,
   GenAI.Batch.Reader, GenAI.Batch.Builder, GenAI.Completions, GenAI.FineTuning,
-  GenAI.Assistants;
+  GenAI.Assistants, GenAI.Threads;
 
 type
   /// <summary>
@@ -47,6 +47,7 @@ type
     function GetImagesRoute: TImagesRoute;
     function GetModelsRoute: TModelsRoute;
     function GetModerationRoute: TModerationRoute;
+    function GetThreadsRoute: TThreadsRoute;
     function GetUploadsRoute: TUploadsRoute;
 
     /// <summary>
@@ -145,6 +146,8 @@ type
     /// for evaluating content against moderation models.
     /// </remarks>
     property Moderation: TModerationRoute read GetModerationRoute;
+
+    property Threads: TThreadsRoute read GetThreadsRoute;
     /// <summary>
     /// Manages routes for handling file uploads, including creating uploads, adding parts, completing uploads, and canceling uploads.
     /// </summary>
@@ -219,6 +222,7 @@ type
     FImagesRoute: TImagesRoute;
     FModelsRoute: TModelsRoute;
     FModerationRoute: TModerationRoute;
+    FThreadsRoute: TThreadsRoute;
     FUploadsRoute: TUploadsRoute;
 
     function GetAPI: TGenAIAPI;
@@ -238,6 +242,7 @@ type
     function GetImagesRoute: TImagesRoute;
     function GetModelsRoute: TModelsRoute;
     function GetModerationRoute: TModerationRoute;
+    function GetThreadsRoute: TThreadsRoute;
     function GetUploadsRoute: TUploadsRoute;
 
   public
@@ -1612,6 +1617,258 @@ type
 
   {$ENDREGION}
 
+  {$REGION 'GenAI.Assistants'}
+
+  /// <summary>
+  /// Represents the parameters used to configure ranking options in a file search operation.
+  /// </summary>
+  /// <remarks>
+  /// This class provides methods to set the ranker and score threshold, which define
+  /// how search results are ranked and filtered. It extends <c>TJSONParam</c> to support
+  /// serialization to JSON format.
+  /// </remarks>
+  TRankingOptionsParams = GenAI.Assistants.TRankingOptionsParams;
+
+  /// <summary>
+  /// Represents the parameters used to configure the file search tool in an assistant.
+  /// </summary>
+  /// <remarks>
+  /// This class provides methods to set the maximum number of results and ranking options
+  /// for the file search operation. It extends <c>TJSONParam</c> to enable JSON serialization.
+  /// </remarks>
+  TFileSearchToolParams = GenAI.Assistants.TFileSearchToolParams;
+
+  /// <summary>
+  /// Represents the parameters used to define a custom function for an assistant.
+  /// </summary>
+  /// <remarks>
+  /// This class provides methods to set the function's name, description, parameters,
+  /// and strict mode. It extends <c>TJSONParam</c> to enable JSON serialization.
+  /// </remarks>
+  TAssistantsFunctionParams = GenAI.Assistants.TAssistantsFunctionParams;
+
+  /// <summary>
+  /// Represents the parameters used to configure tools for an assistant.
+  /// </summary>
+  /// <remarks>
+  /// This class provides methods to define different types of tools, including
+  /// file search and custom functions. It extends <c>TJSONParam</c> to support
+  /// JSON serialization.
+  /// </remarks>
+  TAssistantsToolsParams = GenAI.Assistants.TAssistantsToolsParams;
+
+  /// <summary>
+  /// Represents the parameters used to configure the code interpreter tool for an assistant.
+  /// </summary>
+  /// <remarks>
+  /// This class provides methods to specify the file IDs that the code interpreter tool
+  /// can access. It extends <c>TJSONParam</c> to enable JSON serialization.
+  /// </remarks>
+  TCodeInterpreterParams = GenAI.Assistants.TCodeInterpreterParams;
+
+  /// <summary>
+  /// Represents the parameters used to configure static chunking for file processing.
+  /// </summary>
+  /// <remarks>
+  /// This class provides methods to set the maximum chunk size and overlap between chunks.
+  /// It is used to control how large text or data is divided into manageable parts for
+  /// processing. The class extends <c>TJSONParam</c> to enable JSON serialization.
+  /// </remarks>
+  TChunkStaticParams = GenAI.Assistants.TChunkStaticParams;
+
+  /// <summary>
+  /// Represents the parameters used to configure the chunking strategy for file processing.
+  /// </summary>
+  /// <remarks>
+  /// This class provides methods to define the type of chunking strategy and configure
+  /// specific parameters, such as static chunking options. It extends <c>TJSONParam</c>
+  /// to enable JSON serialization.
+  /// </remarks>
+  TChunkingStrategyParams = GenAI.Assistants.TChunkingStrategyParams;
+
+  /// <summary>
+  /// Represents the parameters used to configure vector stores for file search operations.
+  /// </summary>
+  /// <remarks>
+  /// This class provides methods to specify file IDs, chunking strategies, and metadata
+  /// associated with vector stores. It extends <c>TJSONParam</c> to enable JSON serialization.
+  /// </remarks>
+  TVectorStoresParams = GenAI.Assistants.TVectorStoresParams;
+
+  /// <summary>
+  /// Represents the parameters used to configure file search operations in an assistant.
+  /// </summary>
+  /// <remarks>
+  /// This class provides methods to specify vector store IDs and configure vector stores
+  /// for efficient file searching. It extends <c>TJSONParam</c> to enable JSON serialization.
+  /// </remarks>
+  TFileSearchParams = GenAI.Assistants.TFileSearchParams;
+
+  /// <summary>
+  /// Represents the parameters used to configure tool resources for an assistant.
+  /// </summary>
+  /// <remarks>
+  /// This class provides methods to specify resources for the code interpreter and
+  /// file search tools. It extends <c>TJSONParam</c> to enable JSON serialization.
+  /// </remarks>
+  TToolResourcesParams = GenAI.Assistants.TToolResourcesParams;
+
+  /// <summary>
+  /// Represents the parameters used to define a JSON schema for structured responses.
+  /// </summary>
+  /// <remarks>
+  /// This class provides methods to specify the schema name, description, and structure.
+  /// It allows strict schema adherence for function calls and output validation.
+  /// Extends <c>TJSONParam</c> to enable JSON serialization.
+  /// </remarks>
+  TJsonSchemaParams = GenAI.Assistants.TJsonSchemaParams;
+
+  /// <summary>
+  /// Represents the parameters used to configure the response format for an assistant.
+  /// </summary>
+  /// <remarks>
+  /// This class provides methods to define the type of response format, including JSON
+  /// schema and structured outputs. It extends <c>TJSONParam</c> to enable JSON serialization.
+  /// </remarks>
+  TResponseFormatParams = GenAI.Assistants.TResponseFormatParams;
+
+  /// <summary>
+  /// Represents the parameters used to configure an assistant.
+  /// </summary>
+  /// <remarks>
+  /// This class provides methods to specify the assistant's model, name, description,
+  /// instructions, tools, and response format. It extends <c>TJSONParam</c> to enable
+  /// JSON serialization.
+  /// </remarks>
+  TAssistantsParams = GenAI.Assistants.TAssistantsParams;
+
+  /// <summary>
+  /// Represents the ranking options for a file search operation.
+  /// </summary>
+  /// <remarks>
+  /// This class provides properties to configure the ranking mechanism of a file search,
+  /// including the ranker type and score threshold for filtering results.
+  /// </remarks>
+  TRankingOptions = GenAI.Assistants.TRankingOptions;
+
+  /// <summary>
+  /// Represents the file search configuration for an assistant.
+  /// </summary>
+  /// <remarks>
+  /// This class provides properties to define the file search behavior, including the
+  /// maximum number of search results and ranking options for filtering results.
+  /// </remarks>
+  TAssistantsFileSearch = GenAI.Assistants.TAssistantsFileSearch;
+
+  /// <summary>
+  /// Represents a custom function definition for an assistant.
+  /// </summary>
+  /// <remarks>
+  /// This class provides properties to define a function's name, description, parameters,
+  /// and strict mode. Functions allow the assistant to execute predefined operations.
+  /// </remarks>
+  TAssistantsFunction = GenAI.Assistants.TAssistantsFunction;
+
+  /// <summary>
+  /// Represents a tool configuration for an assistant.
+  /// </summary>
+  /// <remarks>
+  /// This class provides properties to define different types of tools that an assistant
+  /// can use, such as file search or custom functions. Each tool configuration includes
+  /// specific settings based on its type.
+  /// </remarks>
+  TAssistantsTools = GenAI.Assistants.TAssistantsTools;
+
+  /// <summary>
+  /// Represents the configuration for the code interpreter tool.
+  /// </summary>
+  /// <remarks>
+  /// This class provides properties to specify the files accessible to the code interpreter.
+  /// It enables the assistant to process and analyze code-related files.
+  /// </remarks>
+  TCodeInterpreter = GenAI.Assistants.TCodeInterpreter;
+
+  /// <summary>
+  /// Represents the configuration for the file search tool.
+  /// </summary>
+  /// <remarks>
+  /// This class provides properties to specify the vector stores used for file searching.
+  /// It enables the assistant to perform efficient and accurate file searches.
+  /// </remarks>
+  TFileSearch = GenAI.Assistants.TFileSearch;
+
+  /// <summary>
+  /// Represents the resources used by the tools configured for an assistant.
+  /// </summary>
+  /// <remarks>
+  /// This class provides properties to define the resources available to tools such as
+  /// the code interpreter and file search. These resources ensure that tools can perform
+  /// their operations efficiently.
+  /// </remarks>
+  TToolResources = GenAI.Assistants.TToolResources;
+
+  /// <summary>
+  /// Represents an assistant configuration and its associated properties.
+  /// </summary>
+  /// <remarks>
+  /// This class provides properties to define the assistant's settings, including its
+  /// name, model, instructions, tools, and metadata. It extends <c>TJSONFingerprint</c>
+  /// to support JSON serialization.
+  /// </remarks>
+  TAssistant = GenAI.Assistants.TAssistant;
+
+  /// <summary>
+  /// Represents a list of assistant objects.
+  /// </summary>
+  /// <remarks>
+  /// This type is a specialization of <c>TAdvancedList</c> for handling a collection of
+  /// <c>TAssistant</c> objects. It includes pagination metadata and provides access to
+  /// multiple assistant configurations in a structured format.
+  /// </remarks>
+  TAssistants = GenAI.Assistants.TAssistants;
+
+  /// <summary>
+  /// Represents the response returned after deleting an assistant.
+  /// </summary>
+  /// <remarks>
+  /// This class provides information about the deletion status of an assistant, including
+  /// its ID, object type, and whether the deletion was successful. It extends
+  /// <c>TJSONFingerprint</c> for JSON serialization.
+  /// </remarks>
+  TAssistantDeletion = GenAI.Assistants.TAssistantDeletion;
+
+  /// <summary>
+  /// Manages asynchronous chat callBacks for a chat request using <c>TAssistant</c> as the response type.
+  /// </summary>
+  /// <remarks>
+  /// The <c>TAsynAssistant</c> type extends the <c>TAsynParams&lt;TAssistant&gt;</c> record to handle the lifecycle of an asynchronous chat operation.
+  /// It provides event handlers that trigger at various stages, such as when the operation starts, completes successfully, or encounters an error.
+  /// This structure facilitates non-blocking chat operations and is specifically tailored for scenarios where multiple choices from a chat model are required.
+  /// </remarks>
+  TAsynAssistant = GenAI.Assistants.TAsynAssistant;
+
+  /// <summary>
+  /// Manages asynchronous chat callBacks for a chat request using <c>TAssistants</c> as the response type.
+  /// </summary>
+  /// <remarks>
+  /// The <c>TAsynAssistants</c> type extends the <c>TAsynParams&lt;TAssistants&gt;</c> record to handle the lifecycle of an asynchronous chat operation.
+  /// It provides event handlers that trigger at various stages, such as when the operation starts, completes successfully, or encounters an error.
+  /// This structure facilitates non-blocking chat operations and is specifically tailored for scenarios where multiple choices from a chat model are required.
+  /// </remarks>
+  TAsynAssistants = GenAI.Assistants.TAsynAssistants;
+
+  /// <summary>
+  /// Manages asynchronous chat callBacks for a chat request using <c>TAssistantDeletion</c> as the response type.
+  /// </summary>
+  /// <remarks>
+  /// The <c>TAsynAssistantDeletion</c> type extends the <c>TAsynParams&lt;TAssistantDeletion&gt;</c> record to handle the lifecycle of an asynchronous chat operation.
+  /// It provides event handlers that trigger at various stages, such as when the operation starts, completes successfully, or encounters an error.
+  /// This structure facilitates non-blocking chat operations and is specifically tailored for scenarios where multiple choices from a chat model are required.
+  /// </remarks>
+  TAsynAssistantDeletion = GenAI.Assistants.TAsynAssistantDeletion;
+
+  {$ENDREGION}
+
 function FromDeveloper(const Content: string; const Name: string = ''):TMessagePayload;
 function FromSystem(const Content: string; const Name: string = ''):TMessagePayload;
 function FromUser(const Content: string; const Name: string = ''):TMessagePayload; overload;
@@ -1801,6 +2058,7 @@ begin
   FImagesRoute.Free;
   FModelsRoute.Free;
   FModerationRoute.Free;
+  FThreadsRoute.Free;
   FUploadsRoute.Free;
   FAPI.Free;
   inherited;
@@ -1870,6 +2128,13 @@ begin
   if not Assigned(FModerationRoute) then
     FModerationRoute := TModerationRoute.CreateRoute(API);
   Result := FModerationRoute;
+end;
+
+function TGenAI.GetThreadsRoute: TThreadsRoute;
+begin
+  if not Assigned(FThreadsRoute) then
+    FThreadsRoute := TThreadsRoute.CreateRoute(API);
+  Result := FThreadsRoute;
 end;
 
 function TGenAI.GetUploadsRoute: TUploadsRoute;
