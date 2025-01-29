@@ -43,7 +43,7 @@ unit GenAI.Assistants;
     Assistant := TAssistantsRoute.Create(
       procedure(Params: TAssistantsParams)
       begin
-        Params.Model('gpt-4-turbo')
+        Params.Model('gpt-4o')
               .Name('My Assistant')
               .Instructions('Respond concisely and professionally.')
               .Temperature(0.7);
@@ -56,7 +56,7 @@ unit GenAI.Assistants;
   TAssistantsRoute.AsynCreate(
     procedure(Params: TAssistantsParams)
     begin
-      Params.Model('gpt-4-turbo').Name('Assistant Async');
+      Params.Model('gpt-4o').Name('Assistant Async');
     end,
     function: TAsynAssistant
     begin
