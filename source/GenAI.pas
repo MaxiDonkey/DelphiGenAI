@@ -10,11 +10,12 @@ unit GenAI;
 interface
 
 uses
-  System.SysUtils, System.Classes, GenAI.API, GenAI.API.Params, GenAI.Models,
-  GenAI.Functions.Core, GenAI.Batch.Interfaces, GenAI.Schema, GenAI.Embeddings,
-  GenAI.Audio, GenAI.Chat, GenAI.Moderation, GenAI.Images, GenAI.Files, GenAI.Uploads,
-  GenAI.Batch, GenAI.Batch.Reader, GenAI.Batch.Builder, GenAI.Completions,
-  GenAI.FineTuning, GenAI.Assistants;
+  System.SysUtils, System.Classes, System.JSON,
+  GenAI.API, GenAI.API.Params, GenAI.Types, GenAI.Models, GenAI.Functions.Core,
+  GenAI.Batch.Interfaces, GenAI.Schema, GenAI.Embeddings, GenAI.Audio, GenAI.Chat,
+  GenAI.Moderation, GenAI.Images, GenAI.Files, GenAI.Uploads, GenAI.Batch,
+  GenAI.Batch.Reader, GenAI.Batch.Builder, GenAI.Completions, GenAI.FineTuning,
+  GenAI.Assistants;
 
 type
   /// <summary>
@@ -48,7 +49,14 @@ type
     function GetModerationRoute: TModerationRoute;
     function GetUploadsRoute: TUploadsRoute;
 
-    // Todo
+    /// <summary>
+    /// Represents the API route handler for managing assistants.
+    /// </summary>
+    /// <remarks>
+    /// This class provides methods to create, retrieve, update, list, and delete assistants
+    /// using the OpenAI API. It extends <c>TGenAIRoute</c> to handle API interactions and
+    /// custom headers.
+    /// </remarks>
     property Assistants: TAssistantsRoute read GetAssistantsRoute;
     /// <summary>
     /// Provides routes to handle audio-related requests including speech generation, transcription, and translation.
@@ -1617,6 +1625,24 @@ function ToolCall(const Id: string; const Name: string; const Arguments: string)
 function PredictionPart(const AType: string; const Text: string): TPredictionPartParams;
 function ToolName(const Name: string): TToolChoiceParams;
 
+function Code_interpreter: TAssistantsToolsParams; overload;
+function Code_interpreter(const FileIds: TArray<string>): TToolResourcesParams; overload;
+
+function File_search: TAssistantsToolsParams; overload;
+function File_search(const MaxNumResults: Integer; const RankingOptions: TRankingOptionsParams = nil): TAssistantsToolsParams; overload;
+function File_search(const RankingOptions: TRankingOptionsParams): TAssistantsToolsParams; overload;
+function File_search(const VectorStoreIds: TArray<string>; const VectorStores: TArray<TVectorStoresParams> = []): TToolResourcesParams; overload;
+function File_search(const VectorStores: TArray<TVectorStoresParams>): TToolResourcesParams; overload;
+
+function RankingOptions(const ScoreThreshold: Double; const Ranker: string = 'auto'): TRankingOptionsParams;
+
+function Vector_store(const FileIds: TArray<string>;
+  const Metadata: TJSONObject = nil): TVectorStoresParams; overload;
+function Vector_store(const FileIds: TArray<string>;
+  const ChunkingStrategy: TChunkingStrategyParams;
+  const Metadata: TJSONObject = nil): TVectorStoresParams; overload;
+
+
 var
   JSONLChatReader: GenAI.Batch.Interfaces.IJSONLReader<TChat>;
   JSONLEmbeddingReader: GenAI.Batch.Interfaces.IJSONLReader<TEmbeddings>;
@@ -1678,6 +1704,74 @@ end;
 function ToolName(const Name: string): TToolChoiceParams;
 begin
   Result := TToolChoiceParams.New(Name);
+end;
+
+function Code_interpreter: TAssistantsToolsParams;
+begin
+  Result := TAssistantsToolsParams.Create.&Type(TAssistantsToolsType.code_interpreter);
+end;
+
+function Code_interpreter(const FileIds: TArray<string>): TToolResourcesParams;
+begin
+  Result := TToolResourcesParams.Create.CodeInterpreter(FileIds);
+end;
+
+function File_search: TAssistantsToolsParams;
+begin
+  Result := TAssistantsToolsParams.Create.&Type(TAssistantsToolsType.file_search);
+end;
+
+function File_search(const MaxNumResults: Integer;
+  const RankingOptions: TRankingOptionsParams): TAssistantsToolsParams; overload;
+begin
+  var FileSearchTool := TFileSearchToolParams.Create.MaxNumResults(MaxNumResults);
+  if Assigned(RankingOptions) then
+    FileSearchTool := FileSearchTool.RankingOptions(RankingOptions);
+  Result := File_search.FileSearch(FileSearchTool);
+end;
+
+function File_search(const RankingOptions: TRankingOptionsParams): TAssistantsToolsParams; overload;
+begin
+  var FileSearchTool := TFileSearchToolParams.Create.RankingOptions(RankingOptions);
+  Result := File_search.FileSearch(FileSearchTool);
+end;
+
+function File_search(const VectorStoreIds: TArray<string>;
+  const VectorStores: TArray<TVectorStoresParams> = []): TToolResourcesParams;
+begin
+  var FileSearch := TFileSearchParams.Create.VectorStoreIds(VectorStoreIds);
+  if Length(VectorStores) > 0 then
+    FileSearch := FileSearch.VectorStores(VectorStores);
+  Result := TToolResourcesParams.Create.FileSearch(FileSearch);
+end;
+
+function File_search(const VectorStores: TArray<TVectorStoresParams>): TToolResourcesParams;
+begin
+  if Length(VectorStores) = 0 then
+    raise Exception.Create('Vector stores can''t be null');
+  var FileSearch := TFileSearchParams.Create.VectorStores(VectorStores);
+  Result := TToolResourcesParams.Create.FileSearch(FileSearch);
+end;
+
+function RankingOptions(const ScoreThreshold: Double; const Ranker: string = 'auto'): TRankingOptionsParams;
+begin
+  Result := TRankingOptionsParams.Create.Ranker(Ranker).ScoreThreshold(ScoreThreshold);
+end;
+
+function Vector_store(const FileIds: TArray<string>; const Metadata: TJSONObject): TVectorStoresParams;
+begin
+  if Length(FileIds) = 0 then
+    raise Exception.Create('File Ids can''t be null');
+  Result := TVectorStoresParams.Create.FileIds(FileIds);
+  if Assigned(Metadata) then
+    Result := Result.Metadata(Metadata);
+end;
+
+function Vector_store(const FileIds: TArray<string>;
+  const ChunkingStrategy: TChunkingStrategyParams;
+  const Metadata: TJSONObject = nil): TVectorStoresParams; overload;
+begin
+  Result := Vector_store(FileIds, Metadata).ChunkingStrategy(ChunkingStrategy);
 end;
 
 { TGenAI }

@@ -77,6 +77,7 @@ type
     procedure SetCustomHeaders(const Value: TNetHeaders);
     procedure SetAPIKey(const Value: string);
     procedure VerifyApiSettings;
+    procedure ResetCustomHeader;
   protected
     /// <summary>
     /// Retrieves the headers required for API requests.
@@ -454,13 +455,9 @@ type
     /// The GenAI API instance associated with this route.
     /// </summary>
     FAPI: TGenAIAPI;
-    /// <summary>
-    /// Sets the API instance associated with this route.
-    /// </summary>
-    /// <param name="Value">
-    /// The <c>TGenAIAPI</c> instance to associate.
-    /// </param>
     procedure SetAPI(const Value: TGenAIAPI);
+  protected
+    procedure HeaderCustomize; virtual;
   public
     /// <summary>
     /// Initializes a new instance of the <c>TGenAIRoute</c> class with the given API instance.
@@ -529,6 +526,7 @@ begin
   finally
     Params.Free;
     Response.Free;
+    ResetCustomHeader;
   end;
 end;
 
@@ -557,6 +555,7 @@ begin
     end;
   finally
     Params.Free;
+    ResetCustomHeader;
   end;
 end;
 
@@ -568,6 +567,7 @@ begin
     Result := Deserialize<TResult>(Code, Response.DataString);
   finally
     Response.Free;
+    ResetCustomHeader;
   end;
 end;
 
@@ -579,6 +579,7 @@ begin
     Result := Deserialize<TResult>(Code, Response.DataString);
   finally
     Response.Free;
+    ResetCustomHeader;
   end;
 end;
 
@@ -594,6 +595,7 @@ begin
   finally
     Params.Free;
     Response.Free;
+    ResetCustomHeader;
   end;
 end;
 
@@ -610,6 +612,7 @@ begin
   finally
     Response.Free;
     Params.Free;
+    ResetCustomHeader;
   end;
 end;
 
@@ -621,6 +624,7 @@ begin
     Result := Deserialize<TResult>(Code, Response.DataString);
   finally
     Response.Free;
+    ResetCustomHeader;
   end;
 end;
 
@@ -632,27 +636,32 @@ begin
     Result := Deserialize<TResult>(Code, MockJsonFile(JSONFieldName, Stream));
   finally
     Stream.Free;
+    ResetCustomHeader;
   end;
 end;
 
 function TGenAIAPI.GetFile(const Endpoint: string; Response: TStream): Integer;
 begin
   var Headers := BuildHeaders;
-  Result := HttpClient.Get(BuildUrl(Endpoint), Response, Headers);
-  case Result of
-    200..299:
-       {success};
-    else
-      begin
-        var Recieved := TStringStream.Create;
-        try
-          Response.Position := 0;
-          Recieved.LoadFromStream(Response);
-          DeserializeErrorData(Result, Recieved.DataString);
-        finally
-          Recieved.Free;
+  try
+    Result := HttpClient.Get(BuildUrl(Endpoint), Response, Headers);
+    case Result of
+      200..299:
+         {success};
+      else
+        begin
+          var Recieved := TStringStream.Create;
+          try
+            Response.Position := 0;
+            Recieved.LoadFromStream(Response);
+            DeserializeErrorData(Result, Recieved.DataString);
+          finally
+            Recieved.Free;
+          end;
         end;
-      end;
+    end;
+  finally
+    ResetCustomHeader;
   end;
 end;
 
@@ -687,6 +696,7 @@ begin
   finally
     Params.Free;
     Response.Free;
+    ResetCustomHeader;
   end;
 end;
 
@@ -696,6 +706,11 @@ constructor TGenAIRoute.CreateRoute(AAPI: TGenAIAPI);
 begin
   inherited Create;
   FAPI := AAPI;
+end;
+
+procedure TGenAIRoute.HeaderCustomize;
+begin
+
 end;
 
 procedure TGenAIRoute.SetAPI(const Value: TGenAIAPI);
@@ -727,6 +742,11 @@ begin
   inherited;
   FAPIKey := EmptyStr;
   FBaseUrl := URL_BASE;
+end;
+
+procedure TGenAIConfiguration.ResetCustomHeader;
+begin
+  CustomHeaders := [];
 end;
 
 function TGenAIConfiguration.BuildHeaders: TNetHeaders;
