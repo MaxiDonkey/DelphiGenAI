@@ -1844,6 +1844,7 @@ end;
 
 procedure TAssistantsRoute.HeaderCustomize;
 begin
+  inherited;
   API.CustomHeaders := [TNetHeader.Create('OpenAI-Beta', 'assistants=v2')];
 end;
 
