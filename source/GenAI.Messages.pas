@@ -233,6 +233,9 @@ type
       const CallBacks: TFunc<TAsynMessagesList>); overload;
     procedure AsynRetrieve(const ThreadId: string; const MessageId: string;
       const CallBacks: TFunc<TAsynMessages>);
+    procedure AsynUpdate(const ThreadId: string; const MessageId: string;
+      const ParamProc: TProc<TMessagesUpdateParams>;
+      const CallBacks: TFunc<TAsynMessages>);
     procedure AsynDelete(const ThreadId: string; const MessageId: string;
       const CallBacks: TFunc<TAsynMessagesDeletion>);
 
@@ -339,6 +342,26 @@ begin
       function: TMessages
       begin
         Result := Self.Retrieve(ThreadId, MessageId);
+      end);
+  finally
+    Free;
+  end;
+end;
+
+procedure TMessagesRoute.AsynUpdate(const ThreadId, MessageId: string;
+  const ParamProc: TProc<TMessagesUpdateParams>;
+  const CallBacks: TFunc<TAsynMessages>);
+begin
+  with TAsynCallBackExec<TAsynMessages, TMessages>.Create(CallBacks) do
+  try
+    Sender := Use.Param.Sender;
+    OnStart := Use.Param.OnStart;
+    OnSuccess := Use.Param.OnSuccess;
+    OnError := Use.Param.OnError;
+    Run(
+      function: TMessages
+      begin
+        Result := Self.Update(ThreadId, MessageId, ParamProc);
       end);
   finally
     Free;
