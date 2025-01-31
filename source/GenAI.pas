@@ -15,7 +15,7 @@ uses
   GenAI.Batch.Interfaces, GenAI.Schema, GenAI.Embeddings, GenAI.Audio, GenAI.Chat,
   GenAI.Moderation, GenAI.Images, GenAI.Files, GenAI.Uploads, GenAI.Batch,
   GenAI.Batch.Reader, GenAI.Batch.Builder, GenAI.Completions, GenAI.FineTuning,
-  GenAI.Assistants, GenAI.Threads, GenAI.Messages;
+  GenAI.Assistants, GenAI.Threads, GenAI.Messages, GenAI.Runs;
 
 type
   /// <summary>
@@ -48,6 +48,7 @@ type
     function GetMesssagesRoute: TMessagesRoute;
     function GetModelsRoute: TModelsRoute;
     function GetModerationRoute: TModerationRoute;
+    function GetRunsRoute: TRunsRoute;
     function GetThreadsRoute: TThreadsRoute;
     function GetUploadsRoute: TUploadsRoute;
 
@@ -150,6 +151,8 @@ type
     /// </remarks>
     property Moderation: TModerationRoute read GetModerationRoute;
 
+    property Runs: TRunsRoute read GetRunsRoute;
+
     property Threads: TThreadsRoute read GetThreadsRoute;
     /// <summary>
     /// Manages routes for handling file uploads, including creating uploads, adding parts, completing uploads, and canceling uploads.
@@ -226,6 +229,7 @@ type
     FMessagesRoute: TMessagesRoute;
     FModelsRoute: TModelsRoute;
     FModerationRoute: TModerationRoute;
+    FRunsRoute: TRunsRoute;
     FThreadsRoute: TThreadsRoute;
     FUploadsRoute: TUploadsRoute;
 
@@ -247,6 +251,7 @@ type
     function GetMesssagesRoute: TMessagesRoute;
     function GetModelsRoute: TModelsRoute;
     function GetModerationRoute: TModerationRoute;
+    function GetRunsRoute: TRunsRoute;
     function GetThreadsRoute: TThreadsRoute;
     function GetUploadsRoute: TUploadsRoute;
 
@@ -2064,6 +2069,7 @@ begin
   FMessagesRoute.Free;
   FModelsRoute.Free;
   FModerationRoute.Free;
+  FRunsRoute.Free;
   FThreadsRoute.Free;
   FUploadsRoute.Free;
   FAPI.Free;
@@ -2141,6 +2147,13 @@ begin
   if not Assigned(FModerationRoute) then
     FModerationRoute := TModerationRoute.CreateRoute(API);
   Result := FModerationRoute;
+end;
+
+function TGenAI.GetRunsRoute: TRunsRoute;
+begin
+  if not Assigned(FRunsRoute) then
+    FRunsRoute := TRunsRoute.CreateRoute(API);
+  Result := FRunsRoute;
 end;
 
 function TGenAI.GetThreadsRoute: TThreadsRoute;
