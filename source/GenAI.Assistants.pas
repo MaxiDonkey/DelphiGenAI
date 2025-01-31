@@ -1848,17 +1848,17 @@ begin
   API.CustomHeaders := [TNetHeader.Create('OpenAI-Beta', 'assistants=v2')];
 end;
 
-function TAssistantsRoute.List: TAssistants;
-begin
-  HeaderCustomize;
-  Result := API.Get<TAssistants>('assistants');
-end;
-
 function TAssistantsRoute.List(
   const ParamProc: TProc<TUrlAdvancedParams>): TAssistants;
 begin
   HeaderCustomize;
   Result := API.Get<TAssistants, TUrlAdvancedParams>('assistants', ParamProc);
+end;
+
+function TAssistantsRoute.List: TAssistants;
+begin
+  HeaderCustomize;
+  Result := API.Get<TAssistants>('assistants');
 end;
 
 function TAssistantsRoute.Retrieve(const AssistantId: string): TAssistant;

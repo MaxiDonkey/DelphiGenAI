@@ -15,7 +15,7 @@ uses
   GenAI.Batch.Interfaces, GenAI.Schema, GenAI.Embeddings, GenAI.Audio, GenAI.Chat,
   GenAI.Moderation, GenAI.Images, GenAI.Files, GenAI.Uploads, GenAI.Batch,
   GenAI.Batch.Reader, GenAI.Batch.Builder, GenAI.Completions, GenAI.FineTuning,
-  GenAI.Assistants, GenAI.Threads;
+  GenAI.Assistants, GenAI.Threads, GenAI.Messages;
 
 type
   /// <summary>
@@ -45,6 +45,7 @@ type
     function GetFilesRoute: TFilesRoute;
     function GetFineTuningRoute: TFineTuningRoute;
     function GetImagesRoute: TImagesRoute;
+    function GetMesssagesRoute: TMessagesRoute;
     function GetModelsRoute: TModelsRoute;
     function GetModerationRoute: TModerationRoute;
     function GetThreadsRoute: TThreadsRoute;
@@ -126,6 +127,8 @@ type
     /// diverse use cases involving image generation and manipulation.
     /// </remarks>
     property Images: TImagesRoute read GetImagesRoute;
+
+    property Messages : TMessagesRoute read GetMesssagesRoute;
     /// <summary>
     /// Provides routes for managing model data via API calls, including listing, retrieving, and deleting models.
     /// </summary>
@@ -220,6 +223,7 @@ type
     FFilesRoute: TFilesRoute;
     FFineTuningRoute: TFineTuningRoute;
     FImagesRoute: TImagesRoute;
+    FMessagesRoute: TMessagesRoute;
     FModelsRoute: TModelsRoute;
     FModerationRoute: TModerationRoute;
     FThreadsRoute: TThreadsRoute;
@@ -240,6 +244,7 @@ type
     function GetFilesRoute: TFilesRoute;
     function GetFineTuningRoute: TFineTuningRoute;
     function GetImagesRoute: TImagesRoute;
+    function GetMesssagesRoute: TMessagesRoute;
     function GetModelsRoute: TModelsRoute;
     function GetModerationRoute: TModerationRoute;
     function GetThreadsRoute: TThreadsRoute;
@@ -2056,6 +2061,7 @@ begin
   FFilesRoute.Free;
   FFineTuningRoute.Free;
   FImagesRoute.Free;
+  FMessagesRoute.Free;
   FModelsRoute.Free;
   FModerationRoute.Free;
   FThreadsRoute.Free;
@@ -2114,6 +2120,13 @@ begin
   if not Assigned(FImagesRoute) then
     FImagesRoute := TImagesRoute.CreateRoute(API);
   Result := FImagesRoute;
+end;
+
+function TGenAI.GetMesssagesRoute: TMessagesRoute;
+begin
+  if not Assigned(FMessagesRoute) then
+    FMessagesRoute := TMessagesRoute.CreateRoute(API);
+  Result := FMessagesRoute;
 end;
 
 function TGenAI.GetModelsRoute: TModelsRoute;

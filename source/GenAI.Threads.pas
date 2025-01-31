@@ -192,15 +192,15 @@ begin
   Result := TThreadsContentParams(Add('image_url', Value.Detach));
 end;
 
+function TThreadsContentParams.Text(const Value: string): TThreadsContentParams;
+begin
+  Result := TThreadsContentParams(Add('text', Value));
+end;
+
 function TThreadsContentParams.&Type(
   const Value: string): TThreadsContentParams;
 begin
   Result := TThreadsContentParams(Add('type', TThreadsContentType.Create(Value).ToString));
-end;
-
-function TThreadsContentParams.Text(const Value: string): TThreadsContentParams;
-begin
-  Result := TThreadsContentParams(Add('text', Value));
 end;
 
 function TThreadsContentParams.&Type(
