@@ -78,7 +78,7 @@ uses
   System.SysUtils, System.Classes, System.Threading, System.JSON, REST.Json.Types,
   REST.JsonReflect, System.Net.URLClient,
   GenAI.API.Params, GenAI.API, GenAI.Consts, GenAI.Types, GenAI.Async.Support,
-  GenAI.Schema;
+  GenAI.Schema, GenAI.API.Lists;
 
 type
   /// <summary>
@@ -748,51 +748,6 @@ type
     /// The <c>TAssistantsParams</c> instance, allowing for method chaining.
     /// </returns>
     function ResponseFormat(const Value: TJSONObject): TAssistantsParams; overload;
-  end;
-
-  /// <summary>
-  /// Represents a generic advanced list structure for handling API responses.
-  /// </summary>
-  /// <remarks>
-  /// This class is a generic container for handling paginated API responses. It provides
-  /// properties to store the retrieved data, pagination information, and object metadata.
-  /// The generic type parameter <c>T</c> must be a class with a parameterless constructor.
-  /// </remarks>
-  /// <typeparam name="T">
-  /// The class type of objects contained in the list. The type must have a parameterless
-  /// constructor.
-  /// </typeparam>
-  TAdvancedList<T: class, constructor> = class(TJSONFingerprint)
-    FObject: string;
-    FData: TArray<T>;
-    [JsonNameAttribute('has_more')]
-    FHasMore: Boolean;
-    [JsonNameAttribute('first_id')]
-    FFirstId: string;
-    [JsonNameAttribute('last_id')]
-    FLastId: string;
-  public
-    /// <summary>
-    /// Represents the type of object contained in the list.
-    /// </summary>
-    property &Object: string read FObject write FObject;
-    /// <summary>
-    /// Stores the list of retrieved objects.
-    /// </summary>
-    property Data: TArray<T> read FData write FData;
-    /// <summary>
-    /// Indicates whether there are more results available in the API pagination.
-    /// </summary>
-    property HasMore: Boolean read FHasMore write FHasMore;
-    /// <summary>
-    /// The ID of the first object in the current result set.
-    /// </summary>
-    property FirstId: string read FFirstId write FFirstId;
-    /// <summary>
-    /// The ID of the last object in the current result set.
-    /// </summary>
-    property LastId: string read FLastId write FLastId;
-    destructor Destroy; override;
   end;
 
   /// <summary>
@@ -1872,15 +1827,6 @@ function TAssistantsRoute.Update(const AssistantId: string;
 begin
   HeaderCustomize;
   Result := API.Post<TAssistant, TAssistantsParams>('assistants/' + AssistantId, ParamProc);
-end;
-
-{ TAdvancedList<T> }
-
-destructor TAdvancedList<T>.Destroy;
-begin
-  for var Item in FData do
-    Item.Free;
-  inherited;
 end;
 
 end.

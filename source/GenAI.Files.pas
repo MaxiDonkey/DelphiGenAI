@@ -12,7 +12,8 @@ interface
 uses
   System.SysUtils, System.Classes, System.Threading, System.JSON, REST.Json.Types,
   REST.JsonReflect, System.Net.Mime,
-  GenAI.API.Params, GenAI.API, GenAI.Consts, GenAI.Types, GenAI.Async.Support;
+  GenAI.API.Params, GenAI.API, GenAI.Consts, GenAI.Types, GenAI.Async.Support,
+  GenAI.API.Lists;
 
 type
   /// <summary>
@@ -190,39 +191,7 @@ type
   /// including the list of files, pagination information, and object type.
   /// It is used for operations that involve listing or retrieving multiple files.
   /// </remarks>
-  TFiles = class(TJSONFingerprint)
-  private
-    FData: TArray<TFile>;
-    FObject: string;
-    [JsonNameAttribute('has_more')]
-    FHasMore: Boolean;
-    [JsonNameAttribute('first_id')]
-    FFirstId: string;
-    [JsonNameAttribute('last_id')]
-    FLastId: string;
-  public
-    /// <summary>
-    /// An array of file objects included in the collection.
-    /// </summary>
-    property Data: TArray<TFile> read FData write FData;
-    /// <summary>
-    /// Gets or sets the type of object, which is always "list".
-    /// </summary>
-    property &Object: string read FObject write FObject;
-    /// <summary>
-    /// Indicates whether there are more files to be retrieved beyond the current collection.
-    /// </summary>
-    property HasMore: Boolean read FHasMore write FHasMore;
-    /// <summary>
-    /// Gets or sets the ID of the first file in the collection.
-    /// </summary>
-    property FirstId: string read FFirstId write FFirstId;
-    /// <summary>
-    /// Gets or sets the ID of the last file in the collection.
-    /// </summary>
-    property LastId: string read FLastId write FLastId;
-    destructor Destroy; override;
-  end;
+  TFiles = TAdvancedList<TFile>;
 
   /// <summary>
   /// Represents the content of a file retrieved from the API.
@@ -466,15 +435,6 @@ end;
 constructor TFileUploadParams.Create;
 begin
   inherited Create(true);
-end;
-
-{ TFiles }
-
-destructor TFiles.Destroy;
-begin
-  for var Item in FData do
-    Item.Free;
-  inherited;
 end;
 
 { TFileUrlParams }

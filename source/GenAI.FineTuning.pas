@@ -117,7 +117,8 @@ interface
 uses
   System.SysUtils, System.Classes, System.Threading, System.JSON, REST.Json.Types,
   REST.JsonReflect,
-  GenAI.API.Params, GenAI.API, GenAI.Consts, GenAI.Types, GenAI.Async.Support;
+  GenAI.API.Params, GenAI.API, GenAI.Consts, GenAI.Types, GenAI.Async.Support,
+  GenAI.API.Lists;
 
 type
   /// <summary>
@@ -527,40 +528,6 @@ type
     /// Returns the current instance of <c>TFineTuningJobParams</c> to allow method chaining.
     /// </returns>
     function Method(const AType: TJobMethodType; const Value: THyperparametersParams): TFineTuningJobParams; overload;
-  end;
-
-  /// <summary>
-  /// Represents a paginated list of fine-tuning job-related objects.
-  /// This generic class can store a list of objects of type <c>T</c> and
-  /// provides metadata about pagination, such as whether more results are available.
-  /// </summary>
-  /// <typeparam name="T">
-  /// The type of objects stored in the list. It must be a class and have a default constructor.
-  /// </typeparam>
-  TPaginatedList<T: class, constructor> = class(TJSONFingerprint)
-    FObject: string;
-    FData: TArray<T>;
-    [JsonNameAttribute('has_more')]
-    FHasMore: Boolean;
-  public
-    /// <summary>
-    /// Gets or sets the object type. This usually describes the nature of the list (e.g., "fine_tuning.jobs").
-    /// </summary>
-    property &Object: string read FObject write FObject;
-    /// <summary>
-    /// Gets or sets the array of objects stored in the list.
-    /// Each element is of type <c>T</c>.
-    /// </summary>
-    property Data: TArray<T> read FData write FData;
-    /// <summary>
-    /// Gets or sets a boolean value indicating whether there are more results to fetch.
-    /// </summary>
-    property HasMore: Boolean read FHasMore write FHasMore;
-    /// <summary>
-    /// Destructor for the <c>TPaginatedList</c> class.
-    /// Frees all objects stored in the <c>Data</c> property to release memory.
-    /// </summary>
-    destructor Destroy; override;
   end;
 
   /// <summary>
@@ -2070,15 +2037,6 @@ end;
 function TJobCheckpoint.GetCreatedAtAsString: string;
 begin
   Result := TimestampToString(CreatedAt, UTCtimestamp);
-end;
-
-{ TPaginatedList<T> }
-
-destructor TPaginatedList<T>.Destroy;
-begin
-  for var Item in FData do
-    Item.Free;
-  inherited;
 end;
 
 end.

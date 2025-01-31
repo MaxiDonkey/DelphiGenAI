@@ -20,7 +20,8 @@ interface
 uses
   System.SysUtils, System.Classes, System.Threading, System.JSON, REST.Json.Types,
   REST.JsonReflect,
-  GenAI.API.Params, GenAI.API, GenAI.Consts, GenAI.Types, GenAI.Async.Support;
+  GenAI.API.Params, GenAI.API, GenAI.Consts, GenAI.Types, GenAI.Async.Support,
+  GenAI.API.Lists;
 
 type
   /// <summary>
@@ -389,47 +390,7 @@ type
   /// This class provides an aggregated view of multiple batch entries, enabling effective navigation and management
   /// of batch operations. It includes functionality for pagination to handle large sets of data efficiently.
   /// </summary>
-  TBatches = class(TJSONFingerprint)
-  private
-    FObject: string;
-    FData: TArray<TBatch>;
-    [JsonNameAttribute('first_id')]
-    FFirstId: string;
-    [JsonNameAttribute('last_id')]
-    FLastId: string;
-    [JsonNameAttribute('has_more')]
-    FHasMore: Boolean;
-  public
-    /// <summary>
-    /// Gets or sets the object type, which indicates the nature of the data stored in this class.
-    /// Typically, this is set to 'list', signifying that the object is a collection of batch entries.
-    /// </summary>
-    property &Object: string read FObject write FObject;
-    /// <summary>
-    /// Gets or sets the array of TBatch instances that constitute the batch entries.
-    /// This property allows for easy access to individual batch details, supporting operations like detailed inspection,
-    /// status checks, or further processing.
-    /// </summary>
-    /// <returns>An array of TBatch instances.</returns>
-    property Data: TArray<TBatch> read FData write FData;
-    /// <summary>
-    /// Gets or sets the ID of the first batch in the current list retrieval window, helping to define the pagination scope.
-    /// </summary>
-    /// <returns>The ID of the first batch as a string.</returns>
-    property FirstId: string read FFirstId write FFirstId;
-    /// <summary>
-    /// Gets or sets the ID of the last batch in the current list retrieval window, helping to define the pagination scope.
-    /// </summary>
-    /// <returns>The ID of the last batch as a string.</returns>
-    property LastId: string read FLastId write FLastId;
-    /// <summary>
-    /// Gets or sets a flag indicating whether more batches are available for retrieval beyond the current list window.
-    /// This is useful for implementing pagination controls in user interfaces or automated batch retrieval processes.
-    /// </summary>
-    /// <returns>A Boolean value indicating the presence of additional batches beyond the current scope.</returns>
-    property HasMore: Boolean read FHasMore write FHasMore;
-    destructor Destroy; override;
-  end;
+  TBatches = TAdvancedList<TBatch>;
 
   /// <summary>
   /// Manages asynchronous chat callBacks for a chat request using <c>TBatch</c> as the response type.
@@ -745,15 +706,6 @@ end;
 function TBatchRoute.Retrieve(const BatchId: string): TBatch;
 begin
   Result := API.Get<TBatch>('batches/' + BatchId);
-end;
-
-{ TBatches }
-
-destructor TBatches.Destroy;
-begin
-  for var Item in FData do
-    Item.Free;
-  inherited;
 end;
 
 end.

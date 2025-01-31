@@ -844,7 +844,7 @@ type
   /// of participants, ensuring appropriate responses based on user or system activity, and
   /// integrates external tool functions as part of the conversation flow.
   /// </remarks>
-  TMessage = GenAI.Chat.TMessage;
+  TChatMessage = GenAI.Chat.TChatMessage;
 
   /// <summary>
   /// Represents a choice or option generated during a chat interaction, encapsulating

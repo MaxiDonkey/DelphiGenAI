@@ -1593,12 +1593,12 @@ type
   /// and additional interactive elements like tool calls and audio data.
   /// </summary>
   /// <remarks>
-  /// TMessage class is designed to facilitate detailed interaction within chat systems,
+  /// TChatMessage class is designed to facilitate detailed interaction within chat systems,
   /// supporting rich content types including text, tools, and audio. It handles the roles
   /// of participants, ensuring appropriate responses based on user or system activity, and
   /// integrates external tool functions as part of the conversation flow.
   /// </remarks>
-  TMessage = class
+  TChatMessage = class
   private
     FContent: string;
     FRefusal: string;
@@ -1666,7 +1666,7 @@ type
     [JsonNameAttribute('finish_reason')]
     FFinishReason: TFinishReason;
     FIndex: Int64;
-    FMessage: TMessage;
+    FMessage: TChatMessage;
     FLogprobs: TLogprobs;
     FDelta: TDelta;
   public
@@ -1691,9 +1691,9 @@ type
     /// text, audio, or structured responses.
     /// </summary>
     /// <returns>
-    /// A TMessage object containing the response and any associated metadata.
+    /// A TChatMessage object containing the response and any associated metadata.
     /// </returns>
-    property Message: TMessage read FMessage write FMessage;
+    property Message: TChatMessage read FMessage write FMessage;
     /// <summary>
     /// Contains log probability details for the tokens used in the choice's message,
     /// useful for analyzing model behavior and decisions.
@@ -2751,9 +2751,9 @@ begin
   inherited;
 end;
 
-{ TMessage }
+{ TChatMessage }
 
-destructor TMessage.Destroy;
+destructor TChatMessage.Destroy;
 begin
   for var Item in FToolCalls do
     Item.Free;

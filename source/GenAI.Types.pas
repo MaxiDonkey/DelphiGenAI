@@ -1125,14 +1125,14 @@ type
     &function
   );
 
-  TAssistantsToolsTypeInterceptor = class(TJSONInterceptorStringToString)
-    function StringConverter(Data: TObject; Field: string): string; override;
-    procedure StringReverter(Data: TObject; Field: string; Arg: string); override;
-  end;
-
   TAssistantsToolsTypeHelper = record Helper for TAssistantsToolsType
     constructor Create(const Value: string);
     function ToString: string;
+  end;
+
+  TAssistantsToolsTypeInterceptor = class(TJSONInterceptorStringToString)
+    function StringConverter(Data: TObject; Field: string): string; override;
+    procedure StringReverter(Data: TObject; Field: string; Arg: string); override;
   end;
 
   TChunkingStrategyType = (
@@ -1170,6 +1170,26 @@ type
   TThreadsContentTypeHelper = record Helper for TThreadsContentType
     constructor Create(const Value: string);
     function ToString: string;
+  end;
+
+  {$ENDREGION}
+
+  {$REGION 'GenAI.Messages'}
+
+  TMessageStatus = (
+    in_progress,
+    incomplete,
+    completed
+  );
+
+  TMessageStatusHelper = record Helper for TMessageStatus
+    constructor Create(const Value: string);
+    function ToString: string;
+  end;
+
+  TMessageStatusInterceptor = class(TJSONInterceptorStringToString)
+    function StringConverter(Data: TObject; Field: string): string; override;
+    procedure StringReverter(Data: TObject; Field: string; Arg: string); override;
   end;
 
   {$ENDREGION}
@@ -1941,6 +1961,40 @@ begin
     TThreadsContentType.image_file:
       Exit('image_file');
   end;
+end;
+
+{ TMessageStatusHelper }
+
+constructor TMessageStatusHelper.Create(const Value: string);
+begin
+  Self := TEnumValueRecovery.TypeRetrieve<TMessageStatus>(Value,
+            ['in_progress', 'incomplete', 'completed']);
+end;
+
+function TMessageStatusHelper.ToString: string;
+begin
+  case self of
+    TMessageStatus.in_progress:
+      Exit('in_progress');
+    TMessageStatus.incomplete:
+      Exit('incomplete');
+    TMessageStatus.completed:
+      Exit('completed');
+  end;
+end;
+
+{ TMessageStatusInterceptor }
+
+function TMessageStatusInterceptor.StringConverter(Data: TObject;
+  Field: string): string;
+begin
+  Result := RTTI.GetType(Data.ClassType).GetField(Field).GetValue(Data).AsType<TMessageStatus>.ToString;
+end;
+
+procedure TMessageStatusInterceptor.StringReverter(Data: TObject; Field,
+  Arg: string);
+begin
+  RTTI.GetType(Data.ClassType).GetField(Field).SetValue(Data, TValue.From(TMessageStatus.Create(Arg)));
 end;
 
 end.
