@@ -65,7 +65,7 @@ type
     function ToolResources(const Value: TToolResourcesParams): TCreateRunsParams;
   end;
 
-  TUpdateParams = class(TRunsCoreParams)
+  TUpdateParams = class(TJSONParam)
   public
     function Metadata(const Value: TJSONObject): TUpdateParams;
   end;
