@@ -70,6 +70,18 @@ type
     function Metadata(const Value: TJSONObject): TUpdateParams;
   end;
 
+  TToolOutputParam = class(TJSONParam)
+  public
+    function ToolCallId(const Value: string): TToolOutputParam;
+    function Output(const Value: string): TToolOutputParam;
+  end;
+
+  TSubmitToolParams = class(TJSONParam)
+  public
+     function ToolOutputs(const Value: TToolOutputParam): TSubmitToolParams;
+     function Stream(const Value: Boolean): TSubmitToolParams;
+  end;
+
   TSubmitToolOutputs = class
   private
     [JsonNameAttribute('tool_calls')]
@@ -243,10 +255,48 @@ type
 
   TRuns = TAdvancedList<TRun>;
 
+  /// <summary>
+  /// Manages asynchronous chat callBacks for a chat request using <c>TRun</c> as the response type.
+  /// </summary>
+  /// <remarks>
+  /// The <c>TAsynRun</c> type extends the <c>TAsynParams&lt;TRun&gt;</c> record to handle the lifecycle of an asynchronous chat operation.
+  /// It provides event handlers that trigger at various stages, such as when the operation starts, completes successfully, or encounters an error.
+  /// This structure facilitates non-blocking chat operations and is specifically tailored for scenarios where multiple choices from a chat model are required.
+  /// </remarks>
+  TAsynRun = TAsynCallBack<TRun>;
+
+  /// <summary>
+  /// Manages asynchronous chat callBacks for a chat request using <c>TRuns</c> as the response type.
+  /// </summary>
+  /// <remarks>
+  /// The <c>TAsynRuns</c> type extends the <c>TAsynParams&lt;TRuns&gt;</c> record to handle the lifecycle of an asynchronous chat operation.
+  /// It provides event handlers that trigger at various stages, such as when the operation starts, completes successfully, or encounters an error.
+  /// This structure facilitates non-blocking chat operations and is specifically tailored for scenarios where multiple choices from a chat model are required.
+  /// </remarks>
+  TAsynRuns = TAsynCallBack<TRuns>;
+
   TRunsRoute = class(TGenAIRoute)
   protected
     procedure HeaderCustomize; override;
   public
+    procedure AsynCreate(const ThreadId: string; const ParamProc: TProc<TRunsParams>;
+      const CallBacks: TFunc<TAsynRun>);
+    procedure AsynCreateAndRun(const ParamProc: TProc<TCreateRunsParams>;
+      const CallBacks: TFunc<TAsynRun>);
+    procedure AsynList(const ThreadId: string; const CallBacks: TFunc<TAsynRuns>); overload;
+    procedure AsynList(const ThreadId: string; const ParamProc: TProc<TRunsUrlParams>;
+      const CallBacks: TFunc<TAsynRuns>); overload;
+    procedure AsynRetrieve(const ThreadId: string; const RunId: string;
+      const CallBacks: TFunc<TAsynRun>);
+    procedure AsynUpdate(const ThreadId: string; const RunId: string;
+      const ParamProc: TProc<TUpdateParams>;
+      const CallBacks: TFunc<TAsynRun>);
+    procedure AsynSubmitTool(const ThreadId: string; const RunId: string;
+      const ParamProc: TProc<TSubmitToolParams>;
+      const CallBacks: TFunc<TAsynRun>);
+    procedure AsynCancel(const ThreadId: string; const RunId: string;
+      const CallBacks: TFunc<TAsynRun>);
+
     function Create(const ThreadId: string; const ParamProc: TProc<TRunsParams>): TRun;
     function CreateAndRun(const ParamProc: TProc<TCreateRunsParams>): TRun;
     function List(const ThreadId: string): TRuns; overload;
@@ -254,11 +304,172 @@ type
     function Retrieve(const ThreadId: string; const RunId: string): TRun;
     function Update(const ThreadId: string; const RunId: string;
       const ParamProc: TProc<TUpdateParams>): TRun;
+    function SubmitTool(const ThreadId: string; const RunId: string;
+      const ParamProc: TProc<TSubmitToolParams>): TRun;
+    function Cancel(const ThreadId: string; const RunId: string): TRun;
   end;
 
 implementation
 
 { TRunsRoute }
+
+procedure TRunsRoute.AsynCancel(const ThreadId, RunId: string;
+  const CallBacks: TFunc<TAsynRun>);
+begin
+  with TAsynCallBackExec<TAsynRun, TRun>.Create(CallBacks) do
+  try
+    Sender := Use.Param.Sender;
+    OnStart := Use.Param.OnStart;
+    OnSuccess := Use.Param.OnSuccess;
+    OnError := Use.Param.OnError;
+    Run(
+      function: TRun
+      begin
+        Result := Self.Cancel(ThreadId, RunId);
+      end);
+  finally
+    Free;
+  end;
+end;
+
+procedure TRunsRoute.AsynCreate(const ThreadId: string;
+  const ParamProc: TProc<TRunsParams>; const CallBacks: TFunc<TAsynRun>);
+begin
+  with TAsynCallBackExec<TAsynRun, TRun>.Create(CallBacks) do
+  try
+    Sender := Use.Param.Sender;
+    OnStart := Use.Param.OnStart;
+    OnSuccess := Use.Param.OnSuccess;
+    OnError := Use.Param.OnError;
+    Run(
+      function: TRun
+      begin
+        Result := Self.Create(ThreadId, ParamProc);
+      end);
+  finally
+    Free;
+  end;
+end;
+
+procedure TRunsRoute.AsynCreateAndRun(const ParamProc: TProc<TCreateRunsParams>;
+  const CallBacks: TFunc<TAsynRun>);
+begin
+  with TAsynCallBackExec<TAsynRun, TRun>.Create(CallBacks) do
+  try
+    Sender := Use.Param.Sender;
+    OnStart := Use.Param.OnStart;
+    OnSuccess := Use.Param.OnSuccess;
+    OnError := Use.Param.OnError;
+    Run(
+      function: TRun
+      begin
+        Result := Self.CreateAndRun(ParamProc);
+      end);
+  finally
+    Free;
+  end;
+end;
+
+procedure TRunsRoute.AsynList(const ThreadId: string;
+  const ParamProc: TProc<TRunsUrlParams>; const CallBacks: TFunc<TAsynRuns>);
+begin
+  with TAsynCallBackExec<TAsynRuns, TRuns>.Create(CallBacks) do
+  try
+    Sender := Use.Param.Sender;
+    OnStart := Use.Param.OnStart;
+    OnSuccess := Use.Param.OnSuccess;
+    OnError := Use.Param.OnError;
+    Run(
+      function: TRuns
+      begin
+        Result := Self.List(ThreadId, ParamProc);
+      end);
+  finally
+    Free;
+  end;
+end;
+
+procedure TRunsRoute.AsynList(const ThreadId: string;
+  const CallBacks: TFunc<TAsynRuns>);
+begin
+  with TAsynCallBackExec<TAsynRuns, TRuns>.Create(CallBacks) do
+  try
+    Sender := Use.Param.Sender;
+    OnStart := Use.Param.OnStart;
+    OnSuccess := Use.Param.OnSuccess;
+    OnError := Use.Param.OnError;
+    Run(
+      function: TRuns
+      begin
+        Result := Self.List(ThreadId);
+      end);
+  finally
+    Free;
+  end;
+end;
+
+procedure TRunsRoute.AsynRetrieve(const ThreadId, RunId: string;
+  const CallBacks: TFunc<TAsynRun>);
+begin
+  with TAsynCallBackExec<TAsynRun, TRun>.Create(CallBacks) do
+  try
+    Sender := Use.Param.Sender;
+    OnStart := Use.Param.OnStart;
+    OnSuccess := Use.Param.OnSuccess;
+    OnError := Use.Param.OnError;
+    Run(
+      function: TRun
+      begin
+        Result := Self.Retrieve(ThreadId, RunId);
+      end);
+  finally
+    Free;
+  end;
+end;
+
+procedure TRunsRoute.AsynSubmitTool(const ThreadId, RunId: string;
+  const ParamProc: TProc<TSubmitToolParams>; const CallBacks: TFunc<TAsynRun>);
+begin
+  with TAsynCallBackExec<TAsynRun, TRun>.Create(CallBacks) do
+  try
+    Sender := Use.Param.Sender;
+    OnStart := Use.Param.OnStart;
+    OnSuccess := Use.Param.OnSuccess;
+    OnError := Use.Param.OnError;
+    Run(
+      function: TRun
+      begin
+        Result := Self.SubmitTool(ThreadId, RunId, ParamProc);
+      end);
+  finally
+    Free;
+  end;
+end;
+
+procedure TRunsRoute.AsynUpdate(const ThreadId, RunId: string;
+  const ParamProc: TProc<TUpdateParams>; const CallBacks: TFunc<TAsynRun>);
+begin
+  with TAsynCallBackExec<TAsynRun, TRun>.Create(CallBacks) do
+  try
+    Sender := Use.Param.Sender;
+    OnStart := Use.Param.OnStart;
+    OnSuccess := Use.Param.OnSuccess;
+    OnError := Use.Param.OnError;
+    Run(
+      function: TRun
+      begin
+        Result := Self.Update(ThreadId, RunId, ParamProc);
+      end);
+  finally
+    Free;
+  end;
+end;
+
+function TRunsRoute.Cancel(const ThreadId, RunId: string): TRun;
+begin
+  HeaderCustomize;
+  Result := API.Post<TRun>('threads/' + ThreadId + '/runs/' + RunId + '/cancel');
+end;
 
 function TRunsRoute.Create(const ThreadId: string;
   const ParamProc: TProc<TRunsParams>): TRun;
@@ -297,6 +508,13 @@ function TRunsRoute.Retrieve(const ThreadId, RunId: string): TRun;
 begin
   HeaderCustomize;
   Result := API.Get<TRun>('threads/' + ThreadId + '/runs/' + RunId);
+end;
+
+function TRunsRoute.SubmitTool(const ThreadId, RunId: string;
+  const ParamProc: TProc<TSubmitToolParams>): TRun;
+begin
+  HeaderCustomize;
+  Result := API.Post<TRun, TSubmitToolParams>('threads/' + ThreadId + '/runs/' + RunId + '/submit_tool_outputs', ParamProc);
 end;
 
 function TRunsRoute.Update(const ThreadId, RunId: string;
@@ -539,6 +757,31 @@ end;
 function TUpdateParams.Metadata(const Value: TJSONObject): TUpdateParams;
 begin
   Result := TUpdateParams(Add('metadata', Value));
+end;
+
+{ TToolOutputParam }
+
+function TToolOutputParam.Output(const Value: string): TToolOutputParam;
+begin
+  Result := TToolOutputParam(Add('output', Value));
+end;
+
+function TToolOutputParam.ToolCallId(const Value: string): TToolOutputParam;
+begin
+  Result := TToolOutputParam(Add('tool_call_id', Value));
+end;
+
+{ TSubmitToolParams }
+
+function TSubmitToolParams.Stream(const Value: Boolean): TSubmitToolParams;
+begin
+  Result := TSubmitToolParams(Add('stream', Value));
+end;
+
+function TSubmitToolParams.ToolOutputs(
+  const Value: TToolOutputParam): TSubmitToolParams;
+begin
+  Result := TSubmitToolParams(Add('tool_outputs', Value.Detach));
 end;
 
 end.
