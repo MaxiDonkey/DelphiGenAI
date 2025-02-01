@@ -1194,6 +1194,47 @@ type
 
   {$ENDREGION}
 
+  {$REGION 'GenAI.Runs'}
+
+  TTruncationStrategyType = (
+    auto,
+    last_messages
+  );
+
+  TTruncationStrategyTypeHelper = record Helper for TTruncationStrategyType
+    constructor Create(const Value: string);
+    function ToString: string;
+  end;
+
+  TTruncationStrategyTypeInterceptor = class(TJSONInterceptorStringToString)
+    function StringConverter(Data: TObject; Field: string): string; override;
+    procedure StringReverter(Data: TObject; Field: string; Arg: string); override;
+  end;
+
+  TRunStatus = (
+    queued,
+    in_progress,
+    requires_action,
+    cancelling,
+    cancelled,
+    failed,
+    completed,
+    incomplete,
+    expired
+  );
+
+  TRunStatusHelper = record Helper for TRunStatus
+    constructor Create(const Value: string);
+    function ToString: string;
+  end;
+
+  TRunStatusInterceptor = class(TJSONInterceptorStringToString)
+    function StringConverter(Data: TObject; Field: string): string; override;
+    procedure StringReverter(Data: TObject; Field: string; Arg: string); override;
+  end;
+
+  {$ENDREGION}
+
 implementation
 
 uses
@@ -1995,6 +2036,86 @@ procedure TMessageStatusInterceptor.StringReverter(Data: TObject; Field,
   Arg: string);
 begin
   RTTI.GetType(Data.ClassType).GetField(Field).SetValue(Data, TValue.From(TMessageStatus.Create(Arg)));
+end;
+
+{ TTruncationStrategyTypeHelper }
+
+constructor TTruncationStrategyTypeHelper.Create(const Value: string);
+begin
+  Self := TEnumValueRecovery.TypeRetrieve<TTruncationStrategyType>(Value,
+            ['auto', 'last_messages']);
+end;
+
+function TTruncationStrategyTypeHelper.ToString: string;
+begin
+  case self of
+    TTruncationStrategyType.auto:
+      Exit('auto');
+    TTruncationStrategyType.last_messages:
+      Exit('last_messages');
+  end;
+end;
+
+{ TTruncationStrategyTypeInterceptor }
+
+function TTruncationStrategyTypeInterceptor.StringConverter(Data: TObject;
+  Field: string): string;
+begin
+  Result := RTTI.GetType(Data.ClassType).GetField(Field).GetValue(Data).AsType<TTruncationStrategyType>.ToString;
+end;
+
+procedure TTruncationStrategyTypeInterceptor.StringReverter(Data: TObject;
+  Field, Arg: string);
+begin
+  RTTI.GetType(Data.ClassType).GetField(Field).SetValue(Data, TValue.From(TTruncationStrategyType.Create(Arg)));
+end;
+
+{ TRunStatusHelper }
+
+constructor TRunStatusHelper.Create(const Value: string);
+begin
+  Self := TEnumValueRecovery.TypeRetrieve<TRunStatus>(Value,
+            ['queued', 'in_progress', 'requires_action', 'cancelling',
+             'cancelled', 'failed', 'completed', 'incomplete',
+             'expired']);
+end;
+
+function TRunStatusHelper.ToString: string;
+begin
+  case self of
+    TRunStatus.queued:
+      Exit('queued');
+    TRunStatus.in_progress:
+      Exit('in_progress');
+    TRunStatus.requires_action:
+      Exit('requires_action');
+    TRunStatus.cancelling:
+      Exit('cancelling');
+    TRunStatus.cancelled:
+      Exit('cancelled');
+    TRunStatus.failed:
+      Exit('failed');
+    TRunStatus.completed:
+      Exit('completed');
+    TRunStatus.incomplete:
+      Exit('incomplete');
+    TRunStatus.expired:
+      Exit('expired');
+  end;
+end;
+
+{ TRunStatusInterceptor }
+
+function TRunStatusInterceptor.StringConverter(Data: TObject;
+  Field: string): string;
+begin
+  Result := RTTI.GetType(Data.ClassType).GetField(Field).GetValue(Data).AsType<TRunStatus>.ToString;
+end;
+
+procedure TRunStatusInterceptor.StringReverter(Data: TObject; Field,
+  Arg: string);
+begin
+  RTTI.GetType(Data.ClassType).GetField(Field).SetValue(Data, TValue.From(TRunStatus.Create(Arg)));
 end;
 
 end.

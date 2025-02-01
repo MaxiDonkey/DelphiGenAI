@@ -14,8 +14,10 @@ uses
 
 const
   FIELDSASSTRING : TArray<string> = [
-    '"metadata": {', '"metadata":{', '"response_format": {', '"response_format":{',
-    '"parameters": {', '"parameters":{'
+    '"metadata": {', '"metadata":{',
+    '"response_format": {', '"response_format":{', //GenAI.Runs, GenAI.Assistants
+    '"parameters": {', '"parameters":{',           //GenAI.Assistants
+    '"tool_choice": {', '"tool_choice":{'          //GenAI.Runs
   ];
 
 (*
