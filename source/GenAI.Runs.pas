@@ -16,6 +16,8 @@ uses
   GenAI.Schema, GenAI.API.Lists, GenAI.Assistants, GenAI.Threads, GenAI.Chat;
 
 type
+  TRunsUrlParams = TUrlAdvancedParams;
+
   TRunsToolChoice = class(TJSONParam)
   public
     function &Type(const Value: string): TRunsToolChoice;
@@ -30,27 +32,42 @@ type
     function LastMessages(const Value: Integer): TRunsTruncationStrategy;
   end;
 
-  TRunsParams = class(TJSONParam)
+  TRunsCoreParams = class(TJSONParam)
   public
-    function AssistantId(const Value: string): TRunsParams;
-    function Model(const Value: string): TRunsParams;
-    function Instructions(const Value: string): TRunsParams;
-    function AdditionalInstructions(const Value: string): TRunsParams;
-    function AdditionalMessages(const Value: TArray<TThreadsMessageParams>): TRunsParams; overload;
-    function Tools(const Value: TArray<TAssistantsToolsParams>): TRunsParams;
-    function Metadata(const Value: TJSONObject): TRunsParams;
-    function Temperature(const Value: Double): TRunsParams;
-    function TopP(const Value: Double): TRunsParams;
-    function Stream(const Value: Boolean): TRunsParams;
-    function MaxPromptTokens(const Value: Integer): TRunsParams;
-    function MaxCompletionTokens(const Value: Integer): TRunsParams;
-    function TruncationStrategy(const Value: TRunsTruncationStrategy): TRunsParams;
-    function ToolChoice(const Value: string): TRunsParams; overload;
-    function ToolChoice(const Value: TRunsToolChoice): TRunsParams; overload;
-    function ParallelToolCalls(const Value: Boolean): TRunsParams;
-    function ResponseFormat(const Value: string = 'auto'): TRunsParams; overload;
-    function ResponseFormat(const Value: TResponseFormatParams): TRunsParams; overload;
-    function ResponseFormat(const Value: TJSONObject): TRunsParams; overload;
+    function AssistantId(const Value: string): TRunsCoreParams;
+    function Model(const Value: string): TRunsCoreParams;
+    function Instructions(const Value: string): TRunsCoreParams;
+    function AdditionalInstructions(const Value: string): TRunsCoreParams;
+    function Tools(const Value: TArray<TAssistantsToolsParams>): TRunsCoreParams;
+    function Metadata(const Value: TJSONObject): TRunsCoreParams;
+    function Temperature(const Value: Double): TRunsCoreParams;
+    function TopP(const Value: Double): TRunsCoreParams;
+    function Stream(const Value: Boolean): TRunsCoreParams;
+    function MaxPromptTokens(const Value: Integer): TRunsCoreParams;
+    function MaxCompletionTokens(const Value: Integer): TRunsCoreParams;
+    function TruncationStrategy(const Value: TRunsTruncationStrategy): TRunsCoreParams;
+    function ToolChoice(const Value: string): TRunsCoreParams; overload;
+    function ToolChoice(const Value: TRunsToolChoice): TRunsCoreParams; overload;
+    function ParallelToolCalls(const Value: Boolean): TRunsCoreParams;
+    function ResponseFormat(const Value: string = 'auto'): TRunsCoreParams; overload;
+    function ResponseFormat(const Value: TResponseFormatParams): TRunsCoreParams; overload;
+    function ResponseFormat(const Value: TJSONObject): TRunsCoreParams; overload;
+  end;
+
+  TRunsParams = class(TRunsCoreParams)
+  public
+    function AdditionalMessages(const Value: TArray<TThreadsMessageParams>): TRunsParams;
+  end;
+
+  TCreateRunsParams = class(TRunsCoreParams)
+  public
+    function Thread(const Value: TThreadsCreateParams): TCreateRunsParams;
+    function ToolResources(const Value: TToolResourcesParams): TCreateRunsParams;
+  end;
+
+  TUpdateParams = class(TRunsCoreParams)
+  public
+    function Metadata(const Value: TJSONObject): TUpdateParams;
   end;
 
   TSubmitToolOutputs = class
@@ -224,11 +241,19 @@ type
     destructor Destroy; override;
   end;
 
+  TRuns = TAdvancedList<TRun>;
+
   TRunsRoute = class(TGenAIRoute)
   protected
     procedure HeaderCustomize; override;
   public
     function Create(const ThreadId: string; const ParamProc: TProc<TRunsParams>): TRun;
+    function CreateAndRun(const ParamProc: TProc<TCreateRunsParams>): TRun;
+    function List(const ThreadId: string): TRuns; overload;
+    function List(const ThreadId: string; const ParamProc: TProc<TRunsUrlParams>): TRuns; overload;
+    function Retrieve(const ThreadId: string; const RunId: string): TRun;
+    function Update(const ThreadId: string; const RunId: string;
+      const ParamProc: TProc<TUpdateParams>): TRun;
   end;
 
 implementation
@@ -242,116 +267,140 @@ begin
   Result := API.Post<TRun, TRunsParams>('threads/' + ThreadId + '/runs', ParamProc);
 end;
 
+function TRunsRoute.CreateAndRun(
+  const ParamProc: TProc<TCreateRunsParams>): TRun;
+begin
+  HeaderCustomize;
+  Result := API.Post<TRun, TCreateRunsParams>('threads/runs', ParamProc);
+end;
+
 procedure TRunsRoute.HeaderCustomize;
 begin
   inherited;
   API.CustomHeaders := [TNetHeader.Create('OpenAI-Beta', 'assistants=v2')];
 end;
 
-{ TRunsParams }
-
-function TRunsParams.AdditionalInstructions(const Value: string): TRunsParams;
+function TRunsRoute.List(const ThreadId: string): TRuns;
 begin
-  Result := TRunsParams(Add('additional_instructions', Value));
+  HeaderCustomize;
+  Result := API.Get<TRuns>('threads/' + ThreadId + '/runs');
 end;
 
-function TRunsParams.AdditionalMessages(
-  const Value: TArray<TThreadsMessageParams>): TRunsParams;
+function TRunsRoute.List(const ThreadId: string;
+  const ParamProc: TProc<TRunsUrlParams>): TRuns;
+begin
+  HeaderCustomize;
+  Result := API.Get<TRuns, TRunsUrlParams>('threads/' + ThreadId + '/runs', ParamProc);
+end;
+
+function TRunsRoute.Retrieve(const ThreadId, RunId: string): TRun;
+begin
+  HeaderCustomize;
+  Result := API.Get<TRun>('threads/' + ThreadId + '/runs/' + RunId);
+end;
+
+function TRunsRoute.Update(const ThreadId, RunId: string;
+  const ParamProc: TProc<TUpdateParams>): TRun;
+begin
+  HeaderCustomize;
+  Result := API.Post<TRun, TUpdateParams>('threads/' + ThreadId + '/runs/' + RunId, ParamProc);
+end;
+
+{ TRunsCoreParams }
+
+function TRunsCoreParams.AdditionalInstructions(const Value: string): TRunsCoreParams;
+begin
+  Result := TRunsCoreParams(Add('additional_instructions', Value));
+end;
+
+function TRunsCoreParams.AssistantId(const Value: string): TRunsCoreParams;
+begin
+  Result := TRunsCoreParams(Add('assistant_id', Value));
+end;
+
+function TRunsCoreParams.Instructions(const Value: string): TRunsCoreParams;
+begin
+  Result := TRunsCoreParams(Add('instructions', Value));
+end;
+
+function TRunsCoreParams.MaxCompletionTokens(const Value: Integer): TRunsCoreParams;
+begin
+  Result := TRunsCoreParams(Add('max_completion_tokens', Value));
+end;
+
+function TRunsCoreParams.MaxPromptTokens(const Value: Integer): TRunsCoreParams;
+begin
+  Result := TRunsCoreParams(Add('max_prompt_tokens', Value));
+end;
+
+function TRunsCoreParams.Metadata(const Value: TJSONObject): TRunsCoreParams;
+begin
+  Result := TRunsCoreParams(Add('metadata', Value));
+end;
+
+function TRunsCoreParams.Model(const Value: string): TRunsCoreParams;
+begin
+  Result := TRunsCoreParams(Add('model', Value));
+end;
+
+function TRunsCoreParams.ParallelToolCalls(const Value: Boolean): TRunsCoreParams;
+begin
+  Result := TRunsCoreParams(Add('parallel_tool_calls', Value));
+end;
+
+function TRunsCoreParams.ResponseFormat(
+  const Value: TResponseFormatParams): TRunsCoreParams;
+begin
+  Result := TRunsCoreParams(Add('response_format', Value.Detach));
+end;
+
+function TRunsCoreParams.ResponseFormat(const Value: string): TRunsCoreParams;
+begin
+  Result := TRunsCoreParams(Add('response_format', Value));
+end;
+
+function TRunsCoreParams.Stream(const Value: Boolean): TRunsCoreParams;
+begin
+  Result := TRunsCoreParams(Add('stream', Value));
+end;
+
+function TRunsCoreParams.Temperature(const Value: Double): TRunsCoreParams;
+begin
+  Result := TRunsCoreParams(Add('temperature', Value));
+end;
+
+function TRunsCoreParams.ToolChoice(const Value: string): TRunsCoreParams;
+begin
+  Result := TRunsCoreParams(Add('tool_choice', Value));
+end;
+
+function TRunsCoreParams.ToolChoice(const Value: TRunsToolChoice): TRunsCoreParams;
+begin
+  Result := TRunsCoreParams(Add('tool_choice', Value.Detach));
+end;
+
+function TRunsCoreParams.Tools(const Value: TArray<TAssistantsToolsParams>): TRunsCoreParams;
 begin
   var JSONArray := TJSONArray.Create;
   for var Item in Value do
     JSONArray.Add(Item.Detach);
-  Result := TRunsParams(Add('additional_messages', JSONArray));
+  Result := TRunsCoreParams(Add('tools', JSONArray));
 end;
 
-function TRunsParams.AssistantId(const Value: string): TRunsParams;
+function TRunsCoreParams.TopP(const Value: Double): TRunsCoreParams;
 begin
-  Result := TRunsParams(Add('assistant_id', Value));
+  Result := TRunsCoreParams(Add('top_p', Value));
 end;
 
-function TRunsParams.Instructions(const Value: string): TRunsParams;
+function TRunsCoreParams.TruncationStrategy(
+  const Value: TRunsTruncationStrategy): TRunsCoreParams;
 begin
-  Result := TRunsParams(Add('instructions', Value));
+  Result := TRunsCoreParams(Add('truncation_strategy', Value.Detach));
 end;
 
-function TRunsParams.MaxCompletionTokens(const Value: Integer): TRunsParams;
+function TRunsCoreParams.ResponseFormat(const Value: TJSONObject): TRunsCoreParams;
 begin
-  Result := TRunsParams(Add('max_completion_tokens', Value));
-end;
-
-function TRunsParams.MaxPromptTokens(const Value: Integer): TRunsParams;
-begin
-  Result := TRunsParams(Add('max_prompt_tokens', Value));
-end;
-
-function TRunsParams.Metadata(const Value: TJSONObject): TRunsParams;
-begin
-  Result := TRunsParams(Add('metadata', Value));
-end;
-
-function TRunsParams.Model(const Value: string): TRunsParams;
-begin
-  Result := TRunsParams(Add('model', Value));
-end;
-
-function TRunsParams.ParallelToolCalls(const Value: Boolean): TRunsParams;
-begin
-  Result := TRunsParams(Add('parallel_tool_calls', Value));
-end;
-
-function TRunsParams.ResponseFormat(
-  const Value: TResponseFormatParams): TRunsParams;
-begin
-  Result := TRunsParams(Add('response_format', Value.Detach));
-end;
-
-function TRunsParams.ResponseFormat(const Value: string): TRunsParams;
-begin
-  Result := TRunsParams(Add('response_format', Value));
-end;
-
-function TRunsParams.Stream(const Value: Boolean): TRunsParams;
-begin
-  Result := TRunsParams(Add('stream', Value));
-end;
-
-function TRunsParams.Temperature(const Value: Double): TRunsParams;
-begin
-  Result := TRunsParams(Add('temperature', Value));
-end;
-
-function TRunsParams.ToolChoice(const Value: string): TRunsParams;
-begin
-  Result := TRunsParams(Add('tool_choice', Value));
-end;
-
-function TRunsParams.ToolChoice(const Value: TRunsToolChoice): TRunsParams;
-begin
-  Result := TRunsParams(Add('tool_choice', Value.Detach));
-end;
-
-function TRunsParams.Tools(const Value: TArray<TAssistantsToolsParams>): TRunsParams;
-begin
-  var JSONArray := TJSONArray.Create;
-  for var Item in Value do
-    JSONArray.Add(Item.Detach);
-  Result := TRunsParams(Add('tools', JSONArray));
-end;
-
-function TRunsParams.TopP(const Value: Double): TRunsParams;
-begin
-  Result := TRunsParams(Add('top_p', Value));
-end;
-
-function TRunsParams.TruncationStrategy(
-  const Value: TRunsTruncationStrategy): TRunsParams;
-begin
-  Result := TRunsParams(Add('truncation_strategy', Value.Detach));
-end;
-
-function TRunsParams.ResponseFormat(const Value: TJSONObject): TRunsParams;
-begin
-  Result := TRunsParams(Add('response_format', Value));
+  Result := TRunsCoreParams(Add('response_format', Value));
 end;
 
 { TRunsTruncationStrategy }
@@ -458,6 +507,38 @@ begin
   for var Item in FToolCalls do
     Item.Free;
   inherited;
+end;
+
+{ TRunsParams }
+
+function TRunsParams.AdditionalMessages(
+  const Value: TArray<TThreadsMessageParams>): TRunsParams;
+begin
+  var JSONArray := TJSONArray.Create;
+  for var Item in Value do
+    JSONArray.Add(Item.Detach);
+  Result := TRunsParams(Add('additional_messages', JSONArray));
+end;
+
+{ TCreateRunsParams }
+
+function TCreateRunsParams.Thread(
+  const Value: TThreadsCreateParams): TCreateRunsParams;
+begin
+  Result := TCreateRunsParams(Add('thread', Value.Detach));
+end;
+
+function TCreateRunsParams.ToolResources(
+  const Value: TToolResourcesParams): TCreateRunsParams;
+begin
+  Result := TCreateRunsParams(Add('tool_resources', Value.Detach));
+end;
+
+{ TUpdateParams }
+
+function TUpdateParams.Metadata(const Value: TJSONObject): TUpdateParams;
+begin
+  Result := TUpdateParams(Add('metadata', Value));
 end;
 
 end.
