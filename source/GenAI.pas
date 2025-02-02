@@ -16,7 +16,7 @@ uses
   GenAI.Moderation, GenAI.Images, GenAI.Files, GenAI.Uploads, GenAI.Batch,
   GenAI.Batch.Reader, GenAI.Batch.Builder, GenAI.Completions, GenAI.FineTuning,
   GenAI.Assistants, GenAI.Threads, GenAI.Messages, GenAI.Runs, GenAI.RunSteps,
-  GenAI.Vector, GenAI.VectorFiles;
+  GenAI.Vector, GenAI.VectorFiles, GenAI.VectorBatch;
 
 type
   /// <summary>
@@ -54,6 +54,7 @@ type
     function GetThreadsRoute: TThreadsRoute;
     function GetUploadsRoute: TUploadsRoute;
     function GetVectorStoreRoute: TVectorStoreRoute;
+    function GetVectorStoreBatchRoute: TVectorStoreBatchRoute;
     function GetVectorStoreFilesRoute: TVectorStoreFilesRoute;
 
     /// <summary>
@@ -171,6 +172,8 @@ type
 
     property VectorStore: TVectorStoreRoute read GetVectorStoreRoute;
 
+    property VectorStoreBatch: TVectorStoreBatchRoute read GetVectorStoreBatchRoute;
+
     property VectorStoreFiles: TVectorStoreFilesRoute read GetVectorStoreFilesRoute;
 
     /// <summary>
@@ -244,6 +247,7 @@ type
     FThreadsRoute: TThreadsRoute;
     FUploadsRoute: TUploadsRoute;
     FVectorStoreRoute: TVectorStoreRoute;
+    FVectorStoreBatchRoute: TVectorStoreBatchRoute;
     FVectorStoreFilesRoute: TVectorStoreFilesRoute;
 
     function GetAPI: TGenAIAPI;
@@ -269,6 +273,7 @@ type
     function GetThreadsRoute: TThreadsRoute;
     function GetUploadsRoute: TUploadsRoute;
     function GetVectorStoreRoute: TVectorStoreRoute;
+    function GetVectorStoreBatchRoute: TVectorStoreBatchRoute;
     function GetVectorStoreFilesRoute: TVectorStoreFilesRoute;
 
   public
@@ -2090,6 +2095,7 @@ begin
   FThreadsRoute.Free;
   FUploadsRoute.Free;
   FVectorStoreRoute.Free;
+  FVectorStoreBatchRoute.Free;
   FVectorStoreFilesRoute.Free;
   FAPI.Free;
   inherited;
@@ -2194,6 +2200,13 @@ begin
   if not Assigned(FUploadsRoute) then
     FUploadsRoute := TUploadsRoute.CreateRoute(API);
   Result := FUploadsRoute;
+end;
+
+function TGenAI.GetVectorStoreBatchRoute: TVectorStoreBatchRoute;
+begin
+  if not Assigned(FVectorStoreBatchRoute) then
+    FVectorStoreBatchRoute := TVectorStoreBatchRoute.CreateRoute(API);
+  Result := FVectorStoreBatchRoute;
 end;
 
 function TGenAI.GetVectorStoreFilesRoute: TVectorStoreFilesRoute;
