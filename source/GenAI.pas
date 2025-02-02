@@ -15,7 +15,8 @@ uses
   GenAI.Batch.Interfaces, GenAI.Schema, GenAI.Embeddings, GenAI.Audio, GenAI.Chat,
   GenAI.Moderation, GenAI.Images, GenAI.Files, GenAI.Uploads, GenAI.Batch,
   GenAI.Batch.Reader, GenAI.Batch.Builder, GenAI.Completions, GenAI.FineTuning,
-  GenAI.Assistants, GenAI.Threads, GenAI.Messages, GenAI.Runs, GenAI.RunSteps;
+  GenAI.Assistants, GenAI.Threads, GenAI.Messages, GenAI.Runs, GenAI.RunSteps,
+  GenAI.Vector;
 
 type
   /// <summary>
@@ -52,6 +53,7 @@ type
     function GetRunStepRoute: TRunStepRoute;
     function GetThreadsRoute: TThreadsRoute;
     function GetUploadsRoute: TUploadsRoute;
+    function GetVectorStoreRoute: TVectorStoreRoute;
 
     /// <summary>
     /// Represents the API route handler for managing assistants.
@@ -166,6 +168,8 @@ type
     /// </remarks>
     property Uploads: TUploadsRoute read GetUploadsRoute;
 
+    property VectorStore: TVectorStoreRoute read GetVectorStoreRoute;
+
     /// <summary>
     /// the main API object used for making requests.
     /// </summary>
@@ -236,6 +240,7 @@ type
     FRunStepRoute: TRunStepRoute;
     FThreadsRoute: TThreadsRoute;
     FUploadsRoute: TUploadsRoute;
+    FVectorStoreRoute: TVectorStoreRoute;
 
     function GetAPI: TGenAIAPI;
     function GetAPIKey: string;
@@ -259,6 +264,7 @@ type
     function GetRunStepRoute: TRunStepRoute;
     function GetThreadsRoute: TThreadsRoute;
     function GetUploadsRoute: TUploadsRoute;
+    function GetVectorStoreRoute: TVectorStoreRoute;
 
   public
     /// <summary>
@@ -2078,6 +2084,7 @@ begin
   FRunStepRoute.Free;
   FThreadsRoute.Free;
   FUploadsRoute.Free;
+  FVectorStoreRoute.Free;
   FAPI.Free;
   inherited;
 end;
@@ -2181,6 +2188,13 @@ begin
   if not Assigned(FUploadsRoute) then
     FUploadsRoute := TUploadsRoute.CreateRoute(API);
   Result := FUploadsRoute;
+end;
+
+function TGenAI.GetVectorStoreRoute: TVectorStoreRoute;
+begin
+  if not Assigned(FVectorStoreRoute) then
+    FVectorStoreRoute := TVectorStoreRoute.CreateRoute(API);
+  Result := FVectorStoreRoute;
 end;
 
 function TGenAI.GetChatRoute: TChatRoute;
