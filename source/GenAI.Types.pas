@@ -1235,6 +1235,25 @@ type
 
   {$ENDREGION}
 
+  {$REGION 'GenAI.RunSteps'}
+
+  TRunStepType = (
+    message_creation,
+    tool_calls
+  );
+
+  TRunStepTypeHelper = record Helper for TRunStepType
+    constructor Create(const Value: string);
+    function ToString: string;
+  end;
+
+  TRunStepTypeInterceptor = class(TJSONInterceptorStringToString)
+    function StringConverter(Data: TObject; Field: string): string; override;
+    procedure StringReverter(Data: TObject; Field: string; Arg: string); override;
+  end;
+
+  {$ENDREGION}
+
 implementation
 
 uses
@@ -2116,6 +2135,38 @@ procedure TRunStatusInterceptor.StringReverter(Data: TObject; Field,
   Arg: string);
 begin
   RTTI.GetType(Data.ClassType).GetField(Field).SetValue(Data, TValue.From(TRunStatus.Create(Arg)));
+end;
+
+{ TRunStepTypeHelper }
+
+constructor TRunStepTypeHelper.Create(const Value: string);
+begin
+  Self := TEnumValueRecovery.TypeRetrieve<TRunStepType>(Value,
+            ['message_creation', 'tool_calls']);
+end;
+
+function TRunStepTypeHelper.ToString: string;
+begin
+  case self of
+    TRunStepType.message_creation:
+      Exit('message_creation');
+    TRunStepType.tool_calls:
+      Exit('tool_calls');
+  end;
+end;
+
+{ TRunStepTypeInterceptor }
+
+function TRunStepTypeInterceptor.StringConverter(Data: TObject;
+  Field: string): string;
+begin
+  Result := RTTI.GetType(Data.ClassType).GetField(Field).GetValue(Data).AsType<TRunStepType>.ToString;
+end;
+
+procedure TRunStepTypeInterceptor.StringReverter(Data: TObject; Field,
+  Arg: string);
+begin
+  RTTI.GetType(Data.ClassType).GetField(Field).SetValue(Data, TValue.From(TRunStepType.Create(Arg)));
 end;
 
 end.

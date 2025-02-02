@@ -15,7 +15,7 @@ uses
   GenAI.Batch.Interfaces, GenAI.Schema, GenAI.Embeddings, GenAI.Audio, GenAI.Chat,
   GenAI.Moderation, GenAI.Images, GenAI.Files, GenAI.Uploads, GenAI.Batch,
   GenAI.Batch.Reader, GenAI.Batch.Builder, GenAI.Completions, GenAI.FineTuning,
-  GenAI.Assistants, GenAI.Threads, GenAI.Messages, GenAI.Runs;
+  GenAI.Assistants, GenAI.Threads, GenAI.Messages, GenAI.Runs, GenAI.RunSteps;
 
 type
   /// <summary>
@@ -49,6 +49,7 @@ type
     function GetModelsRoute: TModelsRoute;
     function GetModerationRoute: TModerationRoute;
     function GetRunsRoute: TRunsRoute;
+    function GetRunStepRoute: TRunStepRoute;
     function GetThreadsRoute: TThreadsRoute;
     function GetUploadsRoute: TUploadsRoute;
 
@@ -153,6 +154,8 @@ type
 
     property Runs: TRunsRoute read GetRunsRoute;
 
+    property RunStep: TRunStepRoute read GetRunStepRoute;
+
     property Threads: TThreadsRoute read GetThreadsRoute;
     /// <summary>
     /// Manages routes for handling file uploads, including creating uploads, adding parts, completing uploads, and canceling uploads.
@@ -230,6 +233,7 @@ type
     FModelsRoute: TModelsRoute;
     FModerationRoute: TModerationRoute;
     FRunsRoute: TRunsRoute;
+    FRunStepRoute: TRunStepRoute;
     FThreadsRoute: TThreadsRoute;
     FUploadsRoute: TUploadsRoute;
 
@@ -252,6 +256,7 @@ type
     function GetModelsRoute: TModelsRoute;
     function GetModerationRoute: TModerationRoute;
     function GetRunsRoute: TRunsRoute;
+    function GetRunStepRoute: TRunStepRoute;
     function GetThreadsRoute: TThreadsRoute;
     function GetUploadsRoute: TUploadsRoute;
 
@@ -2070,6 +2075,7 @@ begin
   FModelsRoute.Free;
   FModerationRoute.Free;
   FRunsRoute.Free;
+  FRunStepRoute.Free;
   FThreadsRoute.Free;
   FUploadsRoute.Free;
   FAPI.Free;
@@ -2154,6 +2160,13 @@ begin
   if not Assigned(FRunsRoute) then
     FRunsRoute := TRunsRoute.CreateRoute(API);
   Result := FRunsRoute;
+end;
+
+function TGenAI.GetRunStepRoute: TRunStepRoute;
+begin
+  if not Assigned(FRunStepRoute) then
+    FRunStepRoute := TRunStepRoute.CreateRoute(API);
+  Result := FRunStepRoute;
 end;
 
 function TGenAI.GetThreadsRoute: TThreadsRoute;

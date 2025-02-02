@@ -13,7 +13,7 @@ uses
   System.SysUtils, System.Classes, System.Threading, System.JSON, REST.Json.Types,
   REST.JsonReflect, System.Net.URLClient,
   GenAI.API.Params, GenAI.API, GenAI.Consts, GenAI.Types, GenAI.Async.Support,
-  GenAI.Schema, GenAI.API.Lists, GenAI.Assistants, GenAI.Threads, GenAI.Chat;
+  GenAI.API.Lists, GenAI.Assistants, GenAI.Threads, GenAI.Chat;
 
 type
   TRunsUrlParams = TUrlAdvancedParams;
