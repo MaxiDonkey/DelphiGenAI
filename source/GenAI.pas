@@ -16,7 +16,7 @@ uses
   GenAI.Moderation, GenAI.Images, GenAI.Files, GenAI.Uploads, GenAI.Batch,
   GenAI.Batch.Reader, GenAI.Batch.Builder, GenAI.Completions, GenAI.FineTuning,
   GenAI.Assistants, GenAI.Threads, GenAI.Messages, GenAI.Runs, GenAI.RunSteps,
-  GenAI.Vector;
+  GenAI.Vector, GenAI.VectorFiles;
 
 type
   /// <summary>
@@ -54,6 +54,7 @@ type
     function GetThreadsRoute: TThreadsRoute;
     function GetUploadsRoute: TUploadsRoute;
     function GetVectorStoreRoute: TVectorStoreRoute;
+    function GetVectorStoreFilesRoute: TVectorStoreFilesRoute;
 
     /// <summary>
     /// Represents the API route handler for managing assistants.
@@ -170,6 +171,8 @@ type
 
     property VectorStore: TVectorStoreRoute read GetVectorStoreRoute;
 
+    property VectorStoreFiles: TVectorStoreFilesRoute read GetVectorStoreFilesRoute;
+
     /// <summary>
     /// the main API object used for making requests.
     /// </summary>
@@ -241,6 +244,7 @@ type
     FThreadsRoute: TThreadsRoute;
     FUploadsRoute: TUploadsRoute;
     FVectorStoreRoute: TVectorStoreRoute;
+    FVectorStoreFilesRoute: TVectorStoreFilesRoute;
 
     function GetAPI: TGenAIAPI;
     function GetAPIKey: string;
@@ -265,6 +269,7 @@ type
     function GetThreadsRoute: TThreadsRoute;
     function GetUploadsRoute: TUploadsRoute;
     function GetVectorStoreRoute: TVectorStoreRoute;
+    function GetVectorStoreFilesRoute: TVectorStoreFilesRoute;
 
   public
     /// <summary>
@@ -2085,6 +2090,7 @@ begin
   FThreadsRoute.Free;
   FUploadsRoute.Free;
   FVectorStoreRoute.Free;
+  FVectorStoreFilesRoute.Free;
   FAPI.Free;
   inherited;
 end;
@@ -2188,6 +2194,13 @@ begin
   if not Assigned(FUploadsRoute) then
     FUploadsRoute := TUploadsRoute.CreateRoute(API);
   Result := FUploadsRoute;
+end;
+
+function TGenAI.GetVectorStoreFilesRoute: TVectorStoreFilesRoute;
+begin
+  if not Assigned(FVectorStoreFilesRoute) then
+    FVectorStoreFilesRoute := TVectorStoreFilesRoute.CreateRoute(API);
+  Result := FVectorStoreFilesRoute;
 end;
 
 function TGenAI.GetVectorStoreRoute: TVectorStoreRoute;

@@ -115,6 +115,8 @@ type
     destructor Destroy; override;
   end;
 
+  TVectorStores = TAdvancedList<TVectorStore>;
+
   TVectorStoreDeletion = class
   private
     FId: string;
@@ -125,8 +127,6 @@ type
     property &Object: string read FObject write FObject;
     property Deleted: Boolean read FDeleted write FDeleted;
   end;
-
-  TVectorStores = TAdvancedList<TVectorStore>;
 
   /// <summary>
   /// Manages asynchronous chat callBacks for a chat request using <c>TVectorStore</c> as the response type.
