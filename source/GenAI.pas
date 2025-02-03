@@ -7,6 +7,49 @@ unit GenAI;
 
  ------------------------------------------------------------------------------}
 
+(*
+
+   This Delphi project relies on several key dependencies that cover network functionality,
+   JSON handling,  serialization,  asynchronous operations,  and error management. Here are
+   the main categories of dependencies:
+
+     1. Standard Delphi Dependencies:
+
+   Utilizes  native libraries such as  System.Classes,  System.SysUtils,  System.JSON,  and
+   System.Net.HttpClient for general operations, input/output, date management, and network
+   communications.
+
+     2. JSON and REST:
+
+   Uses units like REST.Json.Types,  REST.Json.Interceptors, and REST.JsonReflect to handle
+   object serialization/deserialization and REST API calls.
+
+     3. Custom Exception and Error Handling:
+
+   Internal modules GenAI.Exceptions and GenAI.Errors capture and propagate errors specific
+   to the API.
+
+     4. Custom GenAI API Modules:
+
+   Custom modules like GenAI.API, GenAI.API.Params,  and GenAI.HttpClientInterface are used
+   to build HTTP requests to the GenAI API and handle asynchronous responses.
+
+     5. Multithreading and Asynchronous Operations:
+
+   Utilizes System.Threading  and internal classes  (such as TAsynCallBack)  to handle long
+   running tasks and avoid blocking the main thread.
+
+     6. Testing Dependencies:
+
+   Uses  DUnitX.TestFramework and  related  modules to implement  unit tests  and  validate
+   critical project functionality.
+
+   This  project is structured to be modular and extensible, with  abstractions that  allow
+   for  easily switching  network  libraries  or  adding  new  features  while  maintaining
+   robustness and testability.
+
+*)
+
 interface
 
 uses
