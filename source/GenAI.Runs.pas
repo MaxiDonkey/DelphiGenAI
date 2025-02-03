@@ -20,17 +20,22 @@ type
   /// Represents the URL parameters for API requests related to execution runs on threads.
   /// </summary>
   /// <remarks>
-  /// This class is used to customize and configure URL-based parameters for retrieving or managing runs in API requests.
-  /// It extends the base functionality of <c>TUrlAdvancedParams</c>, enabling additional customization for OpenAI API endpoints related to execution runs.
+  /// This class is used to customize and configure URL-based parameters for retrieving or
+  /// managing runs in API requests.
+  /// It extends the base functionality of <c>TUrlAdvancedParams</c>, enabling additional
+  /// customization for OpenAI API endpoints related to execution runs.
   /// </remarks>
   TRunsUrlParams = TUrlAdvancedParams;
 
   /// <summary>
-  /// Represents the configuration for selecting a tool choice when creating or running an execution run on a thread in the OpenAI API.
+  /// Represents the configuration for selecting a tool choice when creating or running an execution
+  /// run on a thread in the OpenAI API.
   /// </summary>
   /// <remarks>
-  /// This class allows specifying the tool type and, optionally, the name of the function to be called during the run.
-  /// The tool choice is essential for directing the assistant to use specific tools like functions during an API run execution.
+  /// This class allows specifying the tool type and, optionally, the name of the function to be
+  /// called during the run.
+  /// The tool choice is essential for directing the assistant to use specific tools like functions
+  /// during an API run execution.
   /// </remarks>
   TRunsToolChoice = class(TJSONParam)
   public
@@ -38,7 +43,8 @@ type
     /// Sets the type of the tool to be used for this run.
     /// </summary>
     /// <param name="Value">
-    /// The type of tool to use. For example, "function" when the assistant is expected to call a function during the run.
+    /// The type of tool to use. For example, "function" when the assistant is expected to call
+    /// a function during the run.
     /// </param>
     /// <returns>
     /// Returns the current instance of <c>TRunsToolChoice</c> to allow method chaining.
@@ -61,7 +67,8 @@ type
     /// The name of the function that should be called by the assistant during the run.
     /// </param>
     /// <returns>
-    /// Returns a new instance of <c>TRunsToolChoice</c> configured with the specified function name and tool type set to "function".
+    /// Returns a new instance of <c>TRunsToolChoice</c> configured with the specified function
+    /// name and tool type set to "function".
     /// </returns>
     class function New(const FunctionName: string): TRunsToolChoice;
   end;
@@ -70,8 +77,10 @@ type
   /// Represents the truncation strategy configuration for a run in the OpenAI API.
   /// </summary>
   /// <remarks>
-  /// This class allows specifying how the thread context should be truncated when constructing the prompt for the run.
-  /// Different truncation strategies help optimize token usage and focus the context on relevant messages.
+  /// This class allows specifying how the thread context should be truncated when constructing
+  /// the prompt for the run.
+  /// Different truncation strategies help optimize token usage and focus the context on relevant
+  /// messages.
   /// </remarks>
   TRunsTruncationStrategy = class(TJSONParam)
   public
@@ -79,7 +88,8 @@ type
     /// Sets the type of truncation strategy to be used.
     /// </summary>
     /// <param name="Value">
-    /// The truncation strategy type. For example, "auto" to automatically determine which messages to drop or "last_messages" to keep the most recent messages.
+    /// The truncation strategy type. For example, "auto" to automatically determine which messages
+    /// to drop or "last_messages" to keep the most recent messages.
     /// </param>
     /// <returns>
     /// Returns the current instance of <c>TRunsTruncationStrategy</c> to allow method chaining.
@@ -96,7 +106,8 @@ type
     /// </returns>
     function &Type(const Value: TTruncationStrategyType): TRunsTruncationStrategy; overload;
     /// <summary>
-    /// Specifies the number of recent messages to retain when using the "last_messages" truncation strategy.
+    /// Specifies the number of recent messages to retain when using the "last_messages" truncation
+    /// strategy.
     /// </summary>
     /// <param name="Value">
     /// The number of most recent messages to keep in the context.
@@ -111,7 +122,9 @@ type
   /// Represents the core parameters for creating or modifying a run in the OpenAI API.
   /// </summary>
   /// <remarks>
-  /// This class provides methods to configure various settings such as model selection, instructions, token limits, tool usage, and other options that affect the behavior of the run.
+  /// This class provides methods to configure various settings such as model selection,
+  /// instructions, token limits, tool usage, and other options that affect the behavior
+  /// of the run.
   /// </remarks>
   TRunsCoreParams = class(TJSONParam)
   public
@@ -126,7 +139,8 @@ type
     /// </returns>
     function AssistantId(const Value: string): TRunsCoreParams;
     /// <summary>
-    /// Specifies the model to be used for the run, overriding the default model of the assistant if provided.
+    /// Specifies the model to be used for the run, overriding the default model of the assistant
+    /// if provided.
     /// </summary>
     /// <param name="Value">
     /// The ID of the model to use.
@@ -298,10 +312,12 @@ type
   end;
 
   /// <summary>
-  /// Represents the parameters for creating a run in the OpenAI API, extending the core parameters with additional settings.
+  /// Represents the parameters for creating a run in the OpenAI API, extending the core parameters
+  /// with additional settings.
   /// </summary>
   /// <remarks>
-  /// This class extends <c>TRunsCoreParams</c> by adding options for including additional messages at the start of the thread.
+  /// This class extends <c>TRunsCoreParams</c> by adding options for including additional messages
+  /// at the start of the thread.
   /// It allows fine-tuning the initial context and behavior of the assistant during the run.
   /// </remarks>
   TRunsParams = class(TRunsCoreParams)
@@ -323,7 +339,8 @@ type
   /// Represents the parameters for creating a new thread and running it in the OpenAI API.
   /// </summary>
   /// <remarks>
-  /// This class extends <c>TRunsCoreParams</c> and allows configuring both the thread and the tools/resources available to the assistant during the run.
+  /// This class extends <c>TRunsCoreParams</c> and allows configuring both the thread and the
+  /// tools/resources available to the assistant during the run.
   /// It is used when you need to create a new conversation thread and immediately execute the run.
   /// </remarks>
   TCreateRunsParams = class(TRunsCoreParams)
@@ -332,7 +349,8 @@ type
     /// Specifies the configuration for creating the initial thread associated with the run.
     /// </summary>
     /// <param name="Value">
-    /// A <c>TThreadsCreateParams</c> object containing details about the initial messages, roles, and context for the thread.
+    /// A <c>TThreadsCreateParams</c> object containing details about the initial messages, roles,
+    /// and context for the thread.
     /// </param>
     /// <returns>
     /// Returns the current instance of <c>TCreateRunsParams</c> to allow method chaining.
@@ -342,7 +360,8 @@ type
     /// Specifies the tools and resources that will be available to the assistant during the run.
     /// </summary>
     /// <param name="Value">
-    /// A <c>TToolResourcesParams</c> object defining the resources, such as files or vector stores, that the assistant can access during the run.
+    /// A <c>TToolResourcesParams</c> object defining the resources, such as files or vector stores,
+    /// that the assistant can access during the run.
     /// </param>
     /// <returns>
     /// Returns the current instance of <c>TCreateRunsParams</c> to allow method chaining.
@@ -354,7 +373,8 @@ type
   /// Represents the parameters for updating an existing run in the OpenAI API.
   /// </summary>
   /// <remarks>
-  /// This class allows modifying metadata associated with a run, enabling the attachment of key-value pairs for tracking additional information.
+  /// This class allows modifying metadata associated with a run, enabling the attachment of
+  /// key-value pairs for tracking additional information.
   /// </remarks>
   TUpdateParams = class(TJSONParam)
   public
@@ -375,8 +395,10 @@ type
   /// Represents the parameters for submitting tool outputs to a run in the OpenAI API.
   /// </summary>
   /// <remarks>
-  /// This class allows specifying the output generated by a tool and associating it with the appropriate tool call within the run.
-  /// Tool outputs are required to continue or complete certain runs that depend on external computations.
+  /// This class allows specifying the output generated by a tool and associating it with
+  /// the appropriate tool call within the run.
+  /// Tool outputs are required to continue or complete certain runs that depend on external
+  /// computations.
   /// </remarks>
   TToolOutputParam = class(TJSONParam)
   public
@@ -415,7 +437,8 @@ type
     /// Specifies the outputs generated by the tools that are being submitted.
     /// </summary>
     /// <param name="Value">
-    /// An instance of <c>TToolOutputParam</c> containing the details of the tool outputs, such as the tool call ID and its corresponding output.
+    /// An instance of <c>TToolOutputParam</c> containing the details of the tool outputs, such
+    /// as the tool call ID and its corresponding output.
     /// </param>
     /// <returns>
     /// Returns the current instance of <c>TSubmitToolParams</c> to allow method chaining.
@@ -425,7 +448,8 @@ type
     /// Enables or disables token streaming when submitting tool outputs.
     /// </summary>
     /// <param name="Value">
-    /// Set to <c>True</c> to enable streaming, allowing the server to return a stream of events as the submission is processed.
+    /// Set to <c>True</c> to enable streaming, allowing the server to return a stream of events
+    /// as the submission is processed.
     /// </param>
     /// <returns>
     /// Returns the current instance of <c>TSubmitToolParams</c> to allow method chaining.
@@ -437,7 +461,8 @@ type
   /// Represents the tool output submissions required to continue a run in the OpenAI API.
   /// </summary>
   /// <remarks>
-  /// This class holds the collection of tool call outputs that are needed to satisfy the required action of a run.
+  /// This class holds the collection of tool call outputs that are needed to satisfy the required
+  /// action of a run.
   /// Each tool call output contains the necessary details to be processed by the run.
   /// </remarks>
   TSubmitToolOutputs = class
@@ -456,7 +481,8 @@ type
   /// Represents details about an action required to continue an execution run in the OpenAI API.
   /// </summary>
   /// <remarks>
-  /// When a run is paused and requires input or tool output to proceed, this class provides information on the specific action needed.
+  /// When a run is paused and requires input or tool output to proceed, this class provides
+  /// information on the specific action needed.
   /// </remarks>
   TRequiredAction = class
   private
@@ -503,7 +529,8 @@ type
   /// Represents details about why an execution run is incomplete in the OpenAI API.
   /// </summary>
   /// <remarks>
-  /// This class provides the reason explaining why the run did not complete successfully, such as token limits or other restrictions.
+  /// This class provides the reason explaining why the run did not complete successfully,
+  /// such as token limits or other restrictions.
   /// </remarks>
   TIncompleteDetailsReason = class
   private
@@ -519,7 +546,8 @@ type
   /// Represents token usage statistics for an execution run in the OpenAI API.
   /// </summary>
   /// <remarks>
-  /// This class tracks the number of tokens used during the run, including prompt tokens, completion tokens, and the total token count.
+  /// This class tracks the number of tokens used during the run, including prompt tokens,
+  /// completion tokens, and the total token count.
   /// </remarks>
   TRunUsage = class
   private
@@ -545,10 +573,12 @@ type
   end;
 
   /// <summary>
-  /// Represents the truncation strategy used to manage the context window for an execution run in the OpenAI API.
+  /// Represents the truncation strategy used to manage the context window for an execution run
+  /// in the OpenAI API.
   /// </summary>
   /// <remarks>
-  /// This class allows control over how much of the thread's context is included in the prompt, which helps optimize token usage.
+  /// This class allows control over how much of the thread's context is included in the prompt,
+  /// which helps optimize token usage.
   /// </remarks>
   TTruncationStrategy = class
   private
@@ -561,11 +591,13 @@ type
     /// Gets or sets the type of truncation strategy.
     /// </summary>
     /// <remarks>
-    /// Common types include "auto" for automatic truncation and "last_messages" for retaining only the most recent messages.
+    /// Common types include "auto" for automatic truncation and "last_messages" for retaining only
+    /// the most recent messages.
     /// </remarks>
     property &Type: TTruncationStrategyType read FType write FType;
     /// <summary>
-    /// Gets or sets the number of most recent messages to retain when using the "last_messages" truncation strategy.
+    /// Gets or sets the number of most recent messages to retain when using the "last_messages"
+    /// truncation strategy.
     /// </summary>
     property LastMessages: Int64 read FLastMessages write FLastMessages;
   end;
@@ -591,7 +623,8 @@ type
   /// Represents an execution run on a thread in the OpenAI API.
   /// </summary>
   /// <remarks>
-  /// This class contains information about the run, such as its status, associated assistant, model, instructions, token usage, and any errors encountered.
+  /// This class contains information about the run, such as its status, associated assistant,
+  /// model, instructions, token usage, and any errors encountered.
   /// </remarks>
   TRun = class(TRunTimeStamp)
   private
@@ -673,7 +706,8 @@ type
     /// Gets or sets the status of the run.
     /// </summary>
     /// <remarks>
-    /// Possible statuses include "queued", "in_progress", "requires_action", "failed", "completed", and others.
+    /// Possible statuses include "queued", "in_progress", "requires_action", "failed",
+    /// "completed", and others.
     /// </remarks>
     property Status: TRunStatus read FStatus write FStatus;
     /// <summary>
@@ -732,14 +766,16 @@ type
     /// Gets or sets the sampling temperature used for the run.
     /// </summary>
     /// <remarks>
-    /// Higher values make the output more random, while lower values make it more focused and deterministic.
+    /// Higher values make the output more random, while lower values make it more focused
+    /// and deterministic.
     /// </remarks>
     property Temperature: Double read FTemperature write FTemperature;
     /// <summary>
     /// Gets or sets the nucleus sampling parameter for the run.
     /// </summary>
     /// <remarks>
-    /// The top_p value determines the probability mass to consider for selecting tokens during generation.
+    /// The top_p value determines the probability mass to consider for selecting tokens
+    /// during generation.
     /// </remarks>
     property TopP: Double read FTopP write FTopP;
     /// <summary>
@@ -773,7 +809,8 @@ type
   /// Represents a list of execution runs on a thread in the OpenAI API.
   /// </summary>
   /// <remarks>
-  /// This class is a collection of <c>TRun</c> objects, providing access to multiple execution runs associated with a specific thread.
+  /// This class is a collection of <c>TRun</c> objects, providing access to multiple execution
+  /// runs associated with a specific thread.
   /// It can be used to iterate through and retrieve information about each run.
   /// </remarks>
   TRuns = TAdvancedList<TRun>;
@@ -782,8 +819,10 @@ type
   /// Manages asynchronous callBacks for a request using <c>TRun</c> as the response type.
   /// </summary>
   /// <remarks>
-  /// The <c>TAsynRun</c> type extends the <c>TAsynParams&lt;TRun&gt;</c> record to handle the lifecycle of an asynchronous chat operation.
-  /// It provides event handlers that trigger at various stages, such as when the operation starts, completes successfully, or encounters an error.
+  /// The <c>TAsynRun</c> type extends the <c>TAsynParams&lt;TRun&gt;</c> record to handle the lifecycle
+  /// of an asynchronous chat operation.
+  /// It provides event handlers that trigger at various stages, such as when the operation starts,
+  /// completes successfully, or encounters an error.
   /// This structure facilitates non-blocking operations.
   /// </remarks>
   TAsynRun = TAsynCallBack<TRun>;
@@ -792,8 +831,10 @@ type
   /// Manages asynchronous callBacks for a request using <c>TRuns</c> as the response type.
   /// </summary>
   /// <remarks>
-  /// The <c>TAsynRuns</c> type extends the <c>TAsynParams&lt;TRuns&gt;</c> record to handle the lifecycle of an asynchronous chat operation.
-  /// It provides event handlers that trigger at various stages, such as when the operation starts, completes successfully, or encounters an error.
+  /// The <c>TAsynRuns</c> type extends the <c>TAsynParams&lt;TRuns&gt;</c> record to handle the
+  /// lifecycle of an asynchronous chat operation.
+  /// It provides event handlers that trigger at various stages, such as when the operation starts,
+  /// completes successfully, or encounters an error.
   /// This structure facilitates non-blocking operations.
   /// </remarks>
   TAsynRuns = TAsynCallBack<TRuns>;
@@ -803,7 +844,8 @@ type
   /// </summary>
   /// <remarks>
   /// This class provides methods to create, retrieve, update, list, and manage execution runs on threads.
-  /// It handles both synchronous and asynchronous requests, allowing efficient interaction with the OpenAI API for execution management.
+  /// It handles both synchronous and asynchronous requests, allowing efficient interaction with
+  /// the OpenAI API for execution management.
   /// </remarks>
   TRunsRoute = class(TGenAIRoute)
   protected
