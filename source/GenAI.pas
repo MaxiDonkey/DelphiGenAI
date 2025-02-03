@@ -166,9 +166,21 @@ type
 
     property RunStep: TRunStepRoute read GetRunStepRoute;
     /// <summary>
-    /// Manages the API routes for interacting with OpenAI threads, including creating, retrieving, modifying, and deleting threads.
-    /// This class encapsulates both synchronous and asynchronous operations.
+    /// Provides an interface for interacting with OpenAI threads via API routes.
+    /// This class supports both synchronous and asynchronous operations, including creating, retrieving, modifying, and deleting threads.
     /// </summary>
+    /// <remarks>
+    /// <para>
+    /// The class encapsulates API requests and manages the associated headers, routes, and callbacks required
+    /// for interacting with the OpenAI API. Developers can use it to perform thread-related tasks while leveraging
+    /// both synchronous and non-blocking (asynchronous) execution flows.
+    /// </para>
+    /// <para>
+    /// The tool resources associated with threads, such as files and vector stores, can be specified to enhance
+    /// assistant capabilities like code execution or vector-based searches. Metadata can also be attached
+    /// to threads for storing structured information.
+    /// </para>
+    /// </remarks>
     property Threads: TThreadsRoute read GetThreadsRoute;
     /// <summary>
     /// Manages routes for handling file uploads, including creating uploads, adding parts, completing uploads, and canceling uploads.
