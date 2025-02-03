@@ -16,7 +16,7 @@ uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes,
   Vcl.Graphics, Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.ExtCtrls,
   System.UITypes, Vcl.MPlayer, system.JSON,
-  GenAI, GenAI.Types, GenAI.API;
+  GenAI, GenAI.Types;
 
 type
   TToolProc = procedure (const Value: string) of object;
@@ -244,7 +244,7 @@ begin
     F('id', Value.Id),
     F('object', Value.&Object),
     F('owned_by', Value.OwnedBy),
-    F('created', TimestampToString(Value.Created))
+    F('created', Value.CreatedAsString)
   ]);
   Display(Sender, EmptyStr);
 end;
@@ -391,7 +391,7 @@ begin
     F('id', [
       Value.Id,
       F('purpose', Value.Purpose.ToString),
-      F('created_at', TimestampToString(Value.CreatedAt))
+      F('created_at', Value.CreatedAtAsString)
     ])
   ]);
   Display(Sender);
@@ -420,8 +420,8 @@ begin
       F(Value.Filename, Value.Bytes.ToString),
       Value.Purpose.ToString,
       Value.Status,
-      TimestampToString(Value.CreatedAt),
-      TimestampToString(Value.ExpiresAt)
+      Value.CreatedAtAsString,
+      Value.ExpiresAtAsString
     ]);
   Display(Sender);
 end;
@@ -432,7 +432,7 @@ begin
   Display(TutorialHub, [
       Value.Id,
       F(Value.&Object, F('upload_id', Value.UploadId)),
-      TimestampToString(Value.CreatedAt)
+      Value.CreatedAtAsString
     ]);
   Display(Sender);
 end;

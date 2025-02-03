@@ -165,7 +165,10 @@ type
     property Runs: TRunsRoute read GetRunsRoute;
 
     property RunStep: TRunStepRoute read GetRunStepRoute;
-
+    /// <summary>
+    /// Manages the API routes for interacting with OpenAI threads, including creating, retrieving, modifying, and deleting threads.
+    /// This class encapsulates both synchronous and asynchronous operations.
+    /// </summary>
     property Threads: TThreadsRoute read GetThreadsRoute;
     /// <summary>
     /// Manages routes for handling file uploads, including creating uploads, adding parts, completing uploads, and canceling uploads.
@@ -2039,6 +2042,68 @@ type
   /// This structure facilitates non-blocking operations.
   /// </remarks>
   TAsynMessagesList = GenAI.Messages.TAsynMessagesList;
+
+  {$ENDREGION}
+
+  {$REGION 'GenAI.Threads'}
+
+  /// <summary>
+  /// Represents parameters for specifying image files in OpenAI threads.
+  /// This class is used to define image-related details such as the file ID and image detail level.
+  /// </summary>
+  TThreadsImageFileParams = GenAI.Threads.TThreadsImageFileParams;
+
+  /// <summary>
+  /// Represents parameters for specifying image URLs in OpenAI threads.
+  /// This class is used to define URL-related details such as the image URL and its detail level.
+  /// </summary>
+  TThreadsImageUrlParams = GenAI.Threads.TThreadsImageUrlParams;
+
+  /// <summary>
+  /// Represents the parameters used to define the content of messages in OpenAI threads.
+  /// This can include text content, image files, or image URLs.
+  /// </summary>
+  TThreadsContentParams = GenAI.Threads.TThreadsContentParams;
+
+  /// <summary>
+  /// Represents attachments that can be included in messages in OpenAI threads.
+  /// Attachments can be files with specific tools applied, such as a code interpreter or file search.
+  /// </summary>
+  TThreadsAttachment = GenAI.Threads.TThreadsAttachment;
+
+  /// <summary>
+  /// Represents the parameters used to define a message in OpenAI threads.
+  /// A message contains details such as its role, content, attachments, and metadata.
+  /// </summary>
+  TThreadsMessageParams = GenAI.Threads.TThreadsMessageParams;
+
+  /// <summary>
+  /// Represents the parameters for creating a new thread in OpenAI threads.
+  /// This includes defining initial messages, tool resources, and metadata.
+  /// </summary>
+  TThreadsCreateParams = GenAI.Threads.TThreadsCreateParams;
+
+  /// <summary>
+  /// Represents the parameters used to modify an existing thread in OpenAI threads.
+  /// This includes updating tool resources and metadata.
+  /// </summary>
+  TThreadsModifyParams = GenAI.Threads.TThreadsModifyParams;
+
+  /// <summary>
+  /// Represents a thread object in OpenAI threads.
+  /// A thread contains messages, tool resources, metadata, and other properties related to its creation and management.
+  /// </summary>
+  TThreads = GenAI.Threads.TThreads;
+
+  /// <summary>
+  /// Manages asynchronous callBacks for a request using <c>TThreads</c> as the response type.
+  /// </summary>
+  /// <remarks>
+  /// The <c>TAsynThreads</c> type extends the <c>TAsynParams&lt;TThreads&gt;</c> record to handle the lifecycle of an asynchronous chat operation.
+  /// It provides event handlers that trigger at various stages, such as when the operation starts, completes successfully, or encounters an error.
+  /// This structure facilitates non-blocking operations.
+  /// </remarks>
+  TAsynThreads = GenAI.Threads.TAsynThreads;
 
   {$ENDREGION}
 

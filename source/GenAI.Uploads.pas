@@ -242,6 +242,8 @@ type
     [JsonNameAttribute('upload_id')]
     FUploadId: string;
     FObject: string;
+  private
+    function GetCreatedAtAsString: string;
   public
     /// <summary>
     /// Gets or sets the unique identifier of the upload part.
@@ -251,6 +253,10 @@ type
     /// Gets or sets the Unix timestamp (in seconds) indicating when the upload part was created.
     /// </summary>
     property CreatedAt: Int64 read FCreatedAt write FCreatedAt;
+    /// <summary>
+    /// Gets the formatted creation time as a human-readable string.
+    /// </summary>
+    property CreatedAtAsString: string read GetCreatedAtAsString;
     /// <summary>
     /// Gets or sets the ID of the upload to which this part belongs.
     /// </summary>
@@ -575,6 +581,13 @@ function TUploadCompleteParams.PartIds(
   const Value: TArray<string>): TUploadCompleteParams;
 begin
   Result := TUploadCompleteParams(Add('part_ids',  Value));
+end;
+
+{ TUploadPart }
+
+function TUploadPart.GetCreatedAtAsString: string;
+begin
+  Result := TimestampToString(CreatedAt, UTCtimestamp);
 end;
 
 end.
