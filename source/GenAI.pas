@@ -211,7 +211,14 @@ type
     /// operations, making it flexible for different application needs.
     /// </remarks>
     property VectorStore: TVectorStoreRoute read GetVectorStoreRoute;
-
+    /// <summary>
+    /// Provides methods to manage file batches within a vector store using the OpenAI API.
+    /// </summary>
+    /// <remarks>
+    /// This class allows users to create, retrieve, cancel, and list file batches associated
+    /// with a specific vector store. It supports both synchronous and asynchronous operations,
+    /// enabling flexible interaction with the API for managing batch processing.
+    /// </remarks>
     property VectorStoreBatch: TVectorStoreBatchRoute read GetVectorStoreBatchRoute;
     /// <summary>
     /// Provides methods to manage files within a vector store using the OpenAI API.
@@ -2647,6 +2654,70 @@ type
   /// This structure facilitates non-blocking operations.
   /// </remarks>
   TAsynVectorStoreFiles = GenAI.VectorFiles.TAsynVectorStoreFiles;
+
+  {$ENDREGION}
+
+  {$REGION 'GenAI.VectorBatch'}
+
+  /// <summary>
+  /// Represents URL parameters for configuring requests related to file batches in a vector store using the OpenAI API.
+  /// </summary>
+  /// <remarks>
+  /// This class extends <c>TVectorStoreFilesUrlParams</c> and provides the ability to customize the URL query parameters
+  /// when listing or filtering batches of files associated with a specific vector store.
+  /// It is useful for narrowing down results or retrieving batches with particular statuses.
+  /// </remarks>
+  TVectorStoreBatchUrlParams = GenAI.VectorBatch.TVectorStoreBatchUrlParams;
+
+  /// <summary>
+  /// Represents the parameters for creating file batches in a vector store using the OpenAI API.
+  /// </summary>
+  /// <remarks>
+  /// This class extends <c>TVectorStoreFilesCreateParams</c> and allows users to define key parameters
+  /// when creating a new batch of files in a vector store, including the file IDs and chunking strategy.
+  /// These settings control how files are processed and chunked before being stored.
+  /// </remarks>
+  TVectorStoreBatchCreateParams = GenAI.VectorBatch.TVectorStoreBatchCreateParams;
+
+  /// <summary>
+  /// Represents a batch of files attached to a vector store in the OpenAI API.
+  /// </summary>
+  /// <remarks>
+  /// This class provides details about a file batch within a vector store, including its creation timestamp,
+  /// status, and the number of files processed. It is used to monitor and manage the batch processing of files
+  /// for indexing and retrieval in the vector store.
+  /// </remarks>
+  TVectorStoreBatch = GenAI.VectorBatch.TVectorStoreBatch;
+
+  /// <summary>
+  /// Represents a list of file batches attached to a vector store in the OpenAI API.
+  /// </summary>
+  /// <remarks>
+  /// This class extends <c>TAdvancedList&lt;TVectorStoreBatch&gt;</c> and provides an iterable
+  /// collection of file batches within a vector store. Each batch contains information such as
+  /// its status, creation timestamp, and file counts.
+  /// </remarks>
+  TVectorStoreBatches = GenAI.VectorBatch.TVectorStoreBatches;
+
+  /// <summary>
+  /// Manages asynchronous callBacks for a request using <c>TVectorStoreBatch</c> as the response type.
+  /// </summary>
+  /// <remarks>
+  /// The <c>TAsynVectorStoreBatch</c> type extends the <c>TAsynParams&lt;TVectorStoreBatch&gt;</c> record to handle the lifecycle of an asynchronous chat operation.
+  /// It provides event handlers that trigger at various stages, such as when the operation starts, completes successfully, or encounters an error.
+  /// This structure facilitates non-blocking operations.
+  /// </remarks>
+  TAsynVectorStoreBatch = GenAI.VectorBatch.TAsynVectorStoreBatch;
+
+  /// <summary>
+  /// Manages asynchronous callBacks for a request using <c>TVectorStoreBatches</c> as the response type.
+  /// </summary>
+  /// <remarks>
+  /// The <c>TAsynVectorStoreBatches</c> type extends the <c>TAsynParams&lt;TVectorStoreBatches&gt;</c> record to handle the lifecycle of an asynchronous chat operation.
+  /// It provides event handlers that trigger at various stages, such as when the operation starts, completes successfully, or encounters an error.
+  /// This structure facilitates non-blocking operations.
+  /// </remarks>
+  TAsynVectorStoreBatches = GenAI.VectorBatch.TAsynVectorStoreBatches;
 
   {$ENDREGION}
 
