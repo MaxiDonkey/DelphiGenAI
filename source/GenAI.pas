@@ -169,7 +169,13 @@ type
     /// It handles both synchronous and asynchronous requests, allowing efficient interaction with the OpenAI API for execution management.
     /// </remarks>
     property Runs: TRunsRoute read GetRunsRoute;
-
+    /// <summary>
+    /// Represents the route for managing run steps within execution runs in the OpenAI API.
+    /// </summary>
+    /// <remarks>
+    /// This class provides methods to list or retrieve details of run steps. It handles both synchronous
+    /// and asynchronous requests, enabling efficient interaction with the OpenAI API for managing run steps.
+    /// </remarks>
     property RunStep: TRunStepRoute read GetRunStepRoute;
     /// <summary>
     /// Provides an interface for interacting with OpenAI threads via API routes.
