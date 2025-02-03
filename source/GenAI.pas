@@ -133,7 +133,13 @@ type
     /// diverse use cases involving image generation and manipulation.
     /// </remarks>
     property Images: TImagesRoute read GetImagesRoute;
-
+    /// <summary>
+    /// Manages the API routes for handling messages within a thread in the OpenAI API.
+    /// </summary>
+    /// <remarks>
+    /// This class provides methods to create, retrieve, update, delete, and list messages
+    /// within a thread. It also supports asynchronous operations for non-blocking message handling.
+    /// </remarks>
     property Messages : TMessagesRoute read GetMesssagesRoute;
     /// <summary>
     /// Provides routes for managing model data via API calls, including listing, retrieving, and deleting models.
@@ -1882,6 +1888,157 @@ type
   /// This structure facilitates non-blocking operations.
   /// </remarks>
   TAsynAssistants = GenAI.Assistants.TAsynAssistants;
+
+  {$ENDREGION}
+
+  {$REGION 'GenAI.Messages'}
+
+  /// <summary>
+  /// Represents URL parameters used for customizing requests related to assistants in the OpenAI API.
+  /// </summary>
+  /// <remarks>
+  /// This class extends <c>TUrlAdvancedParams</c> to provide additional parameters
+  /// that can be added to API calls when interacting with assistant-related threads.
+  /// </remarks>
+  TAssistantsUrlParams = GenAI.Messages.TAssistantsUrlParams;
+
+  /// <summary>
+  /// Represents parameters used for updating messages within a thread in the OpenAI API.
+  /// </summary>
+  /// <remarks>
+  /// This class extends <c>TJSONParam</c> to provide structured key-value pairs
+  /// for modifying messages, such as attaching metadata or updating message-specific details.
+  /// </remarks>
+  TMessagesUpdateParams = GenAI.Messages.TMessagesUpdateParams;
+
+  /// <summary>
+  /// Represents details related to incomplete messages within a thread in the OpenAI API.
+  /// </summary>
+  /// <remarks>
+  /// This class contains information on why a message was marked as incomplete,
+  /// typically providing a reason for the failure or interruption during processing.
+  /// </remarks>
+  TIncompleteDetails = GenAI.Messages.TIncompleteDetails;
+
+  /// <summary>
+  /// Represents an image file attached to a message within a thread in the OpenAI API.
+  /// </summary>
+  /// <remarks>
+  /// This class is used to reference an image that is included as part of a message.
+  /// The image is identified by its file ID and can have an associated detail level.
+  /// </remarks>
+  TMessagesImageFile = GenAI.Messages.TMessagesImageFile;
+
+  /// <summary>
+  /// Represents an external image URL attached to a message within a thread in the OpenAI API.
+  /// </summary>
+  /// <remarks>
+  /// This class is used to reference an image located at an external URL.
+  /// The image can have an associated detail level, which determines the resolution or processing cost.
+  /// </remarks>
+  TMessagesImageUrl = GenAI.Messages.TMessagesImageUrl;
+
+  /// <summary>
+  /// Represents a citation within a message that references a specific portion of a file in the OpenAI API.
+  /// </summary>
+  /// <remarks>
+  /// This class is used to provide contextual citations by referencing parts of a file
+  /// that the assistant used during message generation or processing.
+  /// </remarks>
+  TFileCitation = GenAI.Messages.TFileCitation;
+
+  /// <summary>
+  /// Represents the file path of a file generated or referenced during message processing in the OpenAI API.
+  /// </summary>
+  /// <remarks>
+  /// This class is used to reference a file by its path or identifier, typically when
+  /// files are generated dynamically during tasks like code execution or data processing.
+  /// </remarks>
+  TFilePath = GenAI.Messages.TFilePath;
+
+  /// <summary>
+  /// Represents an annotation within a message, providing contextual references such as file citations or file paths.
+  /// </summary>
+  /// <remarks>
+  /// This class is used to add annotations that point to specific parts of external files,
+  /// providing traceable references within the message content.
+  /// </remarks>
+  TMesssagesAnnotation = GenAI.Messages.TMesssagesAnnotation;
+
+  /// <summary>
+  /// Represents the text content of a message within the OpenAI API, including any associated annotations.
+  /// </summary>
+  /// <remarks>
+  /// This class stores the text content of a message along with any annotations that provide
+  /// additional context, such as file citations or file paths.
+  /// </remarks>
+  TMessagesText = GenAI.Messages.TMessagesText;
+
+  /// <summary>
+  /// Represents the content of a message in the OpenAI API, including text, images, and refusal reasons.
+  /// </summary>
+  /// <remarks>
+  /// This class stores various types of content that can be part of a message,
+  /// such as plain text, image references, or refusal messages indicating that the assistant
+  /// declined to respond.
+  /// </remarks>
+  TMessagesContent = GenAI.Messages.TMessagesContent;
+
+  /// <summary>
+  /// Represents a tool associated with an attachment in a message within the OpenAI API.
+  /// </summary>
+  /// <remarks>
+  /// This class specifies the type of tool linked to an attachment, such as a code interpreter
+  /// or file search tool, which can be used during message processing.
+  /// </remarks>
+  TAttachmentTool = GenAI.Messages.TAttachmentTool;
+
+  /// <summary>
+  /// Represents an attachment associated with a message in the OpenAI API.
+  /// </summary>
+  /// <remarks>
+  /// This class stores information about a file attached to a message and the tools
+  /// that can be used to process or interact with the file.
+  /// </remarks>
+  TAttachment = GenAI.Messages.TAttachment;
+
+  /// <summary>
+  /// Represents a message within a thread in the OpenAI API, including its content, status, metadata, and attachments.
+  /// </summary>
+  /// <remarks>
+  /// This class stores all the details related to a message, such as its creation timestamp,
+  /// role, status, and the content it contains (text, images, or other media).
+  /// </remarks>
+  TMessages = GenAI.Messages.TMessages;
+
+  /// <summary>
+  /// Represents a list of messages within a thread in the OpenAI API.
+  /// </summary>
+  /// <remarks>
+  /// This class extends <c>TAdvancedList</c> to provide a collection of <c>TMessages</c> objects,
+  /// allowing for easy iteration and manipulation of messages retrieved from the API.
+  /// </remarks>
+  TMessagesList = GenAI.Messages.TMessagesList;
+
+  /// <summary>
+  /// Manages asynchronous callBacks for a request using <c>TMessages</c> as the response type.
+  /// </summary>
+  /// <remarks>
+  /// The <c>TAsynMessages</c> type extends the <c>TAsynParams&lt;TMessages&gt;</c> record to handle the lifecycle of an asynchronous chat operation.
+  /// It provides event handlers that trigger at various stages, such as when the operation starts, completes successfully, or encounters an error.
+  /// This structure facilitates non-blocking operations.
+  /// </remarks>
+  TAsynMessages = GenAI.Messages.TAsynMessages;
+
+  /// <summary>
+  /// Manages asynchronous callBacks for a request using <c>TMessagesList</c> as the response type.
+  /// </summary>
+  /// <remarks>
+  /// The <c>TAsynMessagesList</c> type extends the <c>TAsynParams&lt;TMessagesList&gt;</c> record to handle the lifecycle of an asynchronous chat operation.
+  /// It provides event handlers that trigger at various stages, such as when the operation starts, completes successfully, or encounters an error.
+  /// This structure facilitates non-blocking operations.
+  /// </remarks>
+  TAsynMessagesList = GenAI.Messages.TAsynMessagesList;
 
   {$ENDREGION}
 
