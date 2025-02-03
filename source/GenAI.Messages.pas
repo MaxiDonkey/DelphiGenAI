@@ -423,6 +423,7 @@ type
     [JsonNameAttribute('run_id')]
     FRunId: string;
     FAttachments: TArray<TAttachment>;
+    [JsonReflectAttribute(ctString, rtString, TMetadataInterceptor)]
     FMetadata: string;
   private
     function GetCreatedAtAsString: string;

@@ -497,6 +497,8 @@ begin
     Result := DateTimeToStr(TimestampToDateTime(Value, UTC))
 end;
 
+{TGenAIAPI}
+
 constructor TGenAIAPI.Create(const AAPIKey: string);
 begin
   Create;

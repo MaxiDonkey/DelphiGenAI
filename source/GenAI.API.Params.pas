@@ -544,7 +544,8 @@ end;
 function TUrlParam.Add(const Name, Value: string): TUrlParam;
 begin
   Check(Name);
-  var S := Format('%s=%s', [Name, Value]);
+//  var S := Format('%s=%s', [Name, Value]);
+  var S := Format('%s=%s', [Name, TNetEncoding.URL.Encode(Value).Replace('+', '%20')]);
   if FValue.IsEmpty then
     FValue := S else
     FValue := FValue + '&' + S;
@@ -600,7 +601,8 @@ begin
       var SubStr := Item.Split(['=']);
       if Length(SubStr) <> 2 then
         raise Exception.CreateFmt('%s: Ivalid URL parameter.', [SubStr]);
-      Params := Params + [TNetEncoding.URL.Encode(SubStr[0]) + '=' + TNetEncoding.URL.Encode(SubStr[1])];
+      Params := Params + [
+        TNetEncoding.URL.Encode(SubStr[0]).Replace('+', '%20') + '=' + SubStr[1] ];
     end;
   Result := string.Join('&', Params);
   if not Result.IsEmpty then

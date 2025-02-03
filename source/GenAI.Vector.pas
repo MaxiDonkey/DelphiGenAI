@@ -273,6 +273,7 @@ type
     FExpiresAt: Int64;
     [JsonNameAttribute('last_active_at')]
     FLastActiveAt: Int64;
+    [JsonReflectAttribute(ctString, rtString, TMetadataInterceptor)]
     FMetadata: string;
   protected
     function GetCreatedAtAsString: string; override;

@@ -383,6 +383,7 @@ type
     FFailedAt: Int64;
     [JsonNameAttribute('completed_at')]
     FCompletedAt: Int64;
+    [JsonReflectAttribute(ctString, rtString, TMetadataInterceptor)]
     FMetadata: string;
     FUsage: TRunUsage;
   protected

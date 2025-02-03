@@ -657,6 +657,7 @@ type
     FModel: string;
     FInstructions: string;
     FTools: TArray<TAssistantsTools>;
+    [JsonReflectAttribute(ctString, rtString, TMetadataInterceptor)]
     FMetadata: string;
     FUsage: TRunUsage;
     FTemperature: Double;

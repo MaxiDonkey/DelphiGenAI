@@ -328,6 +328,7 @@ type
     FObject: string;
     [JsonNameAttribute('tool_resources')]
     FToolResources: TToolResources;
+    [JsonReflectAttribute(ctString, rtString, TMetadataInterceptor)]
     FMetadata: string;
   private
     function GetCreatedAtAsString: string;

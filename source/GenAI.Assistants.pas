@@ -999,6 +999,7 @@ type
     FTools: TArray<TAssistantsTools>;
     [JsonNameAttribute('tool_resources')]
     FToolResources: TToolResources;
+    [JsonReflectAttribute(ctString, rtString, TMetadataInterceptor)]
     FMetadata: string;
     FTemperature: Double;
     [JsonNameAttribute('top_p')]
