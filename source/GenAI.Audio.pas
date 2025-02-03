@@ -428,32 +428,32 @@ type
   end;
 
   /// <summary>
-  /// Manages asynchronous chat callBacks for a chat request using <c>TSpeechResult</c> as the response type.
+  /// Manages asynchronous callBacks for a request using <c>TSpeechResult</c> as the response type.
   /// </summary>
   /// <remarks>
   /// The <c>TAsynSpeechResult</c> type extends the <c>TAsynParams&lt;TSpeechResult&gt;</c> record to handle the lifecycle of an asynchronous chat operation.
   /// It provides event handlers that trigger at various stages, such as when the operation starts, completes successfully, or encounters an error.
-  /// This structure facilitates non-blocking chat operations and is specifically tailored for scenarios where multiple choices from a chat model are required.
+  /// This structure facilitates non-blocking operations.
   /// </remarks>
   TAsynSpeechResult = TAsynCallBack<TSpeechResult>;
 
   /// <summary>
-  /// Manages asynchronous chat callBacks for a chat request using <c>TTranscription</c> as the response type.
+  /// Manages asynchronous callBacks for a request using <c>TTranscription</c> as the response type.
   /// </summary>
   /// <remarks>
   /// The <c>TAsynTranscription</c> type extends the <c>TAsynParams&lt;TTranscription&gt;</c> record to handle the lifecycle of an asynchronous chat operation.
   /// It provides event handlers that trigger at various stages, such as when the operation starts, completes successfully, or encounters an error.
-  /// This structure facilitates non-blocking chat operations and is specifically tailored for scenarios where multiple choices from a chat model are required.
+  /// This structure facilitates non-blocking operations.
   /// </remarks>
   TAsynTranscription = TAsynCallBack<TTranscription>;
 
   /// <summary>
-  /// Manages asynchronous chat callBacks for a chat request using <c>TTranslation</c> as the response type.
+  /// Manages asynchronous callBacks for a request using <c>TTranslation</c> as the response type.
   /// </summary>
   /// <remarks>
   /// The <c>TAsynTranslation</c> type extends the <c>TAsynParams&lt;TTranslation&gt;</c> record to handle the lifecycle of an asynchronous chat operation.
   /// It provides event handlers that trigger at various stages, such as when the operation starts, completes successfully, or encounters an error.
-  /// This structure facilitates non-blocking chat operations and is specifically tailored for scenarios where multiple choices from a chat model are required.
+  /// This structure facilitates non-blocking operations.
   /// </remarks>
   TAsynTranslation = TAsynCallBack<TTranslation>;
 

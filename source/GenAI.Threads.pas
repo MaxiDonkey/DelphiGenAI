@@ -13,7 +13,7 @@ uses
   System.SysUtils, System.Classes, System.Threading, System.JSON, REST.Json.Types,
   REST.JsonReflect, System.Net.URLClient,
   GenAI.API.Params, GenAI.API, GenAI.Consts, GenAI.Types, GenAI.Async.Support,
-  GenAI.Assistants;
+  GenAI.API.Deletion, GenAI.Assistants;
 
 type
   TThreadsImageFileParams = class(TJSONparam)
@@ -85,36 +85,15 @@ type
     destructor Destroy; override;
   end;
 
-  TThreadDeletion = class(TJSONFingerprint)
-  private
-    FId: string;
-    FObject: string;
-    FDeleted: Boolean;
-  public
-    property Id: string read FId write FId;
-    property &Object: string read FObject write FObject;
-    property Deleted: Boolean read FDeleted write FDeleted;
-  end;
-
   /// <summary>
-  /// Manages asynchronous chat callBacks for a chat request using <c>TThreads</c> as the response type.
+  /// Manages asynchronous callBacks for a request using <c>TThreads</c> as the response type.
   /// </summary>
   /// <remarks>
   /// The <c>TAsynThreads</c> type extends the <c>TAsynParams&lt;TThreads&gt;</c> record to handle the lifecycle of an asynchronous chat operation.
   /// It provides event handlers that trigger at various stages, such as when the operation starts, completes successfully, or encounters an error.
-  /// This structure facilitates non-blocking chat operations and is specifically tailored for scenarios where multiple choices from a chat model are required.
+  /// This structure facilitates non-blocking operations.
   /// </remarks>
   TAsynThreads = TAsynCallBack<TThreads>;
-
-  /// <summary>
-  /// Manages asynchronous chat callBacks for a chat request using <c>TThreadDeletion</c> as the response type.
-  /// </summary>
-  /// <remarks>
-  /// The <c>TAsynThreadDeletion</c> type extends the <c>TAsynParams&lt;TThreadDeletion&gt;</c> record to handle the lifecycle of an asynchronous chat operation.
-  /// It provides event handlers that trigger at various stages, such as when the operation starts, completes successfully, or encounters an error.
-  /// This structure facilitates non-blocking chat operations and is specifically tailored for scenarios where multiple choices from a chat model are required.
-  /// </remarks>
-  TAsynThreadDeletion = TAsynCallBack<TThreadDeletion>;
 
   TThreadsRoute = class(TGenAIRoute)
   protected
@@ -125,11 +104,11 @@ type
     procedure AsynRetrieve(const ThreadId: string; const CallBacks: TFunc<TAsynThreads>);
     procedure AsynModify(const ThreadId: string; const ParamProc: TProc<TThreadsModifyParams>;
       const CallBacks: TFunc<TAsynThreads>);
-    procedure AsynDelete(const ThreadId: string; const CallBacks: TFunc<TAsynThreadDeletion>);
+    procedure AsynDelete(const ThreadId: string; const CallBacks: TFunc<TAsynDeletion>);
     function Create(const ParamProc: TProc<TThreadsCreateParams> = nil): TThreads;
     function Retrieve(const ThreadId: string): TThreads;
     function Modify(const ThreadId: string; const ParamProc: TProc<TThreadsModifyParams>): TThreads;
-    function Delete(const ThreadId: string): TThreadDeletion;
+    function Delete(const ThreadId: string): TDeletion;
   end;
 
 implementation
@@ -331,16 +310,16 @@ begin
 end;
 
 procedure TThreadsRoute.AsynDelete(const ThreadId: string;
-  const CallBacks: TFunc<TAsynThreadDeletion>);
+  const CallBacks: TFunc<TAsynDeletion>);
 begin
-  with TAsynCallBackExec<TAsynThreadDeletion, TThreadDeletion>.Create(CallBacks) do
+  with TAsynCallBackExec<TAsynDeletion, TDeletion>.Create(CallBacks) do
   try
     Sender := Use.Param.Sender;
     OnStart := Use.Param.OnStart;
     OnSuccess := Use.Param.OnSuccess;
     OnError := Use.Param.OnError;
     Run(
-      function: TThreadDeletion
+      function: TDeletion
       begin
         Result := Self.Delete(ThreadId);
       end);
@@ -395,10 +374,10 @@ begin
   Result := API.Post<TThreads, TThreadsCreateParams>('threads', ParamProc)
 end;
 
-function TThreadsRoute.Delete(const ThreadId: string): TThreadDeletion;
+function TThreadsRoute.Delete(const ThreadId: string): TDeletion;
 begin
   HeaderCustomize;
-  Result := API.Delete<TThreadDeletion>('threads/' + ThreadId);
+  Result := API.Delete<TDeletion>('threads/' + ThreadId);
 end;
 
 procedure TThreadsRoute.HeaderCustomize;

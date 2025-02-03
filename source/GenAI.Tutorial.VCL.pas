@@ -123,7 +123,7 @@ type
   procedure Display(Sender: TObject; Value: TArray<string>); overload;
   procedure Display(Sender: TObject; Value: TModel); overload;
   procedure Display(Sender: TObject; Value: TModels); overload;
-  procedure Display(Sender: TObject; Value: TModelDeletion); overload;
+  procedure Display(Sender: TObject; Value: TDeletion); overload;
   procedure Display(Sender: TObject; Value: TEmbedding); overload;
   procedure Display(Sender: TObject; Value: TEmbeddings); overload;
   procedure Display(Sender: TObject; Value: TSpeechResult); overload;
@@ -266,9 +266,8 @@ begin
   Display(Sender);
 end;
 
-procedure Display(Sender: TObject; Value: TModelDeletion);
+procedure Display(Sender: TObject; Value: TDeletion);
 begin
-  TutorialHub.JSONResponse := Value.JSONResponse;
   Display(Sender, [
     EmptyStr,
     F('id', Value.Id),

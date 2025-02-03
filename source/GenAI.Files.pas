@@ -13,7 +13,7 @@ uses
   System.SysUtils, System.Classes, System.Threading, System.JSON, REST.Json.Types,
   REST.JsonReflect, System.Net.Mime,
   GenAI.API.Params, GenAI.API, GenAI.Consts, GenAI.Types, GenAI.Async.Support,
-  GenAI.API.Lists;
+  GenAI.API.Lists, GenAI.API.Deletion;
 
 type
   /// <summary>
@@ -219,56 +219,35 @@ type
     property Content: string read GetContent;
   end;
 
-  TFileDeletion = class
-  private
-    FId: string;
-    FObject: string;
-    FDeleted: Boolean;
-  public
-    property Id: string read FId write FId;
-    property &Object: string read FObject write FObject;
-    property Deleted: Boolean read FDeleted write FDeleted;
-  end;
-
   /// <summary>
-  /// Manages asynchronous chat callBacks for a chat request using <c>TFile</c> as the response type.
+  /// Manages asynchronous callBacks for a request using <c>TFile</c> as the response type.
   /// </summary>
   /// <remarks>
   /// The <c>TAsynFile</c> type extends the <c>TAsynParams&lt;TFile&gt;</c> record to handle the lifecycle of an asynchronous chat operation.
   /// It provides event handlers that trigger at various stages, such as when the operation starts, completes successfully, or encounters an error.
-  /// This structure facilitates non-blocking chat operations and is specifically tailored for scenarios where multiple choices from a chat model are required.
+  /// This structure facilitates non-blocking operations.
   /// </remarks>
   TAsynFile = TAsynCallBack<TFile>;
 
   /// <summary>
-  /// Manages asynchronous chat callBacks for a chat request using <c>TFiles</c> as the response type.
+  /// Manages asynchronous callBacks for a request using <c>TFiles</c> as the response type.
   /// </summary>
   /// <remarks>
   /// The <c>TAsynFiles</c> type extends the <c>TAsynParams&lt;TFiles&gt;</c> record to handle the lifecycle of an asynchronous chat operation.
   /// It provides event handlers that trigger at various stages, such as when the operation starts, completes successfully, or encounters an error.
-  /// This structure facilitates non-blocking chat operations and is specifically tailored for scenarios where multiple choices from a chat model are required.
+  /// This structure facilitates non-blocking operations.
   /// </remarks>
   TAsynFiles = TAsynCallBack<TFiles>;
 
   /// <summary>
-  /// Manages asynchronous chat callBacks for a chat request using <c>TFiles</c> as the response type.
+  /// Manages asynchronous callBacks for a request using <c>TFiles</c> as the response type.
   /// </summary>
   /// <remarks>
   /// The <c>TAsynFiles</c> type extends the <c>TAsynParams&lt;TFiles&gt;</c> record to handle the lifecycle of an asynchronous chat operation.
   /// It provides event handlers that trigger at various stages, such as when the operation starts, completes successfully, or encounters an error.
-  /// This structure facilitates non-blocking chat operations and is specifically tailored for scenarios where multiple choices from a chat model are required.
+  /// This structure facilitates non-blocking operations.
   /// </remarks>
   TAsynFileContent = TAsynCallBack<TFileContent>;
-
-  /// <summary>
-  /// Manages asynchronous chat callBacks for a chat request using <c>TFileDeletion</c> as the response type.
-  /// </summary>
-  /// <remarks>
-  /// The <c>TAsynFileDeletion</c> type extends the <c>TAsynParams&lt;TFileDeletion&gt;</c> record to handle the lifecycle of an asynchronous chat operation.
-  /// It provides event handlers that trigger at various stages, such as when the operation starts, completes successfully, or encounters an error.
-  /// This structure facilitates non-blocking chat operations and is specifically tailored for scenarios where multiple choices from a chat model are required.
-  /// </remarks>
-  TAsynFileDeletion = TAsynCallBack<TFileDeletion>;
 
   /// <summary>
   /// Represents a route for managing file operations in the API.
@@ -335,7 +314,7 @@ type
     /// <param name="CallBacks">
     /// A function that defines callbacks to handle events like success, failure, or progress during the deletion process.
     /// </param>
-    procedure AsynDelete(const FileId: string; const CallBacks: TFunc<TAsynFileDeletion>);
+    procedure AsynDelete(const FileId: string; const CallBacks: TFunc<TAsynDeletion>);
     /// <summary>
     /// Uploads a file to the API synchronously.
     /// </summary>
@@ -392,7 +371,7 @@ type
     /// <returns>
     /// Returns an instance of TFileDeletion representing the deleted file.
     /// </returns>
-    function Delete(const FileId: string): TFileDeletion;
+    function Delete(const FileId: string): TDeletion;
   end;
 
 implementation
@@ -467,16 +446,16 @@ end;
 { TFilesRoute }
 
 procedure TFilesRoute.AsynDelete(const FileId: string;
-  const CallBacks: TFunc<TAsynFileDeletion>);
+  const CallBacks: TFunc<TAsynDeletion>);
 begin
-  with TAsynCallBackExec<TAsynFileDeletion, TFileDeletion>.Create(CallBacks) do
+  with TAsynCallBackExec<TAsynDeletion, TDeletion>.Create(CallBacks) do
   try
     Sender := Use.Param.Sender;
     OnStart := Use.Param.OnStart;
     OnSuccess := Use.Param.OnSuccess;
     OnError := Use.Param.OnError;
     Run(
-      function: TFileDeletion
+      function: TDeletion
       begin
         Result := Self.Delete(FileId);
       end);
@@ -579,9 +558,9 @@ begin
   end;
 end;
 
-function TFilesRoute.Delete(const FileId: string): TFileDeletion;
+function TFilesRoute.Delete(const FileId: string): TDeletion;
 begin
-  Result := API.Delete<TFileDeletion>('files/' + FileId);
+  Result := API.Delete<TDeletion>('files/' + FileId);
 end;
 
 function TFilesRoute.List: TFiles;

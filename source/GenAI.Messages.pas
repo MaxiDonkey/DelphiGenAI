@@ -13,7 +13,7 @@ uses
   System.SysUtils, System.Classes, System.Threading, System.JSON, REST.Json.Types,
   REST.JsonReflect, System.Net.URLClient,
   GenAI.API.Params, GenAI.API, GenAI.Consts, GenAI.Types, GenAI.Async.Support,
-  GenAI.Threads, GenAI.API.Lists;
+  GenAI.Threads, GenAI.API.Lists, GenAI.API.Deletion;
 
 type
   TAssistantsUrlParams = class(TUrlAdvancedParams)
@@ -188,46 +188,25 @@ type
 
   TMessagesList = TAdvancedList<TMessages>;
 
-  TMessagesDeletion = class(TJSONFingerprint)
-  private
-    FId: string;
-    FObject: string;
-    FDeleted: Boolean;
-  public
-    property Id: string read FId write FId;
-    property &Object: string read FObject write FObject;
-    property Deleted: Boolean read FDeleted write FDeleted;
-  end;
-
   /// <summary>
-  /// Manages asynchronous chat callBacks for a chat request using <c>TMessages</c> as the response type.
+  /// Manages asynchronous callBacks for a request using <c>TMessages</c> as the response type.
   /// </summary>
   /// <remarks>
   /// The <c>TAsynMessages</c> type extends the <c>TAsynParams&lt;TMessages&gt;</c> record to handle the lifecycle of an asynchronous chat operation.
   /// It provides event handlers that trigger at various stages, such as when the operation starts, completes successfully, or encounters an error.
-  /// This structure facilitates non-blocking chat operations and is specifically tailored for scenarios where multiple choices from a chat model are required.
+  /// This structure facilitates non-blocking operations.
   /// </remarks>
   TAsynMessages = TAsynCallBack<TMessages>;
 
   /// <summary>
-  /// Manages asynchronous chat callBacks for a chat request using <c>TMessagesList</c> as the response type.
+  /// Manages asynchronous callBacks for a request using <c>TMessagesList</c> as the response type.
   /// </summary>
   /// <remarks>
   /// The <c>TAsynMessagesList</c> type extends the <c>TAsynParams&lt;TMessagesList&gt;</c> record to handle the lifecycle of an asynchronous chat operation.
   /// It provides event handlers that trigger at various stages, such as when the operation starts, completes successfully, or encounters an error.
-  /// This structure facilitates non-blocking chat operations and is specifically tailored for scenarios where multiple choices from a chat model are required.
+  /// This structure facilitates non-blocking operations.
   /// </remarks>
   TAsynMessagesList = TAsynCallBack<TMessagesList>;
-
-  /// <summary>
-  /// Manages asynchronous chat callBacks for a chat request using <c>TMessagesDeletion</c> as the response type.
-  /// </summary>
-  /// <remarks>
-  /// The <c>TAsynMessagesDeletion</c> type extends the <c>TAsynParams&lt;TMessagesDeletion&gt;</c> record to handle the lifecycle of an asynchronous chat operation.
-  /// It provides event handlers that trigger at various stages, such as when the operation starts, completes successfully, or encounters an error.
-  /// This structure facilitates non-blocking chat operations and is specifically tailored for scenarios where multiple choices from a chat model are required.
-  /// </remarks>
-  TAsynMessagesDeletion = TAsynCallBack<TMessagesDeletion>;
 
   TMessagesRoute = class(TGenAIRoute)
   protected
@@ -244,14 +223,14 @@ type
       const ParamProc: TProc<TMessagesUpdateParams>;
       const CallBacks: TFunc<TAsynMessages>);
     procedure AsynDelete(const ThreadId: string; const MessageId: string;
-      const CallBacks: TFunc<TAsynMessagesDeletion>);
+      const CallBacks: TFunc<TAsynDeletion>);
 
     function Create(const ThreadId: string; const ParamProc: TProc<TThreadsMessageParams>): TMessages;
     function List(const ThreadId: string): TMessagesList; overload;
     function List(const ThreadId: string; const ParamProc: TProc<TAssistantsUrlParams>): TMessagesList; overload;
     function Retrieve(const ThreadId: string; const MessageId: string): TMessages;
     function Update(const ThreadId: string; const MessageId: string; const ParamProc: TProc<TMessagesUpdateParams>): TMessages;
-    function Delete(const ThreadId: string; const MessageId: string): TMessagesDeletion;
+    function Delete(const ThreadId: string; const MessageId: string): TDeletion;
   end;
 
 implementation
@@ -279,16 +258,16 @@ begin
 end;
 
 procedure TMessagesRoute.AsynDelete(const ThreadId, MessageId: string;
-  const CallBacks: TFunc<TAsynMessagesDeletion>);
+  const CallBacks: TFunc<TAsynDeletion>);
 begin
-  with TAsynCallBackExec<TAsynMessagesDeletion, TMessagesDeletion>.Create(CallBacks) do
+  with TAsynCallBackExec<TAsynDeletion, TDeletion>.Create(CallBacks) do
   try
     Sender := Use.Param.Sender;
     OnStart := Use.Param.OnStart;
     OnSuccess := Use.Param.OnSuccess;
     OnError := Use.Param.OnError;
     Run(
-      function: TMessagesDeletion
+      function: TDeletion
       begin
         Result := Self.Delete(ThreadId, MessageId);
       end);
@@ -383,10 +362,10 @@ begin
 end;
 
 function TMessagesRoute.Delete(const ThreadId,
-  MessageId: string): TMessagesDeletion;
+  MessageId: string): TDeletion;
 begin
   HeaderCustomize;
-  Result := API.Delete<TMessagesDeletion>('threads/' + ThreadId + '/messages/' + MessageId);
+  Result := API.Delete<TDeletion>('threads/' + ThreadId + '/messages/' + MessageId);
 end;
 
 procedure TMessagesRoute.HeaderCustomize;

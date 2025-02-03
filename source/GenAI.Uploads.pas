@@ -262,22 +262,22 @@ type
   end;
 
   /// <summary>
-  /// Manages asynchronous chat callBacks for a chat request using <c>TUpload</c> as the response type.
+  /// Manages asynchronous callBacks for a request using <c>TUpload</c> as the response type.
   /// </summary>
   /// <remarks>
   /// The <c>TAsynUpload</c> type extends the <c>TAsynParams&lt;TUpload&gt;</c> record to handle the lifecycle of an asynchronous chat operation.
   /// It provides event handlers that trigger at various stages, such as when the operation starts, completes successfully, or encounters an error.
-  /// This structure facilitates non-blocking chat operations and is specifically tailored for scenarios where multiple choices from a chat model are required.
+  /// This structure facilitates non-blocking operations.
   /// </remarks>
   TAsynUpload = TAsynCallBack<TUpload>;
 
   /// <summary>
-  /// Manages asynchronous chat callBacks for a chat request using <c>TUploadPart</c> as the response type.
+  /// Manages asynchronous callBacks for a request using <c>TUploadPart</c> as the response type.
   /// </summary>
   /// <remarks>
   /// The <c>TAsynUploadPart</c> type extends the <c>TAsynParams&lt;TUploadPart&gt;</c> record to handle the lifecycle of an asynchronous chat operation.
   /// It provides event handlers that trigger at various stages, such as when the operation starts, completes successfully, or encounters an error.
-  /// This structure facilitates non-blocking chat operations and is specifically tailored for scenarios where multiple choices from a chat model are required.
+  /// This structure facilitates non-blocking operations.
   /// </remarks>
   TAsynUploadPart = TAsynCallBack<TUploadPart>;
 

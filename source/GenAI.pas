@@ -11,10 +11,10 @@ interface
 
 uses
   System.SysUtils, System.Classes, System.JSON,
-  GenAI.API, GenAI.API.Params, GenAI.Types, GenAI.Models, GenAI.Functions.Core,
-  GenAI.Batch.Interfaces, GenAI.Schema, GenAI.Embeddings, GenAI.Audio, GenAI.Chat,
-  GenAI.Moderation, GenAI.Images, GenAI.Files, GenAI.Uploads, GenAI.Batch,
-  GenAI.Batch.Reader, GenAI.Batch.Builder, GenAI.Completions, GenAI.FineTuning,
+  GenAI.API, GenAI.API.Params, GenAI.Types, GenAI.API.Deletion, GenAI.Models,
+  GenAI.Functions.Core, GenAI.Batch.Interfaces, GenAI.Schema, GenAI.Embeddings,
+  GenAI.Audio, GenAI.Chat, GenAI.Moderation, GenAI.Images, GenAI.Files, GenAI.Uploads,
+  GenAI.Batch, GenAI.Batch.Reader, GenAI.Batch.Builder, GenAI.Completions, GenAI.FineTuning,
   GenAI.Assistants, GenAI.Threads, GenAI.Messages, GenAI.Runs, GenAI.RunSteps,
   GenAI.Vector, GenAI.VectorFiles, GenAI.VectorBatch;
 
@@ -381,6 +381,31 @@ type
 
   {$ENDREGION}
 
+  {$REGION 'GenAI.API.Deletion'}
+
+  /// <summary>
+  /// Represents a deletion response, providing details about the identifier, object type,
+  /// and whether the deletion was successful.
+  /// </summary>
+  /// <remarks>
+  /// This class is primarily used to store the result of a deletion request, including
+  /// the unique ID of the deleted object, the type of the object, and a status indicating
+  /// whether the deletion was completed successfully.
+  /// </remarks>
+  TDeletion = GenAI.API.Deletion.TDeletion;
+
+  /// <summary>
+  /// Manages asynchronous callBacks for a request using <c>TDeletion</c> as the response type.
+  /// </summary>
+  /// <remarks>
+  /// The <c>TAsynDeletion</c> type extends the <c>TAsynParams&lt;TDeletion&gt;</c> record to handle the lifecycle of an asynchronous chat operation.
+  /// It provides event handlers that trigger at various stages, such as when the operation starts, completes successfully, or encounters an error.
+  /// This structure facilitates non-blocking operations.
+  /// </remarks>
+  TAsynDeletion = GenAI.API.Deletion.TAsynDeletion;
+
+  {$ENDREGION}
+
   {$REGION 'GenAI.Functions.Core'}
 
   /// <summary>
@@ -495,32 +520,32 @@ type
   TTranslation = GenAI.Audio.TTranslation;
 
   /// <summary>
-  /// Manages asynchronous chat callBacks for a chat request using <c>TSpeechResult</c> as the response type.
+  /// Manages asynchronous callBacks for a request using <c>TSpeechResult</c> as the response type.
   /// </summary>
   /// <remarks>
   /// The <c>TAsynSpeechResult</c> type extends the <c>TAsynParams&lt;TSpeechResult&gt;</c> record to handle the lifecycle of an asynchronous chat operation.
   /// It provides event handlers that trigger at various stages, such as when the operation starts, completes successfully, or encounters an error.
-  /// This structure facilitates non-blocking chat operations and is specifically tailored for scenarios where multiple choices from a chat model are required.
+  /// This structure facilitates non-blocking operations.
   /// </remarks>
   TAsynSpeechResult = GenAI.Audio.TAsynSpeechResult;
 
   /// <summary>
-  /// Manages asynchronous chat callBacks for a chat request using <c>TTranscription</c> as the response type.
+  /// Manages asynchronous callBacks for a request using <c>TTranscription</c> as the response type.
   /// </summary>
   /// <remarks>
   /// The <c>TAsynTranscription</c> type extends the <c>TAsynParams&lt;TTranscription&gt;</c> record to handle the lifecycle of an asynchronous chat operation.
   /// It provides event handlers that trigger at various stages, such as when the operation starts, completes successfully, or encounters an error.
-  /// This structure facilitates non-blocking chat operations and is specifically tailored for scenarios where multiple choices from a chat model are required.
+  /// This structure facilitates non-blocking operations.
   /// </remarks>
   TAsynTranscription = GenAI.Audio.TAsynTranscription;
 
   /// <summary>
-  /// Manages asynchronous chat callBacks for a chat request using <c>TTranslation</c> as the response type.
+  /// Manages asynchronous callBacks for a request using <c>TTranslation</c> as the response type.
   /// </summary>
   /// <remarks>
   /// The <c>TAsynTranslation</c> type extends the <c>TAsynParams&lt;TTranslation&gt;</c> record to handle the lifecycle of an asynchronous chat operation.
   /// It provides event handlers that trigger at various stages, such as when the operation starts, completes successfully, or encounters an error.
-  /// This structure facilitates non-blocking chat operations and is specifically tailored for scenarios where multiple choices from a chat model are required.
+  /// This structure facilitates non-blocking operations.
   /// </remarks>
   TAsynTranslation = GenAI.Audio.TAsynTranslation;
 
@@ -561,12 +586,12 @@ type
   TEmbeddings = GenAI.Embeddings.TEmbeddings;
 
   /// <summary>
-  /// Manages asynchronous chat callBacks for a chat request using <c>TEmbeddings</c> as the response type.
+  /// Manages asynchronous callBacks a request using <c>TEmbeddings</c> as the response type.
   /// </summary>
   /// <remarks>
   /// The <c>TAsynEmbeddings</c> type extends the <c>TAsynParams&lt;TEmbeddings&gt;</c> record to handle the lifecycle of an asynchronous chat operation.
   /// It provides event handlers that trigger at various stages, such as when the operation starts, completes successfully, or encounters an error.
-  /// This structure facilitates non-blocking chat operations and is specifically tailored for scenarios where multiple choices from a chat model are required.
+  /// This structure facilitates non-blocking operations.
   /// </remarks>
   TAsynEmbeddings = GenAI.Embeddings.TAsynEmbeddings;
 
@@ -595,44 +620,24 @@ type
   TModels = GenAI.Models.TModels;
 
   /// <summary>
-  /// Represents the deletion status of an OpenAI model.
-  /// </summary>
-  /// <remarks>
-  /// The TModelDeletion class encapsulates the outcome of a deletion request for a model,
-  /// including identification and deletion status. It is used to confirm the removal of
-  /// a fine-tuned model instance from the OpenAI API.
-  /// </remarks>
-  TModelDeletion = GenAI.Models.TModelDeletion;
-
-  /// <summary>
-  /// Manages asynchronous chat callBacks for a chat request using <c>TModel</c> as the response type.
+  /// Manages asynchronous callBacks for a request using <c>TModel</c> as the response type.
   /// </summary>
   /// <remarks>
   /// The <c>TAsynModel</c> type extends the <c>TAsynParams&lt;TModel&gt;</c> record to handle the lifecycle of an asynchronous chat operation.
   /// It provides event handlers that trigger at various stages, such as when the operation starts, completes successfully, or encounters an error.
-  /// This structure facilitates non-blocking chat operations and is specifically tailored for scenarios where multiple choices from a chat model are required.
+  /// This structure facilitates non-blocking operations.
   /// </remarks>
   TAsynModel = GenAI.Models.TAsynModel;
 
   /// <summary>
-  /// Manages asynchronous chat callBacks for a chat request using <c>TModels</c> as the response type.
+  /// Manages asynchronous callBacks for a request using <c>TModels</c> as the response type.
   /// </summary>
   /// <remarks>
   /// The <c>TAsynModels</c> type extends the <c>TAsynParams&lt;TModels&gt;</c> record to handle the lifecycle of an asynchronous chat operation.
   /// It provides event handlers that trigger at various stages, such as when the operation starts, completes successfully, or encounters an error.
-  /// This structure facilitates non-blocking chat operations and is specifically tailored for scenarios where multiple choices from a chat model are required.
+  /// This structure facilitates non-blocking operations.
   /// </remarks>
   TAsynModels = GenAI.Models.TAsynModels;
-
-  /// <summary>
-  /// Manages asynchronous chat callBacks for a chat request using <c>TModelDeletion</c> as the response type.
-  /// </summary>
-  /// <remarks>
-  /// The <c>TAsynModelDeletion</c> type extends the <c>TAsynParams&lt;TModelDeletion&gt;</c> record to handle the lifecycle of an asynchronous chat operation.
-  /// It provides event handlers that trigger at various stages, such as when the operation starts, completes successfully, or encounters an error.
-  /// This structure facilitates non-blocking chat operations and is specifically tailored for scenarios where multiple choices from a chat model are required.
-  /// </remarks>
-  TAsynModelDeletion = GenAI.Models.TAsynModelDeletion;
 
   {$ENDREGION}
 
@@ -930,17 +935,17 @@ type
   TChat = GenAI.Chat.TChat;
 
   /// <summary>
-  /// Manages asynchronous chat callBacks for a chat request using <c>TChat</c> as the response type.
+  /// Manages asynchronous chat callBacks for a request using <c>TChat</c> as the response type.
   /// </summary>
   /// <remarks>
   /// The <c>TAsynChat</c> type extends the <c>TAsynParams&lt;TChat&gt;</c> record to handle the lifecycle of an asynchronous chat operation.
   /// It provides event handlers that trigger at various stages, such as when the operation starts, completes successfully, or encounters an error.
-  /// This structure facilitates non-blocking chat operations and is specifically tailored for scenarios where multiple choices from a chat model are required.
+  /// This structure facilitates non-blocking operations.
   /// </remarks>
   TAsynChat = GenAI.Chat.TAsynChat;
 
   /// <summary>
-  /// Manages asynchronous streaming chat callBacks for a chat request using <c>TChat</c> as the response type.
+  /// Manages asynchronous streaming callBacks for a request using <c>TChat</c> as the response type.
   /// </summary>
   /// <remarks>
   /// The <c>TAsynChatStream</c> type extends the <c>TAsynStreamParams&lt;TChat&gt;</c> record to support the lifecycle of an asynchronous streaming chat operation.
@@ -988,7 +993,7 @@ type
   TCompletion = GenAI.Completions.TCompletion;
 
   /// <summary>
-  /// Manages asynchronous chat callBacks for a chat request using <c>TCompletion</c> as the response type.
+  /// Manages asynchronous callBacks for a request using <c>TCompletion</c> as the response type.
   /// </summary>
   /// <remarks>
   /// The <c>TAsynCompletion</c> type extends the <c>TAsynParams&lt;TCompletion&gt;</c> record to handle the lifecycle of an asynchronous chat operation.
@@ -998,7 +1003,7 @@ type
   TAsynCompletion = GenAI.Completions.TAsynCompletion;
 
   /// <summary>
-  /// Manages asynchronous streaming chat callBacks for a chat request using <c>TCompletion</c> as the response type.
+  /// Manages asynchronous streaming callBacks for a request using <c>TCompletion</c> as the response type.
   /// </summary>
   /// <remarks>
   /// The <c>TAsynCompletionStream</c> type extends the <c>TAsynStreamParams&lt;TCompletion&gt;</c> record to support the lifecycle of an asynchronous streaming chat operation.
@@ -1124,12 +1129,12 @@ type
   TModeration = GenAI.Moderation.TModeration;
 
   /// <summary>
-  /// Manages asynchronous chat callBacks for a chat request using <c>TModeration</c> as the response type.
+  /// Manages asynchronous callBacks for a request using <c>TModeration</c> as the response type.
   /// </summary>
   /// <remarks>
   /// The <c>TAsynModeration</c> type extends the <c>TAsynParams&lt;TModeration&gt;</c> record to handle the lifecycle of an asynchronous chat operation.
   /// It provides event handlers that trigger at various stages, such as when the operation starts, completes successfully, or encounters an error.
-  /// This structure facilitates non-blocking chat operations and is specifically tailored for scenarios where multiple choices from a chat model are required.
+  /// This structure facilitates non-blocking operations.
   /// </remarks>
   TAsynModeration = GenAI.Moderation.TAsynModeration;
 
@@ -1202,12 +1207,12 @@ type
   TGeneratedImages = GenAI.Images.TGeneratedImages;
 
   /// <summary>
-  /// Manages asynchronous chat callBacks for a chat request using <c>TGeneratedImages</c> as the response type.
+  /// Manages asynchronous callBacks for a request using <c>TGeneratedImages</c> as the response type.
   /// </summary>
   /// <remarks>
   /// The <c>TAsynImagesCreate</c> type extends the <c>TAsynParams&lt;TGeneratedImages&gt;</c> record to handle the lifecycle of an asynchronous chat operation.
   /// It provides event handlers that trigger at various stages, such as when the operation starts, completes successfully, or encounters an error.
-  /// This structure facilitates non-blocking chat operations and is specifically tailored for scenarios where multiple choices from a chat model are required.
+  /// This structure facilitates non-blocking operations.
   /// </remarks>
   TAsynGeneratedImages = GenAI.Images.TAsynGeneratedImages;
 
@@ -1264,32 +1269,32 @@ type
   TFileContent = GenAI.Files.TFileContent;
 
   /// <summary>
-  /// Manages asynchronous chat callBacks for a chat request using <c>TFile</c> as the response type.
+  /// Manages asynchronous callBacks for a request using <c>TFile</c> as the response type.
   /// </summary>
   /// <remarks>
   /// The <c>TAsynFile</c> type extends the <c>TAsynParams&lt;TFile&gt;</c> record to handle the lifecycle of an asynchronous chat operation.
   /// It provides event handlers that trigger at various stages, such as when the operation starts, completes successfully, or encounters an error.
-  /// This structure facilitates non-blocking chat operations and is specifically tailored for scenarios where multiple choices from a chat model are required.
+  /// This structure facilitates non-blocking operations.
   /// </remarks>
   TAsynFile = GenAI.Files.TAsynFile;
 
   /// <summary>
-  /// Manages asynchronous chat callBacks for a chat request using <c>TFiles</c> as the response type.
+  /// Manages asynchronous callBacks for a request using <c>TFiles</c> as the response type.
   /// </summary>
   /// <remarks>
   /// The <c>TAsynFiles</c> type extends the <c>TAsynParams&lt;TFiles&gt;</c> record to handle the lifecycle of an asynchronous chat operation.
   /// It provides event handlers that trigger at various stages, such as when the operation starts, completes successfully, or encounters an error.
-  /// This structure facilitates non-blocking chat operations and is specifically tailored for scenarios where multiple choices from a chat model are required.
+  /// This structure facilitates non-blocking operations.
   /// </remarks>
   TAsynFiles = GenAI.Files.TAsynFiles;
 
   /// <summary>
-  /// Manages asynchronous chat callBacks for a chat request using <c>TFiles</c> as the response type.
+  /// Manages asynchronous callBacks for a request using <c>TFiles</c> as the response type.
   /// </summary>
   /// <remarks>
   /// The <c>TAsynFiles</c> type extends the <c>TAsynParams&lt;TFiles&gt;</c> record to handle the lifecycle of an asynchronous chat operation.
   /// It provides event handlers that trigger at various stages, such as when the operation starts, completes successfully, or encounters an error.
-  /// This structure facilitates non-blocking chat operations and is specifically tailored for scenarios where multiple choices from a chat model are required.
+  /// This structure facilitates non-blocking operations.
   /// </remarks>
   TAsynFileContent = GenAI.Files.TAsynFileContent;
 
@@ -1346,22 +1351,22 @@ type
   TUploadPart = GenAI.Uploads.TUploadPart;
 
   /// <summary>
-  /// Manages asynchronous chat callBacks for a chat request using <c>TUpload</c> as the response type.
+  /// Manages asynchronous callBacks for a request using <c>TUpload</c> as the response type.
   /// </summary>
   /// <remarks>
   /// The <c>TAsynUpload</c> type extends the <c>TAsynParams&lt;TUpload&gt;</c> record to handle the lifecycle of an asynchronous chat operation.
   /// It provides event handlers that trigger at various stages, such as when the operation starts, completes successfully, or encounters an error.
-  /// This structure facilitates non-blocking chat operations and is specifically tailored for scenarios where multiple choices from a chat model are required.
+  /// This structure facilitates non-blocking operations.
   /// </remarks>
   TAsynUpload = GenAI.Uploads.TAsynUpload;
 
   /// <summary>
-  /// Manages asynchronous chat callBacks for a chat request using <c>TUploadPart</c> as the response type.
+  /// Manages asynchronous callBacks for a request using <c>TUploadPart</c> as the response type.
   /// </summary>
   /// <remarks>
   /// The <c>TAsynUploadPart</c> type extends the <c>TAsynParams&lt;TUploadPart&gt;</c> record to handle the lifecycle of an asynchronous chat operation.
   /// It provides event handlers that trigger at various stages, such as when the operation starts, completes successfully, or encounters an error.
-  /// This structure facilitates non-blocking chat operations and is specifically tailored for scenarios where multiple choices from a chat model are required.
+  /// This structure facilitates non-blocking operations.
   /// </remarks>
   TAsynUploadPart = GenAI.Uploads.TAsynUploadPart;
 
@@ -1412,22 +1417,22 @@ type
   TBatches = GenAI.Batch.TBatches;
 
   /// <summary>
-  /// Manages asynchronous chat callBacks for a chat request using <c>TBatch</c> as the response type.
+  /// Manages asynchronous callBacks for a request using <c>TBatch</c> as the response type.
   /// </summary>
   /// <remarks>
   /// The <c>TAsynBatch</c> type extends the <c>TAsynParams&lt;TBatch&gt;</c> record to handle the lifecycle of an asynchronous chat operation.
   /// It provides event handlers that trigger at various stages, such as when the operation starts, completes successfully, or encounters an error.
-  /// This structure facilitates non-blocking chat operations and is specifically tailored for scenarios where multiple choices from a chat model are required.
+  /// This structure facilitates non-blocking operations.
   /// </remarks>
   TAsynBatch = GenAI.Batch.TAsynBatch;
 
   /// <summary>
-  /// Manages asynchronous chat callBacks for a chat request using <c>TBatches</c> as the response type.
+  /// Manages asynchronous callBacks for a request using <c>TBatches</c> as the response type.
   /// </summary>
   /// <remarks>
   /// The <c>TAsynBatches</c> type extends the <c>TAsynParams&lt;TBatches&gt;</c> record to handle the lifecycle of an asynchronous chat operation.
   /// It provides event handlers that trigger at various stages, such as when the operation starts, completes successfully, or encounters an error.
-  /// This structure facilitates non-blocking chat operations and is specifically tailored for scenarios where multiple choices from a chat model are required.
+  /// This structure facilitates non-blocking operations.
   /// </remarks>
   TAsynBatches = GenAI.Batch.TAsynBatches;
 
@@ -1607,42 +1612,42 @@ type
   TJobCheckpoints = GenAI.FineTuning.TJobCheckpoints;
 
   /// <summary>
-  /// Manages asynchronous chat callBacks for a chat request using <c>TFineTuningJob</c> as the response type.
+  /// Manages asynchronous callBacks for a request using <c>TFineTuningJob</c> as the response type.
   /// </summary>
   /// <remarks>
   /// The <c>TAsynFineTuningJob</c> type extends the <c>TAsynParams&lt;TFineTuningJob&gt;</c> record to handle the lifecycle of an asynchronous chat operation.
   /// It provides event handlers that trigger at various stages, such as when the operation starts, completes successfully, or encounters an error.
-  /// This structure facilitates non-blocking chat operations and is specifically tailored for scenarios where multiple choices from a chat model are required.
+  /// This structure facilitates non-blocking operations.
   /// </remarks>
   TAsynFineTuningJob = GenAI.FineTuning.TAsynFineTuningJob;
 
   /// <summary>
-  /// Manages asynchronous chat callBacks for a chat request using <c>TFineTuningJobs</c> as the response type.
+  /// Manages asynchronous callBacks for a request using <c>TFineTuningJobs</c> as the response type.
   /// </summary>
   /// <remarks>
   /// The <c>TAsynFineTuningJobs</c> type extends the <c>TAsynParams&lt;TFineTuningJobs&gt;</c> record to handle the lifecycle of an asynchronous chat operation.
   /// It provides event handlers that trigger at various stages, such as when the operation starts, completes successfully, or encounters an error.
-  /// This structure facilitates non-blocking chat operations and is specifically tailored for scenarios where multiple choices from a chat model are required.
+  /// This structure facilitates non-blocking operations.
   /// </remarks>
   TAsynFineTuningJobs = GenAI.FineTuning.TAsynFineTuningJobs;
 
   /// <summary>
-  /// Manages asynchronous chat callBacks for a chat request using <c>TJobEvents</c> as the response type.
+  /// Manages asynchronous callBacks for a request using <c>TJobEvents</c> as the response type.
   /// </summary>
   /// <remarks>
   /// The <c>TAsynJobEvents</c> type extends the <c>TAsynParams&lt;TJobEvents&gt;</c> record to handle the lifecycle of an asynchronous chat operation.
   /// It provides event handlers that trigger at various stages, such as when the operation starts, completes successfully, or encounters an error.
-  /// This structure facilitates non-blocking chat operations and is specifically tailored for scenarios where multiple choices from a chat model are required.
+  /// This structure facilitates non-blocking operations.
   /// </remarks>
   TAsynJobEvents = GenAI.FineTuning.TAsynJobEvents;
 
   /// <summary>
-  /// Manages asynchronous chat callBacks for a chat request using <c>TJobCheckpoints</c> as the response type.
+  /// Manages asynchronous callBacks for a request using <c>TJobCheckpoints</c> as the response type.
   /// </summary>
   /// <remarks>
   /// The <c>TAsynFineJobCheckpoints</c> type extends the <c>TAsynParams&lt;TJobCheckpoints&gt;</c> record to handle the lifecycle of an asynchronous chat operation.
   /// It provides event handlers that trigger at various stages, such as when the operation starts, completes successfully, or encounters an error.
-  /// This structure facilitates non-blocking chat operations and is specifically tailored for scenarios where multiple choices from a chat model are required.
+  /// This structure facilitates non-blocking operations.
   /// </remarks>
   TAsynJobCheckpoints = GenAI.FineTuning.TAsynJobCheckpoints;
 
@@ -1859,44 +1864,24 @@ type
   TAssistants = GenAI.Assistants.TAssistants;
 
   /// <summary>
-  /// Represents the response returned after deleting an assistant.
-  /// </summary>
-  /// <remarks>
-  /// This class provides information about the deletion status of an assistant, including
-  /// its ID, object type, and whether the deletion was successful. It extends
-  /// <c>TJSONFingerprint</c> for JSON serialization.
-  /// </remarks>
-  TAssistantDeletion = GenAI.Assistants.TAssistantDeletion;
-
-  /// <summary>
-  /// Manages asynchronous chat callBacks for a chat request using <c>TAssistant</c> as the response type.
+  /// Manages asynchronous callBacks for a request using <c>TAssistant</c> as the response type.
   /// </summary>
   /// <remarks>
   /// The <c>TAsynAssistant</c> type extends the <c>TAsynParams&lt;TAssistant&gt;</c> record to handle the lifecycle of an asynchronous chat operation.
   /// It provides event handlers that trigger at various stages, such as when the operation starts, completes successfully, or encounters an error.
-  /// This structure facilitates non-blocking chat operations and is specifically tailored for scenarios where multiple choices from a chat model are required.
+  /// This structure facilitates non-blocking operations.
   /// </remarks>
   TAsynAssistant = GenAI.Assistants.TAsynAssistant;
 
   /// <summary>
-  /// Manages asynchronous chat callBacks for a chat request using <c>TAssistants</c> as the response type.
+  /// Manages asynchronous callBacks for a request using <c>TAssistants</c> as the response type.
   /// </summary>
   /// <remarks>
   /// The <c>TAsynAssistants</c> type extends the <c>TAsynParams&lt;TAssistants&gt;</c> record to handle the lifecycle of an asynchronous chat operation.
   /// It provides event handlers that trigger at various stages, such as when the operation starts, completes successfully, or encounters an error.
-  /// This structure facilitates non-blocking chat operations and is specifically tailored for scenarios where multiple choices from a chat model are required.
+  /// This structure facilitates non-blocking operations.
   /// </remarks>
   TAsynAssistants = GenAI.Assistants.TAsynAssistants;
-
-  /// <summary>
-  /// Manages asynchronous chat callBacks for a chat request using <c>TAssistantDeletion</c> as the response type.
-  /// </summary>
-  /// <remarks>
-  /// The <c>TAsynAssistantDeletion</c> type extends the <c>TAsynParams&lt;TAssistantDeletion&gt;</c> record to handle the lifecycle of an asynchronous chat operation.
-  /// It provides event handlers that trigger at various stages, such as when the operation starts, completes successfully, or encounters an error.
-  /// This structure facilitates non-blocking chat operations and is specifically tailored for scenarios where multiple choices from a chat model are required.
-  /// </remarks>
-  TAsynAssistantDeletion = GenAI.Assistants.TAsynAssistantDeletion;
 
   {$ENDREGION}
 

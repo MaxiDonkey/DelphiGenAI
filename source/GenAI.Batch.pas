@@ -393,22 +393,22 @@ type
   TBatches = TAdvancedList<TBatch>;
 
   /// <summary>
-  /// Manages asynchronous chat callBacks for a chat request using <c>TBatch</c> as the response type.
+  /// Manages asynchronous callBacks for a request using <c>TBatch</c> as the response type.
   /// </summary>
   /// <remarks>
   /// The <c>TAsynBatch</c> type extends the <c>TAsynParams&lt;TBatch&gt;</c> record to handle the lifecycle of an asynchronous chat operation.
   /// It provides event handlers that trigger at various stages, such as when the operation starts, completes successfully, or encounters an error.
-  /// This structure facilitates non-blocking chat operations and is specifically tailored for scenarios where multiple choices from a chat model are required.
+  /// This structure facilitates non-blocking operations.
   /// </remarks>
   TAsynBatch = TAsynCallBack<TBatch>;
 
   /// <summary>
-  /// Manages asynchronous chat callBacks for a chat request using <c>TBatches</c> as the response type.
+  /// Manages asynchronous callBacks for a request using <c>TBatches</c> as the response type.
   /// </summary>
   /// <remarks>
   /// The <c>TAsynBatches</c> type extends the <c>TAsynParams&lt;TBatches&gt;</c> record to handle the lifecycle of an asynchronous chat operation.
   /// It provides event handlers that trigger at various stages, such as when the operation starts, completes successfully, or encounters an error.
-  /// This structure facilitates non-blocking chat operations and is specifically tailored for scenarios where multiple choices from a chat model are required.
+  /// This structure facilitates non-blocking operations.
   /// </remarks>
   TAsynBatches = TAsynCallBack<TBatches>;
 

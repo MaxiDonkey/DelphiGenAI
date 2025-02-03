@@ -48,22 +48,22 @@ type
   TVectorStoreBatches = TAdvancedList<TVectorStoreBatch>;
 
   /// <summary>
-  /// Manages asynchronous chat callBacks for a chat request using <c>TVectorStoreBatch</c> as the response type.
+  /// Manages asynchronous callBacks for a request using <c>TVectorStoreBatch</c> as the response type.
   /// </summary>
   /// <remarks>
   /// The <c>TAsynVectorStoreBatch</c> type extends the <c>TAsynParams&lt;TVectorStoreBatch&gt;</c> record to handle the lifecycle of an asynchronous chat operation.
   /// It provides event handlers that trigger at various stages, such as when the operation starts, completes successfully, or encounters an error.
-  /// This structure facilitates non-blocking chat operations and is specifically tailored for scenarios where multiple choices from a chat model are required.
+  /// This structure facilitates non-blocking operations.
   /// </remarks>
   TAsynVectorStoreBatch = TAsynCallBack<TVectorStoreBatch>;
 
   /// <summary>
-  /// Manages asynchronous chat callBacks for a chat request using <c>TVectorStoreBatches</c> as the response type.
+  /// Manages asynchronous callBacks for a request using <c>TVectorStoreBatches</c> as the response type.
   /// </summary>
   /// <remarks>
   /// The <c>TAsynVectorStoreBatches</c> type extends the <c>TAsynParams&lt;TVectorStoreBatches&gt;</c> record to handle the lifecycle of an asynchronous chat operation.
   /// It provides event handlers that trigger at various stages, such as when the operation starts, completes successfully, or encounters an error.
-  /// This structure facilitates non-blocking chat operations and is specifically tailored for scenarios where multiple choices from a chat model are required.
+  /// This structure facilitates non-blocking operations.
   /// </remarks>
   TAsynVectorStoreBatches = TAsynCallBack<TVectorStoreBatches>;
 

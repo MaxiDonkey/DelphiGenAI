@@ -78,7 +78,7 @@ uses
   System.SysUtils, System.Classes, System.Threading, System.JSON, REST.Json.Types,
   REST.JsonReflect, System.Net.URLClient,
   GenAI.API.Params, GenAI.API, GenAI.Consts, GenAI.Types, GenAI.Async.Support,
-  GenAI.Schema, GenAI.API.Lists;
+  GenAI.Schema, GenAI.API.Lists, GenAI.API.Deletion;
 
 type
   /// <summary>
@@ -1110,66 +1110,24 @@ type
   TAssistants = TAdvancedList<TAssistant>;
 
   /// <summary>
-  /// Represents the response returned after deleting an assistant.
-  /// </summary>
-  /// <remarks>
-  /// This class provides information about the deletion status of an assistant, including
-  /// its ID, object type, and whether the deletion was successful. It extends
-  /// <c>TJSONFingerprint</c> for JSON serialization.
-  /// </remarks>
-  TAssistantDeletion = class(TJSONFingerprint)
-  private
-    FId: string;
-    FObject: string;
-    FDeleted: Boolean;
-  public
-    /// <summary>
-    /// The unique identifier of the deleted assistant.
-    /// </summary>
-    property Id: string read FId write FId;
-    /// <summary>
-    /// The object type, which is always "assistant".
-    /// </summary>
-    property &Object: string read FObject write FObject;
-    /// <summary>
-    /// Indicates whether the assistant was successfully deleted.
-    /// </summary>
-    /// <remarks>
-    /// This property is set to <c>true</c> if the deletion was successful, and <c>false</c>
-    /// otherwise.
-    /// </remarks>
-    property Deleted: Boolean read FDeleted write FDeleted;
-  end;
-
-  /// <summary>
-  /// Manages asynchronous chat callBacks for a chat request using <c>TAssistant</c> as the response type.
+  /// Manages asynchronous callBacks for a request using <c>TAssistant</c> as the response type.
   /// </summary>
   /// <remarks>
   /// The <c>TAsynAssistant</c> type extends the <c>TAsynParams&lt;TAssistant&gt;</c> record to handle the lifecycle of an asynchronous chat operation.
   /// It provides event handlers that trigger at various stages, such as when the operation starts, completes successfully, or encounters an error.
-  /// This structure facilitates non-blocking chat operations and is specifically tailored for scenarios where multiple choices from a chat model are required.
+  /// This structure facilitates non-blocking operations.
   /// </remarks>
   TAsynAssistant = TAsynCallBack<TAssistant>;
 
   /// <summary>
-  /// Manages asynchronous chat callBacks for a chat request using <c>TAssistants</c> as the response type.
+  /// Manages asynchronous callBacks for a request using <c>TAssistants</c> as the response type.
   /// </summary>
   /// <remarks>
   /// The <c>TAsynAssistants</c> type extends the <c>TAsynParams&lt;TAssistants&gt;</c> record to handle the lifecycle of an asynchronous chat operation.
   /// It provides event handlers that trigger at various stages, such as when the operation starts, completes successfully, or encounters an error.
-  /// This structure facilitates non-blocking chat operations and is specifically tailored for scenarios where multiple choices from a chat model are required.
+  /// This structure facilitates non-blocking operations.
   /// </remarks>
   TAsynAssistants = TAsynCallBack<TAssistants>;
-
-  /// <summary>
-  /// Manages asynchronous chat callBacks for a chat request using <c>TAssistantDeletion</c> as the response type.
-  /// </summary>
-  /// <remarks>
-  /// The <c>TAsynAssistantDeletion</c> type extends the <c>TAsynParams&lt;TAssistantDeletion&gt;</c> record to handle the lifecycle of an asynchronous chat operation.
-  /// It provides event handlers that trigger at various stages, such as when the operation starts, completes successfully, or encounters an error.
-  /// This structure facilitates non-blocking chat operations and is specifically tailored for scenarios where multiple choices from a chat model are required.
-  /// </remarks>
-  TAsynAssistantDeletion = TAsynCallBack<TAssistantDeletion>;
 
   /// <summary>
   /// Represents the API route handler for managing assistants.
@@ -1253,7 +1211,7 @@ type
     /// <param name="CallBacks">
     /// A callback function to handle the asynchronous response.
     /// </param>
-    procedure AsynDelete(const AssistantId: string; const CallBacks: TFunc<TAsynAssistantDeletion>);
+    procedure AsynDelete(const AssistantId: string; const CallBacks: TFunc<TAsynDeletion>);
     /// <summary>
     /// Creates a new assistant synchronously.
     /// </summary>
@@ -1316,7 +1274,7 @@ type
     /// <returns>
     /// A <c>TAssistantDeletion</c> object containing the deletion status.
     /// </returns>
-    function Delete(const AssistantId: string): TAssistantDeletion;
+    function Delete(const AssistantId: string): TDeletion;
   end;
 
 implementation
@@ -1708,16 +1666,16 @@ begin
 end;
 
 procedure TAssistantsRoute.AsynDelete(const AssistantId: string;
-  const CallBacks: TFunc<TAsynAssistantDeletion>);
+  const CallBacks: TFunc<TAsynDeletion>);
 begin
-  with TAsynCallBackExec<TAsynAssistantDeletion, TAssistantDeletion>.Create(CallBacks) do
+  with TAsynCallBackExec<TAsynDeletion, TDeletion>.Create(CallBacks) do
   try
     Sender := Use.Param.Sender;
     OnStart := Use.Param.OnStart;
     OnSuccess := Use.Param.OnSuccess;
     OnError := Use.Param.OnError;
     Run(
-      function: TAssistantDeletion
+      function: TDeletion
       begin
         Result := Self.Delete(AssistantId);
       end);
@@ -1791,10 +1749,10 @@ begin
   Result := API.Post<TAssistant, TAssistantsParams>('assistants', ParamProc);
 end;
 
-function TAssistantsRoute.Delete(const AssistantId: string): TAssistantDeletion;
+function TAssistantsRoute.Delete(const AssistantId: string): TDeletion;
 begin
   HeaderCustomize;
-  Result := API.Delete<TAssistantDeletion>('assistants/' + AssistantId);
+  Result := API.Delete<TDeletion>('assistants/' + AssistantId);
 end;
 
 procedure TAssistantsRoute.HeaderCustomize;

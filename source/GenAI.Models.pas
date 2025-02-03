@@ -11,7 +11,7 @@ interface
 
 uses
   System.SysUtils, System.Classes, System.Threading, REST.Json.Types,
-  GenAI.API.Params, GenAI.API, GenAI.Async.Support;
+  GenAI.API.Params, GenAI.API, GenAI.Async.Support, GenAI.API.Deletion;
 
 type
   /// <summary>
@@ -82,62 +82,24 @@ type
   end;
 
   /// <summary>
-  /// Represents the deletion status of an OpenAI model.
-  /// </summary>
-  /// <remarks>
-  /// The TModelDeletion class encapsulates the outcome of a deletion request for a model,
-  /// including identification and deletion status. It is used to confirm the removal of
-  /// a fine-tuned model instance from the OpenAI API.
-  /// </remarks>
-  TModelDeletion = class(TJSONFingerprint)
-  private
-    FId: string;
-    FObject: string;
-    FDeleted: Boolean;
-  public
-    /// <summary>
-    /// Gets or sets the unique identifier of the deleted model.
-    /// </summary>
-    property Id: string read FId write FId;
-    /// <summary>
-    /// Gets or sets the object type, typically set to "model" in the context of deletion.
-    /// </summary>
-    property &Object: string read FObject write FObject;
-    /// <summary>
-    /// Gets or sets the deletion status of the model.
-    /// </summary>
-    property Deleted: Boolean read FDeleted write FDeleted;
-  end;
-
-  /// <summary>
-  /// Manages asynchronous chat callBacks for a chat request using <c>TModel</c> as the response type.
+  /// Manages asynchronous callBacks for a request using <c>TModel</c> as the response type.
   /// </summary>
   /// <remarks>
   /// The <c>TAsynModel</c> type extends the <c>TAsynParams&lt;TModel&gt;</c> record to handle the lifecycle of an asynchronous chat operation.
   /// It provides event handlers that trigger at various stages, such as when the operation starts, completes successfully, or encounters an error.
-  /// This structure facilitates non-blocking chat operations and is specifically tailored for scenarios where multiple choices from a chat model are required.
+  /// This structure facilitates non-blocking operations.
   /// </remarks>
   TAsynModel = TAsynCallBack<TModel>;
 
   /// <summary>
-  /// Manages asynchronous chat callBacks for a chat request using <c>TModels</c> as the response type.
+  /// Manages asynchronous callBacks for a request using <c>TModels</c> as the response type.
   /// </summary>
   /// <remarks>
   /// The <c>TAsynModels</c> type extends the <c>TAsynParams&lt;TModels&gt;</c> record to handle the lifecycle of an asynchronous chat operation.
   /// It provides event handlers that trigger at various stages, such as when the operation starts, completes successfully, or encounters an error.
-  /// This structure facilitates non-blocking chat operations and is specifically tailored for scenarios where multiple choices from a chat model are required.
+  /// This structure facilitates non-blocking operations.
   /// </remarks>
   TAsynModels = TAsynCallBack<TModels>;
-
-  /// <summary>
-  /// Manages asynchronous chat callBacks for a chat request using <c>TModelDeletion</c> as the response type.
-  /// </summary>
-  /// <remarks>
-  /// The <c>TAsynModelDeletion</c> type extends the <c>TAsynParams&lt;TModelDeletion&gt;</c> record to handle the lifecycle of an asynchronous chat operation.
-  /// It provides event handlers that trigger at various stages, such as when the operation starts, completes successfully, or encounters an error.
-  /// This structure facilitates non-blocking chat operations and is specifically tailored for scenarios where multiple choices from a chat model are required.
-  /// </remarks>
-  TAsynModelDeletion = TAsynCallBack<TModelDeletion>;
 
   /// <summary>
   /// Provides routes for managing model data via API calls, including listing, retrieving, and deleting models.
@@ -158,7 +120,7 @@ type
     /// </summary>
     /// <param name="ModelId">The unique identifier of the model to be deleted.</param>
     /// <param name="CallBacks">A set of callback functions for success, error, and start conditions.</param>
-    procedure AsynDelete(const ModelId: string; const CallBacks: TFunc<TAsynModelDeletion>);
+    procedure AsynDelete(const ModelId: string; const CallBacks: TFunc<TAsynDeletion>);
     /// <summary>
     /// Asynchronously retrieves a specific model by ID and returns it in a TModel object through a callback mechanism.
     /// </summary>
@@ -175,7 +137,7 @@ type
     /// </summary>
     /// <param name="ModelId">The unique identifier of the model to be deleted.</param>
     /// <returns>A TModelDeletion object indicating the status of the deletion.</returns>
-    function Delete(const ModelId: string): TModelDeletion;
+    function Delete(const ModelId: string): TDeletion;
     /// <summary>
     /// Synchronously retrieves a specific model by ID and returns it in a TModel object.
     /// </summary>
@@ -198,16 +160,16 @@ end;
 { TModelsRoute }
 
 procedure TModelsRoute.AsynDelete(const ModelId: string;
-  const CallBacks: TFunc<TAsynModelDeletion>);
+  const CallBacks: TFunc<TAsynDeletion>);
 begin
-  with TAsynCallBackExec<TAsynModelDeletion, TModelDeletion>.Create(CallBacks) do
+  with TAsynCallBackExec<TAsynDeletion, TDeletion>.Create(CallBacks) do
   try
     Sender := Use.Param.Sender;
     OnStart := Use.Param.OnStart;
     OnSuccess := Use.Param.OnSuccess;
     OnError := Use.Param.OnError;
     Run(
-      function: TModelDeletion
+      function: TDeletion
       begin
         Result := Self.Delete(ModelId);
       end);
@@ -253,9 +215,9 @@ begin
   end;
 end;
 
-function TModelsRoute.Delete(const ModelId: string): TModelDeletion;
+function TModelsRoute.Delete(const ModelId: string): TDeletion;
 begin
-  Result := API.Delete<TModelDeletion>(Format('models/%s', [ModelId]));
+  Result := API.Delete<TDeletion>(Format('models/%s', [ModelId]));
 end;
 
 function TModelsRoute.List: TModels;

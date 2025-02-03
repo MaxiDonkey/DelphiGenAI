@@ -13,7 +13,7 @@ uses
   System.SysUtils, System.Classes, System.Threading, System.JSON, REST.Json.Types,
   REST.JsonReflect, System.Net.URLClient,
   GenAI.API.Params, GenAI.API, GenAI.Consts, GenAI.Types, GenAI.Async.Support,
-  GenAI.API.Lists, GenAI.Assistants, GenAI.Runs;
+  GenAI.API.Lists, GenAI.API.Deletion, GenAI.Assistants, GenAI.Runs;
 
 type
   TVectorStoreFilesUrlParams = class(TUrlAdvancedParams)
@@ -81,46 +81,25 @@ type
 
   TVectorStoreFiles = TAdvancedList<TVectorStoreFile>;
 
-  TVectorStoreFileDeletion = class
-  private
-    FId: string;
-    FObject: string;
-    FDeleted: Boolean;
-  public
-    property Id: string read FId write FId;
-    property &Object: string read FObject write FObject;
-    property Deleted: Boolean read FDeleted write FDeleted;
-  end;
-
   /// <summary>
-  /// Manages asynchronous chat callBacks for a chat request using <c>TVectorStoreFile</c> as the response type.
+  /// Manages asynchronous callBacks for a request using <c>TVectorStoreFile</c> as the response type.
   /// </summary>
   /// <remarks>
   /// The <c>TAsynVectorStoreFile</c> type extends the <c>TAsynParams&lt;TVectorStoreFile&gt;</c> record to handle the lifecycle of an asynchronous chat operation.
   /// It provides event handlers that trigger at various stages, such as when the operation starts, completes successfully, or encounters an error.
-  /// This structure facilitates non-blocking chat operations and is specifically tailored for scenarios where multiple choices from a chat model are required.
+  /// This structure facilitates non-blocking operations.
   /// </remarks>
   TAsynVectorStoreFile = TAsynCallBack<TVectorStoreFile>;
 
   /// <summary>
-  /// Manages asynchronous chat callBacks for a chat request using <c>TVectorStoreFiles</c> as the response type.
+  /// Manages asynchronous callBacks for a request using <c>TVectorStoreFiles</c> as the response type.
   /// </summary>
   /// <remarks>
   /// The <c>TAsynVectorStoreFiles</c> type extends the <c>TAsynParams&lt;TVectorStoreFiles&gt;</c> record to handle the lifecycle of an asynchronous chat operation.
   /// It provides event handlers that trigger at various stages, such as when the operation starts, completes successfully, or encounters an error.
-  /// This structure facilitates non-blocking chat operations and is specifically tailored for scenarios where multiple choices from a chat model are required.
+  /// This structure facilitates non-blocking operations.
   /// </remarks>
   TAsynVectorStoreFiles = TAsynCallBack<TVectorStoreFiles>;
-
-  /// <summary>
-  /// Manages asynchronous chat callBacks for a chat request using <c>TVectorStoreFileDeletion</c> as the response type.
-  /// </summary>
-  /// <remarks>
-  /// The <c>TAsynVectorStoreFileDeletion</c> type extends the <c>TAsynParams&lt;TVectorStoreFileDeletion&gt;</c> record to handle the lifecycle of an asynchronous chat operation.
-  /// It provides event handlers that trigger at various stages, such as when the operation starts, completes successfully, or encounters an error.
-  /// This structure facilitates non-blocking chat operations and is specifically tailored for scenarios where multiple choices from a chat model are required.
-  /// </remarks>
-  TAsynVectorStoreFileDeletion = TAsynCallBack<TVectorStoreFileDeletion>;
 
   TVectorStoreFilesRoute = class(TGenAIRoute)
   protected
@@ -136,12 +115,12 @@ type
     procedure AsynRetrieve(const VectorStoreId: string; const FileId: string;
       const CallBacks: TFunc<TAsynVectorStoreFile>);
     procedure AsynDelete(const VectorStoreId: string; const FileId: string;
-      const CallBacks: TFunc<TAsynVectorStoreFileDeletion>);
+      const CallBacks: TFunc<TAsynDeletion>);
     function Create(const VectorStoreId: string; const ParamProc: TProc<TVectorStoreFilesCreateParams>): TVectorStoreFile;
     function List(const VectorStoreId: string): TVectorStoreFiles; overload;
     function List(const VectorStoreId: string; const ParamProc: TProc<TVectorStoreFilesUrlParams>): TVectorStoreFiles; overload;
     function Retrieve(const VectorStoreId: string; const FileId: string): TVectorStoreFile;
-    function Delete(const VectorStoreId: string; const FileId: string): TVectorStoreFileDeletion;
+    function Delete(const VectorStoreId: string; const FileId: string): TDeletion;
   end;
 
 implementation
@@ -208,16 +187,16 @@ begin
 end;
 
 procedure TVectorStoreFilesRoute.AsynDelete(const VectorStoreId, FileId: string;
-  const CallBacks: TFunc<TAsynVectorStoreFileDeletion>);
+  const CallBacks: TFunc<TAsynDeletion>);
 begin
-  with TAsynCallBackExec<TAsynVectorStoreFileDeletion, TVectorStoreFileDeletion>.Create(CallBacks) do
+  with TAsynCallBackExec<TAsynDeletion, TDeletion>.Create(CallBacks) do
   try
     Sender := Use.Param.Sender;
     OnStart := Use.Param.OnStart;
     OnSuccess := Use.Param.OnSuccess;
     OnError := Use.Param.OnError;
     Run(
-      function: TVectorStoreFileDeletion
+      function: TDeletion
       begin
         Result := Self.Delete(VectorStoreId, FileId);
       end);
@@ -292,10 +271,10 @@ begin
 end;
 
 function TVectorStoreFilesRoute.Delete(const VectorStoreId,
-  FileId: string): TVectorStoreFileDeletion;
+  FileId: string): TDeletion;
 begin
   HeaderCustomize;
-  Result := API.Delete<TVectorStoreFileDeletion>('vector_stores/' + VectorStoreId + '/files/' + FileId);
+  Result := API.Delete<TDeletion>('vector_stores/' + VectorStoreId + '/files/' + FileId);
 end;
 
 procedure TVectorStoreFilesRoute.HeaderCustomize;

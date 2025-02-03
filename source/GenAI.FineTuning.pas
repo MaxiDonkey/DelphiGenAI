@@ -1236,42 +1236,42 @@ type
   TJobCheckpoints = TPaginatedList<TJobCheckpoint>;
 
   /// <summary>
-  /// Manages asynchronous chat callBacks for a chat request using <c>TFineTuningJob</c> as the response type.
+  /// Manages asynchronous callBacks for a request using <c>TFineTuningJob</c> as the response type.
   /// </summary>
   /// <remarks>
   /// The <c>TAsynFineTuningJob</c> type extends the <c>TAsynParams&lt;TFineTuningJob&gt;</c> record to handle the lifecycle of an asynchronous chat operation.
   /// It provides event handlers that trigger at various stages, such as when the operation starts, completes successfully, or encounters an error.
-  /// This structure facilitates non-blocking chat operations and is specifically tailored for scenarios where multiple choices from a chat model are required.
+  /// This structure facilitates non-blocking operations.
   /// </remarks>
   TAsynFineTuningJob = TAsynCallBack<TFineTuningJob>;
 
   /// <summary>
-  /// Manages asynchronous chat callBacks for a chat request using <c>TFineTuningJobs</c> as the response type.
+  /// Manages asynchronous callBacks for a request using <c>TFineTuningJobs</c> as the response type.
   /// </summary>
   /// <remarks>
   /// The <c>TAsynFineTuningJobs</c> type extends the <c>TAsynParams&lt;TFineTuningJobs&gt;</c> record to handle the lifecycle of an asynchronous chat operation.
   /// It provides event handlers that trigger at various stages, such as when the operation starts, completes successfully, or encounters an error.
-  /// This structure facilitates non-blocking chat operations and is specifically tailored for scenarios where multiple choices from a chat model are required.
+  /// This structure facilitates non-blocking operations.
   /// </remarks>
   TAsynFineTuningJobs = TAsynCallBack<TFineTuningJobs>;
 
   /// <summary>
-  /// Manages asynchronous chat callBacks for a chat request using <c>TJobEvents</c> as the response type.
+  /// Manages asynchronous callBacks for a request using <c>TJobEvents</c> as the response type.
   /// </summary>
   /// <remarks>
   /// The <c>TAsynJobEvents</c> type extends the <c>TAsynParams&lt;TJobEvents&gt;</c> record to handle the lifecycle of an asynchronous chat operation.
   /// It provides event handlers that trigger at various stages, such as when the operation starts, completes successfully, or encounters an error.
-  /// This structure facilitates non-blocking chat operations and is specifically tailored for scenarios where multiple choices from a chat model are required.
+  /// This structure facilitates non-blocking operations.
   /// </remarks>
   TAsynJobEvents = TAsynCallBack<TJobEvents>;
 
   /// <summary>
-  /// Manages asynchronous chat callBacks for a chat request using <c>TJobCheckpoints</c> as the response type.
+  /// Manages asynchronous callBacks for a request using <c>TJobCheckpoints</c> as the response type.
   /// </summary>
   /// <remarks>
   /// The <c>TAsynFineJobCheckpoints</c> type extends the <c>TAsynParams&lt;TJobCheckpoints&gt;</c> record to handle the lifecycle of an asynchronous chat operation.
   /// It provides event handlers that trigger at various stages, such as when the operation starts, completes successfully, or encounters an error.
-  /// This structure facilitates non-blocking chat operations and is specifically tailored for scenarios where multiple choices from a chat model are required.
+  /// This structure facilitates non-blocking operations.
   /// </remarks>
   TAsynJobCheckpoints = TAsynCallBack<TJobCheckpoints>;
 
