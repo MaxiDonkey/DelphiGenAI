@@ -213,7 +213,14 @@ type
     property VectorStore: TVectorStoreRoute read GetVectorStoreRoute;
 
     property VectorStoreBatch: TVectorStoreBatchRoute read GetVectorStoreBatchRoute;
-
+    /// <summary>
+    /// Provides methods to manage files within a vector store using the OpenAI API.
+    /// </summary>
+    /// <remarks>
+    /// The <c>TVectorStoreFilesRoute</c> class allows users to create, retrieve, list, and delete
+    /// files associated with a vector store. It supports both synchronous and asynchronous
+    /// operations, enabling flexible interaction with the API for managing file storage and processing.
+    /// </remarks>
     property VectorStoreFiles: TVectorStoreFilesRoute read GetVectorStoreFilesRoute;
 
     /// <summary>
@@ -2556,6 +2563,90 @@ type
   /// This structure facilitates non-blocking operations.
   /// </remarks>
   TAsynVectorStores = GenAI.Vector.TAsynVectorStores;
+
+  {$ENDREGION}
+
+  {$REGION 'GenAI.VectorFiles'}
+
+  /// <summary>
+  /// Represents URL parameters for configuring requests related to vector store files in the OpenAI API.
+  /// </summary>
+  /// <remarks>
+  /// The <c>TVectorStoreFilesUrlParams</c> class allows users to customize the URL query parameters
+  /// when listing or filtering files associated with a specific vector store.
+  /// This is useful when retrieving files with particular statuses or conditions.
+  /// </remarks>
+  TVectorStoreFilesUrlParams = GenAI.VectorFiles.TVectorStoreFilesUrlParams;
+
+  /// <summary>
+  /// Represents parameters for creating vector store files in the OpenAI API.
+  /// </summary>
+  /// <remarks>
+  /// The <c>TVectorStoreFilesCreateParams</c> class allows users to specify key parameters such as
+  /// the file ID and chunking strategy when adding a file to a vector store. These parameters
+  /// determine how the file will be chunked and indexed within the vector store.
+  /// </remarks>
+  TVectorStoreFilesCreateParams = GenAI.VectorFiles.TVectorStoreFilesCreateParams;
+
+  /// <summary>
+  /// Represents the static chunking strategy settings for dividing files into chunks in the OpenAI API.
+  /// </summary>
+  /// <remarks>
+  /// The <c>TChunkingStrategyStatic</c> class defines the static configuration for chunking a file
+  /// into smaller, overlapping segments. This strategy is used when users want precise control over
+  /// the size and overlap of the chunks.
+  /// </remarks>
+  TChunkingStrategyStatic = GenAI.VectorFiles.TChunkingStrategyStatic;
+
+  /// <summary>
+  /// Represents the chunking strategy configuration used for splitting files into chunks in the OpenAI API.
+  /// </summary>
+  /// <remarks>
+  /// The <c>TChunkingStrategy</c> class defines how files are divided into chunks for indexing in a vector store.
+  /// It supports both static and dynamic chunking strategies, depending on the configuration.
+  /// </remarks>
+  TChunkingStrategy = GenAI.VectorFiles.TChunkingStrategy;
+
+  /// <summary>
+  /// Represents a file attached to a vector store in the OpenAI API.
+  /// </summary>
+  /// <remarks>
+  /// The <c>TVectorStoreFile</c> class encapsulates details about a file added to a vector store,
+  /// including its ID, usage, creation timestamp, status, and chunking strategy. This information
+  /// is used to monitor file processing and storage within the vector store.
+  /// </remarks>
+  TVectorStoreFile = GenAI.VectorFiles.TVectorStoreFile;
+
+  /// <summary>
+  /// Represents a list of files attached to a vector store in the OpenAI API.
+  /// </summary>
+  /// <remarks>
+  /// The <c>TVectorStoreFiles</c> class is a collection of <c>TVectorStoreFile</c> objects,
+  /// providing access to details about multiple files within a vector store. It supports
+  /// iteration, allowing users to retrieve information about each file, such as its status,
+  /// usage, and chunking strategy.
+  /// </remarks>
+  TVectorStoreFiles = GenAI.VectorFiles.TVectorStoreFiles;
+
+  /// <summary>
+  /// Manages asynchronous callBacks for a request using <c>TVectorStoreFile</c> as the response type.
+  /// </summary>
+  /// <remarks>
+  /// The <c>TAsynVectorStoreFile</c> type extends the <c>TAsynParams&lt;TVectorStoreFile&gt;</c> record to handle the lifecycle of an asynchronous chat operation.
+  /// It provides event handlers that trigger at various stages, such as when the operation starts, completes successfully, or encounters an error.
+  /// This structure facilitates non-blocking operations.
+  /// </remarks>
+  TAsynVectorStoreFile = GenAI.VectorFiles.TAsynVectorStoreFile;
+
+  /// <summary>
+  /// Manages asynchronous callBacks for a request using <c>TVectorStoreFiles</c> as the response type.
+  /// </summary>
+  /// <remarks>
+  /// The <c>TAsynVectorStoreFiles</c> type extends the <c>TAsynParams&lt;TVectorStoreFiles&gt;</c> record to handle the lifecycle of an asynchronous chat operation.
+  /// It provides event handlers that trigger at various stages, such as when the operation starts, completes successfully, or encounters an error.
+  /// This structure facilitates non-blocking operations.
+  /// </remarks>
+  TAsynVectorStoreFiles = GenAI.VectorFiles.TAsynVectorStoreFiles;
 
   {$ENDREGION}
 
