@@ -766,6 +766,16 @@ end;
 
 <br/>
 
+
+>[!WARNING]
+>**OpenAI** also offers the ability to edit and generate variations from an image using the `DALL-E 2` model. These features are integrated into `GenAI` and can be easily found in the `GenAI.Images.pas` unit. 
+>
+>However, no practical examples will be provided here. This is due to the fact that **OpenAI’s image-related models** are not regularly updated, and no official announcements regarding new models have been made. 
+>
+>If you have significant needs in this area, I recommend using the [`DelphiStability` wrapper](https://github.com/MaxiDonkey/DelphiStabilityAI), which provides far more extensive capabilities for creating and modifying images
+
+<bt/>
+
 # Contributing
 
 Pull requests are welcome. If you're planning to make a major change, please open an issue first to discuss your proposed changes.
