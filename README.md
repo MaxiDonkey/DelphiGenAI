@@ -22,6 +22,9 @@ ___
         - [Audio and Text to Text](#Audio-and-Text-to-Text)
         - [Audio to Audio](#Audio-to-Audio)
         - [Audio multi-turn conversations](#Audio-multi-turn-conversations)
+    - [Vision](#Vision)
+        - [Analyze single source](#Analyze-single-source)
+        - [Analyze multi-source](#Analyze-multi-source)
 - [Contributing](#contributing)
 - [License](#license)
 
@@ -537,6 +540,71 @@ It is also possible to omit the audio ID and use the associated text via `Messag
 
 >[!CAUTION]
 >Of course, this is just a simple example. TutorialHub is designed solely to showcase `GenAI`. In a more general scenario, it would be necessary to maintain a history of **audio IDs** to accurately build the conversation history.
+
+<br/>
+
+## Vision
+
+### Analyze single source
+
+`GenAI` processes images from both web sources and local files uniformly. It manages the submission of the source to the API, thereby simplifying the developer's task. Therefore, in this example, we will handle sources in the form of a ***URL*** and ***base-64 encoded*** data.
+
+```Delphi
+//uses GenAI, GenAI.Types, GenAI.Tutorial.VCL;
+
+  var Url := 'https://upload.wikimedia.org/wikipedia/commons/thumb/d/dd/Gfp-wisconsin-madison-the-nature-boardwalk.jpg/2560px-Gfp-wisconsin-madison-the-nature-boardwalk.jpg';
+  //var Ref := 'D:\My_folder\Images\My_image.png'; //This content will be encoded in base-64 by GenAI
+  TutorialHub.JSONRequestClear;
+
+  //Asynchronous example
+  Client.Chat.AsynCreateStream(
+    procedure (Params: TChatParams)
+    begin
+      Params.Model('gpt-4o-mini');
+      Params.Messages([
+        FromUser('What is in this image?', [Url])
+        //FromUser('What is in this image?', [Ref])
+      ]);
+      Params.MaxCompletionTokens(1024);
+      Params.Stream;
+      TutorialHub.JSONRequest := Params.ToFormat();
+    end,
+    function : TAsynChatStream
+    begin
+      Result.Sender := TutorialHub;
+      Result.OnStart := Start;
+      Result.OnProgress := DisplayStream;
+      Result.OnError := Display;
+      Result.OnDoCancel := DoCancellation;
+      Result.OnCancellation := Cancellation;
+    end);
+
+  //Synchronous example
+//  var Value := Client.Chat.CreateStream(
+//    procedure (Params: TChatParams)
+//    begin
+//      Params.Model('gpt-4o-mini');
+//      Params.Messages([
+//        FromUser('What is in this image?', [Url])
+//        //FromUser('What is in this image?', [Ref])
+//      ]);
+//      Params.MaxCompletionTokens(1024);
+//      Params.Stream;
+//      TutorialHub.JSONRequest := Params.ToFormat();
+//    end,
+//    procedure (var Chat: TChat; IsDone: Boolean; var Cancel: Boolean)
+//    begin
+//      if Assigned(Chat) and not IsDone then
+//        DisplayStream(TutorialHub, Chat);
+//    end);
+```
+This example uses streaming. The non-streamed version is straightforward to implement, so it is not covered here.
+
+<br/>
+
+### Analyze multi-source
+
+
 
 <br/>
 
