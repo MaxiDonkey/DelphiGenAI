@@ -173,6 +173,55 @@ By using the GenAI.Tutorial.VCL unit along with the initialization described [ab
 
 ### Streamed
 
+```Delphi
+//uses GenAI, GenAI.Types, GenAI.Tutorial.VCL;
+
+  TutorialHub.JSONRequestClear;
+
+  //Asynchronous example
+  Client.Chat.AsynCreateStream(
+    procedure(Params: TChatParams)
+    begin
+      Params.Model('gpt-4o');
+      Params.Messages([
+          FromSystem('You are a comedian looking for jokes for your new show.'),
+          FromUser('What is the difference between a mathematician and a physicist?')]);
+      Params.MaxCompletionTokens(1024);
+      Params.Stream;
+      TutorialHub.JSONRequest := Params.ToFormat(); //to display JSON Request
+    end,
+    function : TAsynChatStream
+    begin
+      Result.Sender := TutorialHub;
+      Result.OnStart := Start;
+      Result.OnProgress := DisplayStream;
+      Result.OnError := Display;
+      Result.OnDoCancel := DoCancellation;
+      Result.OnCancellation := Cancellation;
+    end);
+
+  //Synchronous example
+//  Client.Chat.CreateStream(
+//    procedure (Params: TChatParams)
+//    begin
+//      Params.Model('gpt-4o');
+//      Params.Messages([
+//          Payload.System('You are a comedian looking for jokes for your new show.'),
+//          Payload.User('What is the difference between a mathematician and a physicist?')]);
+//      Params.MaxCompletionTokens(1024);
+//      Params.Stream;
+//    end,
+//    procedure (var Chat: TChat; IsDone: Boolean; var Cancel: Boolean)
+//    begin
+//      if (not IsDone) and Assigned(Chat) then
+//        begin
+//          DisplayStream(TutorialHub, Chat);
+//        end;
+//    end);
+```
+
+![Preview](/../main/images/GenAIChatStreamedRequest.png?raw=true "Preview")
+
 <br/>
 
 # Contributing
