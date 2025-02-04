@@ -305,7 +305,7 @@ These audio features can be leveraged to:
 - Conduct sentiment analysis on an audio recording (audio input, text output)
 - Facilitate asynchronous speech-to-speech interactions with the model (audio input, audio output)
 
-For example, the `GPT-4o-Audio-Preview` model can process audio both as input and output.
+For example, the `GPT-4o-Audio-Preview` model can process audio both as input and output. Please note, this model does not have vision capability.
 
 Refer to official [documentation](https://platform.openai.com/docs/guides/audio?example=audio-out).
 
@@ -463,7 +463,7 @@ Refer to official [documentation](https://platform.openai.com/docs/guides/audio?
       Params.Modalities(['text', 'audio']);
       Params.Audio('ash', 'mp3');
       Params.Messages([
-        FromUser(['VoiceRecorded.wav'])
+        FromUser(['SpeechRecorded.wav'])
       ]);
       Params.MaxCompletionTokens(1024);
       TutorialHub.JSONRequest := Params.ToFormat();
@@ -484,7 +484,7 @@ Refer to official [documentation](https://platform.openai.com/docs/guides/audio?
 //      Params.Modalities(['text', 'audio']);
 //      Params.Audio('ash', 'mp3');
 //      Params.Messages([
-//        FromUser(['VoiceRecorded.wav'])
+//        FromUser(['SpeechRecorded.wav'])
 //      ]);
 //      Params.MaxCompletionTokens(1024);
 //      TutorialHub.JSONRequest := Params.ToFormat();
