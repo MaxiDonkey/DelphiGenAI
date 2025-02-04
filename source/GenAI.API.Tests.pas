@@ -42,14 +42,14 @@ type
   TGenAIAPITests = class
   public
     [Test] procedure Test_TUrlParam_AddParameters;
-    [Test] procedure Test_TGenAIConfiguration_BuildHeaders;
+    [Test] procedure Test_TUrlPaginationParams;
+    [Test] procedure Test_TJSONParam_Serialization;
     [Test] procedure Test_TApiDeserializer_Deserialize;
     [Test] procedure Test_TApiDeserializer_Deserialize_MetadataAsstring;
     [Test] procedure Test_TApiDeserializer_RaiseErrors;
-    [Test] procedure Test_TJSONParam_Serialization;
     [Test] procedure Test_TApiDeserializer_EmptyResponse;
-    [Test] procedure Test_TUrlPaginationParams;
     [Test] procedure Test_TGenAIAPI_GetFileWithError;
+    [Test] procedure Test_TGenAIConfiguration_BuildHeaders;
   end;
 
   TTestModel = class(TObject)
