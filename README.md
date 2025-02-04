@@ -16,11 +16,12 @@ ___
     - [Text generation](#Text-generation)
         - [Non streamed](#Non-streamed) 
         - [Streamed](#Streamed)
-        - [Multi-turn conversation](#Multi-turn-conversation) 
+        - [Multi-turn conversations](#Multi-turn-conversations) 
     - [Generating Audio Responses with Chat](#Generating-Audio-Responses-with-Chat)
     - [Input Audio for Chat](#Input-Audio-for-Chat)
         - [Audio and Text to Text](#Audio-and-Text-to-Text)
         - [Audio to Audio](#Audio-to-Audio)
+        - [Audio multi-turn conversations](#Audio-multi-turn-conversations)
 - [Contributing](#contributing)
 - [License](#license)
 
@@ -231,7 +232,7 @@ By using the GenAI.Tutorial.VCL unit along with the initialization described [ab
 
 <br/>
 
-### Multi-turn conversation
+### Multi-turn conversations
 
 The `GenAI Chat API` enables the creation of interactive chat experiences tailored to your users' needs. Its chat functionality supports multiple rounds of questions and answers, allowing users to gradually work toward solutions or receive help with complex, multi-step issues. This capability is especially useful for applications requiring ongoing interaction, such as:
 
@@ -385,6 +386,9 @@ begin
   {--- Store the audio Id. }
   TutorialHub.AudioId := Value.Choices[0].Message.Audio.Id;
 
+  {--- Store the audio transcript. }
+  TutorialHub.Transcript := Value.Choices[0].Message.Audio.Transcript;
+
   {--- The audio response is stored in a file. }
   Value.Choices[0].Message.Audio.SaveToFile(TutorialHub.FileName);
 
@@ -505,6 +509,32 @@ Refer to official [documentation](https://platform.openai.com/docs/guides/audio?
 
 >[!WARNING]
 > OpenAI provides other models for simple speech to text and text to speech - when your task requires those conversions (and not dynamic content from a model), the `TTS` and `STT` models will be more performant and cost-efficient.
+
+<br/>
+
+### Audio multi-turn conversations
+
+TutorialHub retains the ID of the most recent audio response. To proceed, simply construct the message as follows:
+
+```Delphi
+  ...
+    procedure (Params: TChatParams)
+    begin
+      Params.Model('gpt-4o-audio-preview');
+      Params.Modalities(['text', 'audio']);
+      Params.Audio('ash', 'mp3');
+      Params.Messages([
+        FromUser('Is a golden retriever a good family dog?'),
+        FromAssistantAudioId(TutorialHub.AudioId),   //or FromAssistantAudioId(TutorialHub.Transcript),
+        FromUser('Why do you say they are loyal?')
+      ]);
+  ...
+```
+
+The `message.audio.id` value above provides an identifier that you can use in an assistant message for a new `/chat/completions` request, as in the example above.
+
+>[!NOTE]
+> It is also possible to omit the audio ID and use the associated text via `Message.Audio.Transcript` instead. However, the model will not be able to analyze the emotions contained in the audio portion of the message.
 
 <br/>
 
