@@ -15,7 +15,8 @@ ___
 - [Quick Start Guide](#Quick-Start-Guide)
     - [Text generation](#Text-generation)
         - [Non streamed](#Non-streamed) 
-        - [Streamed](#Streamed) 
+        - [Streamed](#Streamed)
+        - [Multi-turn conversation](#Multi-turn-conversation) 
 - [Contributing](#contributing)
 - [License](#license)
 
@@ -221,6 +222,71 @@ By using the GenAI.Tutorial.VCL unit along with the initialization described [ab
 ```
 
 ![Preview](https://github.com/MaxiDonkey/DelphiGenAI/blob/main/images/GenAIChatStreamedRequest.png?raw=true "Preview")
+
+<br/>
+
+### Multi-turn conversation
+
+The `GenAI Chat API` enables the creation of interactive chat experiences tailored to your users' needs. Its chat functionality supports multiple rounds of questions and answers, allowing users to gradually work toward solutions or receive help with complex, multi-step issues. This capability is especially useful for applications requiring ongoing interaction, such as:
+
+- **Chatbots**
+- **Educational tools**
+- **Customer support assistants**
+
+```Delphi
+//uses GenAI, GenAI.Types, GenAI.Tutorial.VCL;
+
+  TutorialHub.JSONRequestClear;
+
+  //Asynchronous example
+  Client.Chat.AsynCreateStream(
+    procedure(Params: TChatParams)
+    begin
+      Params.Model('gpt-4o');
+      Params.Messages([
+          FromDeveloper('You are a funny domestic assistant.'),
+          FromUser('Hello'),
+          FromAssistant('Great to meet you. What would you like to know?'),
+          FromUser('I have two dogs in my house. How many paws are in my house?') ]);
+      Params.MaxCompletionTokens(1024);
+      Params.Stream;
+      TutorialHub.JSONRequest := Params.ToFormat(); //to display JSON Request
+    end,
+    function : TAsynChatStream
+    begin
+      Result.Sender := TutorialHub;
+      Result.OnStart := Start;
+      Result.OnProgress := DisplayStream;
+      Result.OnError := Display;
+      Result.OnDoCancel := DoCancellation;
+      Result.OnCancellation := Cancellation;
+    end);
+
+  //Synchronous example
+//  Client.Chat.CreateStream(
+//    procedure (Params: TChatParams)
+//    begin
+//      Params.Model('gpt-4o');
+//      Params.Messages([
+//          FromDeveloper('You are a funny domestic assistant.'),
+//          FromUser('Hello'),
+//          FromAssistant('Great to meet you. What would you like to know?'),
+//          FromUser('I have two dogs in my house. How many paws are in my house?') ]);
+//      Params.MaxCompletionTokens(1024);
+//      Params.Stream;
+//    end,
+//    procedure (var Chat: TChat; IsDone: Boolean; var Cancel: Boolean)
+//    begin
+//      if (not IsDone) and Assigned(Chat) then
+//        begin
+//          DisplayStream(TutorialHub, Chat);
+//        end;
+//    end);
+```
+
+>[!TIP]
+>The `FromUser` and `FromAssistant` methods simplify role management and enhance code readability, eliminating the need to use **TMessagePayload** (e.g., **TMessagePayload.User('Hello'))**. Similarly, `FromDeveloper`, `FromSystem`, and `FromTool` improve code clarity. For details on these methods and their configurations, refer to the `GenAI.pas` unit.
+>
 
 <br/>
 
