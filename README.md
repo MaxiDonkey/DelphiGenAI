@@ -97,7 +97,7 @@ or
 >  TutorialHub := TFMXTutorialHub.Create(Client, Memo1, Memo2, Memo3, Image1, Button1, MediaPlayer1);
 >```
 
-Make sure to add a three TMemo, a TImage, a TButton and a TMediaPlayer components to your form beforehand.
+Make sure to add a three ***TMemo***, a ***TImage***, a ***TButton*** and a ***TMediaPlayer*** components to your form beforehand.
 
 The TButton will allow the interruption of any streamed reception.
 
