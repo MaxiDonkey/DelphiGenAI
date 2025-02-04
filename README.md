@@ -47,7 +47,7 @@ In its latest version, `GenAI` has been primarily optimized to fully leverage Op
 **Technical Support and Code Examples** <br/>
 - Two support units, **VCL** and **FMX**, are included in the provided sources. These units simplify the implementation of the code examples and facilitate learning, with a focus on best practices for using `GenAI`.
 
-For more information about the architecture of GenAI, please refer to [the dedicated page](https://github.com/MaxiDonkey/DelphiGenAI/GenAI.md).
+For more information about the architecture of GenAI, please refer to [the dedicated page](https://github.com/MaxiDonkey/DelphiGenAI/blob/main/GenAI.md).
 
 
 <br/>

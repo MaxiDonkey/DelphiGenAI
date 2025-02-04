@@ -1,1 +1,1 @@
-[go back](https://github.com/MaxiDonkey/DelphiGenAI/README.md)
+[go back](https://github.com/MaxiDonkey/DelphiGenAI/blob/main/README.md)
