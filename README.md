@@ -545,6 +545,8 @@ It is also possible to omit the audio ID and use the associated text via `Messag
 
 ## Vision
 
+Refert to the [official documentation](https://platform.openai.com/docs/guides/vision).
+
 ### Analyze single source
 
 `GenAI` processes images from both web sources and local files uniformly. It manages the submission of the source to the API, thereby simplifying the developer's task. Therefore, in this example, we will handle sources in the form of a ***URL*** and ***base-64 encoded*** data.
