@@ -352,6 +352,16 @@ Refer to official [documentation](https://platform.openai.com/docs/guides/audio?
 //  end;
 ```
 
+>[:NOTE]
+>- The Params.Audio('ash', 'mp3') function allows you to select the output voice and specify the desired audio data format.
+>
+>- **What modalities are supported by gpt-4o-audio-preview**
+>   - text in → text + audio out
+>    - audio in → text + audio out
+>    - audio in → text out
+>    - text + audio in → text + audio out
+>    - text + audio in → text out 
+
 <br/>
 
 Let’s take a closer look at how the `DisplayAudio` method handles output to understand how the model’s response is managed.
