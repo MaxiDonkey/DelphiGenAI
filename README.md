@@ -69,11 +69,17 @@ Once you have a token, you can initialize IGenAI interface, which is an entry po
 
 >[!NOTE]
 >```Delphi
+>//uses GenAI, GenAI.Types;
+>
 >//Declare 
 >//  Client: IGenAI;
 >
 >  Client := TGenAIFactory.CreateInstance(api_key);
 >```
+
+To streamline the use of the API wrapper, the process for declaring units has been simplified. Regardless of the methods being utilized, you only need to reference the following two core units:
+`GenAI` and `GenAI.Types`.
+
 
 <br/>
 
@@ -116,11 +122,6 @@ You can send a structured list of input messages containing only text content, a
 The Chat API can be used for both single-turn requests and multi-turn, stateless conversations.
 
 ### Non streamed
-
->[!NOTE]
->To streamline the use of the API wrapper, the process for declaring units has been simplified. Regardless of the methods being utilized, you only need to reference the following two core units:
->`GenAI` and `GenAI.Types`.
->
 
 ```Delphi
 //uses GenAI, GenAI.Types, GenAI.Tutorial.VCL;
