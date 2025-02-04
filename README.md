@@ -9,6 +9,7 @@ ___
 <br/>
 
 - [Introduction](#Introduction)
+- [TIPS for using the tutorial effectively](#TIPS-for-using-the-tutorial-effectively)
 - [Contributing](#contributing)
 - [License](#license)
 
@@ -49,6 +50,10 @@ In its latest version, `GenAI` has been primarily optimized to fully leverage Op
 
 For more information about the architecture of GenAI, please refer to [the dedicated page](https://github.com/MaxiDonkey/DelphiGenAI/blob/main/GenAI.md). 
 
+
+<br/>
+
+# TIPS for using the tutorial effectively
 
 <br/>
 
