@@ -80,19 +80,21 @@ Once you have a token, you can initialize IGenAI interface, which is an entry po
 
 ## Strategies for quickly using the code examples
 
-To streamline the implementation of the code examples provided in this tutorial, two support units have been included in the source code: Deepseek.Tutorial.VCL and Deepseek.Tutorial.FMX. Based on the platform selected for testing the provided examples, you will need to initialize either the TVCLTutorialHub or TFMXTutorialHub class within the application's OnCreate event, as illustrated below:
+To streamline the implementation of the code examples provided in this tutorial, two support units have been included in the source code: `Deepseek.Tutorial.VCL` and `Deepseek.Tutorial.FMX` Based on the platform selected for testing the provided examples, you will need to initialize either the `TVCLTutorialHub` or `TFMXTutorialHub` class within the application's OnCreate event, as illustrated below:
 
-```Delphi
-//uses GenAI.Tutorial.VCL;
-  TutorialHub := TVCLTutorialHub.Create(Client, Memo1, Memo2, Memo3, Image1, Button1, MediaPlayer1);
-```
+>[!TIP]
+>```Delphi
+>//uses GenAI.Tutorial.VCL;
+>  TutorialHub := TVCLTutorialHub.Create(Client, Memo1, Memo2, Memo3, Image1, Button1, MediaPlayer1);
+>```
 
 or
 
-```Delphi
-//uses GenAI.Tutorial.FMX;
-  TutorialHub := TVCLTutorialHub.Create(Client, Memo1, Memo2, Memo3, Image1, Button1, MediaPlayer1);
-```
+>[!TIP]
+>```Delphi
+>//uses GenAI.Tutorial.FMX;
+>  TutorialHub := TVCLTutorialHub.Create(Client, Memo1, Memo2, Memo3, Image1, Button1, MediaPlayer1);
+>```
 
 Make sure to add a three TMemo, a TImage, a TButton and a TMediaPlayer components to your form beforehand.
 
