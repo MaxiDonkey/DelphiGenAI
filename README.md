@@ -117,6 +117,11 @@ The Chat API can be used for both single-turn requests and multi-turn, stateless
 
 ### Non streamed
 
+>[!NOTE]
+>To streamline the use of the API wrapper, the process for declaring units has been simplified. Regardless of the methods being utilized, you only need to reference the following two core units:
+>`GenAI` and `GenAI.Types`.
+>
+
 ```Delphi
 //uses GenAI, GenAI.Types, GenAI.Tutorial.VCL;
 
