@@ -733,7 +733,7 @@ Let’s take a closer look at how the `Display` method handles output to underst
 ```Delphi
 procedure Display(Sender: TObject; Value: TGeneratedImages);
 begin
-  {--- Load image if url is not null. }
+  {--- Load image when url is not null. }
   if not TutorialHub.FileName.IsEmpty then
     begin
       if not Value.Data[0].Url.IsEmpty then
