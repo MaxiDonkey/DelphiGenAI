@@ -604,7 +604,53 @@ This example uses streaming. The non-streamed version is straightforward to impl
 
 ### Analyze multi-source
 
+```Delphi
+//uses GenAI, GenAI.Types, GenAI.Tutorial.VCL;
 
+  var Url1 := 'https://tripfixers.com/wp-content/uploads/2019/11/eiffel-tower-with-snow.jpeg';
+  var Url2 := 'https://assets.visitorscoverage.com/production/wp-content/uploads/2024/04/AdobeStock_626542468-min-1024x683.jpeg';
+  TutorialHub.JSONRequestClear;
+
+  //Asynchronous example
+  Client.Chat.AsynCreateStream(
+    procedure (Params: TChatParams)
+    begin
+      Params.Model('gpt-4o-mini');
+      Params.Messages([
+        FromUser('What are the differences between two images?', [Url1, Url2])
+      ]);
+      Params.MaxCompletionTokens(1024);
+      Params.Stream;
+      TutorialHub.JSONRequest := Params.ToFormat();
+    end,
+    function : TAsynChatStream
+    begin
+      Result.Sender := TutorialHub;
+      Result.OnStart := Start;
+      Result.OnProgress := DisplayStream;
+      Result.OnError := Display;
+      Result.OnDoCancel := DoCancellation;
+      Result.OnCancellation := Cancellation;
+    end);
+
+  //Synchronous example
+//  var Value := Client.Chat.CreateStream(
+//    procedure (Params: TChatParams)
+//    begin
+//      Params.Model('gpt-4o-mini');
+//      Params.Messages([
+//        FromUser('What are the differences between two images?', [Url1, Url2])
+//      ]);
+//      Params.MaxCompletionTokens(1024);
+//      Params.Stream;
+//      TutorialHub.JSONRequest := Params.ToFormat();
+//    end,
+//    procedure (var Chat: TChat; IsDone: Boolean; var Cancel: Boolean)
+//    begin
+//      if Assigned(Chat) and not IsDone then
+//        DisplayStream(TutorialHub, Chat);
+//    end);
+```
 
 <br/>
 
