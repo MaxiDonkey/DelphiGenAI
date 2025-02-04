@@ -10,6 +10,7 @@ ___
 
 - [Introduction](#Introduction)
 - [TIPS for using the tutorial effectively](#TIPS-for-using-the-tutorial-effectively)
+    - [Obtain an api key](#Obtain-an-api-key)
 - [Contributing](#contributing)
 - [License](#license)
 
@@ -55,14 +56,17 @@ For more information about the architecture of GenAI, please refer to [the dedic
 
 # TIPS for using the tutorial effectively
 
-1. To initialize the API instance, you need to obtain an [API key from OpenAI](https://platform.openai.com/settings/profile/api-keys)
+## Obtain an api key
+
+To initialize the API instance, you need to obtain an [API key from OpenAI](https://platform.openai.com/settings/profile/api-keys)
 
 Once you have a token, you can initialize IGenAI interface, which is an entry point to the API.
 
->[!NOTE]
->```Delphi
->  Client := TGenAIFactory.CreateInstance(api_key);
->```
+```Delphi
+  Client := TGenAIFactory.CreateInstance(api_key);
+```
+
+<br/>
 
 >[!TIP]
 >To effectively use the examples in this tutorial, particularly when working with asynchronous methods, it is recommended to define the client interfaces with the broadest possible scope. For optimal implementation, these clients should be declared in the application's OnCreate method.
