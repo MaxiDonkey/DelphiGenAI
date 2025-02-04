@@ -353,7 +353,7 @@ Refer to official [documentation](https://platform.openai.com/docs/guides/audio?
 ```
 
 >[!NOTE]
->- The **Params.Audio('ash', 'mp3')** function allows you to select the output voice and specify the desired audio data format.
+>  The **Params.Audio('ash', 'mp3')** function allows you to select the output voice and specify the desired audio data format.
 >
 >  About **Params.Modalities(['text', 'audio'])**; modalities supported by gpt-4o-audio-preview**
 >   - text in → text + audio out
