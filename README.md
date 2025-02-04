@@ -80,7 +80,6 @@ Once you have a token, you can initialize IGenAI interface, which is an entry po
 To streamline the use of the API wrapper, the process for declaring units has been simplified. Regardless of the methods being utilized, you only need to reference the following two core units:
 `GenAI` and `GenAI.Types`.
 
-
 <br/>
 
 >[!TIP]
@@ -168,6 +167,7 @@ The Chat API can be used for both single-turn requests and multi-turn, stateless
 
 By using the GenAI.Tutorial.VCL unit along with the initialization described [above](#Strategies-for-quickly-using-the-code-examples), you can achieve results similar to the example shown below.
 
+![Preview](/../main/images/GenAIChatRequest.png?raw=true "Preview")
 
 <br/>
 
