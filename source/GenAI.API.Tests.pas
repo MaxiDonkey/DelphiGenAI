@@ -146,47 +146,37 @@ procedure TGenAIAPITests.Test_TApiDeserializer_RaiseErrors;
 {--- This ensures that every type of API error is handled correctly by the exception system. }
 begin
   var Deserializer := TTestTApiDeserializer.Create;
-
   try
     Assert.WillRaise(
       procedure begin
         Deserializer.DeserializeErrorData(401, '{"error": {"message": "Invalid API key", "code": 401}}');
       end,
       TGenAIAuthError,
-      'TGenAIAuthError exception was not thrown for error 401.'
-    );
-
+      'TGenAIAuthError exception was not thrown for error 401.');
     Assert.WillRaise(
       procedure begin
         Deserializer.DeserializeErrorData(403, '{"error": {"message": "Invalid API key", "code": 403}}');
       end,
       TGenAICountryNotSupportedError,
-      'TGenAICountryNotSupportedError exception was not thrown for error 403.'
-    );
-
+      'TGenAICountryNotSupportedError exception was not thrown for error 403.');
     Assert.WillRaise(
       procedure begin
         Deserializer.DeserializeErrorData(429, '{"error": {"message": "Invalid API key", "code": 429}}');
       end,
       TGenAIRateLimitError,
-      'TGenAIRateLimitError exception was not thrown for error 429.'
-    );
-
+      'TGenAIRateLimitError exception was not thrown for error 429.');
     Assert.WillRaise(
       procedure begin
         Deserializer.DeserializeErrorData(500, '{"error": {"message": "Invalid API key", "code": 500}}');
       end,
       TGenAIServerError,
-      'TGenAIServerError exception was not thrown for error 500.'
-    );
-
+      'TGenAIServerError exception was not thrown for error 500.');
     Assert.WillRaise(
       procedure begin
         Deserializer.DeserializeErrorData(503, '{"error": {"message": "Invalid API key", "code": 503}}');
       end,
       TGenAIEngineOverloadedError,
-      'TGenAIEngineOverloadedError exception was not thrown for error 503.'
-    );
+      'TGenAIEngineOverloadedError exception was not thrown for error 503.');
   finally
     Deserializer.Free;
   end;
