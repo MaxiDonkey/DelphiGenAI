@@ -167,7 +167,7 @@ The Chat API can be used for both single-turn requests and multi-turn, stateless
 
 By using the GenAI.Tutorial.VCL unit along with the initialization described [above](#Strategies-for-quickly-using-the-code-examples), you can achieve results similar to the example shown below.
 
-![Preview](/../main/images/GenAIChatRequest.png?raw=true "Preview")
+![Preview](https://github.com/MaxiDonkey/DelphiGenAI/blob/main/images/GenAIChatRequest.png?raw=true "Preview")
 
 <br/>
 
