@@ -63,13 +63,16 @@ To initialize the API instance, you need to obtain an [API key from OpenAI](http
 Once you have a token, you can initialize IGenAI interface, which is an entry point to the API.
 
 ```Delphi
+//Declare 
+//  Client: IGenAI;
+
   Client := TGenAIFactory.CreateInstance(api_key);
 ```
 
 <br/>
 
 >[!TIP]
->To effectively use the examples in this tutorial, particularly when working with asynchronous methods, it is recommended to define the client interfaces with the broadest possible scope. For optimal implementation, these clients should be declared in the application's OnCreate method.
+> To effectively use the examples in this tutorial, particularly when working with asynchronous methods, it is recommended to define the client interfaces with the broadest possible scope. For optimal implementation, these clients should be declared in the application's `OnCreate` method.
 >
 
 
