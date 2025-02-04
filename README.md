@@ -11,6 +11,7 @@ ___
 - [Introduction](#Introduction)
 - [TIPS for using the tutorial effectively](#TIPS-for-using-the-tutorial-effectively)
     - [Obtain an api key](#Obtain-an-api-key)
+    - [Strategies for quickly using the code examples](#Strategies-for-quickly-using-the-code-examples)
 - [Contributing](#contributing)
 - [License](#license)
 
@@ -75,6 +76,27 @@ Once you have a token, you can initialize IGenAI interface, which is an entry po
 > To effectively use the examples in this tutorial, particularly when working with asynchronous methods, it is recommended to define the client interfaces with the broadest possible scope. For optimal implementation, these clients should be declared in the application's `OnCreate` method.
 >
 
+<br>
+
+## Strategies for quickly using the code examples
+
+To streamline the implementation of the code examples provided in this tutorial, two support units have been included in the source code: Deepseek.Tutorial.VCL and Deepseek.Tutorial.FMX. Based on the platform selected for testing the provided examples, you will need to initialize either the TVCLTutorialHub or TFMXTutorialHub class within the application's OnCreate event, as illustrated below:
+
+```Delphi
+//uses GenAI.Tutorial.VCL;
+  TutorialHub := TVCLTutorialHub.Create(Client, Memo1, Memo2, Memo3, Image1, Button1, MediaPlayer1);
+```
+
+or
+
+```Delphi
+//uses GenAI.Tutorial.FMX;
+  TutorialHub := TVCLTutorialHub.Create(Client, Memo1, Memo2, Memo3, Image1, Button1, MediaPlayer1);
+```
+
+Make sure to add a three TMemo, a TImage, a TButton and a TMediaPlayer components to your form beforehand.
+
+The TButton will allow the interruption of any streamed reception.
 
 <br/>
 
