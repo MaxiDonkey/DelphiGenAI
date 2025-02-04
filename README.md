@@ -95,7 +95,7 @@ To streamline the implementation of the code examples provided in this tutorial,
 >[!NOTE]
 >```Delphi
 >//uses GenAI.Tutorial.VCL;
->  TutorialHub := TVCLTutorialHub.Create(Client, Memo1, Memo2, Memo3, Image1, Button1, MediaPlayer1);
+>TutorialHub := TVCLTutorialHub.Create(Client, Memo1, Memo2, Memo3, Image1, Button1, MediaPlayer1);
 >```
 
 or
@@ -103,7 +103,7 @@ or
 >[!NOTE]
 >```Delphi
 >//uses GenAI.Tutorial.FMX;
->  TutorialHub := TFMXTutorialHub.Create(Client, Memo1, Memo2, Memo3, Image1, Button1, MediaPlayer1);
+>TutorialHub := TFMXTutorialHub.Create(Client, Memo1, Memo2, Memo3, Image1, Button1, MediaPlayer1);
 >```
 
 Make sure to add a three ***TMemo***, a ***TImage***, a ***TButton*** and a ***TMediaPlayer*** components to your form beforehand.
