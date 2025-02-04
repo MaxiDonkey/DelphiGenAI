@@ -220,7 +220,7 @@ By using the GenAI.Tutorial.VCL unit along with the initialization described [ab
 //    end);
 ```
 
-![Preview](/../main/images/GenAIChatStreamedRequest.png?raw=true "Preview")
+![Preview](https://github.com/MaxiDonkey/DelphiGenAI/blob/main/images/GenAIChatStreamedRequest.png?raw=true "Preview")
 
 <br/>
 
