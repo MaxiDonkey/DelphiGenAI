@@ -772,7 +772,7 @@ end;
 >
 >However, no practical examples will be provided here. This is due to the fact that **OpenAI’s image-related models** are not regularly updated, and no official announcements regarding new models have been made. 
 >
->If you have significant needs in this area, I recommend using the [`DelphiStability` wrapper](https://github.com/MaxiDonkey/DelphiStabilityAI), which provides far more extensive capabilities for creating and modifying images
+>If you have significant needs in this area, I recommend using the [`DelphiStability wrapper`](https://github.com/MaxiDonkey/DelphiStabilityAI), which provides far more extensive capabilities for creating and modifying images
 
 <bt/>
 
