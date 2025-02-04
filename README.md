@@ -25,6 +25,8 @@ ___
     - [Vision](#Vision)
         - [Analyze single source](#Analyze-single-source)
         - [Analyze multi-source](#Analyze-multi-source)
+        - [Low or high fidelity image understanding](#Low-or-high-fidelity-image-understanding)
+    - [Image generation](#Image-generation)
 - [Contributing](#contributing)
 - [License](#license)
 
@@ -653,6 +655,114 @@ This example uses streaming. The non-streamed version is straightforward to impl
 //        DisplayStream(TutorialHub, Chat);
 //    end);
 ```
+
+<br/>
+
+### Low or high fidelity image understanding
+
+The detail parameter, which includes three options—**low**, **high**, and **auto**—allows you to customize how the model interprets the image and generates its textual representation. By default, the **auto** setting is applied, where the model evaluates the input image size and automatically selects either the **low** or **high** mode.
+
+- **low mode** activates "low resolution" processing, where the model works with a 512px x 512px version of the image, represented using 85 tokens. This option is ideal for applications where speed and efficiency are prioritized over high detail, as it reduces response time and token consumption.
+
+- **high mode** activates "high resolution" processing. Initially, the model examines the low-resolution image using 85 tokens, then refines its understanding by analyzing detailed segments of the image, dedicating 170 tokens per 512px x 512px tile. This mode is suited for cases requiring precise image details.
+
+`GenAI` allows the addition of `detail=high` or `detail=low` directly in the URL, thereby simplifying the activation of the detail option as follows:
+
+```Delphi
+  var Url1 := 'https://tripfixers.com/wp-content/uploads/2019/11/eiffel-tower-with-snow.jpeg detail=high';
+  or
+  var Url1 := 'https://tripfixers.com/wp-content/uploads/2019/11/eiffel-tower-with-snow.jpeg detail=low';
+```
+
+The same process is applied to the local file paths.
+
+<br/>
+
+## Image generation
+
+Refer to [official documentation](#https://platform.openai.com/docs/guides/images).
+
+Generation of an image using DALL·E 3.
+
+```Delphi
+//uses GenAI, GenAI.Types, GenAI.Tutorial.VCL;
+
+  TutorialHub.FileName := 'Dalle3_01.png';
+
+  //Asynchronous example
+  Client.Images.AsynCreate(
+    procedure (Params: TImageCreateParams)
+    begin
+      Params.Model('dall-e-3');
+      Params.Prompt('A quarter dollar on a wooden floor close up.');
+      Params.N(1);
+      Params.Size('1024x1024');
+      Params.Style('vivid');
+      Params.ResponseFormat(TResponseFormat.url);
+    end,
+    function : TAsynGeneratedImages
+    begin
+      Result.Sender := TutorialHub;
+      Result.OnStart := Start;
+      Result.OnSuccess := Display;
+      Result.OnError := Display;
+    end);
+
+  //Synchronous example
+//  var Value := Client.Images.Create(
+//    procedure (Params: TImageCreateParams)
+//    begin
+//      Params.Model('dall-e-3');
+//      Params.Prompt('A quarter dollar on a wooden floor close up.');
+//      Params.N(1);
+//      Params.Size('1024x1024');
+//      Params.Style('vivid');
+//      Params.ResponseFormat(url);
+//    end);
+//  try
+//    Display(TutorialHub, Value);
+//  finally
+//    Value.Free;
+//  end;
+```
+
+<br/>
+
+Let’s take a closer look at how the `Display` method handles output to understand how the model’s response is managed.
+
+```Delphi
+procedure Display(Sender: TObject; Value: TGeneratedImages);
+begin
+  {--- Load image if url is not null. }
+  if not TutorialHub.FileName.IsEmpty then
+    begin
+      if not Value.Data[0].Url.IsEmpty then
+        Value.Data[0].Download(TutorialHub.FileName) else
+        Value.Data[0].SaveToFile(TutorialHub.FileName);
+    end;
+
+  {--- Load image in a stream }
+  var Stream := Value.Data[0].GetStream;
+  try
+    {--- Display th JSON response. }
+    TutorialHub.JSONResponse := Value.JSONResponse;
+
+    {--- Display the revised prompt. }
+    Display(Sender, Value.Data[0].RevisedPrompt);
+
+    {--- Load the stream in the TImage. }
+    TutorialHub.Image.Picture.LoadFromStream(Stream);
+  finally
+    Stream.Free;
+  end;
+end;
+```
+
+`GenAI` fournit des méthodes pour gérer les réponses d'image générées par le modèle. Les méthodes `SaveToFile`, `Download` et `GetStream` permettent de manipuler le contenu de l'image reçue.
+
+<br/>
+
+![Preview](https://github.com/MaxiDonkey/DelphiGenAI/blob/main/images/DallePreview.png?raw=true "Preview")
 
 <br/>
 
