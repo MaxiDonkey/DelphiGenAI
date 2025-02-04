@@ -26,7 +26,6 @@ unit GenAI.API.Tests;
         else
           Memo1.Lines.Add('Some tests failed.');
       end;
-
 *)
 
 interface
