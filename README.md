@@ -28,7 +28,7 @@ ___
         - [Low or high fidelity image understanding](#Low-or-high-fidelity-image-understanding)
     - [Image generation](#Image-generation)
     - [Text to speech](#Text-to-speech)
-    - [Speech to text](#Speech to text)
+    - [Speech to text](#Speech-to-text)
 - [Contributing](#contributing)
 - [License](#license)
 
