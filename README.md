@@ -12,6 +12,10 @@ ___
 - [TIPS for using the tutorial effectively](#TIPS-for-using-the-tutorial-effectively)
     - [Obtain an api key](#Obtain-an-api-key)
     - [Strategies for quickly using the code examples](#Strategies-for-quickly-using-the-code-examples)
+- [Quick Start Guide](#Quick-Start-Guide)
+    - [Text generation](#Text-generation)
+        - [Non streamed](#Non-streamed) 
+        - [Streamed](#Streamed) 
 - [Contributing](#contributing)
 - [License](#license)
 
@@ -100,6 +104,68 @@ or
 Make sure to add a three ***TMemo***, a ***TImage***, a ***TButton*** and a ***TMediaPlayer*** components to your form beforehand.
 
 The TButton will allow the interruption of any streamed reception.
+
+<br/>
+
+# Quick Start Guide
+
+## Text generation
+
+You can send a structured list of input messages containing only text content, and the model will generate the next message in the conversation.
+
+The Chat API can be used for both single-turn requests and multi-turn, stateless conversations.
+
+### Non streamed
+
+```Delphi
+//uses GenAI, GenAI.Types, GenAI.Tutorial.VCL;
+
+  TutorialHub.JSONRequestClear;
+
+  //Asynchronous example
+  Client.Chat.AsynCreate(
+    procedure (Params: TChatParams)
+    begin
+      Params.Model('gpt-4o');
+      Params.Messages([
+        FromSystem('You are a comedian looking for jokes for your new show.'),
+        FromUser('What is the difference between a mathematician and a physicist?')
+      ]);
+      Params.MaxCompletionTokens(1024);
+      TutorialHub.JSONRequest := Params.ToFormat(); //to display JSON Request
+    end,
+    function : TAsynChat
+    begin
+      Result.Sender := TutorialHub;
+      Result.OnStart := Start;
+      Result.OnSuccess := Display;
+      Result.OnError := Display;
+    end);
+
+  //Synchronous example
+//  var Value := Client.Chat.Create(
+//    procedure (Params: TChatParams)
+//    begin
+//      Params.Model('gpt-4o');
+//      Params.Messages([
+//        FromSystem('You are a comedian looking for jokes for your new show.'),
+//        FromUser('What is the difference between a mathematician and a physicist?')
+//      ]);
+//      Params.MaxCompletionTokens(1024)
+//    end);
+//  try
+//    Display(TutorialHub, Value);
+//  finally
+//    Value.Free;
+//  end;
+```
+
+By using the GenAI.Tutorial.VCL unit along with the initialization described [above](#Strategies-for-quickly-using-the-code-examples), you can achieve results similar to the example shown below.
+
+
+<br/>
+
+### Streamed
 
 <br/>
 
