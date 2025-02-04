@@ -741,16 +741,16 @@ begin
         Value.Data[0].SaveToFile(TutorialHub.FileName);
     end;
 
-  {--- Load image in a stream }
+  {--- Load image into a stream }
   var Stream := Value.Data[0].GetStream;
   try
-    {--- Display th JSON response. }
+    {--- Display the JSON response. }
     TutorialHub.JSONResponse := Value.JSONResponse;
 
     {--- Display the revised prompt. }
     Display(Sender, Value.Data[0].RevisedPrompt);
 
-    {--- Load the stream in the TImage. }
+    {--- Load the stream into the TImage. }
     TutorialHub.Image.Picture.LoadFromStream(Stream);
   finally
     Stream.Free;
