@@ -83,7 +83,7 @@ Once you have a token, you can initialize IGenAI interface, which is an entry po
 
 To streamline the implementation of the code examples provided in this tutorial, two support units have been included in the source code: `Deepseek.Tutorial.VCL` and `Deepseek.Tutorial.FMX` Based on the platform selected for testing the provided examples, you will need to initialize either the `TVCLTutorialHub` or `TFMXTutorialHub` class within the application's OnCreate event, as illustrated below:
 
->[!TIP]
+>[!NOTE]
 >```Delphi
 >//uses GenAI.Tutorial.VCL;
 >  TutorialHub := TVCLTutorialHub.Create(Client, Memo1, Memo2, Memo3, Image1, Button1, MediaPlayer1);
@@ -91,7 +91,7 @@ To streamline the implementation of the code examples provided in this tutorial,
 
 or
 
->[!TIP]
+>[!NOTE]
 >```Delphi
 >//uses GenAI.Tutorial.FMX;
 >  TutorialHub := TFMXTutorialHub.Create(Client, Memo1, Memo2, Memo3, Image1, Button1, MediaPlayer1);
