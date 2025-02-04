@@ -1,4 +1,4 @@
-[go back](https://github.com/MaxiDonkey/DelphiGenAI/blob/main/README.md#Technical-Support)
+[go back](https://github.com/MaxiDonkey/DelphiGenAI/blob/main/README.md#contributing)
 
 <br/>
 
