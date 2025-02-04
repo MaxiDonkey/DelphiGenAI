@@ -63,12 +63,13 @@ To initialize the API instance, you need to obtain an [API key from OpenAI](http
 
 Once you have a token, you can initialize IGenAI interface, which is an entry point to the API.
 
-```Delphi
-//Declare 
-//  Client: IGenAI;
-
-  Client := TGenAIFactory.CreateInstance(api_key);
-```
+>[!NOTE]
+>```Delphi
+>//Declare 
+>//  Client: IGenAI;
+>
+>  Client := TGenAIFactory.CreateInstance(api_key);
+>```
 
 <br/>
 
