@@ -58,7 +58,7 @@ For more information about the architecture of GenAI, please refer to [the dedic
 
 ## Obtain an api key
 
-To initialize the API instance, you need to obtain an [API key from OpenAI](https://platform.openai.com/settings/profile/api-keys)
+To initialize the API instance, you need to obtain an [API key from OpenAI](https://platform.openai.com/settings/organization/api-keys)
 
 Once you have a token, you can initialize IGenAI interface, which is an entry point to the API.
 
