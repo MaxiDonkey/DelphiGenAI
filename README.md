@@ -160,6 +160,7 @@ The Chat API can be used for both single-turn requests and multi-turn, stateless
 //        FromUser('What is the difference between a mathematician and a physicist?')
 //      ]);
 //      Params.MaxCompletionTokens(1024)
+//      TutorialHub.JSONRequest := Params.ToFormat();
 //    end);
 //  try
 //    Display(TutorialHub, Value);
@@ -213,6 +214,7 @@ By using the GenAI.Tutorial.VCL unit along with the initialization described [ab
 //          Payload.User('What is the difference between a mathematician and a physicist?')]);
 //      Params.MaxCompletionTokens(1024);
 //      Params.Stream;
+//      TutorialHub.JSONRequest := Params.ToFormat();
 //    end,
 //    procedure (var Chat: TChat; IsDone: Boolean; var Cancel: Boolean)
 //    begin
@@ -276,6 +278,7 @@ The `GenAI Chat API` enables the creation of interactive chat experiences tailor
 //          FromUser('I have two dogs in my house. How many paws are in my house?') ]);
 //      Params.MaxCompletionTokens(1024);
 //      Params.Stream;
+//      TutorialHub.JSONRequest := Params.ToFormat();
 //    end,
 //    procedure (var Chat: TChat; IsDone: Boolean; var Cancel: Boolean)
 //    begin
@@ -344,6 +347,7 @@ Refer to official [documentation](https://platform.openai.com/docs/guides/audio?
 //        FromUser('Is a golden retriever a good family dog?')
 //      ]);
 //      Params.MaxCompletionTokens(1024)
+//      TutorialHub.JSONRequest := Params.ToFormat();
 //    end);
 //  try
 //    DisplayAudio(TutorialHub, Value);
@@ -396,7 +400,106 @@ end;
 
 Refer to official [documentation](https://platform.openai.com/docs/guides/audio?example=audio-in).
 
+1. **Audio+Text -> Text**
 
+```Delphi
+//uses GenAI, GenAI.Types, GenAI.Tutorial.VCL;
+
+  TutorialHub.JSONRequestClear;
+  var Ref := 'https://cdn.openai.com/API/docs/audio/alloy.wav';
+
+  //Asynchronous example
+  Client.Chat.ASynCreate(
+    procedure (Params: TChatParams)
+    begin
+      Params.Model('gpt-4o-audio-preview');
+      Params.Modalities(['text']); 
+      Params.Messages([
+        FromUser('What is in this recording?', [Ref])
+      ]);
+      Params.MaxCompletionTokens(1024);
+      TutorialHub.JSONRequest := Params.ToFormat();
+    end,
+    function : TAsynChat
+    begin
+      Result.Sender := TutorialHub;
+      Result.OnStart := Start;
+      Result.OnSuccess := Display; 
+      Result.OnError := Display;
+    end);
+
+  //Synchronous example
+//  var Value := Client.Chat.Create(
+//    procedure (Params: TChatParams)
+//    begin
+//      Params.Model('gpt-4o-audio-preview');
+//      Params.Modalities(['text']);
+//      Params.Messages([
+//        FromUser('What is in this recording?', [Ref])
+//      ]);
+//      Params.MaxCompletionTokens(1024);
+//      TutorialHub.JSONRequest := Params.ToFormat();
+//    end);
+//  try
+//    Display(TutorialHub, Value);
+//  finally
+//    Value.Free;
+//  end;
+```
+
+2. **Audio -> Audio+Text**
+
+```Delphi
+//uses GenAI, GenAI.Types, GenAI.Tutorial.VCL;
+
+  TutorialHub.JSONRequestClear;
+  TutorialHub.FileName := 'Response.mp3';
+
+  //Asynchronous example
+  Client.Chat.ASynCreate(
+    procedure (Params: TChatParams)
+    begin
+      Params.Model('gpt-4o-audio-preview');
+      Params.Modalities(['text', 'audio']);
+      Params.Audio('ash', 'mp3');
+      Params.Messages([
+        FromUser(['VoiceRecorded.wav'])
+      ]);
+      Params.MaxCompletionTokens(1024);
+      TutorialHub.JSONRequest := Params.ToFormat();
+    end,
+    function : TAsynChat
+    begin
+      Result.Sender := TutorialHub;
+      Result.OnStart := Start;
+      Result.OnSuccess := DisplayAudio;
+      Result.OnError := Display;
+    end);
+
+  //Synchronous example
+//  var Value := Client.Chat.Create(
+//    procedure (Params: TChatParams)
+//    begin
+//      Params.Model('gpt-4o-audio-preview');
+//      Params.Modalities(['text', 'audio']);
+//      Params.Audio('ash', 'mp3');
+//      Params.Messages([
+//        FromUser(['VoiceRecorded.wav'])
+//      ]);
+//      Params.MaxCompletionTokens(1024);
+//      TutorialHub.JSONRequest := Params.ToFormat();
+//    end);
+//  try
+//    DisplayAudio(TutorialHub, Value);
+//  finally
+//    Value.Free;
+//  end;
+```
+
+<br/>
+
+>[!WARNING]
+> OpenAI provides other models for simple speech to text and text to speech - when your task requires those conversions (and not dynamic content from a model), the `TTS` and `STT` models will be more performant and cost-efficient.
 
 <br/>
 
