@@ -26,7 +26,7 @@ In its latest version, `GenAI` has been primarily optimized to fully leverage Op
 <br/>
 
 **Comprehensive Integration with OpenAI** <br/>
-`GenAI` is designed to support the **GPT-4o**, **O1**, and **O3** models, along with the latest developments in `OpenAI’s APIs`. This extensive coverage ensures maximum flexibility for projects leveraging the latest advancements in OpenAI's offerings.
+- `GenAI` is designed to support the **GPT-4o**, **O1**, and **O3** models, along with the latest developments in `OpenAI’s APIs`. This extensive coverage ensures maximum flexibility for projects leveraging the latest advancements in OpenAI's offerings.
 
 <br/>
 
