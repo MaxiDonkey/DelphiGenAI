@@ -349,6 +349,8 @@ For example, the `GPT-4o-Audio-Preview` model can process audio both as input an
 //  end;
 ```
 
+<br/>
+
 Let’s take a closer look at how the `DisplayAudio` method handles output to understand how the model’s response is managed.
 
 ```Delphi
