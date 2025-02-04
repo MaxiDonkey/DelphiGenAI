@@ -682,7 +682,7 @@ The same process is applied to the local file paths.
 
 Refer to [official documentation](#https://platform.openai.com/docs/guides/images).
 
-Generation of an image using DALL·E 3.
+Generation of an image using `DALL·E 3`.
 
 ```Delphi
 //uses GenAI, GenAI.Types, GenAI.Tutorial.VCL;
