@@ -35,6 +35,7 @@ This approach makes configuring request data more intuitive and fluid.
 
 - **Robust error management:** The framework includes detailed error handling through specific exceptions (`TGenAIAPIException`, `TGenAIAuthError`, etc.), making it possible to capture and handle errors related to authentication, quotas, or server responses effectively.
 <br/>
+
 **Conclusion** 
 - This framework aims to provide a practical and efficient solution for integrating **OpenAI APIs** into Delphi projects. The support for method chaining in JSON request configuration, combined with unit testing (via **DUnitX** and the `GenAI.API.Tests` unit) and flexible error handling, enables developers to focus on the core business logic of their applications. Although it’s not exhaustive, this framework is designed to evolve with developers’ needs and the technological advancements it supports.
 
