@@ -349,7 +349,7 @@ For example, the `GPT-4o-Audio-Preview` model can process audio both as input an
 //  end;
 ```
 
-Let’s take a closer look at how the DisplayAudio method handles output to understand how the model’s response is managed.
+Let’s take a closer look at how the `DisplayAudio` method handles output to understand how the model’s response is managed.
 
 ```Delphi
 procedure DisplayAudio(Sender: TObject; Value: TChat);
