@@ -19,6 +19,8 @@ ___
         - [Multi-turn conversation](#Multi-turn-conversation) 
     - [Generating Audio Responses with Chat](#Generating-Audio-Responses-with-Chat)
     - [Input Audio for Chat](#Input-Audio-for-Chat)
+        - [Audio and Text to Text](#Audio-and-Text-to-Text)
+        - [Audio to Audio](#Audio-to-Audio)
 - [Contributing](#contributing)
 - [License](#license)
 
@@ -373,12 +375,15 @@ Let’s take a closer look at how the `DisplayAudio` method handles output to un
 ```Delphi
 procedure DisplayAudio(Sender: TObject; Value: TChat);
 begin
-  {--- Display the JSON response. }
+  {--- Display the JSON response }
   TutorialHub.JSONResponse := Value.JSONResponse;
 
-  {--- We need an audio filename for the tutorial. }
+  {--- We need an audio filename for the tutorial }
   if TutorialHub.FileName.IsEmpty then
     raise Exception.Create('Set filename value in HFTutorial instance');
+
+  {--- Store the audio Id. }
+  TutorialHub.AudioId := Value.Choices[0].Message.Audio.Id;
 
   {--- The audio response is stored in a file. }
   Value.Choices[0].Message.Audio.SaveToFile(TutorialHub.FileName);
@@ -400,7 +405,7 @@ end;
 
 Refer to official [documentation](https://platform.openai.com/docs/guides/audio?example=audio-in).
 
-1. **Audio+Text -> Text**
+### Audio and Text to Text
 
 ```Delphi
 //uses GenAI, GenAI.Types, GenAI.Tutorial.VCL;
@@ -447,7 +452,7 @@ Refer to official [documentation](https://platform.openai.com/docs/guides/audio?
 //  end;
 ```
 
-2. **Audio -> Audio+Text**
+### Audio to Audio
 
 ```Delphi
 //uses GenAI, GenAI.Types, GenAI.Tutorial.VCL;
@@ -463,7 +468,7 @@ Refer to official [documentation](https://platform.openai.com/docs/guides/audio?
       Params.Modalities(['text', 'audio']);
       Params.Audio('ash', 'mp3');
       Params.Messages([
-        FromUser(['SpeechRecorded.wav'])
+        FromUser(['SpeechRecorded.mp3'])
       ]);
       Params.MaxCompletionTokens(1024);
       TutorialHub.JSONRequest := Params.ToFormat();
@@ -484,7 +489,7 @@ Refer to official [documentation](https://platform.openai.com/docs/guides/audio?
 //      Params.Modalities(['text', 'audio']);
 //      Params.Audio('ash', 'mp3');
 //      Params.Messages([
-//        FromUser(['SpeechRecorded.wav'])
+//        FromUser(['SpeechRecorded.mp3'])
 //      ]);
 //      Params.MaxCompletionTokens(1024);
 //      TutorialHub.JSONRequest := Params.ToFormat();
