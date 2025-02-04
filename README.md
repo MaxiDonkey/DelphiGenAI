@@ -394,17 +394,9 @@ end;
 
 ## Input Audio for Chat
 
-**What modalities are supported by gpt-4o-audio-preview** <br/>
-
-- The `gpt-4o-audio-preview` model requires either audio output or audio input to be used at this time. Acceptable combinations of input and output are:
-
-    - text in → text + audio out
-    - audio in → text + audio out
-    - audio in → text out
-    - text + audio in → text + audio out
-    - text + audio in → text out
-
 Refer to official [documentation](https://platform.openai.com/docs/guides/audio?example=audio-in).
+
+
 
 <br/>
 
