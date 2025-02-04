@@ -632,6 +632,16 @@ type
     /// </returns>
     class function Assistant(const Value: TMessagePayload): TMessagePayload; overload;
     /// <summary>
+    /// Constructs an assistant message payload from a string.
+    /// </summary>
+    /// <param name="Value">
+    /// A string value
+    /// </param>
+    /// <returns>
+    /// Returns the passed TMessagePayload instance.
+    /// </returns>
+    class function Assistant(const Value: string): TMessagePayload; overload;
+    /// <summary>
     /// Constructs a tool message payload to associate it with a specific tool call ID.
     /// </summary>
     /// <param name="Content">
@@ -644,6 +654,16 @@ type
     /// Returns a TMessagePayload instance configured for a specific tool.
     /// </returns>
     class function Tool(const Content: string; const ToolCallId: string): TMessagePayload;
+    /// <summary>
+    /// Constructs an assistant message payload whitn an audio id.
+    /// </summary>
+    /// <param name="Value">
+    /// A string value
+    /// </param>
+    /// <returns>
+    /// Returns the passed TMessagePayload instance.
+    /// </returns>
+    class function AssistantAudioId(const Value: string): TMessagePayload; overload;
   end;
 
   /// <summary>
@@ -2062,6 +2082,17 @@ class function TMessagePayload.Assistant(
   const Value: TMessagePayload): TMessagePayload;
 begin
   Result := Value;
+end;
+
+class function TMessagePayload.Assistant(const Value: string): TMessagePayload;
+begin
+  Result := TMessagePayload.Create.Role(TRole.assistant).Content(Value);
+end;
+
+class function TMessagePayload.AssistantAudioId(
+  const Value: string): TMessagePayload;
+begin
+  Result := TMessagePayload.Create.Role(TRole.assistant).Audio(Value);
 end;
 
 function TMessagePayload.Audio(const Value: string): TMessagePayload;

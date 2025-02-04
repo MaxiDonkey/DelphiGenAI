@@ -2771,6 +2771,8 @@ function FromUser(const Content: string; const Docs: TArray<string>; const Name:
 function FromUser(const Docs: TArray<string>; const Name: string = ''):TMessagePayload; overload;
 function FromAssistant(const ParamProc: TProcRef<TMessagePayload>): TMessagePayload; overload;
 function FromAssistant(const Value: TMessagePayload): TMessagePayload; overload;
+function FromAssistant(const Value: string): TMessagePayload; overload;
+function FromAssistantAudioId(const Value: string): TMessagePayload;
 function FromTool(const Content: string; const ToolCallId: string): TMessagePayload;
 
 function ToolCall(const Id: string; const Name: string; const Arguments: string): TToolCallsParams;
@@ -2836,6 +2838,16 @@ end;
 function FromAssistant(const Value: TMessagePayload): TMessagePayload;
 begin
   Result := TMessagePayload.Assistant(Value);
+end;
+
+function FromAssistant(const Value: string): TMessagePayload; overload;
+begin
+  Result := TMessagePayload.Assistant(Value);
+end;
+
+function FromAssistantAudioId(const Value: string): TMessagePayload;
+begin
+  Result := TMessagePayload.AssistantAudioId(Value);
 end;
 
 function FromTool(const Content: string; const ToolCallId: string): TMessagePayload;

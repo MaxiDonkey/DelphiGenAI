@@ -15,8 +15,7 @@ interface
 uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes,
   Vcl.Graphics, Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.ExtCtrls,
-  System.UITypes, Vcl.MPlayer, system.JSON,
-  GenAI, GenAI.Types;
+  System.UITypes, Vcl.MPlayer, system.JSON, GenAI, GenAI.Types;
 
 type
   TToolProc = procedure (const Value: string) of object;
@@ -40,6 +39,8 @@ type
     FMediaPlayer: TMediaPlayer;
     FClient: IGenAI;
     FId: string;
+    FAudioId: string;
+    FTranscript: string;
     procedure OnButtonClick(Sender: TObject);
     procedure SetButton(const Value: TButton);
     procedure SetMemo1(const Value: TMemo);
@@ -101,6 +102,10 @@ type
     property ToolCall: TToolProc read FToolCall write FToolCall;
 
     property Id: string read FId write FId;
+
+    property AudioId: string read FAudioId write FAudioId;
+
+    property Transcript: string read FTranscript write FTranscript;
 
     property MediaPlayer: TMediaPlayer read FMediaPlayer write FMediaPlayer;
 
@@ -299,10 +304,17 @@ end;
 
 procedure Display(Sender: TObject; Value: TSpeechResult);
 begin
+  {--- Display the JSON response }
   TutorialHub.JSONResponse := Value.JSONResponse;
+
+  {--- The file name can not be null }
   if TutorialHub.FileName.IsEmpty then
     raise Exception.Create('Set filename value in HFTutorial instance');
+
+  {--- Save the audio into a file. }
   Value.SaveToFile(TutorialHub.FileName);
+
+  {--- Play the audio result }
   TutorialHub.PlayAudio;
 end;
 
@@ -340,7 +352,6 @@ begin
       end
     else
       begin
-        Display(Sender, Item.Message.Role.ToString);
         Display(Sender, Item.Message.Content);
       end;
   Display(Sender, sLineBreak);
@@ -366,16 +377,24 @@ end;
 
 procedure Display(Sender: TObject; Value: TGeneratedImages);
 begin
+  {--- Load image when url is not null. }
   if not TutorialHub.FileName.IsEmpty then
     begin
       if not Value.Data[0].Url.IsEmpty then
         Value.Data[0].Download(TutorialHub.FileName) else
         Value.Data[0].SaveToFile(TutorialHub.FileName);
     end;
+
+  {--- Load image into a stream }
   var Stream := Value.Data[0].GetStream;
   try
+    {--- Display the JSON response. }
     TutorialHub.JSONResponse := Value.JSONResponse;
+
+    {--- Display the revised prompt. }
     Display(Sender, Value.Data[0].RevisedPrompt);
+
+    {--- Load the stream into the TImage. }
     TutorialHub.Image.Picture.LoadFromStream(Stream);
   finally
     Stream.Free;
@@ -563,11 +582,26 @@ end;
 
 procedure DisplayAudio(Sender: TObject; Value: TChat);
 begin
+  {--- Display the JSON response }
   TutorialHub.JSONResponse := Value.JSONResponse;
+
+  {--- We need an audio filename for the tutorial }
   if TutorialHub.FileName.IsEmpty then
     raise Exception.Create('Set filename value in HFTutorial instance');
+
+  {--- Store the audio Id. }
+  TutorialHub.AudioId := Value.Choices[0].Message.Audio.Id;
+
+  {--- Store the audio transcript. }
+  TutorialHub.Transcript := Value.Choices[0].Message.Audio.Transcript;
+
+  {--- The audio response is stored in a file. }
   Value.Choices[0].Message.Audio.SaveToFile(TutorialHub.FileName);
+
+  {--- Display the textual response. }
   Display(Sender, Value.Choices[0].Message.Audio.Transcript);
+
+  {--- Play audio response. }
   TutorialHub.PlayAudio;
   Display(Sender, sLineBreak);
 end;

@@ -91,6 +91,10 @@ begin
   var HttpClient := THTTPClient.Create;
   try
     Result := (HttpClient.Head(Url) as IHTTPResponse).MimeType.ToLower;
+
+    {--- Ensure compatibility with current standards }
+    if Result = 'audio/x-wav' then
+      Result := 'audio/wav'
   finally
     HttpClient.Free;
   end;

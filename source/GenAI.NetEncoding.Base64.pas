@@ -231,6 +231,10 @@ begin
   var LKind: TMimeTypes.TKind;
   TMimeTypes.Default.GetFileInfo(FileLocation, Result, LKind);
   Result := Result.ToLower;
+
+  {--- Ensure compatibility with current standards }
+  if Result = 'audio/x-wav' then
+      Result := 'audio/wav'
 end;
 
 function GetUrlOrEncodeBase64(const Value: string): string;
