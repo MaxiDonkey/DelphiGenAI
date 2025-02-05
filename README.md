@@ -29,6 +29,7 @@ ___
     - [Image generation](#Image-generation)
     - [Text to speech](#Text-to-speech)
     - [Speech to text](#Speech-to-text)
+- [Beyond the Basics Advanced Usage](#Beyond-the-Basics-Advanced-Usage)
 - [Contributing](#contributing)
 - [License](#license)
 
@@ -886,6 +887,10 @@ Convert data audio into a text.
 //    Value.Free;
 //  end;
 ```
+
+<br/>
+
+# Beyond the Basics Advanced Usage
 
 <br/>
 
