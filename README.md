@@ -904,8 +904,7 @@ Function calling offers a robust and versatile method for OpenAI models to inter
 
 Refer to the [official documentation](https://platform.openai.com/docs/guides/function-calling?example=get-weather).
 
->[!WARNING]
->Ensure user confirmation for actions like sending emails or making purchases to avoid unintended consequences.
+<br/>
 
 **Use case : What’s the weather in Paris?**
 
@@ -1039,6 +1038,11 @@ end;
     Value.Free;
   end;
 ```
+
+<br/>
+
+>[!WARNING]
+>Ensure user confirmation for actions like sending emails or making purchases to avoid unintended consequences.
 
 <br/>
 
