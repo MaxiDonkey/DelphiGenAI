@@ -1039,6 +1039,36 @@ end;
   end;
 ```
 
+Let's look at how the display method handles the function call.
+
+```Delphi
+procedure Display(Sender: TObject; Value: TChat);
+begin
+  TutorialHub.JSONResponse := Value.JSONResponse;
+  for var Item in Value.Choices do
+    {--- Examine FinishReason }
+    if Item.FinishReason = TFinishReason.tool_calls then
+      begin
+        if Assigned(TutorialHub.ToolCall) then
+          begin
+            for var Func in Item.Message.ToolCalls do
+              begin
+                Display(Sender, Func.&function.Arguments);
+                var Evaluation := TutorialHub.Tool.Execute(Func.&function.Arguments);
+                Display(Sender, Evaluation);
+                Display(Sender);
+                TutorialHub.ToolCall(Evaluation);
+              end;
+          end;
+      end
+    else
+      begin
+        Display(Sender, Item.Message.Content);
+      end;
+  Display(Sender, sLineBreak);
+end;
+```
+
 <br/>
 
 >[!WARNING]
