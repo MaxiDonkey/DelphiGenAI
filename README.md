@@ -1866,6 +1866,59 @@ Now create the batch as follow :
 
 List your organization's batches.
 
+```Delphi
+//uses GenAI, GenAI.Types, GenAI.Tutorial.VCL;
+
+  //Asynchronous example
+  Client.Batch.AsynList(
+    procedure (Params: TUrlPaginationParams)
+    begin
+      Params.Limit(4);
+    end,
+    function : TAsynBatches
+    begin
+      Result.Sender := TutorialHub;
+      Result.OnStart := Start;
+      Result.OnSuccess := Display;
+      Result.OnError := Display;
+    end);
+
+  //Synchronous example
+//  var Value := Client.Batch.List(
+//    procedure (Params: TUrlPaginationParams)
+//    begin
+//      Params.Limit(4);
+//    end);
+//  try
+//    Display(TutorialHub, Value);
+//  finally
+//    Value.Free;
+//  end;
+```
+
+With out request parameters
+
+```Delphi
+//uses GenAI, GenAI.Types, GenAI.Tutorial.VCL;
+
+  //Asynchronous example
+  Client.Batch.AsynList(
+    function : TAsynBatches
+    begin
+      Result.Sender := TutorialHub;
+      Result.OnStart := Start;
+      Result.OnSuccess := Display;
+      Result.OnError := Display;
+    end);
+
+  //Synchronous example
+//  var Value := Client.Batch.List;
+//  try
+//    Display(TutorialHub, Value);
+//  finally
+//    Value.Free;
+//  end;
+```
 
 Refer to [parameters documentation](https://platform.openai.com/docs/api-reference/batch/list).
 
