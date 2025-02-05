@@ -43,7 +43,7 @@ ___
     - [Files](#Files)
         - [Files list](#Files-list)
         - [File upload](#File-upload)
-        - [File retrieve](#File retrieve)
+        - [File retrieve](#File-retrieve)
         - [File retrieve content](#File-retrieve-content)
         - [File Deletion](#File-Deletion)
 - [Contributing](#contributing)
