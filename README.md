@@ -40,6 +40,12 @@ ___
         - [List of models](#List-of-models)
         - [Retrieve a model](#Retrieve-a-model)
         - [Delete a model](#Delete-a-model)
+    - [Files](#Files)
+        - [Files list](#Files-list)
+        - [File upload](#File-upload)
+        - [File retrieve](#File retrieve)
+        - [File retrieve content](#File-retrieve-content)
+        - [File Deletion](#File-Deletion)
 - [Contributing](#contributing)
 - [License](#license)
 
@@ -1398,6 +1404,197 @@ Deleting a model is only possible if the model is one of your fine-tuned models.
 //  finally
 //    Value.Free;
 //  end;
+```
+
+<br/>
+
+## Files
+
+Files are used to upload documents that can be used with features like **Assistants**, **Fine-tuning**, and **Batch API**.
+
+<br/>
+
+### Files list
+
+Example without parameters
+
+```Delphi
+//uses GenAI, GenAI.Types, GenAI.Tutorial.VCL;
+
+  //Asynchronous example
+  Client.Files.AsynList(
+    function : TAsynFiles
+    begin
+      Result.Sender := TutorialHub;
+      Result.OnStart := Start;
+      Result.OnSuccess := Display;
+      Result.OnError := Display;
+    end);
+
+  //Synchronous example
+//  var Value := Client.Files.List;
+//  try
+//    Display(TutorialHub, Value);
+//  finally
+//    Value.Free;
+//  end;
+```
+
+Example using parameters
+
+```Delphi
+//uses GenAI, GenAI.Types, GenAI.Tutorial.VCL;
+
+  //Asynchronous example
+  Client.Files.AsynList(
+    procedure (Params: TFileUrlParams)
+    begin
+      Params.Purpose('batch');
+      Params.Limit(10);
+    end,
+    function : TAsynFiles
+    begin
+      Result.Sender := TutorialHub;
+      Result.OnStart := Start;
+      Result.OnSuccess := Display;
+      Result.OnError := Display;
+    end);
+
+  //Synchronous example
+//  var Value := Client.Files.List(
+//    procedure (Params: TFileUrlParams)
+//    begin
+//      Params.Purpose('batch');
+//      Params.Limit(10);
+//    end);
+//  try
+//    Display(TutorialHub, Value);
+//  finally
+//    Value.Free;
+//  end;
+```
+
+Refer to [parameters documentation](https://platform.openai.com/docs/api-reference/files/list).
+
+<br/>
+
+### File upload
+
+You can upload files for use across multiple endpoints. Each file can be as large as 512 MB, with a maximum combined storage limit of 100 GB per organization.
+
+The Assistants API accommodates files containing up to 2 million tokens and accepts specific file formats. For more information, refer to the [Assistants Tools guide](https://platform.openai.com/docs/assistants/tools).
+
+```Delphi
+//uses GenAI, GenAI.Types, GenAI.Tutorial.VCL;
+
+  //Asynchronous example
+  Client.Files.AsynUpload(
+    procedure (Params: TFileUploadParams)
+    begin
+      Params.&File('BatchExample.jsonl');
+      Params.Purpose(TFilesPurpose.batch);
+    end,
+    function : TAsynFile
+    begin
+      Result.Sender := TutorialHub;
+      Result.OnStart := Start;
+      Result.OnSuccess := Display;
+      Result.OnError := Display;
+    end);
+
+  //Synchronous example
+//  var Value := Client.Files.Upload(
+//    procedure (Params: TFileUploadParams)
+//    begin
+//      Params.&File('BatchExample.jsonl');
+//      Params.Purpose(fp_batch);
+//    end);
+//  try
+//    Display(TutorialHub, Value);
+//  finally
+//    Value.Free;
+//  end;
+```
+Example with batch file.
+
+<br/>
+
+### File retrieve
+
+Returns information about a specific file.
+
+```Delphi
+//uses GenAI, GenAI.Types, GenAI.Tutorial.VCL;
+
+  TutorialHub.Id := '...Id file to retrieve...';
+
+  //Asynchronous example
+  Client.Files.AsynRetrieve(TutorialHub.Id,
+    function : TAsynFile
+    begin
+      Result.Sender := TutorialHub;
+      Result.OnStart := Start;
+      Result.OnSuccess := Display;
+      Result.OnError := Display;
+    end);
+
+  //Synchronous example
+//  var Value := Client.Files.Retrieve(TutorialHub.Id);
+//  try
+//    Display(TutorialHub, Value);
+//  finally
+//    Value.Free;
+//  end;
+```
+
+<br/>
+
+Returns the contents of the specified file.
+
+### File retrieve content
+
+```Delphi
+//uses GenAI, GenAI.Types, GenAI.Tutorial.VCL;
+
+  TutorialHub.Id := '...Id of the file to retrieve content...';
+
+  //Asynchronous example
+  Client.Files.AsynRetrieveContent(TutorialHub.Id,
+    function : TAsynFileContent
+    begin
+      Result.Sender := TutorialHub;
+      Result.OnStart := Start;
+      Result.OnSuccess := Display;
+      Result.OnError := Display;
+    end);
+
+  //Synchronous example
+//  var Value := Client.Files.RetrieveContent(TutorialHub.Id);
+//  try
+//    Display(TutorialHub, Value);
+//  finally
+//    Value.Free;
+//  end;
+```
+
+<br/>
+
+### File Deletion
+
+Delete a file.
+
+```Delphi
+//uses GenAI, GenAI.Types, GenAI.Tutorial.VCL;
+
+  TutorialHub.Id := '...Id file to delete...';
+
+  //Synchronous example
+  var Value := Client.Files.Delete(TutorialHub.Id);
+  try
+    Display(TutorialHub, F('Deleted', BoolToStr(Value.Deleted, True)));
+  finally
+    Value.Free;
+  end;
 ```
 
 <br/>
