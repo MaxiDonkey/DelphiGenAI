@@ -32,6 +32,8 @@ ___
     - [Reasoning with o1 or o3](#Reasoning-with-o1-or-o3)
     - [Embeddings](#Embeddings)
     - [Moderation](#Moderation)
+        - [Modarate text inputs](#Modarate-text-inputs)
+        - [Modarate images and text](#Modarate-images-and-text)
 - [Beyond the Basics Advanced Usage](#Beyond-the-Basics-Advanced-Usage)
     - [Function calling](#Function-calling)
 - [Contributing](#contributing)
@@ -1000,6 +1002,94 @@ An embedding is represented as a vector, or a list of floating-point numbers. Th
 <br/>
 
 ## Moderation
+
+The moderation endpoint is a valuable resource for detecting potentially harmful text or images. When harmful content is identified, developers can take appropriate measures, such as filtering the content or managing user accounts responsible for the violations. This service is provided free of charge.
+
+Available models for the moderation endpoint include:
+
+- **omni-moderation-latest:** The most advanced model, supporting a wider range of content categorization and multi-modal inputs (both text and images).
+
+- **text-moderation-latest (Legacy):** An older model designed exclusively for text-based inputs with limited categorization options. For new projects, the omni-moderation model is recommended due to its superior capabilities and broader input support.
+
+<br/>
+
+### Modarate text inputs
+
+```Delphi
+//uses GenAI, GenAI.Types, GenAI.Tutorial.VCL;
+
+  //Asynchronous example
+  Client.Moderation.AsynEvaluate(
+    procedure (Params: TModerationParams)
+    begin
+      Params.Input(['...text to classify goes here...']);
+      Params.Model('omni-moderation-latest');
+      TutorialHub.JSONRequest := Params.ToFormat();
+    end,
+    function : TAsynModeration
+    begin
+      Result.Sender := TutorialHub;
+      Result.OnStart := Start;
+      Result.OnSuccess := Display;
+      Result.OnError := Display;
+    end);
+
+  //Synchronous example
+//  var Value := Client.Moderation.Evaluate(
+//    procedure (Params: TModerationParams)
+//    begin
+//      Params.Input(['...text to classify goes here...']);
+//      Params.Model('omni-moderation-latest');
+//      TutorialHub.JSONRequest := Params.ToFormat();
+//      TutorialHub.JSONRequest := Params.ToFormat();
+//    end);
+//  try
+//    Display(TutorialHub, Value);
+//  finally
+//    Value.Free;
+//  end;
+```
+
+<br/>
+
+### Modarate images and text
+
+```Delphi
+//uses GenAI, GenAI.Types, GenAI.Tutorial.VCL;
+
+  var Ref := 'https://example.com/image.png';
+
+  //Asynchronous example
+  Client.Moderation.AsynEvaluate(
+    procedure (Params: TModerationParams)
+    begin
+      Params.Input(['...text to classify goes here...', Ref]);
+      Params.Model('omni-moderation-latest');
+      TutorialHub.JSONRequest := Params.ToFormat();
+    end,
+    function : TAsynModeration
+    begin
+      Result.Sender := TutorialHub;
+      Result.OnStart := Start;
+      Result.OnSuccess := Display;
+      Result.OnError := Display;
+    end);
+
+  //Synchronous example
+//  var Value := Client.Moderation.Evaluate(
+//    procedure (Params: TModerationParams)
+//    begin
+//      Params.Input(['...text to classify goes here...', Ref]);
+//      Params.Model('omni-moderation-latest');
+//      TutorialHub.JSONRequest := Params.ToFormat();
+//      TutorialHub.JSONRequest := Params.ToFormat();
+//    end);
+//  try
+//    Display(TutorialHub, Value);
+//  finally
+//    Value.Free;
+//  end;
+```
 
 <br/>
 
