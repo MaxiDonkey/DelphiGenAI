@@ -29,7 +29,7 @@ ___
     - [Image generation](#Image-generation)
     - [Text to speech](#Text-to-speech)
     - [Speech to text](#Speech-to-text)
-    - [Reasoning](#Reasoning)
+    - [Reasoning with O1 or O3](#Reasoning-with-O1-or-O3)
 - [Beyond the Basics Advanced Usage](#Beyond-the-Basics-Advanced-Usage)
     - [Function calling](#Function-calling)
 - [Contributing](#contributing)
@@ -892,7 +892,7 @@ Convert data audio into a text.
 
 <br/>
 
-## Reasoning
+## Reasoning with O1 or O3
 
 **Advanced models for reasoning and problem-solving.**
 Reasoning models, such as **OpenAI’s** `o1` and `o3-mini`, are large language models trained using reinforcement learning to handle complex reasoning tasks. These models “think” before generating a response by forming a detailed internal chain of reasoning. This approach allows them to excel in areas like advanced problem-solving, coding, scientific analysis, and multi-step planning within agent-driven workflows.
@@ -928,6 +928,8 @@ Since these models can require response times ranging from a few seconds to seve
       Result.OnCancellation := Cancellation;
     end);
 ```
+
+For more information, consult the [official documentation](https://platform.openai.com/docs/guides/reasoning).
 
 <br/>
 
