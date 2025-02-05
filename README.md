@@ -7,7 +7,7 @@ ___
 
 <br/>
 
-**GenAI for Delphi – Optimized OpenAI Integration <bt/>**
+# **GenAI for Delphi – Optimized OpenAI Integration <bt/>**
 
 Welcome to `GenAI`, a powerful and flexible Delphi library designed to integrate the capabilities of the latest **OpenAI APIs**. This project, carefully and rigorously developed, is aimed at developers seeking a robust solution for content generation, dialogue management, vision, and much more.
 
