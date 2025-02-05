@@ -1856,6 +1856,10 @@ Now create the batch as follow :
 //  end;
 ```
 
+>[!TIP]
+> `GenAI` provides, through the `IBatchJSONBuilder` interface (available in the `GenAI.Batch.Interfaces` unit and implemented in the `GenAI.Batch.Builder` unit), powerful tools to easily build batch files from collected data. For further details, refer to the two units mentioned above.
+
+
 <br/>
 
 ### Batch List
