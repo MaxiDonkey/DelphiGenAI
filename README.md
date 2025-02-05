@@ -1097,6 +1097,7 @@ Available models for the moderation endpoint include:
 ```Delphi
 procedure Display(Sender: TObject; Value: TModerationResult);
 begin
+ {--- GenAI built the FlaggedDetail property which contains only active moderation categories. }
   for var Item in Value.FlaggedDetail do
     Display(Sender, [
       EmptyStr,
