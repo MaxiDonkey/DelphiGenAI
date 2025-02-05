@@ -29,7 +29,7 @@ ___
     - [Image generation](#Image-generation)
     - [Text to speech](#Text-to-speech)
     - [Speech to text](#Speech-to-text)
-    - [Reasoning with O1 or O3](#Reasoning-with-O1-or-O3)
+    - [Reasoning with o1 or o3](#Reasoning-with-o1-or-o3)
 - [Beyond the Basics Advanced Usage](#Beyond-the-Basics-Advanced-Usage)
     - [Function calling](#Function-calling)
 - [Contributing](#contributing)
@@ -892,7 +892,7 @@ Convert data audio into a text.
 
 <br/>
 
-## Reasoning with O1 or O3
+## Reasoning with o1 or o3
 
 **Advanced models for reasoning and problem-solving.**
 Reasoning models, such as **OpenAI’s** `o1` and `o3-mini`, are large language models trained using reinforcement learning to handle complex reasoning tasks. These models “think” before generating a response by forming a detailed internal chain of reasoning. This approach allows them to excel in areas like advanced problem-solving, coding, scientific analysis, and multi-step planning within agent-driven workflows.
@@ -928,6 +928,16 @@ Since these models can require response times ranging from a few seconds to seve
       Result.OnCancellation := Cancellation;
     end);
 ```
+
+<br/>
+
+The OpenAI `o1` and `o3` series models are highly capable across several advanced tasks, including:
+
+- **Implementing complex algorithms and generating code:** For example, a prompt can instruct the o1 model to refactor a React component based on specific requirements.
+
+- **Developing multi-step plans:** The models can create detailed plans, such as generating a complete filesystem structure and providing Python code that fulfills the given use case.
+
+- **Supporting STEM research:** The models have demonstrated strong performance in scientific and technical research tasks, with prompts designed for basic research yielding highly effective results.
 
 For more information, consult the [official documentation](https://platform.openai.com/docs/guides/reasoning).
 
