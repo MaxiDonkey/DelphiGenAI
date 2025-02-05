@@ -29,6 +29,7 @@ ___
     - [Image generation](#Image-generation)
     - [Text to speech](#Text-to-speech)
     - [Speech to text](#Speech-to-text)
+    - [Reasoning](#Reasoning)
 - [Beyond the Basics Advanced Usage](#Beyond-the-Basics-Advanced-Usage)
     - [Function calling](#Function-calling)
 - [Contributing](#contributing)
@@ -887,6 +888,45 @@ Convert data audio into a text.
 //  finally
 //    Value.Free;
 //  end;
+```
+
+<br/>
+
+## Reasoning
+
+**Advanced models for reasoning and problem-solving.**
+Reasoning models, such as **OpenAI’s** `o1` and `o3-mini`, are large language models trained using reinforcement learning to handle complex reasoning tasks. These models “think” before generating a response by forming a detailed internal chain of reasoning. This approach allows them to excel in areas like advanced problem-solving, coding, scientific analysis, and multi-step planning within agent-driven workflows.
+
+Similar to GPT models, they offer two options: a smaller, faster, and more cost-effective model (`o3-mini`) and a larger model (`o1`) that, while slower and more expensive per token, often produces higher-quality responses for challenging tasks and demonstrates stronger generalization across various domains.
+
+Since these models can require response times ranging from a few seconds to several tens of seconds, it is more prudent and efficient to use asynchronous methods when using them.
+
+```Delphi
+//uses GenAI, GenAI.Types, GenAI.Tutorial.VCL;
+
+  TutorialHub.JSONRequestClear;
+
+  //Asynchronous example
+  Client.Chat.AsynCreateStream(
+    procedure(Params: TChatParams)
+    begin
+      Params.Model('o3-mini');
+      Params.Messages([
+        FromUser('Write a bash script that takes a matrix represented as a string with format \"[1,2],[3,4],[5,6]\" and prints the transpose in the same format.')
+      ]);
+      Params.ReasoningEffort(TReasoningEffort.medium);
+      Params.Stream;
+      TutorialHub.JSONRequest := Params.ToFormat();
+    end,
+    function : TAsynChatStream
+    begin
+      Result.Sender := TutorialHub;
+      Result.OnStart := Start;
+      Result.OnProgress := DisplayStream;
+      Result.OnError := Display;
+      Result.OnDoCancel := DoCancellation;
+      Result.OnCancellation := Cancellation;
+    end);
 ```
 
 <br/>
