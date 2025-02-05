@@ -51,6 +51,12 @@ ___
         - [Upload cancel](#Upload-cancel)
         - [Upload add part](#Upload-add-part)
         - [Upload complete](#Upload-complete)
+    - [Batch](#Batch)
+        - [Batch create](#Batch-create)
+        - [Batch List](#Batch-List)
+        - [Batch retrieve](#Batch-retrieve)
+        - [Batch cancel](#Batch-cancel)
+        - [Batch output viewer](#Batch-output-viewer)
 - [Contributing](#contributing)
 - [License](#license)
 
@@ -1772,6 +1778,30 @@ The number of bytes uploaded upon completion must match the number of bytes init
 //    Value.Free;
 //  end;
 ```
+
+<br/>
+
+## Batch
+
+<br/>
+
+### Batch create
+
+<br/>
+
+### Batch List
+
+<br/>
+
+### Batch retrieve
+
+<br/>
+
+### Batch cancel
+
+<br/>
+
+### Batch output viewer
 
 <br/>
 
