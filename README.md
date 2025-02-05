@@ -926,7 +926,7 @@ In this unit, this schema will be used for function calls.
      },
      "required": ["location"],
      "additionalProperties": false
-  }
+}
 ```
 
 <br/>
