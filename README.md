@@ -1308,6 +1308,8 @@ end;
 
 ## Models
 
+Refert to [official documentation](https://platform.openai.com/docs/models).
+
 ### List of models
 
 The list of available models can be retrieved from the Models API response. The models are ordered by release date, with the most recently published appearing first.
@@ -1340,18 +1342,62 @@ The list of available models can be retrieved from the Models API response. The 
 
 ### Retrieve a model
 
+Retrieve a model using its ID.
+
 ```Delphi
 //uses GenAI, GenAI.Types, GenAI.Tutorial.VCL;
 
+  TutorialHub.JSONRequestClear;
+  TutorialHub.ModelId := '...the id tio retrieve...';
+
+  //Asynchronous example
+  Client.Models.AsynRetrieve(TutorialHub.ModelId,
+    function : TAsynModel
+    begin
+      Result.Sender := TutorialHub;
+      Result.OnStart := Start;
+      Result.OnSuccess := Display;
+      Result.OnError := Display;
+    end);
+
+  //Synchronous example
+//  var Value := Client.Models.Retrieve(TutorialHub.ModelId);
+//  try
+//    Display(TutorialHub, Value);
+//  finally
+//    Value.Free;
+//  end;
 ```
 
 <br/>
 
 ### Delete a model
 
+Deleting a model is only possible if the model is one of your fine-tuned models.
+
 ```Delphi
 //uses GenAI, GenAI.Types, GenAI.Tutorial.VCL;
 
+  TutorialHub.JSONRequestClear;
+  TutorialHub.ModelId := '...Id of the model to delete...';
+
+  //Asynchronous example
+  Client.Models.AsynDelete(TutorialHub.ModelId,
+    function : TAsynDeletion
+    begin
+      Result.Sender := TutorialHub;
+      Result.OnStart := Start;
+      Result.OnSuccess := Display;
+      Result.OnError := Display;
+    end);
+
+  //Synchronous example
+//  var Value := Client.Models.Delete(TutorialHub.ModelId);
+//  try
+//    Display(TutorialHub, Value);
+//  finally
+//    Value.Free;
+//  end;
 ```
 
 <br/>
