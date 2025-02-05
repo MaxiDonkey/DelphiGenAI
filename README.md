@@ -1783,25 +1783,40 @@ The number of bytes uploaded upon completion must match the number of bytes init
 
 ## Batch
 
+Create large batches of API requests for asynchronous processing. The Batch API returns completions within 24 hours for a 50% discount. Related guide: [Batch](https://platform.openai.com/docs/guides/batch)
+
 <br/>
 
 ### Batch create
+
+Creates and executes a batch from an uploaded file of requests.
 
 <br/>
 
 ### Batch List
 
+List your organization's batches.
+
+
+Refer to [parameters documentation](https://platform.openai.com/docs/api-reference/batch/list).
+
 <br/>
 
 ### Batch retrieve
+
+Retrieves a batch using its ID.
 
 <br/>
 
 ### Batch cancel
 
+Cancels an in-progress batch. The batch will be in status `cancelling` for up to 10 minutes, before changing to `cancelled`, where it will have partial results (if any) available in the output file.
+
 <br/>
 
 ### Batch output viewer
+
+Open and view the results obtained after processing the batch.
 
 <br/>
 
