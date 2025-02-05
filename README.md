@@ -36,6 +36,10 @@ ___
         - [Modarate images and text](#Modarate-images-and-text)
 - [Beyond the Basics Advanced Usage](#Beyond-the-Basics-Advanced-Usage)
     - [Function calling](#Function-calling)
+    - [Models](#Models)
+        - [List of models](#List-of-models)
+        - [Retrieve a model](#Retrieve-a-model)
+        - [Delete a model](#Delete-a-model)
 - [Contributing](#contributing)
 - [License](#license)
 
@@ -1299,6 +1303,56 @@ end;
 
 >[!WARNING]
 >Ensure user confirmation for actions like sending emails or making purchases to avoid unintended consequences.
+
+<br/>
+
+## Models
+
+### List of models
+
+The list of available models can be retrieved from the Models API response. The models are ordered by release date, with the most recently published appearing first.
+
+```Delphi
+//uses GenAI, GenAI.Types, GenAI.Tutorial.VCL;
+
+  TutorialHub.JSONRequestClear;
+
+  //Asynchronous example
+  Client.Models.AsynList(
+    function : TAsynModels
+    begin
+      Result.Sender := TutorialHub;
+      Result.OnStart := Start;
+      Result.OnSuccess := Display;
+      Result.OnError := Display;
+    end);
+
+  //Synchronous example
+//  var Value := Client.Models.List;
+//  try
+//    Display(TutorialHub, Value);
+//  finally
+//    Value.Free;
+//  end;
+```
+
+<br/>
+
+### Retrieve a model
+
+```Delphi
+//uses GenAI, GenAI.Types, GenAI.Tutorial.VCL;
+
+```
+
+<br/>
+
+### Delete a model
+
+```Delphi
+//uses GenAI, GenAI.Types, GenAI.Tutorial.VCL;
+
+```
 
 <br/>
 
