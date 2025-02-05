@@ -30,6 +30,7 @@ ___
     - [Text to speech](#Text-to-speech)
     - [Speech to text](#Speech-to-text)
 - [Beyond the Basics Advanced Usage](#Beyond-the-Basics-Advanced-Usage)
+    - [Function calling](#Function-calling)
 - [Contributing](#contributing)
 - [License](#license)
 
@@ -673,7 +674,7 @@ The detail parameter, which includes three options—**low**, **high**, and **au
 
 ```Delphi
   var Url1 := 'https://tripfixers.com/wp-content/uploads/2019/11/eiffel-tower-with-snow.jpeg detail=high';
-  or
+  //or
   var Url1 := 'https://tripfixers.com/wp-content/uploads/2019/11/eiffel-tower-with-snow.jpeg detail=low';
 ```
 
@@ -891,6 +892,153 @@ Convert data audio into a text.
 <br/>
 
 # Beyond the Basics Advanced Usage
+
+## Function calling
+
+Allow models to access data and execute actions. <br/>
+Function calling offers a robust and versatile method for OpenAI models to interact with your code or external services, serving two main purposes:
+
+- **Data Retrieval:** Access real-time information to enhance the model's responses (RAG). This is particularly beneficial for searching knowledge bases and extracting specific data from APIs (e.g., obtaining the current weather).
+
+- **Action Execution:** Carry out tasks such as form submissions, API calls, updating the application state (UI/frontend or backend), or executing agent-driven workflows (e.g., transferring a conversation).
+
+Refer to the [official documentation](https://platform.openai.com/docs/guides/function-calling?example=get-weather).
+
+>[!WARNING]
+>Ensure user confirmation for actions like sending emails or making purchases to avoid unintended consequences.
+
+**Use case : What’s the weather in Paris?**
+
+In the `GenAI.Functions.Example` unit, there is a class that defines a function which OpenAI can choose to use or not, depending on the options provided. This class inherits from a parent class defined in the `GenAI.Functions.Core` unit. To create new functions, you can derive from the `TFunctionCore` class and define a new plugin.
+
+In this unit, this schema will be used for function calls.
+```Json
+{
+    "type": "object",
+    "properties": {
+         "location": {
+             "type": "string",
+             "description": "The city and department, e.g. Marseille, 13"
+         },
+         "unit": {
+             "type": "string",
+             "enum": ["celsius", "fahrenheit"]
+         }
+     },
+     "required": ["location"],
+     "additionalProperties": false
+  }
+```
+
+<br/>
+
+1. We will use the TWeatherReportFunction plugin defined in the `GenAI.Functions.Example` unit.
+
+```Delphi
+  var Weather := TWeatherReportFunction.CreateInstance;
+  //or
+  var Weather := TWeatherReportFunction.CreateInstance(True);  //To activate `Strict` option
+
+  //See step 3
+```
+<br/>
+
+2. We then define a method to display the result of the query using the Weather tool.
+
+With this tutorial, a method is defined within TutorialHub. Let’s take a closer look at how this method works.
+
+- A. The first method display a stream text. 
+
+```Delphi
+procedure TVCLTutorialHub.DisplayWeatherStream(const Value: string);
+begin
+  //Asynchronous example
+  Client.Chat.AsynCreateStream(
+    procedure(Params: TChatParams)
+    begin
+      Params.Model('gpt-4o');
+      Params.Messages([
+          FromSystem('You are a weather presenter on a prime time TV channel.'),
+          FromUser(Value)]);
+      Params.MaxCompletionTokens(1024);
+      Params.Stream;
+    end,
+    function : TAsynChatStream
+    begin
+      Result.Sender := TutorialHub;
+      Result.OnProgress := DisplayStream;
+      Result.OnError := Display;
+      Result.OnDoCancel := DoCancellation;
+      Result.OnCancellation := Cancellation;
+    end);
+end;
+```
+
+<br/>
+
+- B. The second method use audio with response.
+
+```Delphi
+procedure TVCLTutorialHub.DisplayWeatherAudio(const Value: string);
+begin
+  FileName := 'AudioWeather.mp3';
+
+  //Asynchronous example
+  Client.Chat.AsynCreate(
+    procedure (Params: TChatParams)
+    begin
+      Params.Model('gpt-4o-audio-preview');
+      Params.Modalities(['text', 'audio']);
+      Params.Audio('verse', 'mp3');
+      Params.Messages([
+        FromSystem('You are a weather presenter on a prime time TV channel.'),
+        FromUser(Value)
+      ]);
+      Params.MaxCompletionTokens(1024);
+    end,
+    function : TAsynChat
+    begin
+      Result.Sender := TutorialHub;
+      Result.OnStart := Start;
+      Result.OnSuccess := DisplayAudio;
+      Result.OnError := Display;
+    end);
+end;
+```
+
+<br/>
+
+3. Building the query using the Weather tool. (Simply copy/paste this last code to test the usage of the functions.)
+
+```Delphi
+//uses GenAI, GenAI.Types, GenAI.Tutorial.VCL,  GenAI.Functions.Example;
+
+  TutorialHub.JSONRequestClear;
+  var Weather := TWeatherReportFunction.CreateInstance(True);
+//  TutorialHub.ToolCall := TutorialHub.DisplayWeatherStream;
+// or
+  TutorialHub.ToolCall := TutorialHub.DisplayWeatherAudio;
+  TutorialHub.Tool := Weather;
+
+  //Synchronous example
+  var Value := Client.Chat.Create(
+    procedure (Params: TChatParams)
+    begin
+      Params.Model('gpt-4o');
+      Params.Messages([
+        FromUser('What is the weather in Paris?')
+      ]);
+      Params.Tools([Weather]);
+      Params.ToolChoice(TToolChoice.auto);
+      Params.MaxCompletionTokens(1024);
+      TutorialHub.JSONRequest := Params.ToFormat();
+    end);
+  try
+    Display(TutorialHub, Value);
+  finally
+    Value.Free;
+  end;
+```
 
 <br/>
 
