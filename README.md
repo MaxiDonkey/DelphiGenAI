@@ -46,6 +46,11 @@ ___
         - [File retrieve](#File-retrieve)
         - [File retrieve content](#File-retrieve-content)
         - [File Deletion](#File-Deletion)
+    - [Uploads](#Uploads)
+        - [Upload create](#Upload-create)
+        - [Upload cancel](#Upload-cancel)
+        - [Upload add part](#Upload-add-part)
+        - [Upload complete](#Upload-complete)
 - [Contributing](#contributing)
 - [License](#license)
 
@@ -1596,6 +1601,28 @@ Delete a file.
     Value.Free;
   end;
 ```
+
+<br/>
+
+## Uploads
+
+Allows you to upload large files in multiple parts.
+
+<br/>
+
+### Upload create
+
+<br/>
+
+### Upload cancel
+
+<br/>
+
+### Upload add part
+
+<br/>
+
+### Upload complete
 
 <br/>
 
