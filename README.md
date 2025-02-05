@@ -1011,7 +1011,7 @@ end;
 3. Building the query using the Weather tool. (Simply copy/paste this last code to test the usage of the functions.)
 
 ```Delphi
-//uses GenAI, GenAI.Types, GenAI.Tutorial.VCL,  GenAI.Functions.Example;
+//uses GenAI, GenAI.Types, GenAI.Tutorial.VCL, GenAI.Functions.Example;
 
   TutorialHub.JSONRequestClear;
   var Weather := TWeatherReportFunction.CreateInstance(True);
