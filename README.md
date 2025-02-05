@@ -1796,6 +1796,66 @@ Create large batches of API requests for asynchronous processing. The Batch API 
 
 Creates and executes a batch from an uploaded file of requests.
 
+For our example, the contents of the batch JSONL file are as follows :
+
+BatchExample.jsonl
+```JSON
+{"custom_id": "request-1", "method": "POST", "url": "/v1/chat/completions", "body": {"model": "gpt-4o-mini", "messages": [{"role": "system", "content": "You are a helpful assistant."}, {"role": "user", "content": "What is 2+2?"}]}}
+{"custom_id": "request-2", "method": "POST", "url": "/v1/chat/completions", "body": {"model": "gpt-4o-mini", "messages": [{"role": "system", "content": "You are a helpful assistant."}, {"role": "user", "content": "What is the topology definition?"}]}}
+```
+
+Use the [File upload](#File-upload) method and get the ID referring to the JSONL file.
+
+<br/>
+
+Now create the batch as follow :
+
+```Delphi
+//uses GenAI, GenAI.Types, GenAI.Tutorial.VCL;
+
+  TutorialHub.Id := '...id of BatchExample.jsonl...';
+
+ {--- If needed, then create metadata }
+  var MetaData := TJSONObject.Create
+    .AddPair('customer_id', 'user_123456789')
+    .AddPair('batch_description', 'Nightly eval job');
+
+  //Asynchronous example
+  Client.Batch.AsynCreate(
+    procedure (Params: TBatchCreateParams)
+    begin
+      Params.InputFileId(TutorialHub.Id);
+      Params.Endpoint('/v1/chat/completions');
+      Params.CompletionWindow('24h');
+      Params.Metadata(MetaData);
+      TutorialHub.JSONRequest := Params.ToFormat();
+    end,
+    function : TAsynBatch
+    begin
+      Result.Sender := TutorialHub;
+      Result.OnStart := Start;
+      Result.OnSuccess := Display;
+      Result.OnError := Display;
+    end);
+
+
+  //Synchronous example
+//  var Value := Client.Batch.Create(
+//    procedure (Params: TBatchCreateParams)
+//    begin
+//      Params.InputFileId(TutorialHub.Id);
+//      Params.Endpoint('/v1/chat/completions');
+//      Params.CompletionWindow('24h');
+//      Params.Metadata(MetaData);
+//      TutorialHub.JSONRequest := Params.ToFormat();
+//    end);
+//  try
+//    Display(TutorialHub, Value);
+//  finally
+//    Value.Free;
+//  end;
+```
+
 <br/>
 
 ### Batch List
