@@ -1565,9 +1565,9 @@ Returns information about a specific file.
 
 <br/>
 
-Returns the contents of the specified file.
-
 ### File retrieve content
+
+Returns the contents of the specified file.
 
 ```Delphi
 //uses GenAI, GenAI.Types, GenAI.Tutorial.VCL;
