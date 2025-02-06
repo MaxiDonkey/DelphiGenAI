@@ -57,6 +57,13 @@ ___
         - [Batch retrieve](#Batch-retrieve)
         - [Batch cancel](#Batch-cancel)
         - [Batch output viewer](#Batch-output-viewer)
+    - [Fine tuning](#Fine-tuning)
+        - [Fine tuning create](#Fine-tuning-create)
+        - [Fine tuning list](#Fine-tuning-list)
+        - [Fine tuning cancel](#Fine-tuning-cancel)
+        - [Fine tuning events](#Fine-tuning-events)
+        - [Fine tuning check point](#Fine-tuning-check-point)
+        - [Fine tuning retrieve](#Fine-tuning-retrieve)
 - [Contributing](#contributing)
 - [License](#license)
 
@@ -2011,6 +2018,33 @@ Open and view the results obtained after processing the batch.
 >[!TIP]
 > `GenAI` provides, through the `IJSONLReader` interface (available in the `GenAI.Batch.Interfaces` unit and implemented in the `GenAI.Batch.Reader` unit), powerful tools to easily read batch files content. For further details, refer to the two units mentioned above.
 
+<br/>
+
+## Fine tuning
+
+<br/>
+
+### Fine tuning create
+
+<br/>
+
+### Fine tuning list
+
+<br/>
+
+### Fine tuning cancel
+
+<br/>
+
+### Fine tuning events
+
+<br/>
+
+### Fine tuning check point
+
+<br/>
+
+### Fine tuning retrieve
 
 <br/>
 
