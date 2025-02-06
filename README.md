@@ -2371,6 +2371,31 @@ he DPO method is a more advanced approach  that incorporates human preferences i
 
 <br/>
 
+#### Choosing Between the Two Methods
+
+ |-------------------|----------------------------------|------------------------------------------|
+ |    Criteria       |         Supervised               |                 DPO                      |
+ |-------------------|----------------------------------|------------------------------------------|
+ |                   |                                  |                                          |
+ | Data Availability | Requires data with clear target  | Requires comparisons between responses   |
+ |                   | outputs                          | (preferences)                            |
+ |-------------------|----------------------------------|------------------------------------------|
+ |                   |                                  |                                          |
+ | Implementation    | Simpler                          | More complex, needs well-collected       |
+ | Complexity        |                                  | preferences                              |
+ |                   |                                  |                                          |
+ |-------------------|----------------------------------|------------------------------------------|
+ |                   |                                  |                                          |
+ | Human Alignment   | Limited                          | Strong alignment due to human preference |
+ |                   |                                  | incorporation                            |
+ |-------------------|----------------------------------|------------------------------------------|
+ |                   |                                  |                                          |
+ | Primary Use Cases | Well-defined, objective tasks    | Subjective tasks or those requiring      |
+ |                   |                                  | fine-tuned alignment                     |
+ |-------------------|----------------------------------|------------------------------------------|
+
+<br/>
+
 # Contributing
 
 Pull requests are welcome. If you're planning to make a major change, please open an issue first to discuss your proposed changes.
