@@ -2030,7 +2030,7 @@ After determining that fine-tuning is the appropriate approach (meaning you’ve
 
 ### Fine tuning create
 
-### 1. Preparing your dataset
+#### 1. Preparing your dataset
 
 Each data sample should follow the format used by the ***Chat Completions API***, consisting of a list of messages where each message includes a role, content, and an optional name. Some of these training examples should specifically address situations where the current model's responses are inadequate, with the assistant messages in the dataset reflecting the ideal outcomes you want the model to generate.
 
@@ -2054,7 +2054,7 @@ To fine-tune a model, you need to provide at least 10 examples. Generally, notic
 
 <br/>
 
-### 2. Upload dataset
+#### 2. Upload dataset
 
 
 
