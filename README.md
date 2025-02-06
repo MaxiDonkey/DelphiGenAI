@@ -878,7 +878,7 @@ end;
 
 ## Speech to text
 
-Convert data audio into a text. Refer to [official documentation](https://platform.openai.com/docs/guides/audio)
+Convert data audio into a text. Refer to [official documentation](https://platform.openai.com/docs/guides/speech-to-text) or this [page](https://platform.openai.com/docs/guides/audio).
 
 ```Delphi
 //uses GenAI, GenAI.Types, GenAI.Tutorial.VCL;
