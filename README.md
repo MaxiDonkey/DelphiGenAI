@@ -2059,7 +2059,7 @@ To fine-tune a model, you need to provide at least 10 examples. Generally, notic
 
 #### 2. Upload dataset
 
-
+Once the training and test files have been created, they must be uploaded using the File API. The purpose property should be set to `finetune` (refer to the enumerated type `TFilesPurpose`). Please see the [example](#File-upload) above for detailed steps on uploading the files.
 
 
 
