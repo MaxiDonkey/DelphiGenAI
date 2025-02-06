@@ -2375,10 +2375,11 @@ he DPO method is a more advanced approach  that incorporates human preferences i
 
 
  |    Criteria       |         Supervised               |                 DPO                      |
- | Data Availability | Requires data with clear target outputs  | Requires comparisons between responses  (preferences)  |
- | Implementation  Complexity   | Simpler                          | More complex, needs well-collected preferences      |
- | Human Alignment   | Limited                          | Strong alignment due to human preference incorporation |
- | Primary Use Cases | Well-defined, objective tasks    | Subjective tasks or those requiring fine-tuned alignment  |
+ | --- | --- |--- |
+ | Data Availability                           | Requires data with clear target outputs  | Requires comparisons between responses  (preferences)  |
+ | Implementation  Complexity   | Simpler                                                               | More complex, needs well-collected preferences      |
+ | Human Alignment                       | Limited                                                               | Strong alignment due to human preference incorporation |
+ | Primary Use Cases                      | Well-defined, objective tasks                      | Subjective tasks or those requiring fine-tuned alignment  |
  
 <br/>
 
