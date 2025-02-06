@@ -1927,17 +1927,90 @@ Refer to [parameters documentation](https://platform.openai.com/docs/api-referen
 
 Retrieves a batch using its ID.
 
+```Delphi
+//uses GenAI, GenAI.Types, GenAI.Tutorial.VCL;
+
+  TutorialHub.Id := '...Id of batch to retrieve...';
+
+  //Asynchronous example
+  Client.Batch.AsynRetrieve(TutorialHub.Id,
+    function : TAsynBatch
+    begin
+      Result.Sender := TutorialHub;
+      Result.OnStart := Start;
+      Result.OnSuccess := Display;
+      Result.OnError := Display;
+    end);
+
+  //Synchronous example
+//  var Value := Client.Batch.Retrieve(TutorialHub.Id);
+//  try
+//    Display(TutorialHub, Value);
+//  finally
+//    Value.Free;
+//  end;
+```
+
 <br/>
 
 ### Batch cancel
 
 Cancels an in-progress batch. The batch will be in status `cancelling` for up to 10 minutes, before changing to `cancelled`, where it will have partial results (if any) available in the output file.
 
+```Delphi
+//uses GenAI, GenAI.Types, GenAI.Tutorial.VCL;
+
+  TutorialHub.Id := '...Id of batch to cancel...';
+
+  //Asynchronous example
+  Client.Batch.AsynCancel(TutorialHub.Id,
+    function : TAsynBatch
+    begin
+      Result.Sender := TutorialHub;
+      Result.OnStart := Start;
+      Result.OnSuccess := Display;
+      Result.OnError := Display;
+    end);
+
+  //Synchronous example
+//  var Value := Client.Batch.Cancel(TutorialHub.Id);
+//  try
+//    Display(TutorialHub, Value);
+//  finally
+//    Value.Free;
+//  end;
+```
+
 <br/>
 
 ### Batch output viewer
 
 Open and view the results obtained after processing the batch.
+
+```Delphi
+//uses GenAI, GenAI.Types, GenAI.Tutorial.VCL;
+
+  TutorialHub.Id := '...Id of batch...';
+  var Output := EmptyStr;
+
+  var Value := Client.Files.RetrieveContent(TutorialHub.Id);
+  try
+    Output := Value.Content;
+  finally
+    Value.Free;
+  end;
+
+  for var Item in JSONLChatReader.Deserialize(Output) do
+    try
+      Display(TutorialHub, Item.Response.Body);
+    finally
+      Item.Free;
+    end;
+```
+
+>[!TIP]
+> `GenAI` provides, through the `IJSONLReader` interface (available in the `GenAI.Batch.Interfaces` unit and implemented in the `GenAI.Batch.Reader` unit), powerful tools to easily read batch files content. For further details, refer to the two units mentioned above.
+
 
 <br/>
 
