@@ -4,7 +4,7 @@ Welcome to `GenAI`, a powerful and flexible Delphi library designed to integrate
 ___
 ![GitHub](https://img.shields.io/badge/IDE%20Version-Delphi%2010.3/11/12-yellow)
 ![GitHub](https://img.shields.io/badge/platform-all%20platforms-green)
-![GitHub](https://img.shields.io/badge/Updated%20on%20february%2004,%202025-blue)
+![GitHub](https://img.shields.io/badge/Updated%20on%20february%2008,%202025-blue)
 
 <br/>
 
