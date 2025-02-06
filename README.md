@@ -981,6 +981,8 @@ For more information, consult the [official documentation](https://platform.open
 
 An embedding is represented as a vector, or a list of floating-point numbers. The relatedness between two text strings is determined by measuring the distance between their respective vectors: smaller distances indicate strong similarity, while larger distances imply weaker relatedness.
 
+Refer to [official documentation](https://platform.openai.com/docs/guides/embeddings).
+
 ```Delphi
 //uses GenAI, GenAI.Types, GenAI.Tutorial.VCL;
 
@@ -1031,6 +1033,8 @@ Available models for the moderation endpoint include:
 - **omni-moderation-latest:** The most advanced model, supporting a wider range of content categorization and multi-modal inputs (both text and images).
 
 - **text-moderation-latest (Legacy):** An older model designed exclusively for text-based inputs with limited categorization options. For new projects, the omni-moderation model is recommended due to its superior capabilities and broader input support.
+
+Refer to the [official documentation](https://platform.openai.com/docs/guides/moderation).
 
 <br/>
 
