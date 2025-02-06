@@ -2084,24 +2084,211 @@ Once the training and test files have been created, they must be uploaded using 
   end;
 ```
 
-
+e.g. return values
+```JSON
+{
+  "object": "fine_tuning.job",
+  "id": "ftjob-abc123",
+  "model": "gpt-4o-mini-2024-07-18",
+  "created_at": 1721764800,
+  "fine_tuned_model": null,
+  "organization_id": "org-123",
+  "result_files": [],
+  "status": "queued",
+  "validation_file": null,
+  "training_file": "file-abc123",
+  "method": {
+    "type": "supervised",
+    "supervised": {
+      "hyperparameters": {
+        "batch_size": "auto",
+        "learning_rate_multiplier": "auto",
+        "n_epochs": "auto",
+      }
+    }
+  }
+}
+```
 
 <br/>
 
 ### Fine tuning list
 
+List your organization's fine-tuning jobs. Refer to [parameters documentation](https://platform.openai.com/docs/api-reference/fine-tuning/list).
+
+```Delphi
+//uses GenAI, GenAI.Types, GenAI.Tutorial.VCL;
+
+  //Asynchronous example
+  Client.FineTuning.AsynList(
+    procedure (Params: TUrlPaginationParams)
+    begin
+      Params.Limit(1);
+    end,
+    function : TAsynFineTuningJobs
+    begin
+      Result.Sender := TutorialHub;
+      Result.OnStart := Start;
+      Result.OnSuccess :=
+        procedure (Sender: TObject; Value: TFineTuningJobs)
+        begin
+          TutorialHub.JSONResponse := Value.JSONResponse;
+          Result.OnSuccess :=
+            procedure (Sender: TObject; Value: TFineTuningJobs)
+            begin
+              TutorialHub.JSONResponse := Value.JSONResponse;
+              for var Item in Value.Data do
+                Display(TutorialHub, Item.Id);
+              Display(TutorialHub, F('hasmore',VarToStr(Value.HasMore)));
+            end;
+      Result.OnError := Display;
+    end);
+
+  //Synchronous example
+//  var Value := Client.FineTuning.List(
+//    procedure (Params: TUrlPaginationParams)
+//    begin
+//      Params.Limit(1);
+//    end);
+//  try
+//    TutorialHub.JSONResponse := Value.JSONResponse;
+//    for var Item in Value.Data do
+//      Display(TutorialHub, Item.Id);
+//    Display(TutorialHub, F('hasmore',VarToStr(Value.HasMore)));
+//  finally
+//    Value.Free;
+//  end;
+```
+
 <br/>
 
 ### Fine tuning cancel
+
+Immediately cancel a fine-tune job.
+
+```Delphi
+//uses GenAI, GenAI.Types, GenAI.Tutorial.VCL;
+
+  TutorialHub.Id := '...Id of fine-tuning job';
+
+  //Synchronous example
+  var Value := Client.FineTuning.Cancel(TutorialHub.Id);
+  try
+    Display(TutorialHub, Value.Status.ToString);
+  finally
+    Value.Free;
+  end;
+```
 
 <br/>
 
 ### Fine tuning events
 
+Get status updates for a fine-tuning job.
+
+```Delphi
+//uses GenAI, GenAI.Types, GenAI.Tutorial.VCL;
+
+  TutorialHub.Id := '...Id of fine-tuning job';
+
+  //Synchronous example
+  var Value := Client.FineTuning.Events(TutorialHub.Id);
+  try
+    for var Item in value.Data do
+      Display(TutorialHub, [Item.&Object,
+        F('id', Item.Id),
+        F('message', Item.Message)]);
+  finally
+    Value.Free;
+  end;
+```
+
+e.g. return values
+```JSON
+{
+  "object": "list",
+  "data": [
+    {
+      "object": "fine_tuning.job.event",
+      "id": "ft-event-ddTJfwuMVpfLXseO0Am0Gqjm",
+      "created_at": 1721764800,
+      "level": "info",
+      "message": "Fine tuning job successfully completed",
+      "data": null,
+      "type": "message"
+    },
+    {
+      "object": "fine_tuning.job.event",
+      "id": "ft-event-tyiGuB72evQncpH87xe505Sv",
+      "created_at": 1721764800,
+      "level": "info",
+      "message": "New fine-tuned model created: ft:gpt-4o-mini:openai::7p4lURel",
+      "data": null,
+      "type": "message"
+    }
+  ],
+  "has_more": true
+}  
+```
+
 <br/>
 
 ### Fine tuning check point
 
+List checkpoints for a fine-tuning job.
+
+```Delphi
+//uses GenAI, GenAI.Types, GenAI.Tutorial.VCL;
+
+  TutorialHub.Id := '...Id of fine-tuning job';
+
+  //Synchronous example
+  var Value := Client.FineTuning.Checkpoints(TutorialHub.Id);
+  try
+    for var Item in value.Data do
+      Display(TutorialHub, [Item.&Object,
+        F('id', Item.Id),
+        F('step_number', Item.StepNumber.ToString)]);
+  finally
+    Value.Free;
+  end;
+```
+
+e.g. return values
+```JSON
+{
+  "object": "list"
+  "data": [
+    {
+      "object": "fine_tuning.job.checkpoint",
+      "id": "ftckpt_zc4Q7MP6XxulcVzj4MZdwsAB",
+      "created_at": 1721764867,
+      "fine_tuned_model_checkpoint": "ft:gpt-4o-mini-2024-07-18:my-org:custom-suffix:96olL566:ckpt-step-2000",
+      "metrics": {
+        "full_valid_loss": 0.134,
+        "full_valid_mean_token_accuracy": 0.874
+      },
+      "fine_tuning_job_id": "ftjob-abc123",
+      "step_number": 2000,
+    },
+    {
+      "object": "fine_tuning.job.checkpoint",
+      "id": "ftckpt_enQCFmOTGj3syEpYVhBRLTSy",
+      "created_at": 1721764800,
+      "fine_tuned_model_checkpoint": "ft:gpt-4o-mini-2024-07-18:my-org:custom-suffix:7q8mpxmy:ckpt-step-1000",
+      "metrics": {
+        "full_valid_loss": 0.167,
+        "full_valid_mean_token_accuracy": 0.781
+      },
+      "fine_tuning_job_id": "ftjob-abc123",
+      "step_number": 1000,
+    },
+  ],
+  "first_id": "ftckpt_zc4Q7MP6XxulcVzj4MZdwsAB",
+  "last_id": "ftckpt_enQCFmOTGj3syEpYVhBRLTSy",
+  "has_more": true
+}  
+```
 <br/>
 
 ### Fine tuning retrieve
