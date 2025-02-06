@@ -2396,8 +2396,8 @@ he DPO method is a more advanced approach  that incorporates human preferences i
 
 In summary, the  supervised method  is ideal for  well-defined tasks, while  DPO is more suitable when human preferences or subjective criteria are central to your project.
 
-
  <br/>
+
 # Contributing
 
 Pull requests are welcome. If you're planning to make a major change, please open an issue first to discuss your proposed changes.
