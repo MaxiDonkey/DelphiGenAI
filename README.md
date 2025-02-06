@@ -2024,9 +2024,16 @@ Open and view the results obtained after processing the batch.
 
 Handle fine-tuning tasks to customize a model according to your specific training dataset. Relevant guide: [Model fine-tuning](https://platform.openai.com/docs/guides/fine-tuning).
 
+After determining that fine-tuning is the appropriate approach (meaning you’ve already optimized your prompt to its full potential and identified remaining issues with the model), the next step is to prepare the training data. You’ll need to create a varied collection of sample conversations that resemble the types of interactions the model will handle during inference in production.
+
 <br/>
 
 ### Fine tuning create
+
+1. Preparing your dataset
+
+Each data sample should follow the format used by our Chat Completions API, consisting of a list of messages where each message includes a role, content, and an optional name. Some of these training examples should specifically address situations where the current model's responses are inadequate, with the assistant messages in the dataset reflecting the ideal outcomes you want the model to generate.
+
 
 <br/>
 
