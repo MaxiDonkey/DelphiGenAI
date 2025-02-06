@@ -64,6 +64,7 @@ ___
         - [Fine tuning events](#Fine-tuning-events)
         - [Fine tuning check point](#Fine-tuning-check-point)
         - [Fine tuning retrieve](#Fine-tuning-retrieve)
+        - [Difference Between Supervised and DPO](#Difference-Between-Supervised-and-DPO)
 - [Contributing](#contributing)
 - [License](#license)
 
@@ -2315,6 +2316,34 @@ Get info about a fine-tuning job.
     Value.Free;
   end;
 ```
+
+<br/>
+
+### Difference Between Supervised and DPO
+
+#### 1. SUPERVISED Fine-Tuning Method
+
+The supervised method  is a classic fine-tuning approach  where the model is trained on a labeled dataset to learn  how to map specific inputs  (prompts)  to target outputs  (ideal responses).
+
+**Key Features:** 
+   - The model learns solely from the examples provided in the training data.
+   - Each training example contains a prompt and a corresponding target response.
+   - The goal is to minimize the error (loss) between the model's output and the target response in
+     the training data.
+
+**Advantages:**
+   - Easy to implement: Requires only a well-annotated training dataset.
+   - Ideal for specific tasks: Works well for well-defined tasks where high-quality labeled data is
+     available (e.g., classification, translation, summarization).
+
+**Limitations:**
+   - Can be prone to overfitting if the training data is not diverse enough.
+   - Does not account for human preferences or comparisons between multiple potential responses.
+
+**When to use it:**
+   - When you have a labeled dataset containing specific examples of what the model should produce.
+   - When you aim to train the model  for a specific, well-defined task  (e.g., answering questions
+     or generating structured summaries).
 
 <br/>
 
