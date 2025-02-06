@@ -2321,7 +2321,7 @@ Get info about a fine-tuning job.
 
 ### Difference Between Supervised and DPO
 
-#### 1. SUPERVISED Fine-Tuning Method
+#### SUPERVISED Fine-Tuning Method
 
 The supervised method  is a classic fine-tuning approach  where the model is trained on a labeled dataset to learn  how to map specific inputs  (prompts)  to target outputs  (ideal responses).
 
@@ -2345,7 +2345,7 @@ The supervised method  is a classic fine-tuning approach  where the model is tra
 
 <br/>
 
-#### 2. DPO (Direct Preference Optimization) Method
+#### DPO (Direct Preference Optimization) Method
 
 
 he DPO method is a more advanced approach  that incorporates human preferences into the training process. Instead  of  focusing  on  "ideal"  responses,  this method  uses  pairs of responses to indicate which one is preferred (based on human or automated evaluations).
@@ -2383,6 +2383,21 @@ he DPO method is a more advanced approach  that incorporates human preferences i
  
 <br/>
 
+#### Recommendation
+
+- **Use the supervised method if:**
+    - You have a  labeled  dataset  with ideal responses  for your prompts.   
+    - Your task is  well-defined and does  not require subjective adjustments  or alignment with human preferences.
+
+- **Use the DPO method if:**
+    - You want the model to generate responses that align with human or specific subjective preferences.
+    - You have a dataset with comparisons between multiple responses.
+    - You  aim  to  improve  response  quality  for  creative  or  open-ended  tasks  where preferences  are  key.
+
+In summary, the  supervised method  is ideal for  well-defined tasks, while  DPO is more suitable when human preferences or subjective criteria are central to your project.
+
+
+ <br/>
 # Contributing
 
 Pull requests are welcome. If you're planning to make a major change, please open an issue first to discuss your proposed changes.
