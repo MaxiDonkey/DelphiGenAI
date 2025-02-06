@@ -710,7 +710,7 @@ The same process is applied to the local file paths.
 
 ## Image generation
 
-Refer to [official documentation](#https://platform.openai.com/docs/guides/images).
+Refer to [official documentation](https://platform.openai.com/docs/guides/images).
 
 Generation of an image using `DALL·E 3`.
 
