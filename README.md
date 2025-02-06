@@ -2022,6 +2022,8 @@ Open and view the results obtained after processing the batch.
 
 ## Fine tuning
 
+Handle fine-tuning tasks to customize a model according to your specific training dataset. Relevant guide: [Model fine-tuning](https://platform.openai.com/docs/guides/fine-tuning).
+
 <br/>
 
 ### Fine tuning create
