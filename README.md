@@ -7,7 +7,6 @@ ___
 ![GitHub](https://img.shields.io/badge/Updated%20on%20february%2004,%202025-blue)
 
 <br/>
-<br/>
 
 - [Introduction](#Introduction)
 - [TIPS for using the tutorial effectively](#TIPS-for-using-the-tutorial-effectively)
