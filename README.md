@@ -2052,6 +2052,9 @@ Multi-turn chat examples
 
 To fine-tune a model, you need to provide at least 10 examples. Generally, noticeable improvements can be observed with fine-tuning using 50 to 100 training examples, especially with gpt-4o-mini and gpt-3.5-turbo. However, the appropriate number of examples can vary significantly depending on the specific use case.
 
+>[!NOTE]
+> After collecting the initial dataset, it is recommended to split it into a training set and a test set. When submitting a fine-tuning task with these two sets, statistics will be provided throughout the training process for both files. This information will serve as the first indicator of the model’s improvement. Additionally, creating a test set from the start will allow you to assess the model’s performance after training by generating samples from the test set.
+
 <br/>
 
 #### 2. Upload dataset
