@@ -2077,6 +2077,7 @@ Once the training and test files have been created, they must be uploaded using 
       //Params.Method(TJobMethodParams.NewDpo(THyperparametersParams.Create.Beta(0.1)));
     end);
   try
+    TutorialHub.JSONResponse := Value.JSONResponse;
     //display the ID of the fine-tuning job
     Display(TutorialHub, Value.Id);
   finally
@@ -2174,6 +2175,7 @@ Immediately cancel a fine-tune job.
   //Synchronous example
   var Value := Client.FineTuning.Cancel(TutorialHub.Id);
   try
+    TutorialHub.JSONResponse := Value.JSONResponse;
     Display(TutorialHub, Value.Status.ToString);
   finally
     Value.Free;
@@ -2194,6 +2196,7 @@ Get status updates for a fine-tuning job.
   //Synchronous example
   var Value := Client.FineTuning.Events(TutorialHub.Id);
   try
+    TutorialHub.JSONResponse := Value.JSONResponse;
     for var Item in value.Data do
       Display(TutorialHub, [Item.&Object,
         F('id', Item.Id),
@@ -2245,6 +2248,7 @@ List checkpoints for a fine-tuning job.
   //Synchronous example
   var Value := Client.FineTuning.Checkpoints(TutorialHub.Id);
   try
+    TutorialHub.JSONResponse := Value.JSONResponse;
     for var Item in value.Data do
       Display(TutorialHub, [Item.&Object,
         F('id', Item.Id),
@@ -2292,6 +2296,25 @@ e.g. return values
 <br/>
 
 ### Fine tuning retrieve
+
+Get info about a fine-tuning job.
+
+```Delphi
+//uses GenAI, GenAI.Types, GenAI.Tutorial.VCL;
+
+  TutorialHub.Id := '...Id of fine-tuning job';
+
+  //Synchronous example
+  var Value := Client.FineTuning.Retrieve(TutorialHub.Id);
+  try
+    TutorialHub.JSONResponse := Value.JSONResponse;
+    Display(TutorialHub, [Value.&Object,
+        F('id', Value.Id),
+        F('status', Value.Status.ToString)]);
+  finally
+    Value.Free;
+  end;
+```
 
 <br/>
 
