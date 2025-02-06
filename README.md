@@ -2328,8 +2328,7 @@ The supervised method  is a classic fine-tuning approach  where the model is tra
 **Key Features:** 
    - The model learns solely from the examples provided in the training data.
    - Each training example contains a prompt and a corresponding target response.
-   - The goal is to minimize the error (loss) between the model's output and the target response in
-     the training data.
+   - The goal is to minimize the error (loss) between the model's output and the target response in the training data.
 
 **Advantages:**
    - Easy to implement: Requires only a well-annotated training dataset.
@@ -2342,8 +2341,33 @@ The supervised method  is a classic fine-tuning approach  where the model is tra
 
 **When to use it:**
    - When you have a labeled dataset containing specific examples of what the model should produce.
-   - When you aim to train the model  for a specific, well-defined task  (e.g., answering questions
-     or generating structured summaries).
+   - When you aim to train the model  for a specific, well-defined task  (e.g., answering questions or generating structured summaries).
+
+<br/>
+
+#### 2. DPO (Direct Preference Optimization) Method
+
+
+he DPO method is a more advanced approach  that incorporates human preferences into the training process. Instead  of  focusing  on  "ideal"  responses,  this method  uses  pairs of responses to indicate which one is preferred (based on human or automated evaluations).
+
+**Key Features:**
+   - The dataset includes comparisons between two responses generated for the same prompt, with one response marked as preferred.
+   - The model is optimized to replicate these preferences.
+   - This method is often used to fine-tune a model to align its responses with subjective or human preferences.
+
+**Advantages:**
+   - Captures human preferences: Improves response quality based on subjective  or context-specific criteria.
+   - Resilient to data  uncertainty:  Useful when  traditional  labeled  data  is  unavailable, but preference judgments are feasible.
+
+**Limitations:**
+   - Requires a dataset with comparison data, which can be costly or time-consuming to create.
+   - More complex to implement and train than the supervised method.
+
+**When to use it:**
+   - When you want the model to produce responses that reflect subjective or human preferences, for example:
+       - Generating more fluent or engaging text.
+       - Aligning responses  with specific criteria  (e.g., avoiding  bias  or  generating  content tailored to a specific domain).
+   - When  you  have a dataset containing  response  comparisons  (e.g., human ratings  of response quality between two options).
 
 <br/>
 
