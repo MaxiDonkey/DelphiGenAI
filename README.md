@@ -2042,7 +2042,7 @@ After determining that fine-tuning is the appropriate approach (meaning you’ve
 
 ### Fine tuning create
 
-#### + Preparing your dataset
+#### Preparing your dataset
 
 Each data sample should follow the format used by the ***Chat Completions API***, consisting of a list of messages where each message includes a role, content, and an optional name. Some of these training examples should specifically address situations where the current model's responses are inadequate, with the assistant messages in the dataset reflecting the ideal outcomes you want the model to generate.
 
@@ -2069,11 +2069,11 @@ To fine-tune a model, you need to provide at least 10 examples. Generally, notic
 
 <br/>
 
-#### + Upload dataset
+#### Upload dataset
 
 Once the training and test files have been created, they must be uploaded using the File API. The purpose property should be set to `finetune` (refer to the enumerated type `TFilesPurpose`). Please see the [example](#File-upload) above for detailed steps on uploading the files.
 
-#### + Create the fine-tuning job
+#### Create the fine-tuning job
 
 ```Delphi
 //uses GenAI, GenAI.Types, GenAI.Tutorial.VCL;
