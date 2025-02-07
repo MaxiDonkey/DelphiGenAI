@@ -2687,6 +2687,49 @@ Let’s consider the upload of two files, ***file1*** and ***file2***, ensuring 
 
 <br/>
 
+#### Create the vector store files
+
+To create the file store containing ***file1*** and ***file2***, the provided code will need to be executed twice, once for each identifier: ***fileId1*** and ***fileId2***. Upon completion of these operations, calling the file store will grant access to both associated files.
+
+```Delphi
+//uses GenAI, GenAI.Types, GenAI.Tutorial.VCL;
+
+  TutorialHub.JSONRequestClear;
+  TutorialHub.Id := 'vs_abc123';  //Id of vector store
+  var Id1 := 'file-124';
+  var Id2 := 'file-456';
+
+  //Asynchronous example
+  Client.VectorStoreFiles.AsynCreate(TutorialHub.id,
+    procedure (Params: TVectorStoreFilesCreateParams)
+    begin
+      Params.FileId(Id1);  // or Params.FileId(Id2);
+      TutorialHub.JSONRequest := Params.ToFormat();
+    end,
+    function : TAsynVectorStoreFile
+    begin
+      Result.Sender := TutorialHub;
+      Result.OnStart := Start;
+      Result.OnSuccess := Display;
+      Result.OnError := Display;
+    end);
+
+  //Synchronous example
+//  var Value := Client.VectorStoreFiles.Create(TutorialHub.id,
+//    procedure (Params: TVectorStoreFilesCreateParams)
+//    begin
+//      Params.FileId(Id1); // or Params.FileId(Id2);
+//      TutorialHub.JSONRequest := Params.ToFormat();
+//    end);
+//  try
+//    Display(TutorialHub, Value);
+//  finally
+//    Value.Free;
+//  end;
+```
+
+<br/>
+
 ### Vsf list
 
 <br/>
