@@ -80,7 +80,7 @@ ___
         - [Vsb create](#Vsb-create)
         - [Vsb list](#Vsb-list)
         - [Vsb retrieve](#Vsb-retrieve)
-        - [Vsb delete](#Vsb-delete)
+        - [Vsb cancel](#Vsb-cancel)
 - [Contributing](#contributing)
 - [License](#license)
 
@@ -2827,7 +2827,6 @@ Refert to [parameters documentation](https://platform.openai.com/docs/api-refere
 //  finally
 //    Value.Free;
 //  end;
-
 ```
 
 The JSON response:
@@ -3070,13 +3069,131 @@ The JSON response:
 
 ### Vsb list
 
+Returns a list of vector store files in a batch.
+
+#### Without parameters
+
+```Delphi
+//uses GenAI, GenAI.Types, GenAI.Tutorial.VCL;
+ 
+  TutorialHub.JSONRequestClear;
+  TutorialHub.Id := 'vs_cde456';
+  var BatchId := 'vsfb_789';
+
+  //Asynchronous example
+  Client.VectorStoreBatch.AsynList(
+    TutorialHub.Id,
+    BatchId,
+    function : TAsynVectorStoreBatches
+    begin
+      Result.Sender := TutorialHub;
+      Result.OnStart := Start;
+      Result.OnSuccess := Display;
+      Result.OnError := Display;
+    end);
+
+  //Synchronous example
+//  var Value := Client.VectorStoreBatch.List(TutorialHub.Id, BatchId);
+//  try
+//    Display(TutorialHub, Value);
+//  finally
+//    Value.Free;
+//  end;
+```
+
+<br/>
+
+#### with parameters
+
+Refert to [parameters documentation](https://platform.openai.com/docs/api-reference/vector-stores-files/listFiles).
+
+```Delphi
+//uses GenAI, GenAI.Types, GenAI.Tutorial.VCL;
+
+  TutorialHub.JSONRequestClear;
+  TutorialHub.Id := 'vs_cde456';
+  var BatchId := 'vsfb_789';
+
+  //Asynchronous example
+  Client.VectorStoreBatch.AsynList(
+    TutorialHub.Id,
+    BatchId,
+    procedure (Params: TVectorStoreFilesUrlParams)
+    begin
+      Params.Limit(5);
+      Params.Filter('completed');
+    end,
+    function : TAsynVectorStoreBatches
+    begin
+      Result.Sender := TutorialHub;
+      Result.OnStart := Start;
+      Result.OnSuccess := Display;
+      Result.OnError := Display;
+    end);
+
+  //Synchronous example
+//  var Value := Client.VectorStoreBatch.List(TutorialHub.Id, BatchId,
+//    procedure (Params: TVectorStoreFilesUrlParams)
+//    begin
+//      Params.Limit(5);
+//      Params.Filter('completed');
+//    end);
+//  try
+//    Display(TutorialHub, Value);
+//  finally
+//    Value.Free;
+//  end;
+```
+
+The JSON response:
+```JSON
+{
+    "object": "list",
+    "data": [
+        {
+            "id": "file-123",
+            "object": "vector_store.file",
+            "created_at": 1738955835,
+            "vector_store_id": "vs_cde456",
+            "status": "completed",
+            "last_error": null
+        },
+        {
+            "id": "file-456",
+            "object": "vector_store.file",
+            "created_at": 1738902946,
+            "vector_store_id": "vs_cde456",
+            "status": "completed",
+            "last_error": null
+        }
+    ],
+    "first_id": "file-123",
+    "last_id": "file-456",
+    "has_more": false
+}
+```
+
 <br/>
 
 ### Vsb retrieve
 
+Returns a list of vector store files in a batch.
+
+```Delphi
+//uses GenAI, GenAI.Types, GenAI.Tutorial.VCL;
+
+```
+
 <br/>
 
-### Vsb delete
+### Vsb cancel
+
+Cancel a vector store file batch. This attempts to cancel the processing of files in this batch as soon as possible.
+
+```Delphi
+//uses GenAI, GenAI.Types, GenAI.Tutorial.VCL;
+
+```
 
 <br/>
 
