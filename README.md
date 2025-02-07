@@ -2728,6 +2728,26 @@ To create the file store containing ***file1*** and ***file2***, the provided co
 //  end;
 ```
 
+The JSON response
+```JSON
+{
+    "id": "file-124",
+    "object": "vector_store.file",
+    "usage_bytes": 62353,
+    "created_at": 1738906505,
+    "vector_store_id": "vs_abc123",
+    "status": "completed",
+    "last_error": null,
+    "chunking_strategy": {
+        "type": "static",
+        "static": {
+            "max_chunk_size_tokens": 800,
+            "chunk_overlap_tokens": 400
+        }
+    }
+}  
+```
+
 <br/>
 
 ### Vsf list
