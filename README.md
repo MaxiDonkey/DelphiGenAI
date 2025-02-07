@@ -2968,7 +2968,7 @@ Remove a vector store file. This action will detach the file from the vector sto
 
 The JSON response:
 ```JSON
-  {
+{
     "id": "file-123",
     "object": "vector_store.file.deleted",
     "deleted": true
