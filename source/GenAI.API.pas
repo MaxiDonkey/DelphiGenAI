@@ -472,30 +472,13 @@ type
     constructor CreateRoute(AAPI: TGenAIAPI); reintroduce;
   end;
 
-function TimestampToDateTime(const Value: Int64; const UTC: Boolean = False): TDateTime;
-function TimestampToString(const Value: Int64; const UTC: Boolean = False): string;
-
 var
-  UTCtimestamp: Boolean = False;
   MetadataAsObject: Boolean = False;
 
 implementation
 
 uses
   System.StrUtils, REST.Json, GenAI.NetEncoding.Base64, System.DateUtils;
-
-function TimestampToDateTime(const Value: Int64; const UTC: Boolean): TDateTime;
-begin
-  Result := UnixToDateTime(Value, UTC);
-end;
-
-function TimestampToString(const Value: Int64; const UTC: Boolean): string;
-begin
-  {--- null date before 01/01/1970 }
-  if Value <= 0 then
-    Result := '' else
-    Result := DateTimeToStr(TimestampToDateTime(Value, UTC))
-end;
 
 {TGenAIAPI}
 

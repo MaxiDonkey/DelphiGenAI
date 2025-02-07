@@ -164,7 +164,7 @@ type
     [JsonNameAttribute('usage_bytes')]
     FUsageBytes: Int64;
     [JsonNameAttribute('created_at')]
-    FCreatedAt: Int64;
+    FCreatedAt: TInt64OrNull;
     [JsonNameAttribute('vector_store_id')]
     FVectorStoreId: string;
     [JsonReflectAttribute(ctString, rtString, TRunStatusInterceptor)]
@@ -174,6 +174,7 @@ type
     [JsonNameAttribute('chunking_strategy')]
     FChunkingStrategy: TChunkingStrategy;
   private
+    function GetCreatedAt: Int64;
     function GetCreatedAtAsString: string;
   public
     /// <summary>
@@ -194,7 +195,7 @@ type
     /// <summary>
     /// Gets or sets the Unix timestamp (in seconds) indicating when the file was added to the vector store.
     /// </summary>
-    property CreatedAt: Int64 read FCreatedAt write FCreatedAt;
+    property CreatedAt: Int64 read GetCreatedAt;
     /// <summary>
     /// Gets the human-readable representation of the creation timestamp.
     /// </summary>
@@ -437,9 +438,14 @@ begin
   inherited;
 end;
 
+function TVectorStoreFile.GetCreatedAt: Int64;
+begin
+  Result := TInt64OrNull(FCreatedAt).ToInteger;
+end;
+
 function TVectorStoreFile.GetCreatedAtAsString: string;
 begin
-  Result := TimestampToString(CreatedAt, UTCtimestamp);
+  Result := TInt64OrNull(FCreatedAt).ToUtcDateString;
 end;
 
 { TChunkingStrategy }

@@ -360,7 +360,7 @@ type
     FId: string;
     FObject: string;
     [JsonNameAttribute('created_at')]
-    FCreatedAt: Int64;
+    FCreatedAt: TInt64OrNull;
     [JsonNameAttribute('assistant_id')]
     FAssistantId: string;
     [JsonNameAttribute('thread_id')]
@@ -376,16 +376,21 @@ type
     [JsonNameAttribute('last_error')]
     FLastError: TLastError;
     [JsonNameAttribute('expired_at')]
-    FExpiredAt: Int64;
+    FExpiredAt: TInt64OrNull;
     [JsonNameAttribute('cancelled_at')]
-    FCancelledAt: Int64;
+    FCancelledAt: TInt64OrNull;
     [JsonNameAttribute('failed_at')]
-    FFailedAt: Int64;
+    FFailedAt: TInt64OrNull;
     [JsonNameAttribute('completed_at')]
-    FCompletedAt: Int64;
+    FCompletedAt: TInt64OrNull;
     [JsonReflectAttribute(ctString, rtString, TMetadataInterceptor)]
     FMetadata: string;
     FUsage: TRunUsage;
+    function GetCreatedAt: Int64;
+    function GetExpiredAt: Int64;
+    function GetCancelledAt: Int64;
+    function GetFailedAt: Int64;
+    function GetCompletedAt: Int64;
   protected
     function GetCreatedAtAsString: string; override;
     function GetExpiredAtAsString: string; override;
@@ -402,9 +407,9 @@ type
     /// </summary>
     property &Object: string read FObject write FObject;
     /// <summary>
-    /// Gets or sets the creation timestamp of the run step.
+    /// Gets the creation timestamp of the run step.
     /// </summary>
-    property CreatedAt: Int64 read FCreatedAt write FCreatedAt;
+    property CreatedAt: Int64 read GetCreatedAt;
     /// <summary>
     /// Gets or sets the ID of the assistant associated with the run step.
     /// </summary>
@@ -434,21 +439,21 @@ type
     /// </summary>
     property LastError: TLastError read FLastError write FLastError;
     /// <summary>
-    /// Gets or sets the timestamp when the run step expired, if applicable.
+    /// Gets the timestamp when the run step expired, if applicable.
     /// </summary>
-    property ExpiredAt: Int64 read FExpiredAt write FExpiredAt;
+    property ExpiredAt: Int64 read GetExpiredAt;
     /// <summary>
-    /// Gets or sets the timestamp when the run step was cancelled, if applicable.
+    /// Gets the timestamp when the run step was cancelled, if applicable.
     /// </summary>
-    property CancelledAt: Int64 read FCancelledAt write FCancelledAt;
+    property CancelledAt: Int64 read GetCancelledAt;
     /// <summary>
-    /// Gets or sets the timestamp when the run step failed, if applicable.
+    /// Gets the timestamp when the run step failed, if applicable.
     /// </summary>
-    property FailedAt: Int64 read FFailedAt write FFailedAt;
+    property FailedAt: Int64 read GetFailedAt;
     /// <summary>
-    /// Gets or sets the timestamp when the run step was completed, if applicable.
+    /// Gets the timestamp when the run step was completed, if applicable.
     /// </summary>
-    property CompletedAt: Int64 read FCompletedAt write FCompletedAt;
+    property CompletedAt: Int64 read GetCompletedAt;
     /// <summary>
     /// Gets or sets any metadata associated with the run step.
     /// </summary>
@@ -612,29 +617,54 @@ begin
   inherited;
 end;
 
+function TRunStep.GetCancelledAt: Int64;
+begin
+  Result := TInt64OrNull(FCancelledAt).ToInteger;
+end;
+
 function TRunStep.GetCancelledAtAsString: string;
 begin
-  Result := TimestampToString(CancelledAt, UTCtimestamp);
+  Result := TInt64OrNull(FCancelledAt).ToUtcDateString;
+end;
+
+function TRunStep.GetCompletedAt: Int64;
+begin
+  Result := TInt64OrNull(CompletedAt).ToInteger;
 end;
 
 function TRunStep.GetCompletedAtAsString: string;
 begin
-  Result := TimestampToString(CompletedAt, UTCtimestamp);
+  Result := TInt64OrNull(FCompletedAt).ToUtcDateString;
+end;
+
+function TRunStep.GetCreatedAt: Int64;
+begin
+  Result := TInt64OrNull(FCreatedAt).ToInteger;
 end;
 
 function TRunStep.GetCreatedAtAsString: string;
 begin
-  Result := TimestampToString(CreatedAt, UTCtimestamp);
+  Result := TInt64OrNull(FCreatedAt).ToUtcDateString;
+end;
+
+function TRunStep.GetExpiredAt: Int64;
+begin
+  Result := TInt64OrNull(FExpiredAt).ToInteger;
 end;
 
 function TRunStep.GetExpiredAtAsString: string;
 begin
-  Result := TimestampToString(ExpiredAt, UTCtimestamp);
+  Result := TInt64OrNull(FExpiredAt).ToUtcDateString;
+end;
+
+function TRunStep.GetFailedAt: Int64;
+begin
+  Result := TInt64OrNull(FFailedAt).ToInteger;
 end;
 
 function TRunStep.GetFailedAtAsString: string;
 begin
-  Result := TimestampToString(FailedAt, UTCtimestamp);
+  Result := TInt64OrNull(FFailedAt).ToUtcDateString;
 end;
 
 { TRunStepDetails }

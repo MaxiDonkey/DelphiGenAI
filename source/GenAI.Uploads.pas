@@ -166,28 +166,30 @@ type
   private
     FId: string;
     [JsonNameAttribute('created_at')]
-    FCreatedAt: Int64;
+    FCreatedAt: TInt64OrNull;
     FFilename: string;
     FBytes: Int64;
     [JsonReflectAttribute(ctString, rtString, TFilesPurposeInterceptor)]
     FPurpose: TFilesPurpose;
     FStatus: string;
     [JsonNameAttribute('expires_at')]
-    FExpiresAt: Int64;
+    FExpiresAt: TInt64OrNull;
     FObject: string;
     FFile: TFile;
   private
     function GetCreatedAtAsString: string;
     function GetExpiresAtAsString: string;
+    function GetCreatedAt: Int64;
+    function GetExpiresAt: Int64;
   public
     /// <summary>
     /// Gets or sets the unique identifier of the upload.
     /// </summary>
     property Id: string read FId write FId;
     /// <summary>
-    /// Gets or sets the Unix timestamp (in seconds) indicating when the upload was created.
+    /// Gets the Unix timestamp (in seconds) indicating when the upload was created.
     /// </summary>
-    property CreatedAt: Int64 read FCreatedAt write FCreatedAt;
+    property CreatedAt: Int64 read GetCreatedAt;
     /// <summary>
     /// Gets the Unix timestamp a a string, indicating when the upload was created.
     /// </summary>
@@ -209,9 +211,9 @@ type
     /// </summary>
     property Status: string read FStatus write FStatus;
     /// <summary>
-    /// Gets or sets the Unix timestamp (in seconds) indicating when the upload will expire.
+    /// Gets the Unix timestamp (in seconds) indicating when the upload will expire.
     /// </summary>
-    property ExpiresAt: Int64 read FExpiresAt write FExpiresAt;
+    property ExpiresAt: Int64 read GetExpiresAt;
     /// <summary>
     /// Gets the Unix timestamp as a string, indicating when the upload will expire.
     /// </summary>
@@ -238,21 +240,22 @@ type
   private
     FId: string;
     [JsonNameAttribute('created_at')]
-    FCreatedAt: Int64;
+    FCreatedAt: TInt64OrNull;
     [JsonNameAttribute('upload_id')]
     FUploadId: string;
     FObject: string;
   private
     function GetCreatedAtAsString: string;
+    function GetCreatedAt: Int64;
   public
     /// <summary>
     /// Gets or sets the unique identifier of the upload part.
     /// </summary>
     property Id: string read FId write FId;
     /// <summary>
-    /// Gets or sets the Unix timestamp (in seconds) indicating when the upload part was created.
+    /// Gets the Unix timestamp (in seconds) indicating when the upload part was created.
     /// </summary>
-    property CreatedAt: Int64 read FCreatedAt write FCreatedAt;
+    property CreatedAt: Int64 read GetCreatedAt;
     /// <summary>
     /// Gets the formatted creation time as a human-readable string.
     /// </summary>
@@ -433,14 +436,24 @@ begin
   inherited;
 end;
 
+function TUpload.GetCreatedAt: Int64;
+begin
+  Result := TInt64OrNull(FCreatedAt).ToInteger;
+end;
+
 function TUpload.GetCreatedAtAsString: string;
 begin
-  Result := TimestampToString(CreatedAt, UTCtimestamp);
+  Result := TInt64OrNull(FCreatedAt).ToUtcDateString;
+end;
+
+function TUpload.GetExpiresAt: Int64;
+begin
+  Result := TInt64OrNull(FExpiresAt).ToInteger;
 end;
 
 function TUpload.GetExpiresAtAsString: string;
 begin
-  Result := TimestampToString(ExpiresAt, UTCtimestamp);
+  Result := TInt64OrNull(FExpiresAt).ToUtcDateString;
 end;
 
 { TUploadsRoute }
@@ -585,9 +598,14 @@ end;
 
 { TUploadPart }
 
+function TUploadPart.GetCreatedAt: Int64;
+begin
+  Result := TInt64OrNull(FCreatedAt).ToInteger;
+end;
+
 function TUploadPart.GetCreatedAtAsString: string;
 begin
-  Result := TimestampToString(CreatedAt, UTCtimestamp);
+  Result := TInt64OrNull(FCreatedAt).ToUtxDateString;
 end;
 
 end.

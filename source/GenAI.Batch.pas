@@ -246,27 +246,36 @@ type
     [JsonNameAttribute('error_file_id')]
     FErrorFileId: string;
     [JsonNameAttribute('created_at')]
-    FCreatedAt: Int64;
+    FCreatedAt: TInt64OrNull;
     [JsonNameAttribute('in_progress_at')]
-    FInProgressAt: Int64;
+    FInProgressAt: TInt64OrNull;
     [JsonNameAttribute('expires_at')]
-    FExpiresAt: Int64;
+    FExpiresAt: TInt64OrNull;
     [JsonNameAttribute('finalizing_at')]
-    FFinalizingAt: Int64;
+    FFinalizingAt: TInt64OrNull;
     [JsonNameAttribute('completed_at')]
-    FCompletedAt: Int64;
+    FCompletedAt: TInt64OrNull;
     [JsonNameAttribute('failed_at')]
-    FFailedAt: Int64;
+    FFailedAt: TInt64OrNull;
     [JsonNameAttribute('expired_at')]
-    FExpiredAt: Int64;
+    FExpiredAt: TInt64OrNull;
     [JsonNameAttribute('cancelling_at')]
-    FCancellingAt: Int64;
+    FCancellingAt: TInt64OrNull;
     [JsonNameAttribute('cancelled_at')]
-    FCancelledAt: Int64;
+    FCancelledAt: TInt64OrNull;
     [JsonNameAttribute('request_counts')]
     FRequestCounts: TBatchRequestCounts;
     [JsonReflectAttribute(ctString, rtString, TMetadataInterceptor)]
     FMetadata: string;
+    function GetCancelledAt: Int64;
+    function GetCancellingAt: Int64;
+    function GetCompletedAt: Int64;
+    function GetCreatedAt: Int64;
+    function GetExpiredAt: Int64;
+    function GetExpiresAt: Int64;
+    function GetFailedAt: Int64;
+    function GetFinalizingAt: Int64;
+    function GetInProgressAt: Int64;
   protected
     function GetCreatedAtAsString: string; override;
     function GetInProgressAtAsString: string; override;
@@ -326,51 +335,51 @@ type
     /// Records the timestamp of when the batch was initially created. This is the starting point in the
     /// lifecycle of a batch operation.
     /// </summary>
-    property CreatedAt: Int64 read FCreatedAt write FCreatedAt;
+    property CreatedAt: Int64 read GetCreatedAt;
     /// <summary>
     /// Marks the timestamp of when the batch started processing. It's crucial for monitoring when the
     /// batch transitions from a queued or pending state to an active processing state.
     /// </summary>
-    property InProgressAt: Int64 read FInProgressAt write FInProgressAt;
+    property InProgressAt: Int64 read GetInProgressAt;
     /// <summary>
     /// Indicates the timestamp of when the batch is set to expire. This property is essential for managing
     /// the lifecycle of the batch, ensuring that operations are completed within the expected timeframe or
     /// handling tasks that exceed their completion window.
     /// </summary>
-    property ExpiresAt: Int64 read FExpiresAt write FExpiresAt;
+    property ExpiresAt: Int64 read GetExpiresAt;
     /// <summary>
     /// Captures the timestamp of when the batch entered the finalizing stage. This stage marks the transition
     /// from active processing to concluding the operations, where final checks or cleanup might occur.
     /// </summary>
-    property FinalizingAt: Int64 read FFinalizingAt write FFinalizingAt;
+    property FinalizingAt: Int64 read GetFinalizingAt;
     /// <summary>
     /// Represents the timestamp of when the batch processing was completed successfully. This timestamp is
     /// crucial for tracking the end of the processing phase and the readiness of the output data.
     /// </summary>
-    property CompletedAt: Int64 read FCompletedAt write FCompletedAt;
+    property CompletedAt: Int64 read GetCompletedAt;
     /// <summary>
     /// Logs the timestamp of when the batch encountered a failure that prevented it from completing
     /// successfully. This property is critical for error handling and for initiating potential retries or
     /// investigations.
     /// </summary>
-    property FailedAt: Int64 read FFailedAt write FFailedAt;
+    property FailedAt: Int64 read GetFailedAt;
     /// <summary>
     /// Denotes the timestamp of when the batch expired. If a batch does not complete within the designated
     /// time (as noted in ExpiresAt), it may be marked as expired, indicating that it did not conclude in the
     /// expected period.
     /// </summary>
-    property ExpiredAt: Int64 read FExpiredAt write FExpiredAt;
+    property ExpiredAt: Int64 read GetExpiredAt;
     /// <summary>
     /// Records the timestamp of when the cancellation process for the batch started. This property is
     /// important for managing batches that need to be stopped before completion due to errors, changes in
     /// requirements, or other operational reasons.
     /// </summary>
-    property CancellingAt: Int64 read FCancellingAt write FCancellingAt;
+    property CancellingAt: Int64 read GetCancellingAt;
     /// <summary>
     /// Indicates the timestamp of when the batch was officially cancelled. This final timestamp in the
     /// cancellation process confirms that no further processing will occur and the batch has been terminated.
     /// </summary>
-    property CancelledAt: Int64 read FCancelledAt write FCancelledAt;
+    property CancelledAt: Int64 read GetCancelledAt;
     /// <summary>
     /// Provides a structured breakdown of request counts within the batch, including total requests,
     /// successfully completed requests, and failed requests, enabling effective management and analysis
@@ -542,49 +551,94 @@ begin
   inherited;
 end;
 
+function TBatch.GetCancelledAt: Int64;
+begin
+  Result := TInt64OrNull(FCancelledAt).ToInteger;
+end;
+
 function TBatch.GetCancelledAtAsString: string;
 begin
-  Result := TimestampToString(CancelledAt, UTCtimestamp);
+  Result := TInt64OrNull(FCancelledAt).ToUtcDateString;
+end;
+
+function TBatch.GetCancellingAt: Int64;
+begin
+  Result := TInt64OrNull(FCancellingAt).ToInteger;
 end;
 
 function TBatch.GetCancellingAtAsString: string;
 begin
-  Result := TimestampToString(CancellingAt, UTCtimestamp);
+  Result := TInt64OrNull(FCancellingAt).ToUtcDateString;
+end;
+
+function TBatch.GetCompletedAt: Int64;
+begin
+  Result := TInt64OrNull(FCompletedAt).ToInteger;
 end;
 
 function TBatch.GetCompletedAtAsString: string;
 begin
-  Result := TimestampToString(CompletedAt, UTCtimestamp);
+  Result := TInt64OrNull(FCompletedAt).ToUtcDateString;
+end;
+
+function TBatch.GetCreatedAt: Int64;
+begin
+  Result := TInt64OrNull(FCreatedAt).ToInteger;
 end;
 
 function TBatch.GetCreatedAtAsString: string;
 begin
-  Result := TimestampToString(CreatedAt, UTCtimestamp);
+  Result := TInt64OrNull(FCreatedAt).ToUtcDateString;
+end;
+
+function TBatch.GetExpiredAt: Int64;
+begin
+  Result := TInt64OrNull(FExpiredAt).ToInteger;
 end;
 
 function TBatch.GetExpiredAtAsString: string;
 begin
-  Result := TimestampToString(ExpiredAt, UTCtimestamp);
+  Result := TInt64OrNull(FExpiredAt).ToUtcDateString;
+end;
+
+function TBatch.GetExpiresAt: Int64;
+begin
+  Result := TInt64OrNull(FExpiresAt).ToInteger;
 end;
 
 function TBatch.GetExpiresAtAsString: string;
 begin
-  Result := TimestampToString(ExpiresAt, UTCtimestamp);
+  Result := TInt64OrNull(FExpiresAt).ToUtcDateString;
+end;
+
+function TBatch.GetFailedAt: Int64;
+begin
+  Result := TInt64OrNull(FFailedAt).ToInteger;
 end;
 
 function TBatch.GetFailedAtAsString: string;
 begin
-  Result := TimestampToString(FailedAt, UTCtimestamp);
+  Result := TInt64OrNull(FFailedAt).ToUtcDateString;
+end;
+
+function TBatch.GetFinalizingAt: Int64;
+begin
+  Result := TInt64OrNull(FFinalizingAt).ToInteger;
 end;
 
 function TBatch.GetFinalizingAtAsString: string;
 begin
-  Result := TimestampToString(FinalizingAt, UTCtimestamp);
+  Result := TInt64OrNull(FFinalizingAt).ToUtcDateString;
+end;
+
+function TBatch.GetInProgressAt: Int64;
+begin
+  Result := TInt64OrNull(FInProgressAt).ToInteger;
 end;
 
 function TBatch.GetInProgressAtAsString: string;
 begin
-  Result := TimestampToString(InProgressAt, UTCtimestamp);
+  Result := TInt64OrNull(FInProgressAt).ToUtcDateString;
 end;
 
 { TBatchRoute }

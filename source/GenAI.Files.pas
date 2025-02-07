@@ -145,13 +145,14 @@ type
     FId: string;
     FBytes: Int64;
     [JsonNameAttribute('created_at')]
-    FCreatedAt: Int64;
+    FCreatedAt: TInt64OrNull;
     FFilename: string;
     FObject: string;
     [JsonReflectAttribute(ctString, rtString, TFilesPurposeInterceptor)]
     FPurpose: TFilesPurpose;
   private
     function GetCreatedAtAsString: string;
+    function GetCreatedAt: Int64;
   public
     /// <summary>
     /// Gets or sets the unique identifier of the file.
@@ -162,9 +163,9 @@ type
     /// </summary>
     property Bytes: Int64 read FBytes write FBytes;
     /// <summary>
-    /// Gets or sets the creation timestamp of the file in Unix seconds.
+    /// Gets the creation timestamp of the file in Unix seconds.
     /// </summary>
-    property CreatedAt: Int64 read FCreatedAt write FCreatedAt;
+    property CreatedAt: Int64 read GetCreatedAt;
     /// <summary>
     /// Gets the creation timestamp of the file as string.
     /// </summary>
@@ -597,9 +598,14 @@ end;
 
 { TFile }
 
+function TFile.GetCreatedAt: Int64;
+begin
+  Result := TInt64OrNull(FCreatedAt).ToInteger;
+end;
+
 function TFile.GetCreatedAtAsString: string;
 begin
-  Result := TimestampToString(CreatedAt, UTCtimestamp);
+  Result := TInt64OrNull(FCreatedAt).ToUtcDateString;
 end;
 
 end.

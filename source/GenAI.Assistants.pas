@@ -369,6 +369,7 @@ type
     function Static(const Value: TChunkStaticParams): TChunkingStrategyParams;
   end;
 
+
   /// <summary>
   /// Represents the parameters used to configure vector stores for file search operations.
   /// </summary>
@@ -661,6 +662,26 @@ type
     /// The <c>TAssistantsParams</c> instance, allowing for method chaining.
     /// </returns>
     function Instructions(const Value: string): TAssistantsParams;
+    /// <summary>
+    /// Specifies the effort level for reasoning when generating responses.
+    /// </summary>
+    /// <param name="Value">
+    /// A string representing the desired effort level ('low', 'medium', or 'high').
+    /// </param>
+    /// <returns>
+    /// Returns an instance of TAssistantsParams with the reasoning effort set.
+    /// </returns>
+    function ReasoningEffort(const Value: TReasoningEffort): TAssistantsParams; overload;
+    /// <summary>
+    /// Specifies the effort level for reasoning when generating responses.
+    /// </summary>
+    /// <param name="Value">
+    /// A string representing the desired effort level ('low', 'medium', or 'high').
+    /// </param>
+    /// <returns>
+    /// Returns an instance of TAssistantsParams with the reasoning effort set.
+    /// </returns>
+    function ReasoningEffort(const Value: string): TAssistantsParams; overload;
     /// <summary>
     /// Configures the tools that the assistant can use.
     /// </summary>
@@ -1306,6 +1327,18 @@ end;
 function TAssistantsParams.Name(const Value: string): TAssistantsParams;
 begin
   Result := TAssistantsParams(Add('name', Value));
+end;
+
+function TAssistantsParams.ReasoningEffort(
+  const Value: TReasoningEffort): TAssistantsParams;
+begin
+  Result := TAssistantsParams(Add('reasoning_effort', Value.ToString));
+end;
+
+function TAssistantsParams.ReasoningEffort(
+  const Value: string): TAssistantsParams;
+begin
+  Result := TAssistantsParams(Add('reasoning_effort', TReasoningEffort.Create(Value).ToString));
 end;
 
 function TAssistantsParams.ResponseFormat(

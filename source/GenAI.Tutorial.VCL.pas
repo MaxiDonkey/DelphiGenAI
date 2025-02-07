@@ -146,6 +146,14 @@ type
   procedure Display(Sender: TObject; Value: TBatch); overload;
   procedure Display(Sender: TObject; Value: TBatches); overload;
   procedure Display(Sender: TObject; Value: TCompletion); overload;
+  procedure Display(Sender: TObject; Value: TVectorStore); overload;
+  procedure Display(Sender: TObject; Value: TVectorStores); overload;
+  procedure Display(Sender: TObject; Value: TVectorStoreFile); overload;
+  procedure Display(Sender: TObject; Value: TVectorStoreFiles); overload;
+  procedure Display(Sender: TObject; Value: TVectorStoreBatch); overload;
+  procedure Display(Sender: TObject; Value: TVectorStoreBatches); overload;
+  procedure Display(Sender: TObject; Value: TAssistant); overload;
+  procedure Display(Sender: TObject; Value: TAssistants); overload;
 
   procedure DisplayStream(Sender: TObject; Value: string); overload;
   procedure DisplayStream(Sender: TObject; Value: TChat); overload;
@@ -273,6 +281,7 @@ end;
 
 procedure Display(Sender: TObject; Value: TDeletion);
 begin
+  TutorialHub.JSONResponse := Value.JSONResponse;
   Display(Sender, [
     EmptyStr,
     F('id', Value.Id),
@@ -492,6 +501,93 @@ begin
   for var Item in Value.Choices do
     Display(Sender, Item.Text);
   Display(Sender);
+end;
+
+procedure Display(Sender: TObject; Value: TVectorStore);
+begin
+  if not Value.JSONResponse.IsEmpty then
+    TutorialHub.JSONResponse := Value.JSONResponse;
+  Display(Sender, [
+    F('id', Value.Id),
+    F('object', Value.&Object),
+    F('name', Value.Name),
+    F('created_at', Value.CreatedAtAsString),
+    F('metadata', Value.Metadata)
+  ]);
+  Display(Sender, sLineBreak);
+end;
+
+procedure Display(Sender: TObject; Value: TVectorStores);
+begin
+  TutorialHub.JSONResponse := Value.JSONResponse;
+  for var Item in Value.Data do
+    begin
+      Display(Sender, Item);
+    end;
+  Display(Sender);
+end;
+
+procedure Display(Sender: TObject; Value: TVectorStoreFile);
+begin
+  if not Value.JSONResponse.IsEmpty then
+    TutorialHub.JSONResponse := Value.JSONResponse;
+  Display(Sender, [
+    F('id', Value.Id),
+    F('object', Value.&Object),
+    F('usage_bytes', Value.UsageBytes.ToString),
+    F('status', Value.Status.ToString)
+  ]);
+  Display(Sender);
+end;
+
+procedure Display(Sender: TObject; Value: TVectorStoreFiles);
+begin
+  TutorialHub.JSONResponse := Value.JSONResponse;
+  for var Item in Value.Data do
+    Display(Sender, Item);
+  Display(Sender);
+end;
+
+procedure Display(Sender: TObject; Value: TVectorStoreBatch);
+begin
+  if not Value.JSONResponse.IsEmpty then
+    TutorialHub.JSONResponse := Value.JSONResponse;
+  Display(Sender, [
+    F('id', Value.Id),
+    F('object', Value.&Object),
+    F('vector_store_id', Value.VectorStoreId),
+    F('status', Value.Status.ToString)
+  ]);
+  Display(Sender);
+end;
+
+procedure Display(Sender: TObject; Value: TVectorStoreBatches);
+begin
+  TutorialHub.JSONResponse := Value.JSONResponse;
+  for var Item in Value.Data do
+    Display(Sender, Item);
+  Display(Sender)
+end;
+
+procedure Display(Sender: TObject; Value: TAssistant);
+begin
+  if not Value.JSONResponse.IsEmpty then
+    TutorialHub.JSONResponse := Value.JSONResponse;
+  Display(Sender, [
+    F('id', Value.Id),
+    F('object', Value.&Object),
+    F('name', Value.Name),
+    F('model', Value.Model)
+  ]);
+  Display(Sender);
+end;
+
+procedure Display(Sender: TObject; Value: TAssistants);
+begin
+  TutorialHub.JSONResponse := Value.JSONResponse;
+  for var Item in Value.Data do
+    Display(Sender, Item);
+  Display(Sender)
 end;
 
 procedure DisplayStream(Sender: TObject; Value: string);

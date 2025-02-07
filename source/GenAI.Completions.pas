@@ -250,7 +250,7 @@ type
   private
     FId: string;
     FChoices: TArray<TCompletionChoice>;
-    FCreated: Int64;
+    FCreated: TInt64OrNull;
     FModel: string;
     [JsonNameAttribute('system_fingerprint')]
     FSystemFingerprint: string;
@@ -258,6 +258,7 @@ type
     FUsage: TUsage;
   private
     function GetCreatedAsString: string;
+    function GetCreated: Int64;
   public
     /// <summary>
     /// Gets or sets the unique identifier for the completion.
@@ -268,9 +269,9 @@ type
     /// </summary>
     property Choices: TArray<TCompletionChoice> read FChoices write FChoices;
     /// <summary>
-    /// Gets or sets the timestamp of when the completion was created.
+    /// Gets the timestamp of when the completion was created.
     /// </summary>
-    property Created: Int64 read FCreated write FCreated;
+    property Created: Int64 read GetCreated;
     /// <summary>
     /// Gets the timestamp of when the completion was created as a string.
     /// </summary>
@@ -482,9 +483,14 @@ begin
   inherited;
 end;
 
+function TCompletion.GetCreated: Int64;
+begin
+  Result := TInt64OrNull(FCreated).ToInteger;
+end;
+
 function TCompletion.GetCreatedAsString: string;
 begin
-  Result := TimestampToString(Created, UTCtimestamp);
+  Result := TInt64OrNull(FCreated).ToUtcDateString;
 end;
 
 { TCompletionRoute }

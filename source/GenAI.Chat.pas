@@ -1469,11 +1469,12 @@ type
   private
     FId: string;
     [JsonNameAttribute('expires_at')]
-    FExpiresAt: Int64;
+    FExpiresAt: TInt64OrNull;
     FData: string;
     FTranscript: string;
   private
     function GetExpiresAtAsString: string;
+    function GetExpiresAt: Int64;
   public
     /// <summary>
     /// Gets or sets the unique identifier for the audio data, used for tracking
@@ -1481,10 +1482,10 @@ type
     /// </summary>
     property Id: string read FId write FId;
     /// <summary>
-    /// Gets or sets the expiration timestamp for the audio data, after which the
+    /// Gets the expiration timestamp for the audio data, after which the
     /// data may no longer be available.
     /// </summary>
-    property ExpiresAt: Int64 read FExpiresAt write FExpiresAt;
+    property ExpiresAt: Int64 read GetExpiresAt;
     /// <summary>
     /// Gets the expiration timestamp for the audio data as string
     /// </summary>
@@ -1894,7 +1895,7 @@ type
   private
     FId: string;
     FChoices: TArray<TChoice>;
-    FCreated: Int64;
+    FCreated: TInt64OrNull;
     FModel: string;
     [JsonNameAttribute('service_tier')]
     FServiceTier: string;
@@ -1904,6 +1905,7 @@ type
     FUsage: TUsage;
   private
     function GetCreatedAsString: string;
+    function GetCreated: Int64;
   public
     /// <summary>
     /// The unique identifier for the chat completion.
@@ -1925,7 +1927,7 @@ type
     /// <returns>
     /// An Int64 value representing the creation time of the chat completion.
     /// </returns>
-    property Created: Int64 read FCreated write FCreated;
+    property Created: Int64 read GetCreated;
     /// <summary>
     /// A string representation of the Unix timestamp indicating when the chat completion was created.
     /// </summary>
@@ -2744,9 +2746,14 @@ begin
   inherited;
 end;
 
+function TChat.GetCreated: Int64;
+begin
+  Result := TInt64OrNull(FCreated).ToInteger;
+end;
+
 function TChat.GetCreatedAsString: string;
 begin
-  Result := TimestampToString(Created, UTCtimestamp);
+  Result := TInt64OrNull(FCreated).ToUtcDateString;
 end;
 
 { TUsage }
@@ -3008,9 +3015,14 @@ end;
 
 { TAudioData }
 
+function TAudioData.GetExpiresAt: Int64;
+begin
+  Result := TInt64OrNull(FExpiresAt).ToInteger;
+end;
+
 function TAudioData.GetExpiresAtAsString: string;
 begin
-  Result := TimestampToString(ExpiresAt, UTCtimestamp);
+  Result := TInt64OrNull(FExpiresAt).ToUtcDateString;
 end;
 
 end.

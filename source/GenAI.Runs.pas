@@ -630,7 +630,7 @@ type
   private
     FId: string;
     [JsonNameAttribute('created_at')]
-    FCreatedAt: Int64;
+    FCreatedAt: TInt64OrNull;
     FObject: string;
     [JsonNameAttribute('thread_id')]
     FThreadId: string;
@@ -643,15 +643,15 @@ type
     [JsonNameAttribute('last_error')]
     FLastError: TLastError;
     [JsonNameAttribute('expires_at')]
-    FExpiresAt: Int64;
+    FExpiresAt: TInt64OrNull;
     [JsonNameAttribute('started_at')]
-    FStartedAt: Int64;
+    FStartedAt: TInt64OrNull;
     [JsonNameAttribute('cancelled_at')]
-    FCancelledAt: Int64;
+    FCancelledAt: TInt64OrNull;
     [JsonNameAttribute('failed_at')]
-    FFailedAt: Int64;
+    FFailedAt: TInt64OrNull;
     [JsonNameAttribute('completed_at')]
-    FCompletedAt: Int64;
+    FCompletedAt: TInt64OrNull;
     [JsonNameAttribute('incomplete_details')]
     FIncompleteDetails: TIncompleteDetails;
     FModel: string;
@@ -675,6 +675,13 @@ type
     FParallelToolCalls: Boolean;
     [JsonNameAttribute('response_format')]
     FResponseFormat: string;
+  private
+    function GetCreatedAt: Int64;
+    function GetExpiresAt: Int64;
+    function GetStartedAt: Int64;
+    function GetCancelledAt: Int64;
+    function GetFailedAt: Int64;
+    function GetCompletedAt: Int64;
   protected
     function GetCreatedAtAsString: string; override;
     function GetExpiresAtAsString: string; override;
@@ -688,9 +695,9 @@ type
     /// </summary>
     property Id: string read FId write FId;
     /// <summary>
-    /// Gets or sets the creation timestamp of the run.
+    /// Gets the creation timestamp of the run.
     /// </summary>
-    property CreatedAt: Int64 read FCreatedAt write FCreatedAt;
+    property CreatedAt: Int64 read GetCreatedAt;
     /// <summary>
     /// Gets or sets the object type, which is always "thread.run".
     /// </summary>
@@ -720,25 +727,25 @@ type
     /// </summary>
     property LastError: TLastError read FLastError write FLastError;
     /// <summary>
-    /// Gets or sets the expiration timestamp of the run.
+    /// Gets the expiration timestamp of the run.
     /// </summary>
-    property ExpiresAt: Int64 read FExpiresAt write FExpiresAt;
+    property ExpiresAt: Int64 read GetExpiresAt;
     /// <summary>
-    /// Gets or sets the timestamp when the run started.
+    /// Gets the timestamp when the run started.
     /// </summary>
-    property StartedAt: Int64 read FStartedAt write FStartedAt;
+    property StartedAt: Int64 read GetStartedAt;
     /// <summary>
-    /// Gets or sets the timestamp when the run was canceled, if applicable.
+    /// Gets the timestamp when the run was canceled, if applicable.
     /// </summary>
-    property CancelledAt: Int64 read FCancelledAt write FCancelledAt;
+    property CancelledAt: Int64 read GetCancelledAt;
     /// <summary>
-    /// Gets or sets the timestamp when the run failed, if applicable.
+    /// Gets the timestamp when the run failed, if applicable.
     /// </summary>
-    property FailedAt: Int64 read FFailedAt write FFailedAt;
+    property FailedAt: Int64 read GetFailedAt;
     /// <summary>
-    /// Gets or sets the timestamp when the run was completed, if applicable.
+    /// Gets the timestamp when the run was completed, if applicable.
     /// </summary>
-    property CompletedAt: Int64 read FCompletedAt write FCompletedAt;
+    property CompletedAt: Int64 read GetCompletedAt;
     /// <summary>
     /// Gets or sets details explaining why the run is incomplete, if applicable.
     /// </summary>
@@ -1350,34 +1357,64 @@ begin
   inherited;
 end;
 
+function TRun.GetCancelledAt: Int64;
+begin
+  Result := TInt64OrNull(FCancelledAt).ToInteger;
+end;
+
 function TRun.GetCancelledAtAsString: string;
 begin
-  Result := TimestampToString(CancelledAt, UTCtimestamp);
+  Result := TInt64OrNull(FCancelledAt).ToUtcDateString;
+end;
+
+function TRun.GetCompletedAt: Int64;
+begin
+  Result := TInt64OrNull(FCompletedAt).ToInteger;
 end;
 
 function TRun.GetCompletedAtAsString: string;
 begin
-  Result := TimestampToString(CompletedAt, UTCtimestamp);
+  Result := TInt64OrNull(FCompletedAt).ToUtcDateString;
+end;
+
+function TRun.GetCreatedAt: Int64;
+begin
+  Result := TInt64OrNull(FCreatedAt).ToInteger;
 end;
 
 function TRun.GetCreatedAtAsString: string;
 begin
-  Result := TimestampToString(CreatedAt, UTCtimestamp);
+  Result := TInt64OrNull(FCreatedAt).ToUtcDateString;
+end;
+
+function TRun.GetExpiresAt: Int64;
+begin
+  Result := TInt64OrNull(FExpiresAt).ToInteger;
 end;
 
 function TRun.GetExpiresAtAsString: string;
 begin
-  Result := TimestampToString(ExpiresAt, UTCtimestamp);
+  Result := TInt64OrNull(FExpiresAt).ToUtcDateString;
+end;
+
+function TRun.GetFailedAt: Int64;
+begin
+  Result := TInt64OrNull(FFailedAt).ToInteger;
 end;
 
 function TRun.GetFailedAtAsString: string;
 begin
-  Result := TimestampToString(FailedAt, UTCtimestamp);
+  Result := TInt64OrNull(FFailedAt).ToUtcDateString;
+end;
+
+function TRun.GetStartedAt: Int64;
+begin
+  Result := TInt64OrNull(StartedAt).ToInteger;
 end;
 
 function TRun.GetStartedAtAsString: string;
 begin
-  Result := TimestampToString(StartedAt, UTCtimestamp);
+  Result := TInt64OrNull(FStartedAt).ToUtcDateString;
 end;
 
 { TRequiredAction }

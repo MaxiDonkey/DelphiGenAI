@@ -403,7 +403,7 @@ type
   private
     FId: string;
     [JsonNameAttribute('created_at')]
-    FCreatedAt: Int64;
+    FCreatedAt: TInt64OrNull;
     FObject: string;
     [JsonNameAttribute('thread_id')]
     FThreadId: string;
@@ -412,9 +412,9 @@ type
     [JsonNameAttribute('incomplete_details')]
     FIncompleteDetails: TIncompleteDetails;
     [JsonNameAttribute('completed_at')]
-    FCompletedAt: Int64;
+    FCompletedAt: TInt64OrNull;
     [JsonNameAttribute('incomplete_at')]
-    FIncompleteAt: Int64;
+    FIncompleteAt: TInt64OrNull;
     [JsonReflectAttribute(ctString, rtString, TRoleInterceptor)]
     FRole: TRole;
     FContent: TArray<TMessagesContent>;
@@ -429,15 +429,18 @@ type
     function GetCreatedAtAsString: string;
     function GetCompletedAtAsString: string;
     function GetIncompleteAtAsString: string;
+    function GetCreatedAt: Int64;
+    function GetCompletedAt: Int64;
+    function GetIncompleteAt: Int64;
   public
     /// <summary>
     /// Gets or sets the unique identifier of the message.
     /// </summary>
     property Id: string read FId write FId;
     /// <summary>
-    /// Gets or sets the Unix timestamp (in seconds) indicating when the message was created.
+    /// Gets the Unix timestamp (in seconds) indicating when the message was created.
     /// </summary>
-    property CreatedAt: Int64 read FCreatedAt write FCreatedAt;
+    property CreatedAt: Int64 read GetCreatedAt;
     /// <summary>
     /// Gets the formatted creation time as a human-readable string.
     /// </summary>
@@ -467,15 +470,15 @@ type
     /// <summary>
     /// Gets or sets the Unix timestamp (in seconds) when the message was completed.
     /// </summary>
-    property CompletedAt: Int64 read FCompletedAt write FCompletedAt;
+    property CompletedAt: Int64 read GetCompletedAt;
     /// <summary>
     /// Gets the formatted completion time as a human-readable string.
     /// </summary>
     property CompletedAtString: string read GetCompletedAtAsString;
     /// <summary>
-    /// Gets or sets the Unix timestamp (in seconds) when the message was marked as incomplete.
+    /// Gets the Unix timestamp (in seconds) when the message was marked as incomplete.
     /// </summary>
-    property IncompleteAt: Int64 read FIncompleteAt write FIncompleteAt;
+    property IncompleteAt: Int64 read GetIncompleteAt;
     /// <summary>
     /// Gets the formatted incomplete time as a human-readable string.
     /// </summary>
@@ -841,19 +844,34 @@ begin
   inherited;
 end;
 
+function TMessages.GetCompletedAt: Int64;
+begin
+  Result := TInt64OrNull(FCompletedAt).ToInteger;
+end;
+
 function TMessages.GetCompletedAtAsString: string;
 begin
-  Result := TimestampToString(CompletedAt, UTCtimestamp);
+  Result := TInt64OrNull(FCompletedAt).ToUctDateString;
+end;
+
+function TMessages.GetCreatedAt: Int64;
+begin
+  Result := TInt64OrNull(FCreatedAt).ToInteger;
 end;
 
 function TMessages.GetCreatedAtAsString: string;
 begin
-  Result := TimestampToString(CreatedAt, UTCtimestamp);
+  Result := TInt64OrNull(FCreatedAt).ToUtcDateString;
+end;
+
+function TMessages.GetIncompleteAt: Int64;
+begin
+  Result := TInt64OrNull(FIncompleteAt).ToInteger;
 end;
 
 function TMessages.GetIncompleteAtAsString: string;
 begin
-  Result := TimestampToString(IncompleteAt, UTCtimestamp);
+  Result := TInt64OrNull(FIncompleteAt).ToUtcDateString;
 end;
 
 { TMessagesContent }

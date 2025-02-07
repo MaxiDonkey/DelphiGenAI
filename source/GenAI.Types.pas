@@ -10,11 +10,56 @@ unit GenAI.Types;
 interface
 
 uses
-  System.SysUtils, System.TypInfo, System.Rtti, GenAI.Consts, GenAI.API.Params;
+  System.SysUtils, System.TypInfo, System.Variants, System.Rtti, GenAI.Consts,
+  GenAI.API.Params;
 
 {$SCOPEDENUMS ON}
 
 type
+  TIntegerOrNull = type Variant;
+
+  TIntegerOrNullHelper = record Helper for TIntegerOrNull
+    constructor Create(const Value: Variant);
+    function isNull: Boolean;
+    function ToInteger: Integer;
+    function ToString: string;
+  end;
+
+  TInt64OrNull = type Variant;
+
+  TInt64OrNullHelper = record Helper for TInt64OrNull
+    constructor Create(const Value: Variant);
+    function isNull: Boolean;
+    function ToUtcDateString: string;
+    function ToInteger: Int64;
+    function ToString: string;
+  end;
+
+  TDoubleOrNull = type Variant;
+
+  TDoubleOrNullHelper = record Helper for TDoubleOrNull
+    constructor Create(const Value: Variant);
+    function isNull: Boolean;
+    function ToDouble: Double;
+    function ToString: string;
+  end;
+
+  TBooleanOrNull = type Variant;
+
+  TBooleanOrNullHelper = record Helper for TBooleanOrNull
+    constructor Create(const Value: Variant);
+    function isNull: Boolean;
+    function ToBoolean: Boolean;
+    function ToString: string;
+  end;
+
+  TStringOrNull = type Variant;
+
+  TStringOrNullHelper = record Helper for TStringOrNull
+    constructor Create(const Value: Variant);
+    function isNull: Boolean;
+    function ToString: string;
+  end;
 
   TMetadataInterceptor = class(TJSONInterceptorStringToString)
   public
@@ -1254,15 +1299,33 @@ type
 
   {$ENDREGION}
 
+function TimestampToDateTime(const Value: Int64; const UTC: Boolean = False): TDateTime;
+function TimestampToString(const Value: Int64; const UTC: Boolean = False): string;
+
+var UtcTimestamp: Boolean = True;
+
 implementation
 
 uses
-  System.StrUtils;
+  System.StrUtils, System.DateUtils;
 
 type
   TEnumValueRecovery = class
     class function TypeRetrieve<T>(const Value: string; const References: TArray<string>): T;
   end;
+
+function TimestampToDateTime(const Value: Int64; const UTC: Boolean): TDateTime;
+begin
+  Result := UnixToDateTime(Value, UTC);
+end;
+
+ function TimestampToString(const Value: Int64; const UTC: Boolean): string;
+begin
+  {--- null date before 01/01/1970 }
+  if Value <= 0 then
+    Result := 'null' else
+    Result := DateTimeToStr(TimestampToDateTime(Value, UTC))
+end;
 
 { TEnumValueRecovery }
 
@@ -2167,6 +2230,186 @@ procedure TRunStepTypeInterceptor.StringReverter(Data: TObject; Field,
   Arg: string);
 begin
   RTTI.GetType(Data.ClassType).GetField(Field).SetValue(Data, TValue.From(TRunStepType.Create(Arg)));
+end;
+
+{ TStringOrNullHelper }
+
+constructor TStringOrNullHelper.Create(const Value: Variant);
+begin
+  Self := Value;
+end;
+
+function TStringOrNullHelper.isNull: Boolean;
+begin
+  case VarType(Self) of
+    varString,
+    varUString,
+    varAny:
+      Exit(False);
+    else
+      Exit(True);
+  end;
+end;
+
+function TStringOrNullHelper.ToString: string;
+begin
+  if Self.isNull then
+    Result := 'null' else
+    Result := VarToStr(Self);
+end;
+
+{ TIntegerOrNullHelper }
+
+constructor TIntegerOrNullHelper.Create(const Value: Variant);
+begin
+  Self := Value;
+end;
+
+function TIntegerOrNullHelper.isNull: Boolean;
+begin
+  case VarType(Self) of
+    varSmallint,
+    varInteger,
+    varShortInt,
+    varByte,
+    varWord,
+    varUInt32:
+      Exit(False);
+    else
+      Exit(True);
+  end;
+end;
+
+function TIntegerOrNullHelper.ToInteger: Integer;
+begin
+  if Self.isNull then
+    Result := 0 else
+    Result := VarAsType(Self, varInteger);
+end;
+
+function TIntegerOrNullHelper.ToString: string;
+begin
+  if Self.isNull then
+    Result := 'null' else
+    Result := Self.ToInteger.ToString;
+end;
+
+{ TInt64OrNullHelper }
+
+constructor TInt64OrNullHelper.Create(const Value: Variant);
+begin
+  Self := Value;
+end;
+
+function TInt64OrNullHelper.isNull: Boolean;
+begin
+  case VarType(Self) of
+    varSmallint,
+    varInteger,
+    varInt64,
+    varShortInt,
+    varByte,
+    varWord,
+    varUInt32,
+    varUInt64:
+      Exit(False);
+    else
+      Exit(True);
+  end;
+end;
+
+function TInt64OrNullHelper.ToInteger: Int64;
+begin
+  if Self.isNull then
+    Result := 0 else
+    Result := VarAsType(Self, varInt64);
+end;
+
+function TInt64OrNullHelper.ToString: string;
+begin
+  if Self.isNull then
+    Result := 'null' else
+    Result := Self.ToInteger.ToString;
+end;
+
+function TInt64OrNullHelper.ToUtcDateString: string;
+begin
+  Result := TimestampToString(Self.ToInteger, UtcTimestamp);
+end;
+
+{ TDoubleOrNullHelper }
+
+constructor TDoubleOrNullHelper.Create(const Value: Variant);
+begin
+  Self := Value;
+end;
+
+function TDoubleOrNullHelper.isNull: Boolean;
+begin
+  case VarType(Self) of
+    varSmallint,
+    varInteger,
+    varInt64,
+    varSingle,
+    varDouble,
+    varCurrency,
+    varShortInt,
+    varByte,
+    varWord,
+    varUInt32,
+    varUInt64:
+      Exit(False);
+    else
+      Exit(True);
+  end;
+end;
+
+function TDoubleOrNullHelper.ToDouble: Double;
+begin
+  if Self.isNull then
+    Result := 0 else
+    Result := VarAsType(Self, varDouble);
+end;
+
+function TDoubleOrNullHelper.ToString: string;
+begin
+  if Self.isNull then
+    Result := 'null' else
+    Result := Self.ToDouble.ToString;
+end;
+
+{ TBooleanOrNullHelper }
+
+constructor TBooleanOrNullHelper.Create(const Value: Variant);
+begin
+  Self := Value;
+end;
+
+function TBooleanOrNullHelper.isNull: Boolean;
+begin
+  case VarType(Self) of
+    varBoolean:
+      Exit(False);
+    varByte,
+    varShortInt:
+      Exit(not ((Self = 0) or (Self = 1) or (Self = -1)));
+    else
+      Exit(True);
+  end;
+end;
+
+function TBooleanOrNullHelper.ToBoolean: Boolean;
+begin
+  if Self.isNull then
+    Result := False else
+    Result := VarAsType(Self, varBoolean);
+end;
+
+function TBooleanOrNullHelper.ToString: string;
+begin
+  if Self.isNull then
+    Result := 'null' else
+    Result := BoolToStr(Self.ToBoolean, True);
 end;
 
 end.

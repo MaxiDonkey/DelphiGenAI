@@ -10,7 +10,7 @@ unit GenAI.API.Deletion;
 interface
 
 uses
-  GenAI.Async.Support;
+  GenAI.API.Params, GenAI.Async.Support;
 
 type
   /// <summary>
@@ -22,7 +22,7 @@ type
   /// the unique ID of the deleted object, the type of the object, and a status indicating
   /// whether the deletion was completed successfully.
   /// </remarks>
-  TDeletion = class
+  TDeletion = class(TJSONFingerprint)
   private
     FId: string;
     FObject: string;

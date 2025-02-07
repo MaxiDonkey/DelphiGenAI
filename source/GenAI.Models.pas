@@ -11,7 +11,8 @@ interface
 
 uses
   System.SysUtils, System.Classes, System.Threading, REST.Json.Types,
-  GenAI.API.Params, GenAI.API, GenAI.Async.Support, GenAI.API.Deletion;
+  GenAI.API.Params, GenAI.API, GenAI.Async.Support, GenAI.API.Deletion,
+  GenAI.Types;
 
 type
   /// <summary>
@@ -25,21 +26,22 @@ type
   TModel = class(TJSONFingerprint)
   private
     FId: string;
-    FCreated: Int64;
+    FCreated: TInt64OrNull;
     FObject: string;
     [JsonNameAttribute('owned_by')]
     FOwnedBy: string;
   private
     function GetCreatedAsString: string;
+    function GetCreated: Int64;
   public
     /// <summary>
     /// Gets or sets the unique identifier of the model.
     /// </summary>
     property Id: string read FId write FId;
     /// <summary>
-    /// Gets or sets the creation timestamp of the model, represented as a Unix timestamp.
+    /// Gets the creation timestamp of the model, represented as a Unix timestamp.
     /// </summary>
-    property Created: Int64 read FCreated write FCreated;
+    property Created: Int64 read GetCreated;
     /// <summary>
     /// Gets the creation timestamp of the model as a string.
     /// </summary>
@@ -232,9 +234,14 @@ end;
 
 { TModel }
 
+function TModel.GetCreated: Int64;
+begin
+  Result := TInt64OrNull(FCreated).ToInteger;
+end;
+
 function TModel.GetCreatedAsString: string;
 begin
-  Result := TimestampToString(Created, UTCtimestamp);
+  Result := TInt64OrNull(FCreated).ToUtcDateString;
 end;
 
 end.

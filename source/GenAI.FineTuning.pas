@@ -788,12 +788,12 @@ type
   private
     FId: string;
     [JsonNameAttribute('created_at')]
-    FCreatedAt: Int64;
+    FCreatedAt: TInt64OrNull;
     FError: TFineTuningJobError;
     [JsonNameAttribute('fine_tuned_model')]
     FFineTunedModel: string;
     [JsonNameAttribute('finished_at')]
-    FFinishedAt: Int64;
+    FFinishedAt: TInt64OrNull;
     FHyperparameters: THyperparameters;
     FModel: string;
     FObject: string;
@@ -812,12 +812,15 @@ type
     FIntegrations: TArray<FineTuningJobIntegration>;
     FSeed: Int64;
     [JsonNameAttribute('estimated_finish')]
-    FEstimatedFinish: Int64;
+    FEstimatedFinish: TInt64OrNull;
     FMethod: TFineTuningMethod;
   private
     function GetCreatedAtAsString: string;
     function GetFinishedAtAsString: string;
     function GetEstimatedFinishAsString: string;
+    function GetCreatedAt: Int64;
+    function GetEstimatedFinish: Int64;
+    function GetFinishedAt: Int64;
   public
     /// <summary>
     /// Gets or sets the unique identifier of the fine-tuning job.
@@ -827,12 +830,12 @@ type
     /// </remarks>
     property Id: string read FId write FId;
     /// <summary>
-    /// Gets or sets the creation timestamp of the fine-tuning job in Unix format (seconds).
+    /// Gets the creation timestamp of the fine-tuning job in Unix format (seconds).
     /// </summary>
     /// <remarks>
     /// A 64-bit integer representing the creation time of the job.
     /// </remarks>
-    property CreatedAt: Int64 read FCreatedAt write FCreatedAt;
+    property CreatedAt: Int64 read GetCreatedAt;
     /// <summary>
     /// Gets the creation timestamp of the fine-tuning job as a human-readable string.
     /// </summary>
@@ -860,7 +863,7 @@ type
     /// <remarks>
     /// A 64-bit integer representing the completion time of the job, or <c>nil</c> if the job is still running.
     /// </remarks>
-    property FinishedAt: Int64 read FFinishedAt write FFinishedAt;
+    property FinishedAt: Int64 read GetFinishedAt;
     /// <summary>
     /// Gets the completion timestamp of the fine-tuning job as a human-readable string.
     /// </summary>
@@ -946,12 +949,12 @@ type
     /// </remarks>
     property Seed: Int64 read FSeed write FSeed;
     /// <summary>
-    /// Gets or sets the estimated completion time for the fine-tuning job in Unix format (seconds).
+    /// Gets the estimated completion time for the fine-tuning job in Unix format (seconds).
     /// </summary>
     /// <remarks>
     /// A 64-bit integer representing the estimated finish time, or <c>nil</c> if the job is not running.
     /// </remarks>
-    property EstimatedFinish: Int64 read FEstimatedFinish write FEstimatedFinish;
+    property EstimatedFinish: Int64 read GetEstimatedFinish;
     /// <summary>
     /// Gets the estimated completion time of the fine-tuning job as a human-readable string.
     /// </summary>
@@ -994,13 +997,14 @@ type
     FObject: string;
     FId: string;
     [JsonNameAttribute('created_at')]
-    FCreatedAt: Int64;
+    FCreatedAt: TInt64OrNull;
     FLevel: string;
     FMessage: string;
     FType: string;
     FData: TEventData;
   private
     function GetCreatedAtAsString: string;
+    function GetCreatedAt: Int64;
   public
     /// <summary>
     /// Gets or sets the object type of the event.
@@ -1017,12 +1021,12 @@ type
     /// </remarks>
     property Id: string read FId write FId;
     /// <summary>
-    /// Gets or sets the timestamp when the event was created, in Unix format (seconds).
+    /// Gets the timestamp when the event was created, in Unix format (seconds).
     /// </summary>
     /// <remarks>
     /// A 64-bit integer representing the event's creation time.
     /// </remarks>
-    property CreatedAt: Int64 read FCreatedAt write FCreatedAt;
+    property CreatedAt: Int64 read GetCreatedAt;
     /// <summary>
     /// Gets the creation timestamp of the event as a human-readable string.
     /// </summary>
@@ -1155,7 +1159,7 @@ type
   private
     FId: string;
     [JsonNameAttribute('created_at')]
-    FCreatedAt: Int64;
+    FCreatedAt: TInt64OrNull;
     [JsonNameAttribute('fine_tuned_model_checkpoint')]
     FFineTunedModelCheckpoint: string;
     [JsonNameAttribute('step_number')]
@@ -1166,6 +1170,7 @@ type
     FObject: string;
   private
     function GetCreatedAtAsString: string;
+    function GetCreatedAt: Int64;
   public
     /// <summary>
     /// Gets or sets the unique identifier for the checkpoint.
@@ -1175,12 +1180,12 @@ type
     /// </remarks>
     property Id: string read FId write FId;
     /// <summary>
-    /// Gets or sets the timestamp when the checkpoint was created, in Unix format (seconds).
+    /// Gets the timestamp when the checkpoint was created, in Unix format (seconds).
     /// </summary>
     /// <remarks>
     /// A 64-bit integer representing the checkpoint's creation time.
     /// </remarks>
-    property CreatedAt: Int64 read FCreatedAt write FCreatedAt;
+    property CreatedAt: Int64 read GetCreatedAt;
     /// <summary>
     /// Gets the creation timestamp of the checkpoint as a human-readable string.
     /// </summary>
@@ -1732,19 +1737,34 @@ begin
   inherited;
 end;
 
+function TFineTuningJob.GetCreatedAt: Int64;
+begin
+  Result := TInt64OrNull(FCreatedAt).ToInteger;
+end;
+
 function TFineTuningJob.GetCreatedAtAsString: string;
 begin
-  Result := TimestampToString(CreatedAt, UTCtimestamp);
+  Result := TInt64OrNull(FCreatedAt).ToUtcDateString;
+end;
+
+function TFineTuningJob.GetEstimatedFinish: Int64;
+begin
+  Result := TInt64OrNull(FEstimatedFinish).ToInteger;
 end;
 
 function TFineTuningJob.GetEstimatedFinishAsString: string;
 begin
-  Result := TimestampToString(EstimatedFinish, UTCtimestamp);
+  Result := TInt64OrNull(FEstimatedFinish).ToUtcDateString;
+end;
+
+function TFineTuningJob.GetFinishedAt: Int64;
+begin
+  Result := TInt64OrNull(FFinishedAt).ToInteger;
 end;
 
 function TFineTuningJob.GetFinishedAtAsString: string;
 begin
-  Result := TimestampToString(FinishedAt, UTCtimestamp);
+  Result := TInt64OrNull(FFinishedAt).ToUtcDateString;
 end;
 
 { FineTuningJobIntegration }
@@ -2020,9 +2040,14 @@ begin
   inherited;
 end;
 
+function TJobEvent.GetCreatedAt: Int64;
+begin
+  Result := TInt64OrNull(FCreatedAt).ToInteger;
+end;
+
 function TJobEvent.GetCreatedAtAsString: string;
 begin
-  Result := TimestampToString(CreatedAt, UTCtimestamp);
+  Result := TInt64OrNull(FCreatedAt).ToUtcDateString;
 end;
 
 { TJobCheckpoint }
@@ -2034,9 +2059,14 @@ begin
   inherited;
 end;
 
+function TJobCheckpoint.GetCreatedAt: Int64;
+begin
+  Result := TInt64OrNull(FCreatedAt).ToInteger;
+end;
+
 function TJobCheckpoint.GetCreatedAtAsString: string;
 begin
-  Result := TimestampToString(CreatedAt, UTCtimestamp);
+  Result := TInt64OrNull(FCreatedAt).ToUtcDateString;
 end;
 
 end.

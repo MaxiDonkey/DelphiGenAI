@@ -34,7 +34,38 @@ type
   /// when creating a new batch of files in a vector store, including the file IDs and chunking strategy.
   /// These settings control how files are processed and chunked before being stored.
   /// </remarks>
-  TVectorStoreBatchCreateParams = TVectorStoreFilesCreateParams;
+  TVectorStoreBatchCreateParams = class(TJSONParam)
+  public
+    /// <summary>
+    /// Specifies the ID of the file to be attached to the vector store.
+    /// </summary>
+    /// <param name="Value">
+    /// A string representing the unique identifier of the file to be added to the vector store.
+    /// </param>
+    /// <returns>
+    /// Returns the current instance of <c>TVectorStoreBatchCreateParams</c>, enabling method chaining.
+    /// </returns>
+    /// <remarks>
+    /// This method is essential for indicating which file should be chunked and processed
+    /// when creating a new vector store entry.
+    /// </remarks>
+    function FileId(const Value: TArray<string>): TVectorStoreBatchCreateParams;
+    /// <summary>
+    /// Specifies the chunking strategy to be used when processing the file.
+    /// </summary>
+    /// <param name="Value">
+    /// An instance of <c>TChunkingStrategyParams</c> that defines settings like maximum chunk size
+    /// and token overlap for dividing the file into smaller chunks.
+    /// </param>
+    /// <returns>
+    /// Returns the current instance of <c>TVectorStoreBatchCreateParams</c>, enabling method chaining.
+    /// </returns>
+    /// <remarks>
+    /// The chunking strategy determines how the file is split for efficient searching and retrieval
+    /// within the vector store. Users can define static or auto chunking depending on their use case.
+    /// </remarks>
+    function ChunkingStrategy(const Value: TChunkingStrategyParams): TVectorStoreBatchCreateParams;
+  end;
 
   /// <summary>
   /// Represents a batch of files attached to a vector store in the OpenAI API.
@@ -49,7 +80,7 @@ type
     FId: string;
     FObject: string;
     [JsonNameAttribute('created_at')]
-    FCreatedAt: Int64;
+    FCreatedAt: TInt64OrNull;
     [JsonNameAttribute('vector_store_id')]
     FVectorStoreId: string;
     [JsonReflectAttribute(ctString, rtString, TRunStatusInterceptor)]
@@ -58,6 +89,7 @@ type
     FFileCounts: TVectorFileCounts;
   private
     function GetCreatedAtAsString: string;
+    function GetCreatedAt: Int64;
   public
     /// <summary>
     /// Gets or sets the unique identifier of the file batch.
@@ -71,10 +103,10 @@ type
     /// Gets or sets the object type, which is always <c>vector_store.file_batch</c>.
     /// </summary>
     property &Object: string read FObject write FObject;
-     /// <summary>
-    /// Gets or sets the Unix timestamp (in seconds) indicating when the file batch was created.
+    /// <summary>
+    /// Gets Unix timestamp (in seconds) indicating when the file batch was created.
     /// </summary>
-    property CreatedAt: Int64 read FCreatedAt write FCreatedAt;
+    property CreatedAt: Int64 read GetCreatedAt;
     /// <summary>
     /// Gets the human-readable representation of the creation timestamp.
     /// </summary>
@@ -314,9 +346,14 @@ begin
   inherited;
 end;
 
+function TVectorStoreBatch.GetCreatedAt: Int64;
+begin
+  Result := TInt64OrNull(FCreatedAt).ToInteger;
+end;
+
 function TVectorStoreBatch.GetCreatedAtAsString: string;
 begin
-  Result := TimestampToString(CreatedAt, UTCtimestamp);
+  Result := TInt64OrNull(FCreatedAt).ToUtcDateString;
 end;
 
 { TVectorStoreBatchRoute }
@@ -422,7 +459,7 @@ function TVectorStoreBatchRoute.Cancel(const VectorStoreId,
   BatchId: string): TVectorStoreBatch;
 begin
   HeaderCustomize;
-  Result := API.Get<TVectorStoreBatch>('vector_stores/' + VectorStoreId + '/file_batches/' + BatchId + '/cancel');
+  Result := API.Post<TVectorStoreBatch>('vector_stores/' + VectorStoreId + '/file_batches/' + BatchId + '/cancel');
 end;
 
 function TVectorStoreBatchRoute.Create(const VectorStoreId: string;
@@ -457,6 +494,20 @@ function TVectorStoreBatchRoute.Retrieve(const VectorStoreId,
 begin
   HeaderCustomize;
   Result := API.Get<TVectorStoreBatch>('vector_stores/' + VectorStoreId + '/file_batches/' + BatchId);
+end;
+
+{ TVectorStoreBatchCreateParams }
+
+function TVectorStoreBatchCreateParams.ChunkingStrategy(
+  const Value: TChunkingStrategyParams): TVectorStoreBatchCreateParams;
+begin
+  Result := TVectorStoreBatchCreateParams(Add('chunking_strategy', Value.Detach));
+end;
+
+function TVectorStoreBatchCreateParams.FileId(
+  const Value: TArray<string>): TVectorStoreBatchCreateParams;
+begin
+  Result := TVectorStoreBatchCreateParams(Add('file_ids', Value));
 end;
 
 end.

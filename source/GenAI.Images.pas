@@ -495,15 +495,16 @@ type
   /// </remarks>
   TGeneratedImages = class(TJSONFingerprint)
   private
-    FCreated: Int64;
+    FCreated: TInt64OrNull;
     FData: TArray<TImagePart>;
   private
     function GetCreatedAsString: string;
+    function GetCreated: Int64;
   public
     /// <summary>
-    /// Gets or sets the timestamp indicating when the images were created.
+    /// Gets the timestamp indicating when the images were created.
     /// </summary>
-    property Created: Int64 read FCreated write FCreated;
+    property Created: Int64 read GetCreated;
     /// <summary>
     /// Gets the timestamp as string, indicating when the images were created.
     /// </summary>
@@ -799,9 +800,14 @@ begin
   inherited;
 end;
 
+function TGeneratedImages.GetCreated: Int64;
+begin
+  Result := TInt64OrNull(FCreated).ToInteger;
+end;
+
 function TGeneratedImages.GetCreatedAsString: string;
 begin
-  Result := TimestampToString(Created, UTCtimestamp);
+  Result := TInt64OrNull(FCreated).ToUtcDateString;
 end;
 
 { TImageEditParams }

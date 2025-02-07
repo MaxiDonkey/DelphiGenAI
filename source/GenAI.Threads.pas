@@ -324,7 +324,7 @@ type
   private
     FId: string;
     [JsonNameAttribute('created_at')]
-    FCreatedAt: Int64;
+    FCreatedAt: TInt64OrNull;
     FObject: string;
     [JsonNameAttribute('tool_resources')]
     FToolResources: TToolResources;
@@ -332,6 +332,7 @@ type
     FMetadata: string;
   private
     function GetCreatedAtAsString: string;
+    function GetCreatedAt: Int64;
   public
     /// <summary>
     /// Gets or sets the unique identifier of the thread.
@@ -340,7 +341,7 @@ type
     /// <summary>
     /// Gets or sets the unique identifier of the thread.
     /// </summary>
-    property CreatedAt: Int64 read FCreatedAt write FCreatedAt;
+    property CreatedAt: Int64 read GetCreatedAt;
     /// <summary>
     /// Gets the formatted creation time as a human-readable string.
     /// </summary>
@@ -802,9 +803,14 @@ begin
   inherited;
 end;
 
+function TThreads.GetCreatedAt: Int64;
+begin
+  Result := TInt64OrNull(FCreatedAt).ToInteger;
+end;
+
 function TThreads.GetCreatedAtAsString: string;
 begin
-  Result := TimestampToString(CreatedAt, UTCtimestamp);
+  Result := TInt64OrNull(FCreatedAt).ToUtcDateString;
 end;
 
 end.

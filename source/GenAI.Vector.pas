@@ -77,7 +77,7 @@ type
     /// <returns>
     /// Returns the current instance of <c>TVectorStoreCreateParams</c>, enabling method chaining.
     /// </returns>
-    function FileIds(const Value: string): TVectorStoreCreateParams;
+    function FileIds(const Value: TArray<string>): TVectorStoreCreateParams;
     /// <summary>
     /// Sets the name of the vector store.
     /// </summary>
@@ -259,8 +259,8 @@ type
     FId: string;
     FObject: string;
     [JsonNameAttribute('created_at')]
-    FCreatedAt: Int64;
-    FName: string;
+    FCreatedAt: TInt64OrNull;
+    FName: TStringOrNull;
     [JsonNameAttribute('usage_bytes')]
     FUsageBytes: Int64;
     [JsonNameAttribute('file_counts')]
@@ -270,11 +270,16 @@ type
     [JsonNameAttribute('expires_after')]
     FExpiresAfter: TExpiresAfter;
     [JsonNameAttribute('expires_at')]
-    FExpiresAt: Int64;
+    FExpiresAt: TInt64OrNull;
     [JsonNameAttribute('last_active_at')]
-    FLastActiveAt: Int64;
+    FLastActiveAt: TInt64OrNull;
     [JsonReflectAttribute(ctString, rtString, TMetadataInterceptor)]
     FMetadata: string;
+  private
+    function GetName: string;
+    function GetCreatedAt: Int64;
+    function GetExpiresAt: Int64;
+    function GetLastActiveAt: Int64;
   protected
     function GetCreatedAtAsString: string; override;
     function GetExpiresAtAsString: string; override;
@@ -289,13 +294,16 @@ type
     /// </summary>
     property &Object: string read FObject write FObject;
     /// <summary>
-    /// Gets or sets the Unix timestamp (in seconds) for when the vector store was created.
+    /// Gets the Unix timestamp (in seconds) for when the vector store was created.
     /// </summary>
-    property CreatedAt: Int64 read FCreatedAt write FCreatedAt;
+    /// <remarks>
+    /// If is null then resturns 0
+    /// </remarks>
+    property CreatedAt: Int64 read GetCreatedAt;
     /// <summary>
-    /// Gets or sets the name of the vector store.
+    /// Gets the name of the vector store.
     /// </summary>
-    property Name: string read FName write FName;
+    property Name: string read GetName;
     /// <summary>
     /// Gets or sets the total number of bytes used by the files in the vector store.
     /// </summary>
@@ -313,13 +321,19 @@ type
     /// </summary>
     property ExpiresAfter: TExpiresAfter read FExpiresAfter write FExpiresAfter;
     /// <summary>
-    /// Gets or sets the Unix timestamp (in seconds) for when the vector store will expire.
+    /// Gets the Unix timestamp (in seconds) for when the vector store will expire.
     /// </summary>
-    property ExpiresAt: Int64 read FExpiresAt write FExpiresAt;
+    /// <remarks>
+    /// If null then returns 0.
+    /// </remarks>
+    property ExpiresAt: Int64 read GetExpiresAt;
     /// <summary>
-    /// Gets or sets the Unix timestamp (in seconds) for when the vector store was last active.
+    /// Gets the Unix timestamp (in seconds) for when the vector store was last active.
     /// </summary>
-    property LastActiveAt: Int64 read FLastActiveAt write FLastActiveAt;
+    /// <remarks>
+    /// If null then returns 0
+    /// </remarks>
+    property LastActiveAt: Int64 read GetLastActiveAt;
     /// <summary>
     /// Gets or sets metadata associated with the vector store, represented as key-value pairs.
     /// </summary>
@@ -516,7 +530,7 @@ begin
   Result := TVectorStoreCreateParams(Add('expires_after', Value.Detach));
 end;
 
-function TVectorStoreCreateParams.FileIds(const Value: string): TVectorStoreCreateParams;
+function TVectorStoreCreateParams.FileIds(const Value: TArray<string>): TVectorStoreCreateParams;
 begin
   Result := TVectorStoreCreateParams(Add('file_ids', Value));
 end;
@@ -555,19 +569,39 @@ begin
   inherited;
 end;
 
+function TVectorStore.GetCreatedAt: Int64;
+begin
+  Result := TInt64OrNull(FCreatedAt).ToInteger;
+end;
+
 function TVectorStore.GetCreatedAtAsString: string;
 begin
-  Result := TimestampToString(CreatedAt, UTCtimestamp);
+  Result := TInt64OrNull(FCreatedAt).ToUtcDateString;
+end;
+
+function TVectorStore.GetExpiresAt: Int64;
+begin
+  Result := TInt64OrNull(FExpiresAt).ToInteger;
 end;
 
 function TVectorStore.GetExpiresAtAsString: string;
 begin
-  Result := TimestampToString(ExpiresAt, UTCtimestamp);
+  Result := TInt64OrNull(FExpiresAt).ToUtcDateString;
+end;
+
+function TVectorStore.GetLastActiveAt: Int64;
+begin
+  Result := TInt64OrNull(FLastActiveAt).ToInteger;
 end;
 
 function TVectorStore.GetLastActiveAtAsString: string;
 begin
-  Result := TimestampToString(LastActiveAt, UTCtimestamp);
+  Result := TInt64OrNull(FLastActiveAt).ToUtcDateString;
+end;
+
+function TVectorStore.GetName: string;
+begin
+  Result := TStringOrNull(FName).ToString;
 end;
 
 { TVectorStoreRoute }
