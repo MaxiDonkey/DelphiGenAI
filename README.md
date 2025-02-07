@@ -87,6 +87,14 @@ ___
         - [Retrieve assistant](#Retrieve-assistant)
         - [Modify assistant](#Modify-assistant)
         - [Delete assistant](#Delete-assistant)
+    - [Threads](#Threads)
+
+    - [Messages](#Messages)
+        - [Create message](#Create-message)
+        - [List messages](#List-messages)
+        - [Retrieve message](#Retrieve-message)
+        - [Modify message](#Modify-message)
+        - [Delete message](#Delete-message)
 - [Contributing](#contributing)
 - [License](#license)
 
@@ -3623,6 +3631,44 @@ Delete an assistant by its ID.
 //    Value.Free;
 //  end;
 ```
+
+<br/>
+
+## Threads
+
+<br/>
+
+
+
+
+
+
+
+## Messages
+
+Create messages within threads
+
+Related guide: [Assistants](https://platform.openai.com/docs/assistants/overview)
+
+<br/>
+
+### Create message
+
+<br/>
+
+### List messages
+
+<br/>
+
+### Retrieve message
+
+<br/>
+
+### Modify message
+
+<br/>
+
+### Delete message
 
 <br/>
 
