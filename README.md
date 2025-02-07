@@ -2332,6 +2332,8 @@ Get info about a fine-tuning job.
 
 ### Difference Between Supervised and DPO
 
+<br/>
+
 #### SUPERVISED Fine-Tuning Method
 
 The supervised method  is a classic fine-tuning approach  where the model is trained on a labeled dataset to learn  how to map specific inputs  (prompts)  to target outputs  (ideal responses).
