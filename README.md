@@ -2146,14 +2146,10 @@ List your organization's fine-tuning jobs. Refer to [parameters documentation](h
         procedure (Sender: TObject; Value: TFineTuningJobs)
         begin
           TutorialHub.JSONResponse := Value.JSONResponse;
-          Result.OnSuccess :=
-            procedure (Sender: TObject; Value: TFineTuningJobs)
-            begin
-              TutorialHub.JSONResponse := Value.JSONResponse;
-              for var Item in Value.Data do
-                Display(TutorialHub, Item.Id);
-              Display(TutorialHub, F('hasmore',VarToStr(Value.HasMore)));
-            end;
+          for var Item in Value.Data do
+            Display(TutorialHub, Item.Id);
+          Display(TutorialHub, F('hasmore',VarToStr(Value.HasMore)));
+        end;
       Result.OnError := Display;
     end);
 
