@@ -81,6 +81,12 @@ ___
         - [Vsb list](#Vsb-list)
         - [Vsb retrieve](#Vsb-retrieve)
         - [Vsb cancel](#Vsb-cancel)
+    - [Assistants](#Assistants)
+        - [Create assistant](#)
+        - [List assistants](#)
+        - [Retrieve assistant](#)
+        - [Modify assistant](#)
+        - [Delete assistant](#)
 - [Contributing](#contributing)
 - [License](#license)
 
@@ -3280,6 +3286,34 @@ The JSON response:
     }
 }
 ```
+
+<br/>
+
+## Assistants
+
+Build assistants that can call models and use tools to perform tasks.
+
+[Get started with the Assistants API](https://platform.openai.com/docs/assistants)
+
+<br/>
+
+### Create assistant
+
+<br/>
+
+### List assistants
+
+<br/>
+
+### Retrieve assistant
+
+<br/>
+
+### Modify assistant
+
+<br/>
+
+### Delete assistant
 
 <br/>
 
