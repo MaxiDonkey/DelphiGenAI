@@ -3293,11 +3293,92 @@ The JSON response:
 
 Build assistants that can call models and use tools to perform tasks.
 
+The version of assistants integrated by GenAI is version 2, currently offered in beta by OpenAI.
+
 [Get started with the Assistants API](https://platform.openai.com/docs/assistants)
 
 <br/>
 
 ### Create assistant
+
+<br/>
+
+#### Code interpreter
+
+```Delphi
+//uses GenAI, GenAI.Types, GenAI.Tutorial.VCL;
+
+  TutorialHub.JSONRequestClear;
+
+  //Asynchronous example
+  Client.Assistants.AsynCreate(
+    procedure (Params: TAssistantsParams)
+    begin
+      Params.Model('gpt-4o');
+      Params.Instructions('You are a personal math tutor. When asked a question, write and run Python code to answer the question.');
+      Params.Name('Math Tutor');
+      TutorialHub.JSONRequest := Params.ToFormat();
+    end,
+    function : TAsynAssistant
+    begin
+      Result.Sender := TutorialHub;
+      Result.OnStart := Start;
+      Result.OnSuccess := Display;
+      Result.OnError := Display;
+    end);
+
+  //Synchronous example
+//  var Value := Client.Assistants.Create(
+//    procedure (Params: TAssistantsParams)
+//    begin
+//      Params.Model('gpt-4o');
+//      Params.Instructions('You are a personal math tutor. When asked a question, write and run Python code to answer the question.');
+//      Params.Name('Math Tutor');
+//      TutorialHub.JSONRequest := Params.ToFormat();
+//    end);
+//  try
+//    Display(TutorialHub, Value);
+//  finally
+//    Value.Free;
+//  end;
+```
+
+The JSON response:
+```JSON
+{
+    "id": "asst_4FYKxWZ3CFprvgLKe4E8CZGl",
+    "object": "assistant",
+    "created_at": 1738960690,
+    "name": "Math Tutor",
+    "description": null,
+    "model": "gpt-4o",
+    "instructions": "You are a personal math tutor. When asked a question, write and run Python code to answer the question.",
+    "tools": [
+    ],
+    "top_p": 1.0,
+    "temperature": 1.0,
+    "reasoning_effort": null,
+    "tool_resources": {
+    },
+    "metadata": {
+    },
+    "response_format": "auto"
+}
+```
+
+<br/>
+
+#### Files
+
+```Delphi
+//uses GenAI, GenAI.Types, GenAI.Tutorial.VCL;
+
+```
+
+The JSON response:
+```JSON
+
+```
 
 <br/>
 
