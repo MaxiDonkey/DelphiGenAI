@@ -2538,7 +2538,7 @@ Retrieves a vector store by its ID.
 ```Delphi
 //uses GenAI, GenAI.Types, GenAI.Tutorial.VCL;
 
-  TutorialHub.Id := 'vs_64a576731d6c8191b25996c80d6b16c2';
+  TutorialHub.Id := 'vs_abc123';
 
   //Asynchronous example
   Client.VectorStore.AsynRetrieve(TutorialHub.Id,
@@ -2568,7 +2568,7 @@ Modifies a vector store by its ID.
 ```Delphi
 //uses GenAI, GenAI.Types, GenAI.Tutorial.VCL;
 
-  TutorialHub.Id := 'vs_64a576731d6c8191b25996c80d6b16c2';
+  TutorialHub.Id := 'vs_abc123';
 
   var MetaData := TJSONObject.Create
     .AddPair('customer_id', 'user_123456789')
@@ -2608,6 +2608,41 @@ Modifies a vector store by its ID.
 <br/>
 
 ### Vector store delete
+
+Delete a vector store by its ID.
+
+```Delphi
+//uses GenAI, GenAI.Types, GenAI.Tutorial.VCL;
+
+  TutorialHub.Id := 'vs_abc123';
+
+  //Asynchronous example
+  Client.VectorStore.AsynDelete(TutorialHub.Id,
+    function : TAsynDeletion
+    begin
+      Result.Sender := TutorialHub;
+      Result.OnStart := Start;
+      Result.OnSuccess := Display;
+      Result.OnError := Display;
+    end);
+
+  //Synchronous example
+//  var Value := Client.VectorStore.Delete(TutorialHub.Id);
+//  try
+//    Display(TutorialHub, Value);
+//  finally
+//    Value.Free;
+//  end;
+```
+
+The JSON response.
+```JSON
+{
+    "id": "vs_abc123",
+    "object": "vector_store.deleted",
+    "deleted": true
+}
+```
 
 <br/>
 
