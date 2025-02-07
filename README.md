@@ -65,6 +65,12 @@ ___
         - [Fine tuning check point](#Fine-tuning-check-point)
         - [Fine tuning retrieve](#Fine-tuning-retrieve)
         - [Difference Between Supervised and DPO](#Difference-Between-Supervised-and-DPO)
+    - [Vector store](#Vector-store)
+        - [Vector store create](#Vector-store-create) 
+        - [Vector store list](#Vector-store-list) 
+        - [Vector store retrieve](#Vector-store-retrieve) 
+        - [Vector store modify](#Vector-store-modify) 
+        - [Vector store delete](#Vector-store-delete) 
 - [Contributing](#contributing)
 - [License](#license)
 
@@ -2397,6 +2403,30 @@ he DPO method is a more advanced approach  that incorporates human preferences i
 In summary, the  supervised method  is ideal for  well-defined tasks, while  DPO is more suitable when human preferences or subjective criteria are central to your project.
 
  <br/>
+
+## Vector store
+
+Vector stores are used to store files for use by the [`file_search`](https://platform.openai.com/docs/assistants/tools/file-search) tool.
+
+### Vector store create
+
+<br/>
+
+### Vector store list
+
+<br/>
+
+### Vector store retrieve
+
+<br/>
+
+### Vector store modify
+
+<br/>
+
+### Vector store delete
+
+<br/>
 
 # Contributing
 
