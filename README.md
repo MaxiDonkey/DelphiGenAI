@@ -2984,9 +2984,87 @@ The JSON response:
 
 ## Vector store batches
 
+Vector store file batches represent operations to add multiple files to a vector store. Related guide: [File Search](https://platform.openai.com/docs/assistants/tools/file-search)
+
 <br/>
 
 ### Vsb create
+
+<br/>
+
+#### Create a vector store
+
+To create the vector store, it is advisable to refer to the example provided [at this location](#Vector-store-create) . Once the creation is complete, it is essential to retrieve the vector store ID. 
+
+<br/>
+
+#### Upload files en get Ids
+
+To link the files to the vector store created in the previous step, it is necessary to [upload](#File-upload) them first, as described earlier. Additionally, it is essential to retrieve the file IDs after the upload, just like in the previous step.
+
+Let’s consider the upload of two files, ***file1*** and ***file2***, ensuring that the `purpose` field is set to `assistant`. This will provide the corresponding file IDs, ***fileId1*** and ***fileId2***, respectively.
+
+<br/>
+
+#### Create the vector store batches
+
+To create the batch store containing ***file1*** and ***file2***, uses example bellow.
+
+
+```Delphi
+//uses GenAI, GenAI.Types, GenAI.Tutorial.VCL;
+
+  TutorialHub.JSONRequestClear;
+  TutorialHub.Id := 'vs_cde456';
+  var Id1 := 'file-123';
+  var Id2 := 'file-456';
+
+  //Asynchronous example
+  Client.VectorStoreBatch.AsynCreate(TutorialHub.id,
+    procedure (Params: TVectorStoreBatchCreateParams)
+    begin
+      Params.FileId([Id1, Id2]);
+      TutorialHub.JSONRequest := Params.ToFormat();
+    end,
+    function : TAsynVectorStoreBatch
+    begin
+      Result.Sender := TutorialHub;
+      Result.OnStart := Start;
+      Result.OnSuccess := Display;
+      Result.OnError := Display;
+    end);
+
+  //Synchronous example
+//  var Value := Client.VectorStoreBatch.Create(TutorialHub.id,
+//    procedure (Params: TVectorStoreBatchCreateParams)
+//    begin
+//      Params.FileId([Id1, Id2]);
+//      TutorialHub.JSONRequest := Params.ToFormat();
+//    end);
+//  try
+//    Display(TutorialHub, Value);
+//  finally
+//    Value.Free;
+//  end;
+```
+
+The JSON response:
+```JSON
+{
+    "id": "vsfb_123",
+    "object": "vector_store.file_batch",
+    "created_at": 1738956347,
+    "status": "in_progress",
+    "vector_store_id": "vs_cde456",
+    "file_counts": {
+        "in_progress": 2,
+        "completed": 0,
+        "failed": 0,
+        "cancelled": 0,
+        "total": 2
+    }
+}
+```
 
 <br/>
 
