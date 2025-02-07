@@ -3293,7 +3293,7 @@ The JSON response:
 
 Build assistants that can call models and use tools to perform tasks.
 
-The version of assistants integrated by GenAI is version 2, currently offered in beta by OpenAI.
+The version of assistants integrated by `GenAI` is version 2, currently offered in beta by **OpenAI**.
 
 [Get started with the Assistants API](https://platform.openai.com/docs/assistants)
 
@@ -3370,14 +3370,76 @@ The JSON response:
 
 #### Files
 
+To fully utilize this feature offered by the `assistants`, you must be comfortable managing file stores. For further details, you can refer to the sections [vector store files](#Vector-store-files) outlined above.
+
 ```Delphi
 //uses GenAI, GenAI.Types, GenAI.Tutorial.VCL;
 
+  TutorialHub.JSONRequestClear;
+  var FilesId := 'vs_123';  //Id of a vector store files
+
+  //Asynchronous example
+  Client.Assistants.AsynCreate(
+    procedure (Params: TAssistantsParams)
+    begin
+      Params.Model('gpt-4o');
+      Params.Instructions('You are an HR bot, and you have access to files to answer employee questions about company policies.');
+      Params.Name('HR Bot');
+      Params.Tools([File_search]);
+      Params.ToolResources(File_search([FilesId]));
+      TutorialHub.JSONRequest := Params.ToFormat();
+    end,
+    function : TAsynAssistant
+    begin
+      Result.Sender := TutorialHub;
+      Result.OnStart := Start;
+      Result.OnSuccess := Display;
+      Result.OnError := Display;
+    end);
+
+  //Synchronous example
+//  var Value := Client.Assistants.Create(
+//    procedure (Params: TAssistantsParams)
+//    begin
+//      Params.Model('gpt-4o');
+//      Params.Instructions('You are an HR bot, and you have access to files to answer employee questions about company policies.');
+//      Params.Name('HR Bot');
+//      Params.Tools([File_search]);
+//      Params.ToolResources(File_search([FilesId]));
+//      TutorialHub.JSONRequest := Params.ToFormat();
+//    end);
+//  try
+//    Display(TutorialHub, Value);
+//  finally
+//    Value.Free;
+//  end;
 ```
 
 The JSON response:
 ```JSON
-
+{
+  "id": "asst_abc123",
+  "object": "assistant",
+  "created_at": 1738963996,
+  "name": "HR Helper",
+  "description": null,
+  "model": "gpt-4o",
+  "instructions": "You are an HR bot, and you have access to files to answer employee questions about company policies.",
+  "tools": [
+    {
+      "type": "file_search"
+    }
+  ],
+  "tool_resources": {
+    "file_search": {
+      "vector_store_ids": ["vs_123"]
+    }
+  },
+  "metadata": {},
+  "top_p": 1.0,
+  "temperature": 1.0,
+  "response_format": "auto"
+}
 ```
 
 <br/>
