@@ -3446,17 +3446,183 @@ The JSON response:
 
 ### List assistants
 
+Returns a list of assistants.
+
+Consult the [official documentation](https://platform.openai.com/docs/api-reference/assistants/listAssistants) for details on list parameters.
+
+```Delphi
+//uses GenAI, GenAI.Types, GenAI.Tutorial.VCL;
+
+  TutorialHub.JSONRequestClear;
+
+  //Asynchronous example
+  Client.Assistants.AsynList(
+    procedure (Params: TUrlAdvancedParams)
+    begin
+      Params.Limit(5);
+    end,
+    function : TAsynAssistants
+    begin
+      Result.Sender := TutorialHub;
+      Result.OnStart := Start;
+      Result.OnSuccess := Display;
+      Result.OnError := Display;
+    end);
+
+  //Synchronous example
+//  var Value := Client.Assistants.List(
+//    procedure (Params: TUrlAdvancedParams)
+//    begin
+//      Params.Limit(5);
+//    end);
+//  try
+//    Display(TutorialHub, Value);
+//  finally
+//    Value.Free;
+//  end;
+```
+
 <br/>
 
 ### Retrieve assistant
+
+Retrieves an assistant by its ID.
+
+```Delphi
+//uses GenAI, GenAI.Types, GenAI.Tutorial.VCL;
+
+  TutorialHub.JSONRequestClear;
+  TutorialHub.Id := 'asst_abc123';
+
+  //Asynchronous example
+  Client.Assistants.AsynRetrieve(TutorialHub.Id,
+    function : TAsynAssistant
+    begin
+      Result.Sender := TutorialHub;
+      Result.OnStart := Start;
+      Result.OnSuccess := Display;
+      Result.OnError := Display;
+    end);
+
+  //Synchronous example
+//  var Value := Client.Assistants.Retrieve(TutorialHub.Id);
+//  try
+//    Display(TutorialHub, Value);
+//  finally
+//    Value.Free;
+//  end;
+```
 
 <br/>
 
 ### Modify assistant
 
+Modifies an assistant by its ID.
+
+```Delphi
+//uses GenAI, GenAI.Types, GenAI.Tutorial.VCL;
+
+  TutorialHub.JSONRequestClear;
+  TutorialHub.Id := 'asst_abc123';
+
+  //Asynchronous example
+  Client.Assistants.AsynUpdate(TutorialHub.Id,
+    procedure (Params: TAssistantsParams)
+    begin
+      Params.Model('o3-mini');
+      Params.ReasoningEffort(TReasoningEffort.medium);
+      TutorialHub.JSONRequest := Params.ToFormat();
+    end,
+    function : TAsynAssistant
+    begin
+      Result.Sender := TutorialHub;
+      Result.OnStart := Start;
+      Result.OnSuccess := Display;
+      Result.OnError := Display;
+    end);
+
+  //Synchronous example
+//  var Value := Client.Assistants.Update(TutorialHub.Id,
+//    procedure (Params: TAssistantsParams)
+//    begin
+//      Params.Model('o3-mini');
+//      Params.ReasoningEffort(TReasoningEffort.medium);
+//      TutorialHub.JSONRequest := Params.ToFormat();
+//    end);
+//  try
+//    Display(TutorialHub, Value);
+//  finally
+//    Value.Free;
+//  end;
+```
+
+The JSON response
+```JSON
+{
+    "id": "asst_abc123",
+    "object": "assistant",
+    "created_at": 1738963996,
+    "name": "HR Bot",
+    "description": null,
+    "model": "o3-mini",
+    "instructions": "You are an HR bot, and you have access to files to answer employee questions about company policies.",
+    "tools": [
+        {
+            "type": "file_search",
+            "file_search": {
+                "ranking_options": {
+                    "ranker": "default_2024_08_21",
+                    "score_threshold": 0.0
+                }
+            }
+        }
+    ],
+    "top_p": 1.0,
+    "temperature": 1.0,
+    "reasoning_effort": "medium",
+    "tool_resources": {
+        "file_search": {
+            "vector_store_ids": [
+                "vs_123"
+            ]
+        }
+    },
+    "metadata": {
+    },
+    "response_format": "auto"
+}
+```
+
 <br/>
 
 ### Delete assistant
+
+Delete an assistant by its ID.
+
+```Delphi
+//uses GenAI, GenAI.Types, GenAI.Tutorial.VCL;
+  
+  TutorialHub.JSONRequestClear;
+  TutorialHub.Id := 'asst_abc123';
+
+  //Asynchronous example
+  Client.Assistants.AsynDelete(TutorialHub.Id,
+    function : TAsynDeletion
+    begin
+      Result.Sender := TutorialHub;
+      Result.OnStart := Start;
+      Result.OnSuccess := Display;
+      Result.OnError := Display;
+    end);
+
+  //Synchronous example
+//  var Value := Client.Assistants.Delete(TutorialHub.Id);
+//  try
+//    Display(TutorialHub, Value);
+//  finally
+//    Value.Free;
+//  end;
+```
 
 <br/>
 
