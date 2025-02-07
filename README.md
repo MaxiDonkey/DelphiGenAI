@@ -2696,7 +2696,7 @@ To create the file store containing ***file1*** and ***file2***, the provided co
 
   TutorialHub.JSONRequestClear;
   TutorialHub.Id := 'vs_abc123';  //Id of vector store
-  var Id1 := 'file-124';
+  var Id1 := 'file-123';
   var Id2 := 'file-456';
 
   //Asynchronous example
@@ -2728,7 +2728,7 @@ To create the file store containing ***file1*** and ***file2***, the provided co
 //  end;
 ```
 
-The JSON response
+The JSON response:
 ```JSON
 {
     "id": "file-124",
@@ -2752,13 +2752,228 @@ The JSON response
 
 ### Vsf list
 
+Returns a list of vector store files.
+
+<br/>
+
+#### Without parameters
+
+```Delphi
+//uses GenAI, GenAI.Types, GenAI.Tutorial.VCL;
+ 
+  TutorialHub.JSONRequestClear;
+  TutorialHub.Id := 'vs_abc123';
+
+  //Asynchronous example
+  Client.VectorStoreFiles.AsynList(TutorialHub.Id,
+    function : TAsynVectorStoreFiles
+    begin
+      Result.Sender := TutorialHub;
+      Result.OnStart := Start;
+      Result.OnSuccess := Display;
+      Result.OnError := Display;
+    end);
+
+  //Synchronous example
+//  var Value := Client.VectorStoreFiles.List(TutorialHub.Id);
+//  try
+//    Display(TutorialHub, Value);
+//  finally
+//    Value.Free;
+//  end;
+```
+
+<br/>
+
+#### with parameters
+
+Refert to [parameters documentation](https://platform.openai.com/docs/api-reference/vector-stores-files/listFiles).
+
+```Delphi
+//uses GenAI, GenAI.Types, GenAI.Tutorial.VCL;
+
+  TutorialHub.JSONRequestClear;
+  TutorialHub.Id := 'vs_abc123';
+
+  //Asynchronous example
+  Client.VectorStoreFiles.AsynList(TutorialHub.Id,
+    procedure (Params: TVectorStoreFilesUrlParams)
+    begin
+      Params.Limit(5);
+      Params.Filter('completed');
+    end,
+    function : TAsynVectorStoreFiles
+    begin
+      Result.Sender := TutorialHub;
+      Result.OnStart := Start;
+      Result.OnSuccess := Display;
+      Result.OnError := Display;
+    end);
+
+  //Synchronous example
+//  var Value := Client.VectorStoreFiles.List(TutorialHub.Id,
+//    procedure (Params: TVectorStoreFilesUrlParams)
+//    begin
+//      Params.Limit(5);
+//      Params.Filter('completed');
+//    end);
+//  try
+//    Display(TutorialHub, Value);
+//  finally
+//    Value.Free;
+//  end;
+
+```
+
+The JSON response:
+```JSON
+{
+    "object": "list",
+    "data": [
+        {
+            "id": "file-123",
+            "object": "vector_store.file",
+            "usage_bytes": 62353,
+            "created_at": 1738906505,
+            "vector_store_id": "vs_abc123",
+            "status": "completed",
+            "last_error": null,
+            "chunking_strategy": {
+                "type": "static",
+                "static": {
+                    "max_chunk_size_tokens": 800,
+                    "chunk_overlap_tokens": 400
+                }
+            },
+            "metadata": {
+            }
+        },
+        {
+            "id": "file-456",
+            "object": "vector_store.file",
+            "usage_bytes": 1601511,
+            "created_at": 1738902946,
+            "vector_store_id": "vs_abc123",
+            "status": "completed",
+            "last_error": null,
+            "chunking_strategy": {
+                "type": "static",
+                "static": {
+                    "max_chunk_size_tokens": 800,
+                    "chunk_overlap_tokens": 400
+                }
+            },
+            "metadata": {
+            }
+        }
+    ],
+    "first_id": "file-123",
+    "last_id": "file-456",
+    "has_more": false
+}
+```
+
 <br/>
 
 ### Vsf retrieve
 
+Retrieves a vector store file.
+
+```Delphi
+//uses GenAI, GenAI.Types, GenAI.Tutorial.VCL;
+
+  TutorialHub.JSONRequestClear;
+  TutorialHub.Id := 'vs_abc123';
+  var Id1 := 'file-123';
+
+  //Asynchronous example
+  Client.VectorStoreFiles.AsynRetrieve(
+    TutorialHub.Id,
+    Id1,
+    function : TAsynVectorStoreFile
+    begin
+      Result.Sender := TutorialHub;
+      Result.OnStart := Start;
+      Result.OnSuccess := Display;
+      Result.OnError := Display;
+    end);
+
+  //Synchronous example
+//  var Value := Client.VectorStoreFiles.Retrieve(
+//                 TutorialHub.Id,
+//                 Id1);
+//  try
+//    Display(TutorialHub, Value);
+//  finally
+//    Value.Free;
+//  end;
+```
+
+The JSON response:
+```JSON
+{
+    "id": "file-123",
+    "object": "vector_store.file",
+    "usage_bytes": 1601511,
+    "created_at": 1738902946,
+    "vector_store_id": "vs_abc123",
+    "status": "completed",
+    "last_error": null,
+    "chunking_strategy": {
+        "type": "static",
+        "static": {
+            "max_chunk_size_tokens": 800,
+            "chunk_overlap_tokens": 400
+        }
+    }
+}
+```
+
 <br/>
 
 ### Vsf delete
+
+Remove a vector store file. This action will detach the file from the vector store without deleting the file itself. To permanently delete the file, use the [delete file](#File-Deletion) endpoint.
+
+```Delphi
+//uses GenAI, GenAI.Types, GenAI.Tutorial.VCL;
+
+  TutorialHub.JSONRequestClear;
+  TutorialHub.Id := 'vs_abc123';
+  var Id1 := 'file-123';
+
+  //Asynchronous example
+  Client.VectorStoreFiles.AsynDelete(
+    TutorialHub.Id,
+    Id1,
+    function : TAsynDeletion
+    begin
+      Result.Sender := TutorialHub;
+      Result.OnStart := Start;
+      Result.OnSuccess := Display;
+      Result.OnError := Display;
+    end);
+
+
+  //Synchronous example
+//  var Value := Client.VectorStoreFiles.Delete(
+//                 TutorialHub.Id,
+//                 Id1);
+//  try
+//    Display(TutorialHub, Value);
+//  finally
+//    Value.Free;
+//  end;
+```
+
+The JSON response:
+```JSON
+  {
+    "id": "file-123",
+    "object": "vector_store.file.deleted",
+    "deleted": true
+}
+```
 
 <br/>
 
