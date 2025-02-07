@@ -2671,16 +2671,19 @@ Related guide: [File Search](https://platform.openai.com/docs/assistants/tools/f
 
 Create a vector store file by attaching a [File](https://platform.openai.com/docs/api-reference/files) to a [vector store](https://platform.openai.com/docs/api-reference/vector-stores/object).
 
+<br/>
+
 #### Create a vector store
 
 To create the vector store, it is advisable to refer to the example provided [at this location](#Vector-store-create) . Once the creation is complete, it is essential to retrieve the vector store ID. 
+
+<br/>
 
 #### Upload files en get Ids
 
 To link the files to the vector store created in the previous step, it is necessary to upload them first, as described earlier. Additionally, it is essential to retrieve the file IDs after the upload, just like in the previous step.
 
 Let’s consider the upload of two files, ***file1*** and ***file2***, ensuring that the `purpose` field is set to `assistant`. This will provide the corresponding file IDs, ***fileId1*** and ***fileId2***, respectively.
-
 
 <br/>
 
