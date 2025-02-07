@@ -1180,6 +1180,8 @@ Refer to the [official documentation](https://platform.openai.com/docs/guides/fu
 
 In the `GenAI.Functions.Example` unit, there is a class that defines a function which OpenAI can choose to use or not, depending on the options provided. This class inherits from a parent class defined in the `GenAI.Functions.Core` unit. To create new functions, you can derive from the `TFunctionCore` class and define a new plugin.
 
+#### Uses a schema
+
 In this unit, this schema will be used for function calls.
 ```Json
 {
@@ -1201,7 +1203,7 @@ In this unit, this schema will be used for function calls.
 
 <br/>
 
-1. We will use the TWeatherReportFunction plugin defined in the `GenAI.Functions.Example` unit.
+We will use the TWeatherReportFunction plugin defined in the `GenAI.Functions.Example` unit.
 
 ```Delphi
   var Weather := TWeatherReportFunction.CreateInstance;
@@ -1212,11 +1214,12 @@ In this unit, this schema will be used for function calls.
 ```
 <br/>
 
-2. We then define a method to display the result of the query using the Weather tool.
+#### Methods to display result
+
+We then define a method to display the result of the query using the Weather tool.
 
 With this tutorial, a method is defined within TutorialHub. Let’s take a closer look at how this method works.
-
-- A. The first method display a stream text. 
+##### The first method display a stream text. 
 
 ```Delphi
 procedure TVCLTutorialHub.DisplayWeatherStream(const Value: string);
@@ -1245,7 +1248,7 @@ end;
 
 <br/>
 
-- B. The second method use audio with response.
+##### The second method use audio with response.
 
 ```Delphi
 procedure TVCLTutorialHub.DisplayWeatherAudio(const Value: string);
@@ -1277,7 +1280,9 @@ end;
 
 <br/>
 
-3. Building the query using the Weather tool. (Simply copy/paste this last code to test the usage of the functions.)
+#### Main method
+
+Building the query using the Weather tool. (Simply copy/paste this last code to test the usage of the functions.)
 
 ```Delphi
 //uses GenAI, GenAI.Types, GenAI.Tutorial.VCL, GenAI.Functions.Example;
@@ -1308,6 +1313,8 @@ end;
     Value.Free;
   end;
 ```
+
+#### FinishReason
 
 Let's look at how the display method handles the function call.
 
