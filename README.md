@@ -3182,6 +3182,49 @@ Returns a list of vector store files in a batch.
 ```Delphi
 //uses GenAI, GenAI.Types, GenAI.Tutorial.VCL;
 
+  TutorialHub.JSONRequestClear;
+  TutorialHub.Id := 'vs_cde456';
+  var BatchId := 'vsfb_7891';
+
+  //Asynchronous example
+  Client.VectorStoreBatch.AsynRetrieve(
+    TutorialHub.Id,
+    BatchId,
+    function : TAsynVectorStoreBatch
+    begin
+      Result.Sender := TutorialHub;
+      Result.OnStart := Start;
+      Result.OnSuccess := Display;
+      Result.OnError := Display;
+    end);
+
+  //Synchronous example
+//  var Value := Client.VectorStoreBatch.Retrieve(
+//                 TutorialHub.Id,
+//                 BatchId);
+//  try
+//    Display(TutorialHub, Value);
+//  finally
+//    Value.Free;
+//  end;
+```
+
+The JSON response:
+```JSON
+{
+    "id": "vsfb_789",
+    "object": "vector_store.file_batch",
+    "created_at": 1738958063,
+    "status": "completed",
+    "vector_store_id": "vs_cde456",
+    "file_counts": {
+        "in_progress": 0,
+        "completed": 2,
+        "failed": 0,
+        "cancelled": 0,
+        "total": 2
+    }
+}
 ```
 
 <br/>
@@ -3193,6 +3236,49 @@ Cancel a vector store file batch. This attempts to cancel the processing of file
 ```Delphi
 //uses GenAI, GenAI.Types, GenAI.Tutorial.VCL;
 
+  TutorialHub.JSONRequestClear;
+  TutorialHub.Id := 'vs_cde456';
+  var BatchId := 'vsfb_789';
+
+  //Asynchronous example
+  Client.VectorStoreBatch.AsynRetrieve(
+    TutorialHub.Id,
+    BatchId,
+    function : TAsynVectorStoreBatch
+    begin
+      Result.Sender := TutorialHub;
+      Result.OnStart := Start;
+      Result.OnSuccess := Display;
+      Result.OnError := Display;
+    end);
+
+  //Synchronous example
+//  var Value := Client.VectorStoreBatch.Cancel(
+//                 TutorialHub.Id,
+//                 BatchId);
+//  try
+//    Display(TutorialHub, Value);
+//  finally
+//    Value.Free;
+//  end;
+```
+
+The JSON response:
+```JSON
+{
+    "id": "vsfb_789",
+    "object": "vector_store.file_batch",
+    "created_at": 1738958063,
+    "status": "completed",
+    "vector_store_id": "vs_cde456",
+    "file_counts": {
+        "in_progress": 0,
+        "completed": 2,
+        "failed": 0,
+        "cancelled": 0,
+        "total": 2
+    }
+}
 ```
 
 <br/>
