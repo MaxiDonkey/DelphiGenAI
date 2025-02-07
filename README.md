@@ -71,6 +71,11 @@ ___
         - [Vector store retrieve](#Vector-store-retrieve) 
         - [Vector store modify](#Vector-store-modify) 
         - [Vector store delete](#Vector-store-delete) 
+    - [Vector store files](#Vector-store-files)
+        - [Vsf create](#Vsf-create)
+        - [Vsf list](#Vsf-list)
+        - [Vsf retrieve](#Vsf-retrieve)
+        - [Vsf delete](#Vsf-delete)
 - [Contributing](#contributing)
 - [License](#license)
 
@@ -2643,6 +2648,32 @@ The JSON response.
     "deleted": true
 }
 ```
+
+<br/>
+
+## Vector store files
+
+Vector store files represent files inside a vector store.
+
+Related guide: [File Search](https://platform.openai.com/docs/assistants/tools/file-search)
+
+<br/>
+
+### Vsf create
+
+Create a vector store file by attaching a [File](https://platform.openai.com/docs/api-reference/files) to a [vector store](https://platform.openai.com/docs/api-reference/vector-stores/object).
+
+<br/>
+
+### Vsf list
+
+<br/>
+
+### Vsf retrieve
+
+<br/>
+
+### Vsf delete
 
 <br/>
 
