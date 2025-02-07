@@ -76,6 +76,11 @@ ___
         - [Vsf list](#Vsf-list)
         - [Vsf retrieve](#Vsf-retrieve)
         - [Vsf delete](#Vsf-delete)
+    - [Vector store batches](#Vector-store-batches)
+        - [Vsb create](#Vsb-create)
+        - [Vsb list](#Vsb-list)
+        - [Vsb retrieve](#Vsb-retrieve)
+        - [Vsb delete](#Vsb-delete)
 - [Contributing](#contributing)
 - [License](#license)
 
@@ -2974,6 +2979,26 @@ The JSON response:
     "deleted": true
 }
 ```
+
+<br/>
+
+## Vector store batches
+
+<br/>
+
+### Vsb create
+
+<br/>
+
+### Vsb list
+
+<br/>
+
+### Vsb retrieve
+
+<br/>
+
+### Vsb delete
 
 <br/>
 
