@@ -1180,7 +1180,7 @@ Refer to the [official documentation](https://platform.openai.com/docs/guides/fu
 
 In the `GenAI.Functions.Example` unit, there is a class that defines a function which OpenAI can choose to use or not, depending on the options provided. This class inherits from a parent class defined in the `GenAI.Functions.Core` unit. To create new functions, you can derive from the `TFunctionCore` class and define a new plugin.
 
-#### Uses a schema
+#### Use a schema
 
 In this unit, this schema will be used for function calls.
 ```Json
@@ -1210,7 +1210,7 @@ We will use the TWeatherReportFunction plugin defined in the `GenAI.Functions.Ex
   //or
   var Weather := TWeatherReportFunction.CreateInstance(True);  //To activate `Strict` option
 
-  //See step 3
+  //See step : Main method
 ```
 <br/>
 
