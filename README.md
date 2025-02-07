@@ -3368,7 +3368,7 @@ The JSON response:
 
 <br/>
 
-#### Files
+#### File search
 
 To fully utilize this feature offered by the `assistants`, you must be comfortable managing file stores. For further details, you can refer to the sections [vector store files](#Vector-store-files) outlined above.
 
