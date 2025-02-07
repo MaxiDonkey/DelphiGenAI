@@ -2394,7 +2394,7 @@ he DPO method is a more advanced approach  that incorporates human preferences i
  
 <br/>
 
-#### Recommendation
+#### Recommendations
 
 - **Use the supervised method if:**
     - You have a  labeled  dataset  with ideal responses  for your prompts.   
