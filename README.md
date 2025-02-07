@@ -2469,7 +2469,7 @@ The Json response.
 
 ### Vector store list
 
-Returns a list of vector stores.  [Refer to documentation](https://platform.openai.com/docs/api-reference/vector-stores/list)
+Returns a list of vector stores.  
 
 ```Delphi
 //uses GenAI, GenAI.Types, GenAI.Tutorial.VCL;
@@ -2495,13 +2495,115 @@ Returns a list of vector stores.  [Refer to documentation](https://platform.open
 //  end;
 ```
 
+Example using [parameter](https://platform.openai.com/docs/api-reference/vector-stores/list).
+
+```Delphi
+//uses GenAI, GenAI.Types, GenAI.Tutorial.VCL;
+
+  TutorialHub.JSONRequestClear;
+
+  //Asynchronous example
+  Client.VectorStore.AsynList(
+    procedure (Params: TVectorStoreUrlParam)
+    begin
+      Params.Limit(3);
+    end,
+    function : TAsynVectorStores
+    begin
+      Result.Sender := TutorialHub;
+      Result.OnStart := Start;
+      Result.OnSuccess := Display;
+      Result.OnError := Display;
+    end);
+
+  //Synchronous example
+//  var Value := Client.VectorStore.List(
+//    procedure (Params: TVectorStoreUrlParam)
+//    begin
+//      Params.Limit(3);
+//    end);
+//  try
+//    Display(TutorialHub, Value);
+//  finally
+//    Value.Free;
+//  end;
+```
+
 <br/>
 
 ### Vector store retrieve
 
+Retrieves a vector store gy its ID.
+
+```Delphi
+//uses GenAI, GenAI.Types, GenAI.Tutorial.VCL;
+
+  TutorialHub.Id := 'vs_64a576731d6c8191b25996c80d6b16c2';
+
+  //Asynchronous example
+  Client.VectorStore.AsynRetrieve(TutorialHub.Id,
+    function : TAsynVectorStore
+    begin
+      Result.Sender := TutorialHub;
+      Result.OnStart := Start;
+      Result.OnSuccess := Display;
+      Result.OnError := Display;
+    end);
+
+  //Synchronous example
+//  var Value := Client.VectorStore.Retrieve(TutorialHub.Id);
+//  try
+//    Display(TutorialHub, Value);
+//  finally
+//    Value.Free;
+//  end;
+```
+
 <br/>
 
 ### Vector store modify
+
+Modifies a vector store by its ID.
+
+```Delphi
+//uses GenAI, GenAI.Types, GenAI.Tutorial.VCL;
+
+  TutorialHub.Id := 'vs_64a576731d6c8191b25996c80d6b16c2';
+
+  var MetaData := TJSONObject.Create
+    .AddPair('customer_id', 'user_123456789')
+    .AddPair('vector_description', 'vector store user');
+
+  //Asynchronous example
+  Client.VectorStore.AsynUpdate(TutorialHub.Id,
+    procedure (Params: TVectorStoreUpdateParams)
+    begin
+      Params.Name('Support FAQ user');
+      Params.Metadata(Metadata);
+      TutorialHub.JSONRequest := Params.ToFormat();
+    end,
+    function : TAsynVectorStore
+    begin
+      Result.Sender := TutorialHub;
+      Result.OnStart := Start;
+      Result.OnSuccess := Display;
+      Result.OnError := Display;
+    end);
+
+  //Synchronous example
+//  var Value := Client.VectorStore.Update(TutorialHub.Id,
+//    procedure (Params: TVectorStoreUpdateParams)
+//    begin
+//      Params.Name('Support FAQ user');
+//      Params.Metadata(Metadata);
+//      TutorialHub.JSONRequest := Params.ToFormat();
+//    end);
+//  try
+//    Display(TutorialHub, Value);
+//  finally
+//    Value.Free;
+//  end;
+```
 
 <br/>
 
