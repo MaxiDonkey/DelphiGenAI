@@ -2533,7 +2533,7 @@ Example using [parameter](https://platform.openai.com/docs/api-reference/vector-
 
 ### Vector store retrieve
 
-Retrieves a vector store gy its ID.
+Retrieves a vector store by its ID.
 
 ```Delphi
 //uses GenAI, GenAI.Types, GenAI.Tutorial.VCL;
