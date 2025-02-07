@@ -1219,7 +1219,8 @@ We will use the TWeatherReportFunction plugin defined in the `GenAI.Functions.Ex
 We then define a method to display the result of the query using the Weather tool.
 
 With this tutorial, a method is defined within TutorialHub. Let’s take a closer look at how this method works.
-##### The first method display a stream text. 
+
+##### Display a stream text. 
 
 ```Delphi
 procedure TVCLTutorialHub.DisplayWeatherStream(const Value: string);
@@ -1248,7 +1249,7 @@ end;
 
 <br/>
 
-##### The second method use audio with response.
+##### Use audio with response.
 
 ```Delphi
 procedure TVCLTutorialHub.DisplayWeatherAudio(const Value: string);
