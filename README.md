@@ -2681,7 +2681,7 @@ To create the vector store, it is advisable to refer to the example provided [at
 
 #### Upload files en get Ids
 
-To link the files to the vector store created in the previous step, it is necessary to upload them first, as described earlier. Additionally, it is essential to retrieve the file IDs after the upload, just like in the previous step.
+To link the files to the vector store created in the previous step, it is necessary to [upload](#File-upload) them first, as described earlier. Additionally, it is essential to retrieve the file IDs after the upload, just like in the previous step.
 
 Let’s consider the upload of two files, ***file1*** and ***file2***, ensuring that the `purpose` field is set to `assistant`. This will provide the corresponding file IDs, ***fileId1*** and ***fileId2***, respectively.
 
