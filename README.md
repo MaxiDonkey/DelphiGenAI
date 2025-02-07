@@ -1176,6 +1176,8 @@ Refer to the [official documentation](https://platform.openai.com/docs/guides/fu
 
 <br/>
 
+#### How build a plugin
+
 **Use case : What’s the weather in Paris?**
 
 In the `GenAI.Functions.Example` unit, there is a class that defines a function which OpenAI can choose to use or not, depending on the options provided. This class inherits from a parent class defined in the `GenAI.Functions.Core` unit. To create new functions, you can derive from the `TFunctionCore` class and define a new plugin.
