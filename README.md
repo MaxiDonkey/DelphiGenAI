@@ -2410,9 +2410,90 @@ Vector stores are used to store files for use by the [`file_search`](https://pla
 
 ### Vector store create
 
+Create a vector store. [Refer to documentation](https://platform.openai.com/docs/api-reference/vector-stores/create)
+
+```Delphi
+//uses GenAI, GenAI.Types, GenAI.Tutorial.VCL;
+  
+  TutorialHub.JSONRequestClear;
+  
+  //Asynchronous example
+  Client.VectorStore.AsynCreate(
+    procedure (Params: TVectorStoreCreateParams)
+    begin
+      Params.Name('Support FAQ');
+      TutorialHub.JSONRequest := Params.ToFormat();
+    end,
+    function : TAsynVectorStore
+    begin
+      Result.Sender := TutorialHub;
+      Result.OnStart := Start;
+      Result.OnSuccess := Display;
+      Result.OnError := Display;
+    end);
+
+  //Synchronous example
+//  var Value := Client.VectorStore.Create(
+//    procedure (Params: TVectorStoreCreateParams)
+//    begin
+//      Params.Name('Support FAQ');
+//      TutorialHub.JSONRequest := Params.ToFormat();
+//    end);
+//  try
+//    Display(TutorialHub, Value);
+//  finally
+//    Value.Free;
+//  end;
+```
+
+The Json response.
+```JSON
+{
+  "id": "vs_abc123",
+  "object": "vector_store",
+  "created_at": 1699061776,
+  "name": "Support FAQ",
+  "bytes": 139920,
+  "file_counts": {
+    "in_progress": 0,
+    "completed": 3,
+    "failed": 0,
+    "cancelled": 0,
+    "total": 3
+  }
+}
+```
+
+
 <br/>
 
 ### Vector store list
+
+Returns a list of vector stores.  [Refer to documentation](https://platform.openai.com/docs/api-reference/vector-stores/list)
+
+```Delphi
+//uses GenAI, GenAI.Types, GenAI.Tutorial.VCL;
+
+  TutorialHub.JSONRequestClear;
+
+  //Asynchronous example
+  Client.VectorStore.AsynList(
+    function : TAsynVectorStores
+    begin
+      Result.Sender := TutorialHub;
+      Result.OnStart := Start;
+      Result.OnSuccess := Display;
+      Result.OnError := Display;
+    end);
+
+  //Synchronous example
+//  var Value := Client.VectorStore.List;
+//  try
+//    Display(TutorialHub, Value);
+//  finally
+//    Value.Free;
+//  end;
+```
 
 <br/>
 
