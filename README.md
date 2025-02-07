@@ -88,7 +88,10 @@ ___
         - [Modify assistant](#Modify-assistant)
         - [Delete assistant](#Delete-assistant)
     - [Threads](#Threads)
-
+        - [Create thread](#Create-thread)
+        - [Retrieve thread](#Retrieve-thread)
+        - [Modify thread](#Modify-thread)
+        - [Delete thread](#Delete-thread)
     - [Messages](#Messages)
         - [Create message](#Create-message)
         - [List messages](#List-messages)
@@ -3636,13 +3639,158 @@ Delete an assistant by its ID.
 
 ## Threads
 
+Create threads that assistants can interact with.
+
+Related guide: [Assistants](https://platform.openai.com/docs/assistants/overview)
+
 <br/>
 
+### Create thread
 
+Create a thread.
 
+```Delphi
+//uses GenAI, GenAI.Types, GenAI.Tutorial.VCL;
 
+  TutorialHub.JSONRequestClear;
 
+  //Synchronous example
+  Client.Threads.AsynCreate(
+    function : TAsynThreads
+    begin
+      Result.Sender := TutorialHub;
+      Result.OnStart := Start;
+      Result.OnSuccess := Display;
+      Result.OnError := Display;
+    end);
 
+  //Synchronous example
+//  var Value := Client.Threads.Create;
+//  try
+//    Display(TutorialHub, Value);
+//  finally
+//    Value.Free;
+//  end;
+```
+
+<br/>
+
+### Retrieve thread
+
+Retrieves a thread by its ID.
+
+```Delphi
+//uses GenAI, GenAI.Types, GenAI.Tutorial.VCL;
+
+  TutorialHub.Id := 'thread_xyz321';
+
+  //Synchronous example
+  Client.Threads.AsynRetrieve(TutorialHub.Id,
+    function : TAsynThreads
+    begin
+      Result.Sender := TutorialHub;
+      Result.OnStart := Start;
+      Result.OnSuccess := Display;
+      Result.OnError := Display;
+    end);
+
+  //Synchronous example
+//  var Value := Client.Threads.Retrieve(TutorialHub.Id);
+//  try
+//    Display(TutorialHub, Value);
+//  finally
+//    Value.Free;
+//  end;
+```
+
+<br/>
+
+### Modify thread
+
+Modifies a thread by its ID.
+
+```Delphi
+//uses GenAI, GenAI.Types, GenAI.Tutorial.VCL;
+
+  TutorialHub.Id := 'thread_xyz321';
+
+  var MetaData := TJSONObject.Create
+    .AddPair('customer_id', 'user_12345')
+    .AddPair('batch_description', 'Nightly eval job');
+
+  //Synchronous example
+  Client.Threads.AsynModify(TutorialHub.Id,
+    procedure (Params: TThreadsModifyParams)
+    begin
+      Params.Metadata(Metadata);
+    end,
+    function : TAsynThreads
+    begin
+      Result.Sender := TutorialHub;
+      Result.OnStart := Start;
+      Result.OnSuccess := Display;
+      Result.OnError := Display;
+    end);
+
+  //Synchronous example
+//  var Value := Client.Threads.Modify(TutorialHub.Id,
+//    procedure (Params: TThreadsModifyParams)
+//    begin
+//      Params.Metadata(Metadata);
+//    end);
+//  try
+//    Display(TutorialHub, Value);
+//  finally
+//    Value.Free;
+//  end;
+```
+
+The JSON response:
+```JSON
+{
+    "id": "thread_xyz321",
+    "object": "thread",
+    "created_at": 1738969338,
+    "metadata": {
+        "customer_id": "user_12345",
+        "batch_description": "Nightly eval job"
+    },
+    "tool_resources": {
+    }
+}
+```
+
+<br/>
+
+### Delete thread
+
+Delete a thread by its ID.
+
+```Delphi
+//uses GenAI, GenAI.Types, GenAI.Tutorial.VCL;
+
+  TutorialHub.Id := 'thread_xyz321';
+
+  //Synchronous example
+  Client.Threads.AsynDelete(TutorialHub.Id,
+    function : TAsynDeletion
+    begin
+      Result.Sender := TutorialHub;
+      Result.OnStart := Start;
+      Result.OnSuccess := Display;
+      Result.OnError := Display;
+    end);
+
+  //Synchronous example
+//  var Value := Client.Threads.Delete(TutorialHub.Id);
+//  try
+//    Display(TutorialHub, Value);
+//  finally
+//    Value.Free;
+//  end;
+```
+
+<br/>
 
 ## Messages
 
