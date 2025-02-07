@@ -1220,7 +1220,7 @@ We then define a method to display the result of the query using the Weather too
 
 With this tutorial, a method is defined within TutorialHub. Let’s take a closer look at how this method works.
 
-##### Display a stream text. 
+##### Display a stream text
 
 ```Delphi
 procedure TVCLTutorialHub.DisplayWeatherStream(const Value: string);
@@ -1249,7 +1249,7 @@ end;
 
 <br/>
 
-##### Use audio with response.
+##### Use audio with response
 
 ```Delphi
 procedure TVCLTutorialHub.DisplayWeatherAudio(const Value: string);
