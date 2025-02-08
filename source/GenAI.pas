@@ -2256,7 +2256,7 @@ type
   /// <remarks>
   /// This class allows modifying metadata associated with a run, enabling the attachment of key-value pairs for tracking additional information.
   /// </remarks>
-  TUpdateParams = GenAI.Runs.TUpdateParams;
+  TRunUpdateParams = GenAI.Runs.TRunUpdateParams;
 
   /// <summary>
   /// Represents the parameters for submitting tool outputs to a run in the OpenAI API.

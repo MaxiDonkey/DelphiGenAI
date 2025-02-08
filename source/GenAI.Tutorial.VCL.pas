@@ -50,10 +50,14 @@ type
     procedure SetJSONRequest(const Value: string);
     procedure SetJSONResponse(const Value: string);
   public
+    /// <summary>
+    /// Play audio using the mediaplayer.
+    /// </summary>
     procedure PlayAudio;
+    /// <summary>
+    /// Gets or sets IGenAI interface.
+    /// </summary>
     property Client: IGenAI read FClient write FClient;
-    //AudioId
-
     /// <summary>
     /// Gets or sets the first memo component for displaying messages or data.
     /// </summary>
@@ -66,7 +70,9 @@ type
     /// Gets or sets the third memo component for displaying messages or data.
     /// </summary>
     property Memo3: TMemo read FMemo3 write SetMemo3;
-
+    /// <summary>
+    /// Sets text Timage component.
+    /// </summary>
     property Image: TImage read FImage write FImage;
     /// <summary>
     /// Sets text for displaying JSON request.
@@ -100,16 +106,22 @@ type
     /// Gets or sets the procedure for handling tool-specific calls.
     /// </summary>
     property ToolCall: TToolProc read FToolCall write FToolCall;
-
+    /// <summary>
+    /// Gets or sets the ID to simplify its usage.
+    /// </summary>
     property Id: string read FId write FId;
-
+    /// <summary>
+    /// Gets or sets the ID used to manage audio references.
+    /// </summary>
     property AudioId: string read FAudioId write FAudioId;
-
+    /// <summary>
+    /// Gets or sets the transcript with audio response.
+    /// </summary>
     property Transcript: string read FTranscript write FTranscript;
-
+    /// <summary>
+    /// Gets or sets a TMediaplayer.
+    /// </summary>
     property MediaPlayer: TMediaPlayer read FMediaPlayer write FMediaPlayer;
-
-
     procedure DisplayWeatherStream(const Value: string);
     procedure DisplayWeatherAudio(const Value: string);
     procedure SpeechChat(const  Value: string);
@@ -154,6 +166,13 @@ type
   procedure Display(Sender: TObject; Value: TVectorStoreBatches); overload;
   procedure Display(Sender: TObject; Value: TAssistant); overload;
   procedure Display(Sender: TObject; Value: TAssistants); overload;
+  procedure Display(Sender: TObject; Value: TThreads); overload;
+  procedure Display(Sender: TObject; Value: TMessages); overload;
+  procedure Display(Sender: TObject; Value: TMessagesList); overload;
+  procedure Display(Sender: TObject; Value: TRun); overload;
+  procedure Display(Sender: TObject; Value: TRuns); overload;
+  procedure Display(Sender: TObject; Value: TRunStep); overload;
+  procedure Display(Sender: TObject; Value: TRunSteps); overload;
 
   procedure DisplayStream(Sender: TObject; Value: string); overload;
   procedure DisplayStream(Sender: TObject; Value: TChat); overload;
@@ -590,6 +609,81 @@ begin
   Display(Sender)
 end;
 
+procedure Display(Sender: TObject; Value: TThreads);
+begin
+  TutorialHub.JSONResponse := Value.JSONResponse;
+  Display(Sender, [
+    F('id', Value.Id),
+    F('object', Value.&Object),
+    F('created_at', Value.CreatedAtAsString)
+  ]);
+  Display(Sender);
+end;
+
+procedure Display(Sender: TObject; Value: TMessages);
+begin
+  if not Value.JSONResponse.IsEmpty then
+    TutorialHub.JSONResponse := Value.JSONResponse;
+  Display(Sender, F('id', [Value.Id, F('status', Value.Status.ToString)]));
+  for var Item in Value.Content do
+    Display(Sender, Item.Text.Value);
+  Display(Sender);
+end;
+
+procedure Display(Sender: TObject; Value: TMessagesList);
+begin
+  TutorialHub.JSONResponse := Value.JSONResponse;
+  for var Item in Value.Data do
+    Display(Sender, Item);
+  Display(Sender);
+end;
+
+procedure Display(Sender: TObject; Value: TRun);
+begin
+  if not Value.JSONResponse.IsEmpty then
+    TutorialHub.JSONResponse := Value.JSONResponse;
+  Display(Sender, [
+    F('id', Value.Id),
+    F('status',Value.Status.ToString),
+    F('thread_id', Value.ThreadId),
+    F('assistant_id', Value.AssistantId),
+    F('expires_at', Value.ExpiresAtAsString)
+  ]);
+  Display(Sender);
+end;
+
+procedure Display(Sender: TObject; Value: TRuns);
+begin
+  TutorialHub.JSONResponse := Value.JSONResponse;
+  for var Item in Value.Data do
+    Display(Sender, Item);
+  Display(Sender);
+end;
+
+procedure Display(Sender: TObject; Value: TRunStep);
+begin
+  if not Value.JSONResponse.IsEmpty then
+    TutorialHub.JSONResponse := Value.JSONResponse;
+  Display(Sender, [
+    F('id', Value.Id),
+    F('status',Value.Status.ToString),
+    F('thread_id', Value.ThreadId),
+    F('assistant_id', Value.AssistantId),
+    F('run_id', Value.RunId),
+    F('step_details.type', Value.StepDetails.&Type.ToString),
+    F('step_details.message_creation.MessageId', Value.StepDetails.MessageCreation.MessageId)
+  ]);
+  Display(Sender);
+end;
+
+procedure Display(Sender: TObject; Value: TRunSteps);
+begin
+  TutorialHub.JSONResponse := Value.JSONResponse;
+  for var Item in Value.Data do
+    Display(Sender, Item);
+  Display(Sender);
+end;
+
 procedure DisplayStream(Sender: TObject; Value: string);
 var
   M: TMemo;
@@ -764,7 +858,7 @@ begin
       Params.Modalities(['text', 'audio']);
       Params.Audio('verse', 'mp3');
       Params.Messages([
-        FromSystem('Tu es un présentateur météo sur une chaîne télé de grande écoute.'),
+        FromSystem('You are a weather presenter on a prime time TV channel.'),
         FromUser(Value)
       ]);
       Params.MaxCompletionTokens(1024);
@@ -786,7 +880,7 @@ begin
     begin
       Params.Model('gpt-4o');
       Params.Messages([
-          FromSystem('Tu es un présentateur météo sur une chaîne télé de grande écoute.'),
+          FromSystem('You are a weather presenter on a prime time TV channel.'),
           FromUser(Value)]);
       Params.MaxCompletionTokens(1024);
       Params.Stream;

@@ -376,7 +376,7 @@ type
   /// This class allows modifying metadata associated with a run, enabling the attachment of
   /// key-value pairs for tracking additional information.
   /// </remarks>
-  TUpdateParams = class(TJSONParam)
+  TRunUpdateParams = class(TJSONParam)
   public
     /// <summary>
     /// Updates the metadata associated with the run.
@@ -386,9 +386,9 @@ type
     /// Keys have a maximum length of 64 characters, and values have a maximum length of 512 characters.
     /// </param>
     /// <returns>
-    /// Returns the current instance of <c>TUpdateParams</c> to allow method chaining.
+    /// Returns the current instance of <c>TRunUpdateParams</c> to allow method chaining.
     /// </returns>
-    function Metadata(const Value: TJSONObject): TUpdateParams;
+    function Metadata(const Value: TJSONObject): TRunUpdateParams;
   end;
 
   /// <summary>
@@ -443,7 +443,7 @@ type
     /// <returns>
     /// Returns the current instance of <c>TSubmitToolParams</c> to allow method chaining.
     /// </returns>
-    function ToolOutputs(const Value: TToolOutputParam): TSubmitToolParams;
+    function ToolOutputs(const Value: TArray<TToolOutputParam>): TSubmitToolParams;
     /// <summary>
     /// Enables or disables token streaming when submitting tool outputs.
     /// </summary>
@@ -907,7 +907,7 @@ type
     /// <param name="ParamProc">A procedure specifying update parameters.</param>
     /// <param name="CallBacks">Callback functions to handle asynchronous execution.</param>
     procedure AsynUpdate(const ThreadId: string; const RunId: string;
-      const ParamProc: TProc<TUpdateParams>;
+      const ParamProc: TProc<TRunUpdateParams>;
       const CallBacks: TFunc<TAsynRun>);
     /// <summary>
     /// Asynchronously submits tool outputs for a paused run that requires them to continue.
@@ -968,7 +968,7 @@ type
     /// <param name="ParamProc">A procedure specifying update parameters.</param>
     /// <returns>The updated <c>TRun</c> object.</returns>
     function Update(const ThreadId: string; const RunId: string;
-      const ParamProc: TProc<TUpdateParams>): TRun;
+      const ParamProc: TProc<TRunUpdateParams>): TRun;
     /// <summary>
     /// Submits tool outputs for a paused run that requires them to continue.
     /// </summary>
@@ -1125,7 +1125,7 @@ begin
 end;
 
 procedure TRunsRoute.AsynUpdate(const ThreadId, RunId: string;
-  const ParamProc: TProc<TUpdateParams>; const CallBacks: TFunc<TAsynRun>);
+  const ParamProc: TProc<TRunUpdateParams>; const CallBacks: TFunc<TAsynRun>);
 begin
   with TAsynCallBackExec<TAsynRun, TRun>.Create(CallBacks) do
   try
@@ -1196,10 +1196,10 @@ begin
 end;
 
 function TRunsRoute.Update(const ThreadId, RunId: string;
-  const ParamProc: TProc<TUpdateParams>): TRun;
+  const ParamProc: TProc<TRunUpdateParams>): TRun;
 begin
   HeaderCustomize;
-  Result := API.Post<TRun, TUpdateParams>('threads/' + ThreadId + '/runs/' + RunId, ParamProc);
+  Result := API.Post<TRun, TRunUpdateParams>('threads/' + ThreadId + '/runs/' + RunId, ParamProc);
 end;
 
 { TRunsCoreParams }
@@ -1460,11 +1460,11 @@ begin
   Result := TCreateRunsParams(Add('tool_resources', Value.Detach));
 end;
 
-{ TUpdateParams }
+{ TRunUpdateParams }
 
-function TUpdateParams.Metadata(const Value: TJSONObject): TUpdateParams;
+function TRunUpdateParams.Metadata(const Value: TJSONObject): TRunUpdateParams;
 begin
-  Result := TUpdateParams(Add('metadata', Value));
+  Result := TRunUpdateParams(Add('metadata', Value));
 end;
 
 { TToolOutputParam }
@@ -1487,9 +1487,12 @@ begin
 end;
 
 function TSubmitToolParams.ToolOutputs(
-  const Value: TToolOutputParam): TSubmitToolParams;
+  const Value: TArray<TToolOutputParam>): TSubmitToolParams;
 begin
-  Result := TSubmitToolParams(Add('tool_outputs', Value.Detach));
+  var JSONArray := TJSONArray.Create;
+  for var Item in Value do
+    JSONArray.Add(Item.Detach);
+  Result := TSubmitToolParams(Add('tool_outputs', JSONArray));
 end;
 
 end.

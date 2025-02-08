@@ -5,7 +5,7 @@ unit GenAI.Async.Params;
       Unit containing generic interfaces and classes for managing parameters
       across  various  asynchronous  operations.
 
-      The HuggingFace.Async.Params  unit  provides  a set of tools for creating
+      The GenAI.Async.Params  unit  provides  a set of tools for creating
       and managing  parameter  instances  using  generic  types. The primary
       components include:
 
@@ -20,7 +20,7 @@ unit GenAI.Async.Params;
       asynchronous  scenarios  such  as  chat  operations.
 
       Note  that  This  unit  is  designed   to  work   seamlessly  with  the
-      Gemini.Chat.AsyncEvents unit,  which  relies  on  IUseParams<T> and
+      GenAI.Chat.AsyncEvents unit,  which  relies  on  IUseParams<T> and
       TUseParamsFactory<T>  to  manage   parameters   for  asynchronous  chat
       requests.
 
