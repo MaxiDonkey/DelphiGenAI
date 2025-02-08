@@ -48,6 +48,8 @@ This approach makes configuring request data more intuitive and fluid.
 
 This framework aims to provide a practical and efficient solution for integrating **OpenAI APIs** into Delphi projects. The support for method chaining in JSON request configuration, combined with unit testing (via **DUnitX** and the `GenAI.API.Tests` unit) and flexible error handling, enables developers to focus on the core business logic of their applications. Although it’s not exhaustive, this framework is designed to evolve with developers’ needs and the technological advancements it supports.
 
+<br/>
+
 # Dependencies
 
 This Delphi project relies on several key dependencies that cover network functionality, JSON handling,  serialization,  asynchronous operations,  and error management. Here are the main categories of dependencies:
@@ -72,6 +74,8 @@ Uses  DUnitX.TestFramework and  related  modules to implement  unit tests  and  
 
 This  project is structured to be modular and extensible, with  abstractions that  allow for  easily switching  network  libraries  or  adding  new  features  while  maintaining robustness and testability.
 
+<br/>
+
 # Asynchronism mechanism
 
 ### Context and Objectives
@@ -82,9 +86,13 @@ The proposed architecture aims to facilitate the management of parameters and th
 
 The goal is to separate the logic for managing parameters from the logic for asynchronous execution, while ensuring proper synchronization with the main thread (GUI) through callbacks.
 
+<br/>
+
 ### Managing Parameters with Generic Interfaces and Classes
 
-#### Interface IUseParams<T>
+<br/>
+
+#### - Interface IUseParams<T>
 
 This generic interface allows for managing parameters of type T, with the following key methods:
 
@@ -92,14 +100,20 @@ SetParams/GetParams: To set and retrieve the parameter values.
 - Assign: Allows assigning values using a function (of type TFunc<T>).
 - AsSender: Returns the instance as a TObject, useful for identifying the sender during asynchronous execution.
 
-####  Class TUseParams<T>
+<br/>
+
+####  - Class TUseParams<T>
 
 Implements the IUseParams<T> interface and encapsulates internal parameter management through a private variable FParams. This provides a simple abstraction for storing and manipulating the parameters required for asynchronous operations.
 
-#### Factory Class TUseParamsFactory<T>
+<br/>
+
+#### - Factory Class TUseParamsFactory<T>
 
 This static factory class creates instances of IUseParams<T>. Two creation methods are provided:
 - One method without parameters that creates an empty instance.
 - One method that accepts a function of type TFunc<T> to initialize the parameters during creation.
 
 Advantage: Using generics makes it possible to reuse the same mechanism for different parameter types, making the code highly flexible and easily extensible.
+
+<br/>
