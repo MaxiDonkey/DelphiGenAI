@@ -896,7 +896,11 @@ end;
 
 procedure TFMXTutorialHub.PlayAudio;
 begin
-
+  with MediaPlayer do
+    begin
+      FileName := Self.FileName;
+      Play;
+    end;
 end;
 
 procedure TFMXTutorialHub.SetButton(const Value: TButton);
@@ -935,18 +939,35 @@ end;
 procedure TFMXTutorialHub.SetMemo2(const Value: TMemo);
 begin
   FMemo2 := Value;
-//  FMemo2.ScrollBars := TScrollStyle.ssBoth;
 end;
 
 procedure TFMXTutorialHub.SetMemo3(const Value: TMemo);
 begin
   FMemo3 := Value;
-//  FMemo3.ScrollBars := TScrollStyle.ssBoth;
 end;
 
 procedure TFMXTutorialHub.SpeechChat(const Value: string);
 begin
+  FileName := 'SpeechChat.mp3';
 
+  //Asynchronous example
+  Client.Chat.AsynCreate(
+    procedure (Params: TChatParams)
+    begin
+      Params.Model('gpt-4o-audio-preview');
+      Params.Modalities(['text', 'audio']);
+      Params.Audio('ash', 'mp3');
+      Params.Messages([
+        FromUser(Value)
+      ]);
+      Params.MaxCompletionTokens(1024);
+    end,
+    function : TAsynChat
+    begin
+      Result.Sender := TutorialHub;
+      Result.OnSuccess := DisplayAudio;
+      Result.OnError := Display;
+    end);
 end;
 
 initialization
