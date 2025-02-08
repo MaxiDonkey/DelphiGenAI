@@ -12,6 +12,7 @@ ___
 - [TIPS for using the tutorial effectively](#TIPS-for-using-the-tutorial-effectively)
     - [Obtain an api key](#Obtain-an-api-key)
     - [Strategies for quickly using the code examples](#Strategies-for-quickly-using-the-code-examples)
+
 - [Quick Start Guide](#Quick-Start-Guide)
     - [Text generation](#Text-generation)
         - [Non streamed](#Non-streamed) 
@@ -34,6 +35,7 @@ ___
     - [Moderation](#Moderation)
         - [Modarate text inputs](#Modarate-text-inputs)
         - [Modarate images and text](#Modarate-images-and-text)
+
 - [Beyond the Basics Advanced Usage](#Beyond-the-Basics-Advanced-Usage)
     - [Function calling](#Function-calling)
     - [Models](#Models)
