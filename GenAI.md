@@ -106,7 +106,7 @@ Implements the `IUseParams<T>` interface and encapsulates internal parameter man
 
 <br/>
 
-### Factory Class TUseParamsFactory\<T\>
+### Factory Class `TUseParamsFactory\<T\>`
 
 This static factory class creates instances of `IUseParams<T>`. Two creation methods are provided:
 - One method without parameters that creates an empty instance.
