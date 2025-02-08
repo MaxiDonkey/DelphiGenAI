@@ -5,6 +5,7 @@ ___
 
 - [Dependencies](#Dependencies)
 - [Asynchronous Engine](#Asynchronous-Engine)
+- [IHttpClientAPI interface](#IHttpClientAPI-interface)
 
 <br/>
 
@@ -149,3 +150,43 @@ This mechanism enables progressive handling of responses from the model (e.g., w
 
 The asynchronous mechanism leverages generics, non-blocking execution, robust exception handling, and a callback-based structure to provide a flexible, reusable, and maintainable solution for managing asynchronous tasks while ensuring safe and responsive user interfaces.
 
+<br/>
+
+# IHttpClientAPI interface
+
+In this project, I chose to use the `IHttpClientAPI` interface to handle HTTP requests instead of calling a specific class like `THttpClient` directly. This brings more flexibility, makes testing easier, and ensures the code is cleaner and more maintainable.
+
+<br/>
+
+## The main idea
+
+Instead of having code that directly depends on a specific HTTP implementation (like `THttpClient`), we rely on an interface that defines the necessary actions (GET, POST, DELETE…). We then inject the implementation we want to use. This decouples the business logic from the technical details.
+
+<br/>
+
+## Practical benefits:
+
+- **Easily swap out the HTTP client:** If I ever want to replace `THttpClient` with another HTTP library or a new version, I won’t have to rewrite everything. I just need to create a new implementation that follows the `IHttpClientAPI` interface, and that’s it.
+- **Simplified unit testing:** During testing, I can inject a mock version of the interface. There’s no need to make real HTTP requests or rely on an external server. I can easily simulate network errors, specific responses (e.g., 500 errors), and test different scenarios.
+- **Cleaner and scalable code:** The business logic doesn’t care how HTTP requests are made; it only focuses on what to do with the response. As a result, the code is more readable, easier to maintain, and adheres to the Dependency Inversion Principle from SOLID.
+
+<br/>
+
+## How does it work in practice
+
+1. I defined an interface `IHttpClientAPI` that specifies what the HTTP client should be able to do.
+2. I created a concrete implementation (e.g., `THttpClientAPI`) that handles the actual HTTP requests.
+3. The code interacting with the API only uses the interface, without knowing the underlying implementation.
+4. During execution or testing, I inject the desired implementation (real or mock).
+
+<br/>
+
+## What this brings to the project
+
+- If the API changes or I switch to a different networking technology, I won’t break the entire codebase.
+- Tests are fast and reliable because I can simulate network behaviors without relying on external infrastructure.
+- The code remains modular, clean, and easy to maintain over time.
+
+<br/>
+
+***In summary:*** This small decision helps prevent bigger problems down the line while making it easy to evolve the project.
