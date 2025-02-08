@@ -138,7 +138,7 @@ This method accepts a function (TFunc<U>) representing the operation to be execu
 
 ### Streaming Callback (TAsynStreamCallBack<T>)
 
-In addition to standard execution, the unit also provides a TAsynStreamCallBack<T> record for managing streaming chat requests. 
+In addition to standard execution, the unit also provides a TAsynStreamCallBack<T> record for managing streaming chat requests. <br/>
 This record defines several events: 
     - **OnStart, OnSuccess, OnProgress, OnError, OnCancellation:** Manage the beginning, success, progress, errors, and cancellation of a streaming operation.
     - **OnDoCancel:** A function that periodically checks whether the operation should be canceled.
