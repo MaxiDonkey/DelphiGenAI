@@ -8,6 +8,10 @@ ___
 
 <br/>
 
+This project facilitates the integration of OpenAI APIs into Delphi applications by offering simplified network call management, unit testing, and a modular approach to configuring JSON requests.
+
+<br/>
+
 - [Introduction](#Introduction)
 
 - [TIPS for using the tutorial effectively](#TIPS-for-using-the-tutorial-effectively)
