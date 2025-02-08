@@ -90,23 +90,23 @@ The goal is to separate the logic for managing parameters from the logic for asy
 
 ## Managing Parameters with Generic Interfaces and Classes
 
-### Interface IUseParams<T>
+### Interface IUseParams\<T\>
 
-This generic interface allows for managing parameters of type T, with the following key methods:
+This generic interface allows for managing parameters of type `T`, with the following key methods:
 
 SetParams/GetParams: To set and retrieve the parameter values.
-- Assign: Allows assigning values using a function (of type TFunc<T>).
-- AsSender: Returns the instance as a TObject, useful for identifying the sender during asynchronous execution.
+- Assign: Allows assigning values using a function (of type `TFunc<T>`).
+- AsSender: Returns the instance as a `TObject`, useful for identifying the sender during asynchronous execution.
 
 <br/>
 
-### Class TUseParams<T>
+### Class TUseParams\<T\>
 
-Implements the IUseParams<T> interface and encapsulates internal parameter management through a private variable FParams. This provides a simple abstraction for storing and manipulating the parameters required for asynchronous operations.
+Implements the `IUseParams<T>` interface and encapsulates internal parameter management through a private variable `FParams`. This provides a simple abstraction for storing and manipulating the parameters required for asynchronous operations.
 
 <br/>
 
-### Factory Class TUseParamsFactory<T>
+### Factory Class TUseParamsFactory\<T\>
 
 This static factory class creates instances of `IUseParams<T>`. Two creation methods are provided:
 - One method without parameters that creates an empty instance.
