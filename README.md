@@ -3802,21 +3802,318 @@ Related guide: [Assistants](https://platform.openai.com/docs/assistants/overview
 
 ### Create message
 
+Create a message.
+
+To take full advantage of this feature provided by Messages, it is essential to be proficient in managing Threads. For more information, please refer to the [Threads sections](#Threads) mentioned earlier.
+
+```Delphi
+//uses GenAI, GenAI.Types, GenAI.Tutorial.VCL;
+
+  TutorialHub.JSONRequestClear;
+  var ThreadId := 'thread_123abc';
+
+  //Asynchronous example
+  Client.Messages.AsynCreate(ThreadId,
+    procedure (Params: TThreadsMessageParams)
+    begin
+      Params.Role('user');
+      Params.Content('How does AI work? Explain it in simple terms.');
+    end,
+    function : TAsynMessages
+    begin
+      Result.Sender := TutorialHub;
+      Result.OnStart := Start;
+      Result.OnSuccess := Display;
+      Result.OnError := Display;
+    end);
+
+  //Synchronous example
+//  var Value := Client.Messages.Create(ThreadId,
+//    procedure (Params: TThreadsMessageParams)
+//    begin
+//      Params.Role('user');
+//      Params.Content('How does AI work? Explain it in simple terms.');
+//    end);
+//  try
+//    Display(TutorialHub, Value);
+//  finally
+//    Value.Free;
+//  end;
+```
+
+The JSON response:
+```JSON
+{
+    "id": "msg_456xyz",
+    "object": "thread.message",
+    "created_at": 1738971461,
+    "assistant_id": null,
+    "thread_id": "thread_123abc",
+    "run_id": null,
+    "role": "user",
+    "content": [
+        {
+            "type": "text",
+            "text": {
+                "value": "How does AI work? Explain it in simple terms.",
+                "annotations": [
+                ]
+            }
+        }
+    ],
+    "attachments": [
+    ],
+    "metadata": {
+    }
+}
+```
+
 <br/>
 
 ### List messages
+
+Returns a list of messages for a given thread.
+
+```Delphi
+//uses GenAI, GenAI.Types, GenAI.Tutorial.VCL;
+
+  TutorialHub.JSONRequestClear;
+  TutorialHub.Id := 'thread_123abc';
+
+  //Asynchronous example
+  Client.Messages.AsynList(TutorialHub.Id,
+    procedure (Params: TAssistantsUrlParams)
+    begin
+      Params.Limit(5);
+    end,
+    function : TAsynMessagesList
+    begin
+      Result.Sender := TutorialHub;
+      Result.OnStart := Start;
+      Result.OnSuccess := Display;
+      Result.OnError := Display;
+    end);
+
+  //Synchronous example
+//  var Value := Client.Messages.List(TutorialHub.Id,
+//    procedure (Params: TAssistantsUrlParams)
+//    begin
+//      Params.Limit(5);
+//    end);
+//  try
+//    Display(TutorialHub, Value);
+//  finally
+//    Value.Free;
+//  end;
+```
+
+The JSON response:
+```JSON
+{
+    "object": "list",
+    "data": [
+        {
+            "id": "msg_456xyz",
+            "object": "thread.message",
+            "created_at": 1738972475,
+            "assistant_id": null,
+            "thread_id": "thread_123abc",
+            "run_id": null,
+            "role": "user",
+            "content": [
+                {
+                    "type": "text",
+                    "text": {
+                        "value": "How does AI work? Explain it in simple terms.",
+                        "annotations": [
+                        ]
+                    }
+                }
+            ],
+            "attachments": [
+            ],
+            "metadata": {
+            }
+        }
+    ],
+    "first_id": "msg_456xyz",
+    "last_id": "msg_456xyz",
+    "has_more": false
+}
+```
 
 <br/>
 
 ### Retrieve message
 
+Retrieve a message by its ID.
+
+```Delphi
+//uses GenAI, GenAI.Types, GenAI.Tutorial.VCL;
+
+  TutorialHub.JSONRequestClear;
+  TutorialHub.Id := 'thread_123abc';
+  var MessageId := 'msg_456xyz';
+
+  //Asynchronous example
+  Client.Messages.AsynRetrieve(TutorialHub.Id, MessageId,
+    function : TAsynMessages
+    begin
+      Result.Sender := TutorialHub;
+      Result.OnStart := Start;
+      Result.OnSuccess := Display;
+      Result.OnError := Display;
+    end);
+
+  //Synchronous example
+//  var Value := Client.Messages.Retrieve(TutorialHub.Id, MessageId);
+//  try
+//    Display(TutorialHub, Value);
+//  finally
+//    Value.Free;
+//  end;
+```
+
+The JSON response:
+```JSON
+{
+    "id": "msg_456xyz",
+    "object": "thread.message",
+    "created_at": 1738972475,
+    "assistant_id": null,
+    "thread_id": "thread_123abc",
+    "run_id": null,
+    "role": "user",
+    "content": [
+        {
+            "type": "text",
+            "text": {
+                "value": "How does AI work? Explain it in simple terms.",
+                "annotations": [
+                ]
+            }
+        }
+    ],
+    "attachments": [
+    ],
+    "metadata": {
+    }
+}
+```
+
 <br/>
 
 ### Modify message
 
+Modifies a message by its ID.
+
+```Delphi
+//uses GenAI, GenAI.Types, GenAI.Tutorial.VCL;
+
+  TutorialHub.JSONRequestClear;
+  TutorialHub.Id := 'thread_123abc';
+  var MessageId := 'msg_456xyz';
+
+  var MetaData := TJSONObject.Create
+    .AddPair('customer_id', 'user_123456789')
+    .AddPair('message_description', 'Eval job');
+
+  //Asynchronous example
+  Client.Messages.AsynUpdate(TutorialHub.Id, MessageId,
+    procedure (Params: TMessagesUpdateParams)
+    begin
+      Params.Metadata(Metadata);
+    end,
+    function : TAsynMessages
+    begin
+      Result.Sender := TutorialHub;
+      Result.OnStart := Start;
+      Result.OnSuccess := Display;
+      Result.OnError := Display;
+    end);
+
+  //Synchronous example
+//  var Value := Client.Messages.Update(TutorialHub.Id, MessageId,
+//    procedure (Params: TMessagesUpdateParams)
+//    begin
+//      Params.Metadata(Metadata);
+//    end);
+//  try
+//    Display(TutorialHub, Value);
+//  finally
+//    Value.Free;
+//  end;
+```
+
+The JSON response:
+```JSON
+{
+    "id": "msg_456xyz",
+    "object": "thread.message",
+    "created_at": 1738972475,
+    "assistant_id": null,
+    "thread_id": "thread_123abc",
+    "run_id": null,
+    "role": "user",
+    "content": [
+        {
+            "type": "text",
+            "text": {
+                "value": "How does AI work? Explain it in simple terms.",
+                "annotations": [
+                ]
+            }
+        }
+    ],
+    "file_ids": [
+    ],
+    "metadata": {
+        "customer_id": "user_123456789",
+        "message_description": "Eval job"
+    }
+}
+```
+
 <br/>
 
 ### Delete message
+
+Deletes a message by its ID.
+
+```Delphi
+//uses GenAI, GenAI.Types, GenAI.Tutorial.VCL;
+
+  TutorialHub.JSONRequestClear;
+  TutorialHub.Id := 'thread_123abc';
+  var MessageId := 'msg_456xyz';
+
+  //Asynchronous example
+  Client.Messages.AsynDelete(TutorialHub.Id, MessageId,
+    function : TAsynDeletion
+    begin
+      Result.Sender := TutorialHub;
+      Result.OnStart := Start;
+      Result.OnSuccess := Display;
+      Result.OnError := Display;
+    end);
+
+  //Synchronous example
+//  var Value := Client.Messages.Delete(TutorialHub.Id, MessageId);
+//  try
+//    Display(TutorialHub, Value);
+//  finally
+//    Value.Free;
+//  end;
+```
+
+The JSON response:
+```JSON
+{
+    "id": "msg_456xyz",
+    "object": "thread.message.deleted",
+    "deleted": true
+}
+```
 
 <br/>
 
