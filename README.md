@@ -4865,9 +4865,9 @@ By iteratively refining these elements, the smaller model can closely match the 
 
 <br/>
 
-For practical purposes, **completion APIs** can be utilized through `GenAI`, enabling the use of models such as ***gpt-3.5-turbo-instruct***, among others. However, the assistant system in Beta 1 is not supported by `GenAI`.
-
 # Legacy
+
+For practical purposes, **completion APIs** can be utilized through `GenAI`, enabling the use of models such as ***gpt-3.5-turbo-instruct***, among others. However, the assistant system in Beta 1 is not supported by `GenAI`.
 
 <br/>
 
