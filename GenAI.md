@@ -145,3 +145,7 @@ This record defines several events:
 
 This mechanism enables progressive handling of responses from the model (e.g., when generating tokens during a conversation).
 
+## Key Points
+
+The asynchronous mechanism leverages generics, non-blocking execution, robust exception handling, and a callback-based structure to provide a flexible, reusable, and maintainable solution for managing asynchronous tasks while ensuring safe and responsive user interfaces.
+
