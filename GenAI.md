@@ -90,8 +90,6 @@ The goal is to separate the logic for managing parameters from the logic for asy
 
 ### Managing Parameters with Generic Interfaces and Classes
 
-<br/>
-
 #### - Interface IUseParams<T>
 
 This generic interface allows for managing parameters of type T, with the following key methods:
