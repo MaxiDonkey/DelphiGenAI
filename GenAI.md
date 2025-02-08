@@ -136,7 +136,7 @@ This method accepts a function (TFunc<U>) representing the operation to be execu
     - **Exception Handling:** The asynchronous operation is wrapped in a try...except block. If an exception occurs, the exception object is captured, and its message is passed to the OnError callback. Special care is taken to free the exception (using Error.Free) to avoid memory leaks.
     - **Resource Management:** In the OnSuccess callback, the result (if it is a dynamically allocated object) is freed after processing to ensure proper memory management.
 
-### Streaming Callback (TAsynStreamCallBack<T>)
+### Streaming Callback (TAsynStreamCallBack\<T\>)
 
 In addition to standard execution, the unit also provides a TAsynStreamCallBack<T> record for managing streaming chat requests. <br/>
 This record defines several events: 
