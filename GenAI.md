@@ -108,9 +108,9 @@ Implements the IUseParams<T> interface and encapsulates internal parameter manag
 
 ### Factory Class TUseParamsFactory<T>
 
-This static factory class creates instances of IUseParams<T>. Two creation methods are provided:
+This static factory class creates instances of `IUseParams<T>`. Two creation methods are provided:
 - One method without parameters that creates an empty instance.
-- One method that accepts a function of type TFunc<T> to initialize the parameters during creation.
+- One method that accepts a function of type `TFunc<T>` to initialize the parameters during creation.
 
 Advantage: Using generics makes it possible to reuse the same mechanism for different parameter types, making the code highly flexible and easily extensible.
 
@@ -118,22 +118,22 @@ Advantage: Using generics makes it possible to reuse the same mechanism for diff
 
 ## Asynchronous Mechanism and Callback Management
 
-### Asynchronous Execution Using TTask
+### Asynchronous Execution Using `TTask`
 
-The TAsynCallBackExec<T, U> class is the core of asynchronous execution. It combines parameter management with asynchronous task execution through the following components:
+The `TAsynCallBackExec<T, U>` class is the core of asynchronous execution. It combines parameter management with asynchronous task execution through the following components:
 
 - **Initialization:**
-The constructor receives a function to obtain the parameters (of type TFunc<T>). These parameters are encapsulated via an IUseParams<T> instance created by the factory.
+The constructor receives a function to obtain the parameters (of type `TFunc<T>`). These parameters are encapsulated via an `IUseParams<T>` instance created by the factory.
 
-- **Method Run:**
-This method accepts a function (TFunc<U>) representing the operation to be executed asynchronously. Key points of its functionality include:
-    - **Assigning Internal Callbacks:** Before starting the task, the callbacks (OnStart, OnSuccess, OnError) and the sender are assigned to local variables. This avoids concurrency issues or unexpected changes during background execution.
-    - **Creating and Starting a TTask:** The method uses TTask.Create to wrap the operation for background execution. Using TTask enables parallelism without blocking the main thread.
-    - **Synchronizing with the Main Thread:** To interact with the user interface or ensure that callbacks are executed in the context of the main thread, TThread.Queue is used.
+- **Method `Run`:**
+This method accepts a function (`TFunc<U>`) representing the operation to be executed asynchronously. Key points of its functionality include:
+    - **Assigning Internal Callbacks:** Before starting the task, the callbacks (`OnStart`, `OnSuccess`, `OnError`) and the sender are assigned to local variables. This avoids concurrency issues or unexpected changes during background execution.
+    - **Creating and Starting a `TTask`:** The method uses `TTask.Create` to wrap the operation for background execution. Using `TTask` enables parallelism without blocking the main thread.
+    - **Synchronizing with the Main Thread:** To interact with the user interface or ensure that callbacks are executed in the context of the main thread, `TThread.Queue` is used.
         - **OnStart:** Triggered before executing the function.
         - **OnSuccess:** Triggered with the operation result upon completion.
         - **OnError:** Triggered with an error message if an exception occurs.
-    - **Exception Handling:** The asynchronous operation is wrapped in a try...except block. If an exception occurs, the exception object is captured, and its message is passed to the OnError callback. Special care is taken to free the exception (using Error.Free) to avoid memory leaks.
+    - **Exception Handling:** The asynchronous operation is wrapped in a `try...except` block. If an exception occurs, the exception object is captured, and its message is passed to the `OnError` callback. Special care is taken to free the exception (using `Error.Free`) to avoid memory leaks.
     - **Resource Management:** In the OnSuccess callback, the result (if it is a dynamically allocated object) is freed after processing to ensure proper memory management.
 
 ### Streaming Callback (TAsynStreamCallBack\<T\>)
