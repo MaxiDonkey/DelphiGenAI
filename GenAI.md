@@ -4,6 +4,7 @@ ___
 - [Abstract](#Abstract)
 
 - [Dependencies](#Dependencies)
+- [Asynchronism mechanism](#Asynchronism-mechanism)
 
 <br/>
 
@@ -71,6 +72,34 @@ Uses  DUnitX.TestFramework and  related  modules to implement  unit tests  and  
 
 This  project is structured to be modular and extensible, with  abstractions that  allow for  easily switching  network  libraries  or  adding  new  features  while  maintaining robustness and testability.
 
+# Asynchronism mechanism
 
+### Context and Objectives
 
+The proposed architecture aims to facilitate the management of parameters and the execution of asynchronous operations, particularly for chat requests. Two main units are used:
+- GenAI.Async.Params: Provides generic interfaces and classes to manage parameters flexibly and in a reusable manner.
+- GenAI.Async.Support: Defines records and classes to control the lifecycle of asynchronous operations, particularly for chat or streaming-based tasks.
 
+The goal is to separate the logic for managing parameters from the logic for asynchronous execution, while ensuring proper synchronization with the main thread (GUI) through callbacks.
+
+### Managing Parameters with Generic Interfaces and Classes
+
+#### Interface IUseParams<T>
+
+This generic interface allows for managing parameters of type T, with the following key methods:
+
+SetParams/GetParams: To set and retrieve the parameter values.
+- Assign: Allows assigning values using a function (of type TFunc<T>).
+- AsSender: Returns the instance as a TObject, useful for identifying the sender during asynchronous execution.
+
+####  Class TUseParams<T>
+
+Implements the IUseParams<T> interface and encapsulates internal parameter management through a private variable FParams. This provides a simple abstraction for storing and manipulating the parameters required for asynchronous operations.
+
+#### Factory Class TUseParamsFactory<T>
+
+This static factory class creates instances of IUseParams<T>. Two creation methods are provided:
+- One method without parameters that creates an empty instance.
+- One method that accepts a function of type TFunc<T> to initialize the parameters during creation.
+
+Advantage: Using generics makes it possible to reuse the same mechanism for different parameter types, making the code highly flexible and easily extensible.
