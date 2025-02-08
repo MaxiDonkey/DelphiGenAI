@@ -1,14 +1,11 @@
 # **Delphi GenAI - Optimized OpenAI Integration**
 
 Welcome to `GenAI`, a powerful and flexible **Delphi library** integrating the latest innovations from `OpenAI` APIs. Designed for comprehensive support, it offers content generation, dialogue management, vision and speech processing, as well as audio interactions with fine-tuned control. Built on advanced models with reasoning capabilities, such as `O1` and `O3`, it provides tools for embedding manipulation, batch processing, function calling, file and data management, and content moderation. It also streamlines assistant orchestration, messaging management, threads, and executions, meeting the needs of modern projects.
+This project facilitates the integration of OpenAI APIs into Delphi applications by offering simplified network call management, unit testing, and a modular approach to configuring JSON requests.
 ___
 ![GitHub](https://img.shields.io/badge/IDE%20Version-Delphi%2010.3/11/12-yellow)
 ![GitHub](https://img.shields.io/badge/platform-all%20platforms-green)
 ![GitHub](https://img.shields.io/badge/Updated%20on%20february%2008,%202025-blue)
-
-<br/>
-
-This project facilitates the integration of OpenAI APIs into Delphi applications by offering simplified network call management, unit testing, and a modular approach to configuring JSON requests.
 
 <br/>
 
