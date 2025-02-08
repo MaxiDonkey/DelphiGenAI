@@ -98,6 +98,14 @@ ___
         - [Retrieve message](#Retrieve-message)
         - [Modify message](#Modify-message)
         - [Delete message](#Delete-message)
+    - [Runs](#Runs)
+        - [Create run](#Create-run)
+        - [Create thread and run](#Create-thread-and-run)
+        - [List runs](#List-runs)
+        - [Retrieve run](#Retrieve-run)
+        - [Modify run](#Modify-run)
+        - [Submit tool outputs](#Submit-tool-outputs)
+        - [Cancel run](#Cancel-run)
 - [Contributing](#contributing)
 - [License](#license)
 
@@ -4114,6 +4122,38 @@ The JSON response:
     "deleted": true
 }
 ```
+
+<br/>
+
+## Runs
+
+<br/>
+
+### Create run
+
+<br/>
+
+### Create thread and run
+
+<br/>
+
+### List runs
+
+<br/>
+
+### Retrieve run
+
+<br/>
+
+### Modify run
+
+<br/>
+
+### Submit tool outputs
+
+<br/>
+
+### Cancel run
 
 <br/>
 
