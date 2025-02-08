@@ -8,7 +8,8 @@ ___
 
 <br/>
 
-- [Introduction](#Introduction) <br/>
+- [Introduction](#Introduction)
+
 - [TIPS for using the tutorial effectively](#TIPS-for-using-the-tutorial-effectively)
     - [Obtain an api key](#Obtain-an-api-key)
     - [Strategies for quickly using the code examples](#Strategies-for-quickly-using-the-code-examples)
