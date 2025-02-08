@@ -78,7 +78,7 @@ This  project is structured to be modular and extensible, with  abstractions tha
 
 # Asynchronism mechanism
 
-### Context and Objectives
+## Context and Objectives
 
 The proposed architecture aims to facilitate the management of parameters and the execution of asynchronous operations, particularly for chat requests. Two main units are used:
 - GenAI.Async.Params: Provides generic interfaces and classes to manage parameters flexibly and in a reusable manner.
@@ -88,9 +88,9 @@ The goal is to separate the logic for managing parameters from the logic for asy
 
 <br/>
 
-### Managing Parameters with Generic Interfaces and Classes
+## Managing Parameters with Generic Interfaces and Classes
 
-#### - Interface IUseParams<T>
+### - Interface IUseParams<T>
 
 This generic interface allows for managing parameters of type T, with the following key methods:
 
@@ -100,13 +100,13 @@ SetParams/GetParams: To set and retrieve the parameter values.
 
 <br/>
 
-####  - Class TUseParams<T>
+###  - Class TUseParams<T>
 
 Implements the IUseParams<T> interface and encapsulates internal parameter management through a private variable FParams. This provides a simple abstraction for storing and manipulating the parameters required for asynchronous operations.
 
 <br/>
 
-#### - Factory Class TUseParamsFactory<T>
+### - Factory Class TUseParamsFactory<T>
 
 This static factory class creates instances of IUseParams<T>. Two creation methods are provided:
 - One method without parameters that creates an empty instance.
