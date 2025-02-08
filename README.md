@@ -111,6 +111,7 @@ ___
         - [List run steps](#List-run-steps)
         - [Retrieve run steps](#Retrieve-run-steps)
     - [Model distilation](#Model-distilation)
+- [Legacy](#Legacy)
 - [Contributing](#contributing)
 - [License](#license)
 
@@ -4861,6 +4862,12 @@ Model distillation involves using outputs (completions) from a large model to fi
            - Improving evaluation criteria (graders).
 
 By iteratively refining these elements, the smaller model can closely match the large model’s performance for specific tasks. Model distillation is a powerful method, but it is just one of many ways to optimize model outputs.
+
+<br/>
+
+For practical purposes, **completion APIs** can be utilized through `GenAI`, enabling the use of models such as ***gpt-3.5-turbo-instruct***, among others. However, the assistant system in Beta 1 is not supported by `GenAI`.
+
+# Legacy
 
 <br/>
 
