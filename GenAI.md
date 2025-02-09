@@ -1,8 +1,4 @@
-[go back](https://github.com/MaxiDonkey/DelphiGenAI/blob/main/README.md#TIPS-for-using-the-tutorial-effectively)
-___
-
 - [Abstract](#Abstract)
-
 - [Dependencies](#Dependencies)
 - [Asynchronous Engine](#Asynchronous-Engine)
 - [IHttpClientAPI interface](#IHttpClientAPI-interface)
