@@ -146,6 +146,10 @@ type
   /// <remarks>
   /// This class contains utility methods for handling task execution flow,
   /// including a method to execute a follow-up action once a task completes.
+  /// <para>
+  /// - In order to replace TTask.WaitForAll due to a memory leak in TLightweightEvent/TCompleteEventsWrapper.
+  /// See report RSP-12462 and RSP-25999.
+  /// </para>
   /// </remarks>
   TTaskHelper = class
   public
@@ -166,6 +170,10 @@ type
     /// This method waits for the specified task to finish within the provided timeout period.
     /// Once completed, the follow-up action is executed in the main thread using <c>TThread.Queue</c>,
     /// ensuring thread safety.
+    /// <para>
+    /// - In order to replace TTask.WaitForAll due to a memory leak in TLightweightEvent/TCompleteEventsWrapper.
+    /// See report RSP-12462 and RSP-25999.
+    /// </para>
     /// </remarks>
     class procedure ContinueWith(const Task: ITask; const NextAction: TProc; const TimeOut: Cardinal = 120000);
   end;
