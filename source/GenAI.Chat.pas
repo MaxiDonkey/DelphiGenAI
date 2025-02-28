@@ -43,7 +43,7 @@ uses
   REST.JsonReflect,
   GenAI.API.Params, GenAI.API, GenAI.Consts, GenAI.Schema, GenAI.Chat.StreamingOpenAI,
   GenAI.Types, GenAI.Chat.StreamingInterface, GenAI.Functions.Tools, GenAI.Functions.Core,
-  GenAI.Async.Params, GenAI.Async.Support;
+  GenAI.Async.Params, GenAI.Async.Support, GenAI.Parallel.Params, GenAI.Chat.Parallel;
 
 type
   /// <summary>
@@ -2056,6 +2056,8 @@ type
     /// Returns True if the streaming session is initiated successfully, otherwise False.
     /// </returns>
     function CreateStream(ParamProc: TProc<TChatParams>; Event: TStreamCallbackEvent<TChat>): Boolean;
+
+    procedure CreateParallel(ParamProc: TProc<TBundleParams>; const CallBacks: TFunc<TAsynBuffer>);
   end;
 
 implementation
@@ -2843,6 +2845,7 @@ begin
   var OnError := CallBackParams.Param.OnError;
   var OnCancellation := CallBackParams.Param.OnCancellation;
   var OnDoCancel := CallBackParams.Param.OnDoCancel;
+  var CancelTag := 0;
 
   var Task: ITask := TTask.Create(
           procedure()
@@ -2875,11 +2878,12 @@ begin
                   if Stop then
                     begin
                       {--- Trigger when processus was stopped }
-                      if Assigned(OnCancellation) then
+                      if (CancelTag = 0) and Assigned(OnCancellation) then
                         TThread.Queue(nil,
                         procedure
                         begin
-                          OnCancellation(Sender)
+                          OnCancellation(Sender);
+                          Inc(CancelTag);
                         end);
                       Cancel := True;
                       Exit;
@@ -2963,6 +2967,101 @@ end;
 function TChatRoute.Create(ParamProc: TProc<TChatParams>): TChat;
 begin
   Result := API.Post<TChat, TChatParams>('chat/completions', ParamProc);
+end;
+
+procedure TChatRoute.CreateParallel(ParamProc: TProc<TBundleParams>;
+  const CallBacks: TFunc<TAsynBuffer>);
+var
+  Tasks: TArray<ITask>;
+  BundleParams: TBundleParams;
+  ReasoningEffort: string;
+begin
+  BundleParams := TBundleParams.Create;
+  try
+    if not Assigned(ParamProc) then
+      raise Exception.Create('The lambda can''t be null');
+
+    ParamProc(BundleParams);
+    var Bundle := TBundleList.Create;
+    var Ranking := 0;
+    var ErrorExists := False;
+
+    var Prompts := BundleParams.GetArrayString('prompts');
+    var Counter := Length(Prompts);
+
+    var Model := BundleParams.GetString('model');
+    case IndexStr(Model.Trim.ToLower, ['o1', 'o3-mini']) of
+      0, 1:
+        ReasoningEffort := BundleParams.GetString('reasoningfEffort');
+      else
+        ReasoningEffort := EmptyStr;
+    end;
+
+    if Assigned(CallBacks.OnStart) then
+      CallBacks.OnStart(CallBacks.Sender);
+
+    SetLength(Tasks, Length(Prompts));
+    for var index := 0 to Pred(Length(Prompts)) do
+      begin
+        Tasks[index] := TTask.Run(
+          procedure
+          begin
+            var Buffer := Bundle.Add(index + 1);
+            Buffer.Prompt := Prompts[index];
+            try
+              var Chat := Create(
+                procedure (Params: TChatParams)
+                begin
+                  Params.Model(Model);
+                  if not ReasoningEffort.IsEmpty then
+                    Params.ReasoningEffort(ReasoningEffort);
+                  Params.Messages([TMessagePayload.User(Buffer.Prompt)]);
+                end);
+              Inc(Ranking);
+              Buffer.FinishIndex := Ranking;
+              Buffer.Response := Chat.Choices[0].Message.Content;
+              Buffer.Chat := Chat;
+            except
+              on E: Exception do
+                begin
+                  {--- Catch the exception }
+                  var Error := AcquireExceptionObject;
+                  ErrorExists := True;
+                  try
+                    if Assigned(CallBacks.OnError) then
+                      CallBacks.OnError(CallBacks.Sender, (Error as Exception).Message);
+                  finally
+                    Error.Free;
+                  end;
+                end;
+            end;
+          end);
+
+        if ErrorExists then
+          Continue;
+
+        {--- TTask.WaitForAll is not used due to a memory leak in TLightweightEvent/TCompleteEventsWrapper.
+             See report RSP-12462 and RSP-25999. }
+        TTaskHelper.ContinueWith(Tasks[Index],
+          procedure
+          begin
+            Dec(Counter);
+            if Counter = 0 then
+              begin
+                try
+                  if not ErrorExists and (Assigned(CallBacks.OnSuccess)) then
+                    CallBacks.OnSuccess(CallBacks.Sender, Bundle);
+                finally
+                  Bundle.Free;
+                end;
+              end;
+          end);
+        {--- Need a delay, otherwise the process runs only with the first ITask. }
+        Sleep(30);
+      end;
+  finally
+    BundleParams.Free;
+  end;
 end;
 
 function TChatRoute.CreateStream(ParamProc: TProc<TChatParams>;

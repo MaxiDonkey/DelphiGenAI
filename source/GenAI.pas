@@ -59,7 +59,8 @@ uses
   GenAI.Audio, GenAI.Chat, GenAI.Moderation, GenAI.Images, GenAI.Files, GenAI.Uploads,
   GenAI.Batch, GenAI.Batch.Reader, GenAI.Batch.Builder, GenAI.Completions, GenAI.FineTuning,
   GenAI.Assistants, GenAI.Threads, GenAI.Messages, GenAI.Runs, GenAI.RunSteps,
-  GenAI.Vector, GenAI.VectorFiles, GenAI.VectorBatch;
+  GenAI.Vector, GenAI.VectorFiles, GenAI.VectorBatch, GenAI.Monitoring, GenAI.Parallel.Params,
+  GenAI.Chat.Parallel;
 
 type
   /// <summary>
@@ -2764,6 +2765,25 @@ type
 
   {$ENDREGION}
 
+  {$REGION 'GenAI.Parallel.Params'}
+
+  TParameters = GenAI.Parallel.Params.TParameters;
+
+  {$ENDREGION}
+
+
+  {$REGION 'GenAI.Chat.Parallel'}
+
+  TBundleItem = GenAI.Chat.Parallel.TBundleItem;
+
+  TBundleList = GenAI.Chat.Parallel.TBundleList;
+
+  TAsynBuffer = GenAI.Chat.Parallel.TAsynBuffer;
+
+  TBundleParams = GenAI.Chat.Parallel.TBundleParams;
+
+  {$ENDREGION}
+
 function FromDeveloper(const Content: string; const Name: string = ''):TMessagePayload;
 function FromSystem(const Content: string; const Name: string = ''):TMessagePayload;
 function FromUser(const Content: string; const Name: string = ''):TMessagePayload; overload;
@@ -2796,6 +2816,7 @@ function Vector_store(const FileIds: TArray<string>;
   const ChunkingStrategy: TChunkingStrategyParams;
   const Metadata: TJSONObject = nil): TVectorStoresParams; overload;
 
+function HttpMonitoring: IRequestMonitor;
 
 var
   JSONLChatReader: GenAI.Batch.Interfaces.IJSONLReader<TChat>;
@@ -2936,6 +2957,11 @@ function Vector_store(const FileIds: TArray<string>;
   const Metadata: TJSONObject = nil): TVectorStoresParams; overload;
 begin
   Result := Vector_store(FileIds, Metadata).ChunkingStrategy(ChunkingStrategy);
+end;
+
+function HttpMonitoring: IRequestMonitor;
+begin
+  Result := Monitoring;
 end;
 
 { TGenAI }

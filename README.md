@@ -42,6 +42,7 @@ ___
 - [Legacy](#Legacy)
     - [Completion](#Completion)
     - [Streamed completion](#Streamed-completion)
+- [Tips and tricks](#Tips-and-tricks)
 - [Contributing](#contributing)
 - [License](#license)
 
@@ -1227,6 +1228,89 @@ For practical purposes, **completion APIs** can be utilized through `GenAI`, ena
 //        DisplayStream(TutorialHub, Data);
 //    end);
 ```
+
+<br/>
+
+# Tips and tricks
+
+- #### 1. How to prevent an error when closing an application while requests are still in progress?
+
+Starting from version ***1.0.1 of GenAI***, the `GenAI.Monitoring` unit is **responsible for monitoring ongoing HTTP requests.**
+
+The `Monitoring` interface is accessible by including the `GenAI.Monitoring` unit in the `uses` clause. <br/>
+Alternatively, you can access it via the `HttpMonitoring` function, declared in the `GenAI` unit.
+
+**Usage Example**
+
+```Delphi
+//uses GenAI;
+
+procedure TForm1.FormCloseQuery(Sender: TObject; var CanClose: Boolean);
+begin
+  CanClose := not HttpMonitoring.IsBusy;
+  if not CanClose then
+    MessageDLG(
+      'Requests are still in progress. Please wait for them to complete before closing the application."',
+      TMsgDlgType.mtInformation, [TMsgDlgBtn.mbOK], 0);
+end;
+
+```
+
+<br/>
+
+- #### 2. How to execute multiple background requests to process a batch of responses?
+
+In the `GenAI.Chat` unit, the `CreateParallel` method allows for executing multiple prompts asynchronously in the background ***(since the version 1.0.1 of GenAI)***.
+
+Among the method's parameters, you can specify the model to be used for the entire batch of prompts. However, assigning a different model to each prompt individually is not supported.
+
+**Usage Example**
+
+```Delphi
+//uses GenAI, GenAI.Types, GenAI.Tutorial.VCL;
+
+  Client.Chat.CreateParallel(
+    procedure (Params: TBundleParams)
+    begin
+      Params.Prompts([
+        'How many television channels were there in France in 1980?',
+        'How many TV channels were there in Germany in 1980?.'
+      ]);
+      Params.Model('gpt-4o-mini');
+    end,
+    function : TAsynBuffer
+    begin
+      Result.Sender := TutorialHub;
+
+      Result.OnStart :=
+        procedure (Sender: TObject)
+        begin
+          Display(Sender, 'Start the job' + sLineBreak);
+        end;
+
+      Result.OnSuccess :=
+        procedure (Sender: TObject; Bundle: TBundleList)
+        begin
+          // Background bundle processing
+          for var Item in Bundle.Items do
+            begin
+              Display(Sender, 'Index : ' + Item.Index.ToString);
+              Display(Sender, 'FinishIndex : ' + Item.FinishIndex.ToString);
+              Display(Sender, Item.Prompt + sLineBreak);
+              Display(Sender, Item.Response + sLineBreak + sLineBreak);
+              // or Display(Sender, TChat(Item.Chat).Choices[0].Message.Content);
+            end;
+        end;
+
+      Result.OnError := Display;
+    end);
+```
+
+<br/>
+
+- #### 3. How to structure a chain of thought and develop advanced processing with GenAI?
+
+To achieve this, it is recommended to use a Promise-based pattern to efficiently construct a chain of thought with GenAI. The [CerebraChain](https://github.com/MaxiDonkey/CerebraChainAI) project offers a method that can be used with GenAI.
 
 <br/>
 

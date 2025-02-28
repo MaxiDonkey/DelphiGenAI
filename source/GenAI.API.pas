@@ -30,7 +30,7 @@ interface
 uses
   System.SysUtils, System.Classes, System.Net.HttpClient, System.Net.URLClient,
   System.Net.Mime, System.JSON, GenAI.API.Params, GenAI.API.Utils, GenAI.Errors,
-  GenAI.Exceptions, GenAI.HttpClientInterface, GenAI.HttpClientAPI;
+  GenAI.Exceptions, GenAI.HttpClientInterface, GenAI.HttpClientAPI, GenAI.Monitoring;
 
 type
   /// <summary>
@@ -491,6 +491,7 @@ end;
 function TGenAIAPI.Post<TResult, TParams>(const Endpoint: string; ParamProc: TProc<TParams>;
   const RawByteFieldName: string): TResult;
 begin
+  Monitoring.Inc;
   var Response := TStringStream.Create('', TEncoding.UTF8);
   var Params := TParams.Create;
   try
@@ -512,11 +513,13 @@ begin
     Params.Free;
     Response.Free;
     ResetCustomHeader;
+    Monitoring.Dec;
   end;
 end;
 
 function TGenAIAPI.Post<TParams>(const Endpoint: string; ParamProc: TProc<TParams>; Response: TStringStream; Event: TReceiveDataCallback): Boolean;
 begin
+  Monitoring.Inc;
   var Params := TParams.Create;
   try
     if Assigned(ParamProc) then
@@ -541,11 +544,13 @@ begin
   finally
     Params.Free;
     ResetCustomHeader;
+    Monitoring.Dec;
   end;
 end;
 
 function TGenAIAPI.Post<TResult>(const Endpoint: string): TResult;
 begin
+  Monitoring.Inc;
   var Response := TStringStream.Create('', TEncoding.UTF8);
   try
     var Code := HttpClient.Post(BuildUrl(Endpoint), Response, BuildHeaders);
@@ -553,11 +558,13 @@ begin
   finally
     Response.Free;
     ResetCustomHeader;
+    Monitoring.Dec;
   end;
 end;
 
 function TGenAIAPI.Delete<TResult>(const Endpoint: string): TResult;
 begin
+  Monitoring.Inc;
   var Response := TStringStream.Create('', TEncoding.UTF8);
   try
     var Code := HttpClient.Delete(BuildUrl(Endpoint), Response, BuildHeaders);
@@ -565,11 +572,13 @@ begin
   finally
     Response.Free;
     ResetCustomHeader;
+    Monitoring.Dec;
   end;
 end;
 
 function TGenAIAPI.PostForm<TResult, TParams>(const Endpoint: string; ParamProc: TProc<TParams>): TResult;
 begin
+  Monitoring.Inc;
   var Response := TStringStream.Create('', TEncoding.UTF8);
   var Params := TParams.Create;
   try
@@ -581,12 +590,14 @@ begin
     Params.Free;
     Response.Free;
     ResetCustomHeader;
+    Monitoring.Dec;
   end;
 end;
 
 function TGenAIAPI.Get<TResult, TParams>(const Endpoint: string;
   ParamProc: TProc<TParams>): TResult;
 begin
+  Monitoring.Inc;
   var Response := TStringStream.Create('', TEncoding.UTF8);
   var Params := TParams.Create;
   try
@@ -598,11 +609,13 @@ begin
     Response.Free;
     Params.Free;
     ResetCustomHeader;
+    Monitoring.Dec;
   end;
 end;
 
 function TGenAIAPI.Get<TResult>(const Endpoint: string): TResult;
 begin
+  Monitoring.Inc;
   var Response := TStringStream.Create('', TEncoding.UTF8);
   try
     var Code := HttpClient.Get(BuildUrl(Endpoint), Response, BuildHeaders);
@@ -610,11 +623,13 @@ begin
   finally
     Response.Free;
     ResetCustomHeader;
+    Monitoring.Dec;
   end;
 end;
 
 function TGenAIAPI.GetFile<TResult>(const Endpoint: string; const JSONFieldName: string):TResult;
 begin
+  Monitoring.Inc;
   var Stream := TStringStream.Create;
   try
     var Code := GetFile(Endpoint, Stream);
@@ -622,6 +637,7 @@ begin
   finally
     Stream.Free;
     ResetCustomHeader;
+    Monitoring.Dec;
   end;
 end;
 
