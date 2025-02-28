@@ -43,7 +43,7 @@ uses
   REST.JsonReflect,
   GenAI.API.Params, GenAI.API, GenAI.Consts, GenAI.Schema, GenAI.Chat.StreamingOpenAI,
   GenAI.Types, GenAI.Chat.StreamingInterface, GenAI.Functions.Tools, GenAI.Functions.Core,
-  GenAI.Async.Params, GenAI.Async.Support, GenAI.Parallel.Params, GenAI.Chat.Parallel;
+  GenAI.Async.Params, GenAI.Async.Support, GenAI.Chat.Parallel;
 
 type
   /// <summary>
