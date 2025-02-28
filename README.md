@@ -14,6 +14,8 @@ ___
 
 NEW: [Tips and tricks](#Tips-and-tricks)
 
+<br/>
+
 - [Introduction](#Introduction)
 - [Changelog](#Changelog)
 - [TIPS for using the tutorial effectively](#TIPS-for-using-the-tutorial-effectively)
