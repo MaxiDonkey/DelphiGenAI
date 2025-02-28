@@ -2056,7 +2056,27 @@ type
     /// Returns True if the streaming session is initiated successfully, otherwise False.
     /// </returns>
     function CreateStream(ParamProc: TProc<TChatParams>; Event: TStreamCallbackEvent<TChat>): Boolean;
-
+    /// <summary>
+    /// Initiates parallel processing of chat prompts by creating multiple chat completions
+    /// asynchronously, with results stored in a bundle and provided back to the callback function.
+    /// This method allows for parallel processing of multiple prompts in an efficient manner,
+    /// handling errors and successes for each chat completion.
+    /// </summary>
+    /// <param name="ParamProc">
+    /// A procedure delegate that configures the parameters for the bundle. It is responsible
+    /// for providing the necessary settings (such as model and reasoning effort) for the chat completions.
+    /// </param>
+    /// <param name="CallBacks">
+    /// A function that returns an instance of TAsynBuffer, which manages the lifecycle of the
+    /// asynchronous operation. The callbacks include handlers for start, error, and success events.
+    /// </param>
+    /// <remarks>
+    /// The method allows for efficient parallel processing of multiple prompts by delegating
+    /// individual tasks to separate threads. It handles the reasoning effort for specific models
+    /// and ensures each task's result is properly bundled and communicated back to the caller.
+    /// If an error occurs, the error handling callback will be triggered, and the rest of the tasks
+    /// will continue processing. The success callback is triggered once all tasks are completed.
+    /// </remarks>
     procedure CreateParallel(ParamProc: TProc<TBundleParams>; const CallBacks: TFunc<TAsynBuffer>);
   end;
 
