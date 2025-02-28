@@ -3083,7 +3083,7 @@ begin
                 end;
               end;
           end);
-        {--- Need a delay, otherwise the process runs only with the first ITask. }
+        {--- Need a delay, otherwise the process runs only with the first task. }
         Sleep(30);
       end;
   finally
