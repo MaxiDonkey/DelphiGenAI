@@ -2790,12 +2790,44 @@ type
 
   {$REGION 'GenAI.Chat.Parallel'}
 
+  /// <summary>
+  /// Represents an item in a bundle of chat prompts and responses.
+  /// </summary>
+  /// <remarks>
+  /// This class stores information about a single chat request, including its index,
+  /// associated prompt, generated response, and related chat object.
+  /// It is used within a <c>TBundleList</c> to manage multiple asynchronous chat requests.
+  /// </remarks>
   TBundleItem = GenAI.Chat.Parallel.TBundleItem;
 
+  /// <summary>
+  /// Manages a collection of <c>TBundleItem</c> objects.
+  /// </summary>
+  /// <remarks>
+  /// This class provides methods to add, retrieve, and count items in a bundle.
+  /// It is designed to store multiple chat request items processed in parallel.
+  /// The internal storage uses a <c>TObjectList&lt;TBundleItem&gt;</c> with automatic memory management.
+  /// </remarks>
   TBundleList = GenAI.Chat.Parallel.TBundleList;
 
+  /// <summary>
+  /// Represents an asynchronous callback buffer for handling chat responses.
+  /// </summary>
+  /// <remarks>
+  /// This class is a specialized type used to manage asynchronous operations
+  /// related to chat request processing. It inherits from <c>TAsynCallBack&lt;TBundleList&gt;</c>,
+  /// enabling structured handling of callback events.
+  /// </remarks>
   TAsynBuffer = GenAI.Chat.Parallel.TAsynBuffer;
 
+  /// <summary>
+  /// Represents the parameters used for configuring a chat request bundle.
+  /// </summary>
+  /// <remarks>
+  /// This class extends <c>TParameters</c> and provides specific methods for setting chat-related
+  /// parameters, such as prompts, model selection, and reasoning effort.
+  /// It is used to structure and pass multiple requests efficiently in parallel processing.
+  /// </remarks>
   TBundleParams = GenAI.Chat.Parallel.TBundleParams;
 
   {$ENDREGION}
