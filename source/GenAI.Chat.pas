@@ -3076,7 +3076,7 @@ begin
             if Counter = 0 then
               begin
                 try
-                  if not ErrorExists and (Assigned(CallBacks.OnSuccess)) then
+                  if not ErrorExists and Assigned(CallBacks.OnSuccess) then
                     CallBacks.OnSuccess(CallBacks.Sender, Bundle);
                 finally
                   Bundle.Free;
