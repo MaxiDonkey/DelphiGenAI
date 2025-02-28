@@ -505,6 +505,28 @@ type
     constructor Create; reintroduce;
   end;
 
+  /// <summary>
+  /// Represents a generic key-value parameter manager.
+  /// </summary>
+  /// <remarks>
+  /// This class allows storing and retrieving various types of parameters as key-value pairs.
+  /// It supports basic types (integers, strings, booleans, floating-point numbers), objects,
+  /// as well as arrays of these types.
+  /// </remarks>
+  /// <example>
+  ///   <code>
+  ///     var Params: TParameters;
+  ///     begin
+  ///       Params := TParameters.Create;
+  ///       Params.Add('Limit', 100)
+  ///             .Add('Order', 'Asc')
+  ///             .Add('IsEnabled', True);
+  ///       if Params.Exists('Limit') then
+  ///         ShowMessage(IntToStr(Params.GetInteger('Limit')));
+  ///       Params.Free;
+  ///     end;
+  ///   </code>
+  /// </example>
   TParameters = class
   private
     FParams: TDictionary<string, TValue>;

@@ -4,7 +4,7 @@ interface
 
 uses
   System.SysUtils, System.Classes, System.Generics.Collections, System.SyncObjs, System.Threading,
-  GenAI.Types, (*GenAI.Parallel.Params,*) GenAI.Async.Support, GenAI.API.Params;
+  GenAI.Types, GenAI.Async.Support, GenAI.API.Params;
 
 type
   TBundleItem = class
