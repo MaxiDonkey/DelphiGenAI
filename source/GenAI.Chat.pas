@@ -3028,9 +3028,16 @@ begin
                   var Error := AcquireExceptionObject;
                   ErrorExists := True;
                   try
+                    var ErrorMsg := (Error as Exception).Message;
+                    {--- Trigger OnError callback if the process has failed }
                     if Assigned(CallBacks.OnError) then
-                      CallBacks.OnError(CallBacks.Sender, (Error as Exception).Message);
+                      TThread.Queue(nil,
+                      procedure
+                      begin
+                        CallBacks.OnError(CallBacks.Sender, ErrorMsg);
+                      end);
                   finally
+                    {--- Ensures that the instance of the caught exception is released}
                     Error.Free;
                   end;
                 end;
