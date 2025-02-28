@@ -687,6 +687,7 @@ end;
 function TGenAIAPI.Patch<TResult, TParams>(const Endpoint: string;
   ParamProc: TProc<TParams>): TResult;
 begin
+  Monitoring.Inc;
   var Response := TStringStream.Create('', TEncoding.UTF8);
   var Params := TParams.Create;
   try
@@ -698,6 +699,7 @@ begin
     Params.Free;
     Response.Free;
     ResetCustomHeader;
+    Monitoring.Dec;
   end;
 end;
 
