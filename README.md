@@ -13,6 +13,7 @@ ___
 <br/>
 
 - [Introduction](#Introduction)
+- [Changelog](#Changelog)
 - [TIPS for using the tutorial effectively](#TIPS-for-using-the-tutorial-effectively)
     - [Obtain an api key](#Obtain-an-api-key)
     - [Strategies for quickly using the code examples](#Strategies-for-quickly-using-the-code-examples)
@@ -89,6 +90,12 @@ For more information about the architecture of GenAI, please refer to [the dedic
 >
 > This is an unofficial library. **OpenAI** does not provide any official library for `Delphi`.
 > This repository contains `Delphi` implementation over [OpenAI](https://openai.com/) public API.
+
+<br/>
+
+# Changelog
+
+Refer to [changelog document](https://github.com/MaxiDonkey/DelphiGenAI/blob/main/Changelog.md).
 
 <br/>
 
