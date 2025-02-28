@@ -59,8 +59,7 @@ uses
   GenAI.Audio, GenAI.Chat, GenAI.Moderation, GenAI.Images, GenAI.Files, GenAI.Uploads,
   GenAI.Batch, GenAI.Batch.Reader, GenAI.Batch.Builder, GenAI.Completions, GenAI.FineTuning,
   GenAI.Assistants, GenAI.Threads, GenAI.Messages, GenAI.Runs, GenAI.RunSteps,
-  GenAI.Vector, GenAI.VectorFiles, GenAI.VectorBatch, GenAI.Monitoring, GenAI.Parallel.Params,
-  GenAI.Chat.Parallel;
+  GenAI.Vector, GenAI.VectorFiles, GenAI.VectorBatch, GenAI.Monitoring, GenAI.Chat.Parallel;
 
 type
   /// <summary>
@@ -476,6 +475,8 @@ type
   /// or custom requirements.
   /// </remarks>
   TJSONInterceptorStringToString = GenAI.API.Params.TJSONInterceptorStringToString;
+
+  TParameters = GenAI.API.Params.TParameters;
 
   {$ENDREGION}
 
@@ -2764,13 +2765,6 @@ type
   TAsynVectorStoreBatches = GenAI.VectorBatch.TAsynVectorStoreBatches;
 
   {$ENDREGION}
-
-  {$REGION 'GenAI.Parallel.Params'}
-
-  TParameters = GenAI.Parallel.Params.TParameters;
-
-  {$ENDREGION}
-
 
   {$REGION 'GenAI.Chat.Parallel'}
 
