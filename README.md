@@ -1289,7 +1289,7 @@ Among the method's parameters, you can specify the model to be used for the enti
       ]);
       Params.Model('gpt-4o-mini');
     end,
-    function : TAsynBuffer
+    function : TAsynBundleList
     begin
       Result.Sender := TutorialHub;
 

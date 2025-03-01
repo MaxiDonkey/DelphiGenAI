@@ -2077,7 +2077,7 @@ type
     /// If an error occurs, the error handling callback will be triggered, and the rest of the tasks
     /// will continue processing. The success callback is triggered once all tasks are completed.
     /// </remarks>
-    procedure CreateParallel(ParamProc: TProc<TBundleParams>; const CallBacks: TFunc<TAsynBuffer>);
+    procedure CreateParallel(ParamProc: TProc<TBundleParams>; const CallBacks: TFunc<TAsynBundleList>);
   end;
 
 implementation
@@ -2990,7 +2990,7 @@ begin
 end;
 
 procedure TChatRoute.CreateParallel(ParamProc: TProc<TBundleParams>;
-  const CallBacks: TFunc<TAsynBuffer>);
+  const CallBacks: TFunc<TAsynBundleList>);
 var
   Tasks: TArray<ITask>;
   BundleParams: TBundleParams;

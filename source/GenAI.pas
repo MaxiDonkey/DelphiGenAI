@@ -2818,7 +2818,8 @@ type
   /// related to chat request processing. It inherits from <c>TAsynCallBack&lt;TBundleList&gt;</c>,
   /// enabling structured handling of callback events.
   /// </remarks>
-  TAsynBuffer = GenAI.Chat.Parallel.TAsynBuffer;
+  TAsynBundleList = GenAI.Chat.Parallel.TAsynBundleList;
+  TAsynBuffer = TAsynBundleList; //deprecated : naming error
 
   /// <summary>
   /// Represents the parameters used for configuring a chat request bundle.

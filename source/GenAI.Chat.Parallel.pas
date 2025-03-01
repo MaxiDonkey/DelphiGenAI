@@ -138,7 +138,7 @@ type
   /// related to chat request processing. It inherits from <c>TAsynCallBack&lt;TBundleList&gt;</c>,
   /// enabling structured handling of callback events.
   /// </remarks>
-  TAsynBuffer = TAsynCallBack<TBundleList>;
+  TAsynBundleList = TAsynCallBack<TBundleList>;
 
   /// <summary>
   /// Provides helper methods for managing asynchronous tasks.
