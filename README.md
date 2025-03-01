@@ -1317,6 +1317,9 @@ Among the method's parameters, you can specify the model to be used for the enti
     end);
 ```
 
+>[!TIP]
+> The provided example is somewhat simplified. It would be better to adopt this approach with ***JSON-formatted outputs***, as this allows for the implementation of more complex and tailored processing during the final stages. 
+
 <br/>
 
 - #### 3. How to structure a chain of thought and develop advanced processing with GenAI?
