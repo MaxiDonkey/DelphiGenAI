@@ -910,7 +910,7 @@ end;
 function TImageVariationParams.Image(const Value: TStream;
   const FilePath: string): TImageVariationParams;
 begin
-  {$IF RTLVersion >= 35.0}
+  {$IF RTLVersion > 35.0}
     AddStream('image', Value, True, FilePath);
   {$ELSE}
     AddStream('image', Value, FilePath);
