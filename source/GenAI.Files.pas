@@ -391,7 +391,7 @@ end;
 function TFileUploadParams.&File(const Value: TStream;
   const FileName: string): TFileUploadParams;
 begin
-  {$IF RTLVersion >= 35.0}
+  {$IF RTLVersion > 35.0}
     AddStream('file', Value, True, FileName);
   {$ELSE}
     AddStream('file', Value, FileName);

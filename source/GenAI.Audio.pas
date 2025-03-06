@@ -731,7 +731,11 @@ end;
 function TTranscriptionParams.&File(const Stream: TStream;
   const FileName: string): TTranscriptionParams;
 begin
-  AddStream('file', Stream, True, FileName);
+  {$IF RTLVersion > 35.0}
+    AddStream('file', Stream, True, FileName);
+  {$ELSE}
+    AddStream('file', Stream, FileName);
+  {$ENDIF}
   Result := Self;
 end;
 
@@ -769,7 +773,11 @@ end;
 function TTranslationParams.&File(const Stream: TStream;
   const FileName: string): TTranslationParams;
 begin
-  AddStream('file', Stream, True, FileName);
+  {$IF RTLVersion > 35.0}
+    AddStream('file', Stream, True, FileName);
+  {$ELSE}
+    AddStream('file', Stream, FileName);
+  {$ENDIF}
   Result := Self;
 end;
 

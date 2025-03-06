@@ -575,7 +575,7 @@ end;
 function TUploadPartParams.Data(const Value: TStream;
   const FileName: string): TUploadPartParams;
 begin
-  {$IF RTLVersion >= 35.0}
+  {$IF RTLVersion > 35.0}
     AddStream('data', Value, True, FileName);
   {$ELSE}
     AddStream('data', Value, FileName);

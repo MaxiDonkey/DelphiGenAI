@@ -825,7 +825,7 @@ end;
 
 function TImageEditParams.Image(const Value: TStream; const FileName: string): TImageEditParams;
 begin
-  {$IF RTLVersion >= 35.0}
+  {$IF RTLVersion > 35.0}
     AddStream('image', Value, True, FileName);
   {$ELSE}
     AddStream('image', Value, FileName);
@@ -836,7 +836,7 @@ end;
 function TImageEditParams.Mask(const Value: TStream;
   const FilePath: string): TImageEditParams;
 begin
-  {$IF RTLVersion >= 35.0}
+  {$IF RTLVersion > 35.0}
     AddStream('mask', Value, True, FilePath);
   {$ELSE}
     AddStream('mask', Value, FilePath);
