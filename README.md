@@ -15,6 +15,7 @@ ___
 NEW: 
 - [Web search](#Web-search)
 - [Tips and tricks](#Tips-and-tricks)
+___
 
 <br>
 
