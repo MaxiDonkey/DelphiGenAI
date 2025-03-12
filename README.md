@@ -583,7 +583,7 @@ It is also possible to omit the audio ID and use the associated text via `Messag
 
 ## Vision
 
-Refert to the [official documentation](https://platform.openai.com/docs/guides/vision).
+Refer to the [official documentation](https://platform.openai.com/docs/guides/vision).
 
 ### Analyze single source
 
