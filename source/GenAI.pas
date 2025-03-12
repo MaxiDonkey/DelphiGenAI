@@ -904,6 +904,16 @@ type
   TToolChoiceParams = GenAI.Chat.TToolChoiceParams;
 
   /// <summary>
+  /// Approximate location parameters for the search.
+  /// </summary>
+  TUserLocationApproximate = GenAI.Chat.TUserLocationApproximate;
+
+  /// <summary>
+  /// Approximate location parameters for the search.
+  /// </summary>
+  TUserLocation = GenAI.Chat.TUserLocation;
+
+  /// <summary>
   /// Manages parameters for chat request configurations in JSON format, supporting a wide
   /// range of attributes to customize the chat completion process.
   /// </summary>
@@ -973,6 +983,28 @@ type
   /// or retrieving the stream directly.
   /// </remarks>
   TAudio = GenAI.Chat.TAudio;
+
+  /// <summary>
+  /// Represents a URL citation within a message, providing details about
+  /// the referenced web resource, including its title, URL, and position in the text.
+  /// </summary>
+  /// <remarks>
+  /// This class is used to store metadata about a URL citation found in a chat message.
+  /// It includes the start and end indices of the citation within the message text,
+  /// the URL itself, and the title of the referenced resource.
+  /// </remarks>
+  TUrlCitation = GenAI.Chat.TUrlCitation;
+
+  /// <summary>
+  /// Represents an annotation within a message, providing additional metadata
+  /// related to web citations, such as referenced URLs.
+  /// </summary>
+  /// <remarks>
+  /// This class is used to store information about web citations that appear in a chat message.
+  /// It includes the type of annotation (which is always "url_citation") and a reference
+  /// to a <c>TUrlCitation</c> instance containing details about the cited web resource.
+  /// </remarks>
+  TAnnotation = GenAI.Chat.TAnnotation;
 
   /// <summary>
   /// Represents a delta update for chat completions, encapsulating modifications

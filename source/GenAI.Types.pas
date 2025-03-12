@@ -568,6 +568,29 @@ type
     procedure StringReverter(Data: TObject; Field: string; Arg: string); override;
   end;
 
+  /// <summary>
+  /// High level guidance for the amount of context window space to use for the search.
+  /// </summary>
+  TSearchWebOptions = (
+    /// <summary>
+    /// Least context, lowest cost, fastest response, but potentially lower answer quality.
+    /// </summary>
+    low,
+    /// <summary>
+    /// (default): Balanced context, cost, and latency.
+    /// </summary>
+    medium,
+    /// <summary>
+    /// Most comprehensive context, highest cost, slower response.
+    /// </summary>
+    high
+  );
+
+  TSearchWebOptionsHelper = record Helper for TSearchWebOptions
+    constructor Create(const Value: string);
+    function ToString: string;
+  end;
+
   {$ENDREGION}
 
   {$REGION 'GenAI.Audio'}
@@ -2410,6 +2433,26 @@ begin
   if Self.isNull then
     Result := 'null' else
     Result := BoolToStr(Self.ToBoolean, True);
+end;
+
+{ TSearchWebOptionsHelper }
+
+constructor TSearchWebOptionsHelper.Create(const Value: string);
+begin
+  Self := TEnumValueRecovery.TypeRetrieve<TSearchWebOptions>(Value,
+            ['low', 'medium', 'high']);
+end;
+
+function TSearchWebOptionsHelper.ToString: string;
+begin
+  case Self of
+    TSearchWebOptions.low:
+      Exit('low');
+    TSearchWebOptions.medium:
+      Exit('medium');
+    TSearchWebOptions.high:
+      Exit('high');
+  end;
 end;
 
 end.

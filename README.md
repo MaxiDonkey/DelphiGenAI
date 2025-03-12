@@ -2,19 +2,21 @@
 
 
 Welcome to `GenAI`, a powerful and flexible **Delphi library** integrating the latest innovations from `OpenAI` APIs. Designed for comprehensive support, it enables content generation, dialogue management, vision and speech processing, as well as audio interactions with precise control.
-Built on advanced models with reasoning capabilities, such as `o1` and `o3`, it provides tools for data manipulation, batch processing, function calling, file management, and content moderation. It also supports the `GPT-4.5-preview` model. 
-Additionally, GenAI streamlines assistant orchestration, message management, threads, and execution (runs), meeting the demands of modern projects. <br/> <br/>
+Built on advanced models with reasoning capabilities, such as `o1` and `o3`, it provides tools for data manipulation, batch processing, function calling, file management, and content moderation. It also supports the `GPT-4.5-preview` model and 'gpt-4o-search-preview' and 'gpt-4o-mini-search-preview'  for web search.
+Additionally, GenAI streamlines assistant orchestration, message management, threads, and execution (runs), meeting the demands of modern projects. <br> <br>
 [This project](https://github.com/MaxiDonkey/DelphiGenAI/blob/main/GenAI.md) facilitates the integration of OpenAI APIs into Delphi applications by offering simplified network call management, unit testing, and a modular approach to configuring JSON requests.
 ___
 ![GitHub](https://img.shields.io/badge/IDE%20Version-Delphi%2010.3/11/12-yellow)
 ![GitHub](https://img.shields.io/badge/platform-all%20platforms-green)
-![GitHub](https://img.shields.io/badge/Updated%20on%20february%2028,%202025-blue)
+![GitHub](https://img.shields.io/badge/Updated%20on%20march%2012,%202025-blue)
 
-<br/>
+<br>
 
-NEW: [Tips and tricks](#Tips-and-tricks)
+NEW: 
+- [Web search](#Web-search)
+- [Tips and tricks](#Tips-and-tricks)
 
-<br/>
+<br>
 
 - [Introduction](#Introduction)
 - [Changelog](#Changelog)
@@ -39,6 +41,7 @@ NEW: [Tips and tricks](#Tips-and-tricks)
     - [Text to speech](#Text-to-speech)
     - [Speech to text](#Speech-to-text)
     - [Reasoning with o1 or o3](#Reasoning-with-o1-or-o3)
+    - [Web search](#Web-search)
     - [Embeddings](#Embeddings)
     - [Moderation](#Moderation)
         - [Modarate text inputs](#Modarate-text-inputs)
@@ -53,7 +56,7 @@ NEW: [Tips and tricks](#Tips-and-tricks)
 
 ___
 
-<br/>
+<br>
 
 # Introduction
 
@@ -61,17 +64,17 @@ Following the development of several wrappers integrating solutions from [Anthro
 
 In its latest version, `GenAI` has been primarily optimized to fully leverage OpenAI’s endpoints while remaining easily adaptable for the integration of the other aforementioned wrappers.
 
-<br/>
+<br>
 
-**Comprehensive Integration with OpenAI** <br/>
+**Comprehensive Integration with OpenAI** <br>
 - `GenAI` is designed to support the **GPT-4o**, **O1**, and **O3** models, along with the latest developments in `OpenAI’s APIs`. This extensive coverage ensures maximum flexibility for projects leveraging the latest advancements in OpenAI's offerings.
 
-<br/>
+<br>
 
-**Document Structure** <br/>
+**Document Structure** <br>
 - This document is divided into two main sections:
 
-   1. **Quick Start Guide** <br/>
+   1. **Quick Start Guide** <br>
    A practical introduction to generating text or audio responses from various types of inputs:
       - Plain text
       - Image/text combinations
@@ -81,9 +84,9 @@ In its latest version, `GenAI` has been primarily optimized to fully leverage Op
   2. **Advanced Features in a Cookbook Format**
       - A detailed guide showcasing advanced features available through OpenAI, complete with practical code examples for easy integration into your applications.
 
-<br/>
+<br>
 
-**Technical Support and Code Examples**<br/>
+**Technical Support and Code Examples**<br>
 - Two support units, **VCL** and **FMX**, are included in the provided sources. These units simplify the implementation of the code examples and facilitate learning, with a focus on best practices for using `GenAI`.
 
 For more information about the architecture of GenAI, please refer to [the dedicated page](https://github.com/MaxiDonkey/DelphiGenAI/blob/main/GenAI.md). 
@@ -95,13 +98,13 @@ For more information about the architecture of GenAI, please refer to [the dedic
 > This is an unofficial library. **OpenAI** does not provide any official library for `Delphi`.
 > This repository contains `Delphi` implementation over [OpenAI](https://openai.com/) public API.
 
-<br/>
+<br>
 
 # Changelog
 
 Refer to [changelog document](https://github.com/MaxiDonkey/DelphiGenAI/blob/main/Changelog.md).
 
-<br/>
+<br>
 
 # TIPS for using the tutorial effectively
 
@@ -124,7 +127,7 @@ Once you have a token, you can initialize IGenAI interface, which is an entry po
 To streamline the use of the API wrapper, the process for declaring units has been simplified. Regardless of the methods being utilized, you only need to reference the following two core units:
 `GenAI` and `GenAI.Types`.
 
-<br/>
+<br>
 
 >[!TIP]
 > To effectively use the examples in this tutorial, particularly when working with asynchronous methods, it is recommended to define the client interfaces with the broadest possible scope. For optimal implementation, these clients should be declared in the application's `OnCreate` method.
@@ -154,7 +157,7 @@ Make sure to add a three ***TMemo***, a ***TImage***, a ***TButton*** and a ***T
 
 The TButton will allow the interruption of any streamed reception.
 
-<br/>
+<br>
 
 # Quick Start Guide
 
@@ -214,7 +217,7 @@ By using the GenAI.Tutorial.VCL unit along with the initialization described [ab
 
 ![Preview](https://github.com/MaxiDonkey/DelphiGenAI/blob/main/images/GenAIChatRequest.png?raw=true "Preview")
 
-<br/>
+<br>
 
 ### Streamed
 
@@ -268,7 +271,7 @@ By using the GenAI.Tutorial.VCL unit along with the initialization described [ab
 
 ![Preview](https://github.com/MaxiDonkey/DelphiGenAI/blob/main/images/GenAIChatStreamedRequest.png?raw=true "Preview")
 
-<br/>
+<br>
 
 ### Multi-turn conversations
 
@@ -334,7 +337,7 @@ The `GenAI Chat API` enables the creation of interactive chat experiences tailor
 >The `FromUser` and `FromAssistant` methods simplify role management and enhance code readability, eliminating the need to use **TMessagePayload** (e.g., **TMessagePayload.User('Hello'))**. Similarly, `FromDeveloper`, `FromSystem`, and `FromTool` improve code clarity. For details on these methods and their configurations, refer to the `GenAI.pas` unit.
 >
 
-<br/>
+<br>
 
 ## Generating Audio Responses with Chat
 
@@ -407,7 +410,7 @@ Refer to official [documentation](https://platform.openai.com/docs/guides/audio?
 >   - text + audio in → text + audio out
 >   - text + audio in → text out 
 
-<br/>
+<br>
 
 Let’s take a closer look at how the `DisplayAudio` method handles output to understand how the model’s response is managed.
 
@@ -441,7 +444,7 @@ end;
 
 `GenAI` provides methods to handle audio responses generated by the model. The `SaveToFile` and `GetStream` methods enable the manipulation of received audio content.
 
-<br/>
+<br>
 
 ## Input Audio for Chat
 
@@ -543,12 +546,12 @@ Refer to official [documentation](https://platform.openai.com/docs/guides/audio?
 //  end;
 ```
 
-<br/>
+<br>
 
 >[!WARNING]
 > OpenAI provides other models for simple speech to text and text to speech - when your task requires those conversions (and not dynamic content from a model), the `TTS` and `STT` models will be more performant and cost-efficient.
 
-<br/>
+<br>
 
 ### Audio multi-turn conversations
 
@@ -576,7 +579,7 @@ It is also possible to omit the audio ID and use the associated text via `Messag
 >[!CAUTION]
 >Of course, this is just a simple example. TutorialHub is designed solely to showcase `GenAI`. In a more general scenario, it would be necessary to maintain a history of **audio IDs** to accurately build the conversation history.
 
-<br/>
+<br>
 
 ## Vision
 
@@ -637,7 +640,7 @@ Refert to the [official documentation](https://platform.openai.com/docs/guides/v
 ```
 This example uses streaming. The non-streamed version is straightforward to implement, so it is not covered here.
 
-<br/>
+<br>
 
 ### Analyze multi-source
 
@@ -689,7 +692,7 @@ This example uses streaming. The non-streamed version is straightforward to impl
 //    end);
 ```
 
-<br/>
+<br>
 
 ### Low or high fidelity image understanding
 
@@ -709,7 +712,7 @@ The detail parameter, which includes three options—**low**, **high**, and **au
 
 The same process is applied to the local file paths.
 
-<br/>
+<br>
 
 ## Image generation
 
@@ -760,7 +763,7 @@ Generation of an image using `DALL·E 3`.
 //  end;
 ```
 
-<br/>
+<br>
 
 Let’s take a closer look at how the `Display` method handles output to understand how the model’s response is managed.
 
@@ -794,11 +797,11 @@ end;
 
 `GenAI` offers optimized methods for managing image responses generated by the model. The `SaveToFile`, `Download`, and `GetStream` methods enable efficient handling of the received image content.
 
-<br/>
+<br>
 
 ![Preview](https://github.com/MaxiDonkey/DelphiGenAI/blob/main/images/DallePreview.png?raw=true "Preview")
 
-<br/>
+<br>
 
 
 >[!WARNING]
@@ -808,7 +811,7 @@ end;
 >
 >If you have significant needs in this area, I recommend using the [`DelphiStability wrapper`](https://github.com/MaxiDonkey/DelphiStabilityAI), which provides far more extensive capabilities for creating and modifying images
 
-<br/>
+<br>
 
 ## Text to speech
 
@@ -853,7 +856,7 @@ Convert a text into an audio file. Refer to [official documentation](https://pla
 //    Value.Free;
 //  end;  
 ```
-<br/>
+<br>
 
 Let’s take a closer look at how the `Display` method handles output to understand how the model’s response is managed.
 
@@ -877,7 +880,7 @@ end;
 
 `GenAI` provides methods to handle audio responses generated by the model. The `SaveToFile` and `GetStream` methods enable the manipulation of received audio content.
 
-<br/>
+<br>
 
 ## Speech to text
 
@@ -918,7 +921,7 @@ Convert data audio into a text. Refer to [official documentation](https://platfo
 //  end;
 ```
 
-<br/>
+<br>
 
 ## Reasoning with o1 or o3
 
@@ -957,7 +960,7 @@ Since these models can require response times ranging from a few seconds to seve
     end);
 ```
 
-<br/>
+<br>
 
 The OpenAI `o1` and `o3` series models are highly capable across several advanced tasks, including:
 
@@ -969,7 +972,240 @@ The OpenAI `o1` and `o3` series models are highly capable across several advance
 
 For more information, consult the [official documentation](https://platform.openai.com/docs/guides/reasoning).
 
-<br/>
+<br>
+
+## Web search
+
+Now you can now search the web for the latest information before generating a response. With the chat completion API, you gain access to the same models and tools optimized for web search in ChatGPT.
+
+When a request is sent via chat completion, the model automatically retrieves online information before formulating its response. However, if you want the web_search_preview tool to be used only when necessary, you should use the responses API instead.
+
+Currently, only specific models support web search through chat completion:
+- `gpt-4o-search-preview`
+- `gpt-4o-mini-search-preview`
+
+These models incorporate web search to deliver more accurate and up-to-date responses.
+
+### Web search : code sample 1
+
+```Delphi
+//uses GenAI, GenAI.Types, GenAI.Tutorial.VCL;
+
+  TutorialHub.JSONRequestClear;
+
+  //Asynchronous example
+  Client.Chat.AsynCreate(
+    procedure (Params: TChatParams)
+    begin
+      Params.Model('gpt-4o-search-preview');
+      Params.Messages([
+        FromUser('What was a positive news story from today?')
+      ]);
+      TutorialHub.JSONRequest := Params.ToFormat();
+    end,
+    function : TAsynChat
+    begin
+      Result.Sender := TutorialHub;
+      Result.OnStart := Start;
+      Result.OnSuccess := Display;
+      Result.OnError := Display;
+    end);
+
+  //Synchronous example
+//  var Value := Client.Chat.Create(
+//    procedure (Params: TChatParams)
+//    begin
+//      Params.Model('gpt-4o-search-preview');
+//      Params.Messages([
+//        FromUser('What was a positive news story from today?')
+//      ]);
+//    end);
+//  try
+//    Display(TutorialHub, Value);
+//  finally
+//    Value.Free;
+//  end;  
+```
+
+<br>
+
+### Output and citations
+
+The choices element in the API response includes:
+- **message.content:** The text generated by the model, with embedded citations referencing the sources.
+- **annotations:** A list detailing the cited URLs.
+
+By default, the model automatically incorporates citations from web search results. Additionally, each url_citation annotation provides specific details about the referenced source, including the URL, the page title, and the start and end character positions in the response where the citation appears.
+
+```JSON
+ [
+        {
+            "index": 0,
+            "message": {
+                "role": "assistant",
+                "content": "As of March 12, 2025, a notable positive news story is the agreement between the United States and Ukraine on a 30-day ceasefire in the conflict with Russia. This development, announced on March 11, 2025, includes the resumption of U.S. military aid and intelligence sharing with Ukraine. U.S. Secretary of State Marco Rubio expressed hope that Russia would respond positively to the proposal, aiming for a swift transition to comprehensive negotiations. ([straitstimes.com](https:\/\/www.straitstimes.com\/world\/while-you-were-sleeping-5-stories-you-might-have-missed-march-12-2025?utm_source=openai))\n\nAdditionally, in Indonesia, authorities rescued a critically endangered two-month-old male Sumatran elephant that had become separated from its mother in a palm oil plantation. The calf was found in Riau province on Sumatra island and is now under the care of local conservation agencies. With only about 2,400-2,800 Sumatran elephants remaining, this rescue is a significant step toward the species' conservation. ([straitstimes.com](https:\/\/www.straitstimes.com\/world\/while-you-were-sleeping-5-stories-you-might-have-missed-march-12-2025?utm_source=openai))\n\nThese stories highlight ongoing efforts toward conflict resolution and wildlife conservation, reflecting positive developments in international relations and environmental protection. ",
+                "refusal": null,
+                "annotations": [
+                    {
+                        "type": "url_citation",
+                        "url_citation": {
+                            "end_index": 599,
+                            "start_index": 455,
+                            "title": "While You Were Sleeping: 5 stories you might have missed, March 12, 2025 | The Straits Times",
+                            "url": "https:\/\/www.straitstimes.com\/world\/while-you-were-sleeping-5-stories-you-might-have-missed-march-12-2025?utm_source=openai"
+                        }
+                    },
+                    {
+                        "type": "url_citation",
+                        "url_citation": {
+                            "end_index": 1160,
+                            "start_index": 1016,
+                            "title": "While You Were Sleeping: 5 stories you might have missed, March 12, 2025 | The Straits Times",
+                            "url": "https:\/\/www.straitstimes.com\/world\/while-you-were-sleeping-5-stories-you-might-have-missed-march-12-2025?utm_source=openai"
+                        }
+                    }
+                ]
+            },
+            "finish_reason": "stop"
+        }
+ ]
+
+```
+
+<br>
+
+### User location
+
+To enhance search relevance based on geographic location, you can provide an approximate user location using details such as country, city, region, or timezone.
+- **City and Region:** These are open-text fields where you can input values like *San Francisco* for the city and *California* for the region.
+- **Country:** This follows the ISO 3166-1 alpha-2 standard, meaning it should be a two-letter country code like *FR* for France or *JP* for Japan.
+- **Timezone:** Uses the IANA format, such as *Europe/Paris* or *Asia/Tokyo*, to specify the user's local time zone.
+
+```Delphi
+//uses GenAI, GenAI.Types, GenAI.Tutorial.VCL;
+  
+  TutorialHub.JSONRequestClear;
+
+  //Asynchronous example
+  Client.Chat.AsynCreate(
+    procedure (Params: TChatParams)
+    begin
+      Params.Model('gpt-4o-search-preview');
+      Params.Messages([
+        FromUser('What was a positive news story from today?')
+      ]);
+      Params.WebSearchOptions(
+          TUserLocationApproximate.Create
+            .City('London')
+            .Country('GB')
+            .Region('London')
+        );
+      TutorialHub.JSONRequest := Params.ToFormat();
+    end,
+    function : TAsynChat
+    begin
+      Result.Sender := TutorialHub;
+      Result.OnStart := Start;
+      Result.OnSuccess := Display;
+      Result.OnError := Display;
+    end);
+
+  //Synchronous example
+//  var Value := Client.Chat.Create(
+//    procedure (Params: TChatParams)
+//    begin
+//      Params.Model('gpt-4o-search-preview');
+//      Params.Messages([
+//        FromUser('What was a positive news story from today?')
+//      ]);
+//      Params.WebSearchOptions(
+//          TUserLocationApproximate.Create
+//            .City('London')
+//            .Country('GB')
+//            .Region('London')
+//        );
+//    end);
+//  try
+//    Display(TutorialHub, Value);
+//  finally
+//    Value.Free;
+//  end;
+```
+
+<br>
+
+### Search context size
+
+The search_context_size parameter determines how much web context is retrieved to enhance responses. It does not affect the main model's token usage or carry over between interactions—its sole purpose is to generate the tool's reply.
+
+Impact of Context Size:
+- **Cost:** Larger contexts are more expensive. See pricing details.
+- **Quality:** More context improves accuracy and depth.
+- **Latency:** Bigger context means longer processing times.
+
+Available Options:
+- ***high*** – Most detailed, highest cost, slower.
+- ***medium*** (default) – Balanced cost, speed, and quality.
+- ***low*** – Fastest, cheapest, but may reduce accuracy.
+
+```Delphi
+//uses GenAI, GenAI.Types, GenAI.Tutorial.VCL;
+
+  TutorialHub.JSONRequestClear;
+
+  //Asynchronous example
+  Client.Chat.AsynCreate(
+    procedure (Params: TChatParams)
+    begin
+      Params.Model('gpt-4o-search-preview');
+      Params.Messages([
+        FromUser('What was a positive news story from today?')
+      ]);
+      Params.WebSearchOptions('high'); //or TSearchWebOptions.high
+      TutorialHub.JSONRequest := Params.ToFormat();
+    end,
+    function : TAsynChat
+    begin
+      Result.Sender := TutorialHub;
+      Result.OnStart := Start;
+      Result.OnSuccess := Display;
+      Result.OnError := Display;
+    end);
+
+  //Synchronous example
+//  var Value := Client.Chat.Create(
+//    procedure (Params: TChatParams)
+//    begin
+//      Params.Model('gpt-4o-search-preview');
+//      Params.Messages([
+//        FromUser('What was a positive news story from today?')
+//      ]);
+//      Params.WebSearchOptions('high'); //or TSearchWebOptions.high
+//    end);
+//  try
+//    Display(TutorialHub, Value);
+//  finally
+//    Value.Free;
+//  end;
+```
+
+>[!NOTE]
+> Context size and localization can be used simultaneously :
+> ```Delphi
+>    Params.WebSearchOptions(
+>      'low',
+>      TUserLocationApproximate.Create
+>        .City('London')
+>        .Country('GB')
+>        .Region('London')
+>    );
+> ```
+
+>[!WARNING]
+> Web search can also be used with APIs designed for streaming. However, annotation data is not included in the returned chunks.
+
+
+<br>
 
 ## Embeddings
 
@@ -1025,7 +1261,7 @@ Refer to [official documentation](https://platform.openai.com/docs/guides/embedd
 //  end;
 ```
 
-<br/>
+<br>
 
 ## Moderation
 
@@ -1039,7 +1275,7 @@ Available models for the moderation endpoint include:
 
 Refer to the [official documentation](https://platform.openai.com/docs/guides/moderation).
 
-<br/>
+<br>
 
 ### Modarate text inputs
 
@@ -1078,7 +1314,7 @@ Refer to the [official documentation](https://platform.openai.com/docs/guides/mo
 //  end;
 ```
 
-<br/>
+<br>
 
 ### Modarate images and text
 
@@ -1118,7 +1354,7 @@ Refer to the [official documentation](https://platform.openai.com/docs/guides/mo
 //    Value.Free;
 //  end;
 ```
-<br/>
+<br>
 
 `GenAI` offers an efficient and streamlined approach for handling categories and scores generated by the moderation process. Specifically, the display method is designed for simplicity and ease of use, as demonstrated in the example below.
 
@@ -1143,19 +1379,19 @@ begin
 end;
 ```
 
-<br/>
+<br>
 
 # Beyond the Basics Advanced Usage
 
 [This section](https://github.com/MaxiDonkey/DelphiGenAI/blob/main/BeyondBasics.md) covers the advanced use of OpenAI's APIs, including key features such as `models` management, `function` management, `file` handling, `batch` processing, `vector` stores, and the use of `assistants`, `threads`, `messages`, and `runs`. It also addresses model `fine-tuning` and includes a note on `distillation`.
 
-<br/>
+<br>
 
 # Legacy
 
 For practical purposes, **completion APIs** can be utilized through `GenAI`, enabling the use of models such as ***gpt-3.5-turbo-instruct***, among others. However, the assistant system in Beta 1 is not supported by `GenAI`.
 
-<br/>
+<br>
 
 ## Completion
 
@@ -1196,7 +1432,7 @@ For practical purposes, **completion APIs** can be utilized through `GenAI`, ena
 //    Value.Free;
 //  end;
 ```
-<br/>
+<br>
 
 ## Streamed completion
 
@@ -1240,7 +1476,7 @@ For practical purposes, **completion APIs** can be utilized through `GenAI`, ena
 //    end);
 ```
 
-<br/>
+<br>
 
 # Tips and tricks
 
@@ -1248,7 +1484,7 @@ For practical purposes, **completion APIs** can be utilized through `GenAI`, ena
 
 Starting from version ***1.0.1 of GenAI***, the `GenAI.Monitoring` unit is **responsible for monitoring ongoing HTTP requests.**
 
-The `Monitoring` interface is accessible by including the `GenAI.Monitoring` unit in the `uses` clause. <br/>
+The `Monitoring` interface is accessible by including the `GenAI.Monitoring` unit in the `uses` clause. <br>
 Alternatively, you can access it via the `HttpMonitoring` function, declared in the `GenAI` unit.
 
 **Usage Example**
@@ -1267,7 +1503,7 @@ end;
 
 ```
 
-<br/>
+<br>
 
 - #### 2. How to execute multiple background requests to process a batch of responses?
 
@@ -1320,13 +1556,13 @@ Among the method's parameters, you can specify the model to be used for the enti
 >[!TIP]
 > The provided example is somewhat simplified. It would be better to adopt this approach with ***JSON-formatted outputs***, as this allows for the implementation of more complex and tailored processing during the final stages. 
 
-<br/>
+<br>
 
 - #### 3. How to structure a chain of thought and develop advanced processing with GenAI?
 
 To achieve this, it is recommended to use a Promise-based pattern to efficiently construct a chain of thought with GenAI. The [CerebraChain](https://github.com/MaxiDonkey/CerebraChainAI) project offers a method that can be used with GenAI.
 
-<br/>
+<br>
 
 # Contributing
 

@@ -890,6 +890,116 @@ type
   end;
 
   /// <summary>
+  /// Approximate location parameters for the search.
+  /// </summary>
+  TUserLocationApproximate = class(TJSONParam)
+  public
+    /// <summary>
+    /// Free text input for the city of the user, e.g. San Francisco.
+    /// </summary>
+    /// <param name="Value">
+    /// The name of the city.
+    /// </param>
+    /// <returns>
+    /// Returns an instance of TUserLocationApproximate.
+    /// </returns>
+    function City(const Value: string): TUserLocationApproximate;
+    /// <summary>
+    /// The two-letter ISO country code of the user, e.g. US.
+    /// </summary>
+    /// <param name="Value">
+    /// The name of the country e.g. FR (for France) or JP (for Japan)
+    /// </param>
+    /// <returns>
+    /// Returns an instance of TUserLocationApproximate.
+    /// </returns>
+    /// <remarks>
+    /// Refer to https://en.wikipedia.org/wiki/ISO_3166-1
+    /// </remarks>
+    function Country(const Value: string): TUserLocationApproximate;
+    /// <summary>
+    /// Free text input for the region of the user, e.g. California.
+    /// </summary>
+    /// <param name="Value">
+    /// The name of the region.
+    /// </param>
+    /// <returns>
+    /// Returns an instance of TUserLocationApproximate.
+    /// </returns>
+    function Region(const Value: string): TUserLocationApproximate;
+    /// <summary>
+    /// The IANA timezone of the user, e.g. America/Los_Angeles.
+    /// </summary>
+    /// <param name="Value">
+    /// The timezone e.g. Europe/Paris or Asia/Tokyo
+    /// </param>
+    /// <returns>
+    /// Returns an instance of TUserLocationApproximate.
+    /// </returns>
+    /// <remarks>
+    /// Refer to https://timeapi.io/documentation/iana-timezones
+    /// </remarks>
+    function Timezone(const Value: string): TUserLocationApproximate;
+  end;
+
+  /// <summary>
+  /// Approximate location parameters for the search.
+  /// </summary>
+  TUserLocation = class(TJSONParam)
+  public
+    /// <summary>
+    /// The type of location approximation. Always approximate.
+    /// </summary>
+    /// <param name="Value">
+    /// Allways : approximate
+    /// </param>
+    /// <returns>
+    /// Returns an instance of TUserLocation.
+    /// </returns>
+    function &Type(const Value: string = 'approximate'): TUserLocation;
+    /// <summary>
+    /// Approximate location parameters for the search.
+    /// </summary>
+    /// <param name="Value">
+    /// e.g. TUserLocationApproximate.Create.Country('fr').Timezone('+01:00')
+    /// </param>
+    /// <returns>
+    /// Returns an instance of TUserLocation.
+    /// </returns>
+    function Approximate(const Value: TUserLocationApproximate): TUserLocation; overload;
+    /// <summary>
+    /// Approximate location parameters for the search.
+    /// </summary>
+    /// <param name="Value">
+    /// e.g. TUserLocationApproximate.Create.Country('fr').Detach
+    /// </param>
+    /// <returns>
+    /// Returns an instance of TUserLocation.
+    /// </returns>
+    function Approximate(const Value: TJSONObject): TUserLocation; overload;
+    /// <summary>
+    /// Creates a new instance of TUserLocation
+    /// </summary>
+    /// <param name="Value">
+    /// e.g. TUserLocationApproximate.Create.Country('fr').Timezone('+01:00')
+    /// </param>
+    /// <returns>
+    /// Returns an instance of TUserLocation.
+    /// </returns>
+    class function New(const Value: TUserLocationApproximate): TUserLocation; overload;
+    /// <summary>
+    /// Creates a new instance of TUserLocation
+    /// </summary>
+    /// <param name="Value">
+    /// e.g. TUserLocationApproximate.Create.Country('fr').Detach
+    /// </param>
+    /// <returns>
+    /// Returns an instance of TUserLocation.
+    /// </returns>
+    class function New(const Value: TJSONObject): TUserLocation; overload;
+  end;
+
+  /// <summary>
   /// Manages parameters for chat request configurations in JSON format, supporting a wide
   /// range of attributes to customize the chat completion process.
   /// </summary>
@@ -1326,6 +1436,121 @@ type
     /// An instance of TChatParams configured with the user identifier.
     /// </returns>
     function User(const Value: string): TChatParams;
+    /// <summary>
+    /// Configures web search options for chat completion requests, allowing
+    /// integration of contextual search results.
+    /// </summary>
+    /// <remarks>
+    /// This method sets the search context size and user location settings to
+    /// refine the results retrieved during a chat session. The options determine
+    /// how much contextual information should be retrieved from the web and how
+    /// the search should be influenced by the user's approximate location.
+    /// </remarks>
+    /// <param name="Value">
+    /// The <c>TSearchWebOptions</c> instance specifying search-related parameters,
+    /// such as the size of the search context.
+    /// </param>
+    /// <param name="UserLocation">
+    /// Optional. A <c>TUserLocation</c> instance representing the approximate
+    /// geographical location of the user. This information helps refine search results.
+    /// </param>
+    /// <returns>
+    /// Returns an instance of <c>TChatParams</c> with the web search options configured.
+    /// </returns>
+    function WebSearchOptions(const Value: TSearchWebOptions; const UserLocation: TUserLocation = nil): TChatParams; overload;
+    /// <summary>
+    /// Configures web search options for chat completion requests, allowing
+    /// integration of contextual search results while considering an approximate user location.
+    /// </summary>
+    /// <remarks>
+    /// This method allows defining search-related parameters such as the size of the search context
+    /// and refining the search results using an approximate geographical location.
+    /// </remarks>
+    /// <param name="Value">
+    /// An instance of <c>TSearchWebOptions</c> that specifies search-related parameters,
+    /// such as the context size for web search.
+    /// </param>
+    /// <param name="Approximation">
+    /// Optional. An instance of <c>TUserLocationApproximate</c> that provides an approximate
+    /// user location to refine search results.
+    /// </param>
+    /// <returns>
+    /// Returns an instance of <c>TChatParams</c> with the web search options configured.
+    /// </returns>
+    function WebSearchOptions(const Value: TSearchWebOptions; const Approximation: TUserLocationApproximate = nil): TChatParams; overload;
+    /// <summary>
+    /// Configures web search options using a string representation of the search
+    /// context size and an optional user location.
+    /// </summary>
+    /// <remarks>
+    /// This method allows specifying the size of the search context as a string value.
+    /// It also provides an optional parameter for user location to refine search results.
+    /// </remarks>
+    /// <param name="Value">
+    /// A string representing the search context size, which determines how much
+    /// information should be retrieved from the web during a chat completion request.
+    /// </param>
+    /// <param name="UserLocation">
+    /// Optional. A <c>TUserLocation</c> instance representing the approximate
+    /// geographical location of the user, helping to refine search results.
+    /// </param>
+    /// <returns>
+    /// Returns an instance of <c>TChatParams</c> with the configured web search options.
+    /// </returns>
+    function WebSearchOptions(const Value: string; const UserLocation: TUserLocation = nil): TChatParams; overload;
+    /// <summary>
+    /// Configures web search options using a string representation of the search
+    /// context size while incorporating an approximate user location.
+    /// </summary>
+    /// <remarks>
+    /// This method allows specifying the size of the search context as a string value.
+    /// It also provides an optional parameter for the approximate user location
+    /// to refine search results.
+    /// </remarks>
+    /// <param name="Value">
+    /// A string representing the search context size, which determines how much
+    /// information should be retrieved from the web during a chat completion request.
+    /// </param>
+    /// <param name="Approximation">
+    /// Optional. An instance of <c>TUserLocationApproximate</c> that provides an
+    /// approximate user location to enhance the relevance of search results.
+    /// </param>
+    /// <returns>
+    /// Returns an instance of <c>TChatParams</c> with the configured web search options.
+    /// </returns>
+    function WebSearchOptions(const Value: string; const Approximation: TUserLocationApproximate = nil): TChatParams; overload;
+    /// <summary>
+    /// Configures web search options using the user's approximate location.
+    /// </summary>
+    /// <remarks>
+    /// This method allows integrating the user's geographical location into the
+    /// chat completion request, refining search results based on the provided location.
+    /// </remarks>
+    /// <param name="UserLocation">
+    /// A <c>TUserLocation</c> instance representing the approximate geographical
+    /// location of the user.
+    /// </param>
+    /// <returns>
+    /// Returns an instance of <c>TChatParams</c> with the user location-based
+    /// web search options configured.
+    /// </returns>
+    function WebSearchOptions(const UserLocation: TUserLocation): TChatParams; overload;
+    /// <summary>
+    /// Configures web search options using only an approximate user location.
+    /// </summary>
+    /// <remarks>
+    /// This method integrates the user's geographical location into the chat completion
+    /// request, refining search results based on the provided location without explicitly
+    /// specifying search parameters.
+    /// </remarks>
+    /// <param name="Approximation">
+    /// An instance of <c>TUserLocationApproximate</c> that specifies the approximate
+    /// geographical location of the user.
+    /// </param>
+    /// <returns>
+    /// Returns an instance of <c>TChatParams</c> with the user location-based web search options configured.
+    /// </returns>
+    function WebSearchOptions(const Approximation: TUserLocationApproximate): TChatParams; overload;
   end;
 
   /// <summary>
@@ -1556,6 +1781,68 @@ type
   end;
 
   /// <summary>
+  /// Represents a URL citation within a message, providing details about
+  /// the referenced web resource, including its title, URL, and position in the text.
+  /// </summary>
+  /// <remarks>
+  /// This class is used to store metadata about a URL citation found in a chat message.
+  /// It includes the start and end indices of the citation within the message text,
+  /// the URL itself, and the title of the referenced resource.
+  /// </remarks>
+  TUrlCitation = class
+  private
+    [JsonNameAttribute('end_index')]
+    FEndindex: Int64;
+    [JsonNameAttribute('start_index')]
+    FStartindex: Int64;
+    FTitle: string;
+    FUrl: string;
+  public
+    /// <summary>
+    /// The index of the last character of the URL citation in the message.
+    /// </summary>
+    property Endindex: Int64 read FEndindex write FEndindex;
+    /// <summary>
+    /// The index of the first character of the URL citation in the message.
+    /// </summary>
+    property Startindex: Int64 read FStartindex write FStartindex;
+    /// <summary>
+    /// The title of the web resource.
+    /// </summary>
+    property Title: string read FTitle write FTitle;
+    /// <summary>
+    /// The URL of the web resource.
+    /// </summary>
+    property Url: string read FUrl write FUrl;
+  end;
+
+  /// <summary>
+  /// Represents an annotation within a message, providing additional metadata
+  /// related to web citations, such as referenced URLs.
+  /// </summary>
+  /// <remarks>
+  /// This class is used to store information about web citations that appear in a chat message.
+  /// It includes the type of annotation (which is always "url_citation") and a reference
+  /// to a <c>TUrlCitation</c> instance containing details about the cited web resource.
+  /// </remarks>
+  TAnnotation = class
+  private
+    FType: string;
+    [JsonNameAttribute('url_citation')]
+    FUrlCitation: TUrlCitation;
+  public
+    /// <summary>
+    /// The type of the URL citation. Always url_citation.
+    /// </summary>
+    property &Type: string read FType write FType;
+    /// <summary>
+    /// A URL citation when using web search.
+    /// </summary>
+    property UrlCitation: TUrlCitation read FUrlCitation write FUrlCitation;
+    destructor Destroy; override;
+  end;
+
+  /// <summary>
   /// Represents a delta update for chat completions, encapsulating modifications
   /// made during streaming or batch updates of chat messages.
   /// </summary>
@@ -1573,6 +1860,7 @@ type
     [JsonReflectAttribute(ctString, rtString, TRoleInterceptor)]
     FRole: TRole;
     FRefusal: string;
+    {--- No annotations provided for the streaming }
   public
     /// <summary>
     /// Provides access to the content of the delta, which includes any text or structured
@@ -1627,6 +1915,7 @@ type
     FToolCalls: TArray<TToolcall>;
     [JsonReflectAttribute(ctString, rtString, TRoleInterceptor)]
     FRole: TRole;
+    FAnnotations: TArray<TAnnotation>;
     FAudio: TAudio;
   public
     /// <summary>
@@ -1660,6 +1949,10 @@ type
     /// A TRole value indicating the author's role in the conversation.
     /// </returns>
     property Role: TRole read FRole write FRole;
+    /// <summary>
+    /// Annotations for the message, when applicable, as when using the web search tool.
+    /// </summary>
+    property Annotations: TArray<TAnnotation> read FAnnotations write FAnnotations;
     /// <summary>
     /// Contains any audio response data linked with the message, suitable for playback
     /// or further processing.
@@ -2480,6 +2773,56 @@ begin
   Result := TChatParams(Add('user', Value));
 end;
 
+function TChatParams.WebSearchOptions(
+  const Approximation: TUserLocationApproximate): TChatParams;
+begin
+  var Context := TJSONObject.Create.AddPair('user_location', TUserLocation.New(Approximation).Detach);
+  Result := TChatParams(Add('web_search_options', Context));
+end;
+
+function TChatParams.WebSearchOptions(
+  const UserLocation: TUserLocation): TChatParams;
+begin
+  var Context := TJSONObject.Create.AddPair('user_location', UserLocation.Detach);
+  Result := TChatParams(Add('web_search_options', Context));
+end;
+
+function TChatParams.WebSearchOptions(
+  const Value: string; const UserLocation: TUserLocation): TChatParams;
+begin
+  var Context := TJSONObject.Create.AddPair('search_context_size', TSearchWebOptions.Create(Value).ToString);
+  if Assigned(UserLocation) then
+    Context := Context.AddPair('user_location', UserLocation.Detach);
+  Result := TChatParams(Add('web_search_options', Context));
+end;
+
+function TChatParams.WebSearchOptions(const Value: string;
+  const Approximation: TUserLocationApproximate): TChatParams;
+begin
+  var Context := TJSONObject.Create.AddPair('search_context_size', TSearchWebOptions.Create(Value).ToString);
+  if Assigned(Approximation) then
+    Context := Context.AddPair('user_location', TUserLocation.New(Approximation).Detach);
+  Result := TChatParams(Add('web_search_options', Context));
+end;
+
+function TChatParams.WebSearchOptions(
+  const Value: TSearchWebOptions; const UserLocation: TUserLocation): TChatParams;
+begin
+  var Context := TJSONObject.Create.AddPair('search_context_size', Value.ToString);
+  if Assigned(UserLocation) then
+    Context := Context.AddPair('user_location', UserLocation.Detach);
+  Result := TChatParams(Add('web_search_options', Context));
+end;
+
+function TChatParams.WebSearchOptions(const Value: TSearchWebOptions;
+  const Approximation: TUserLocationApproximate): TChatParams;
+begin
+  var Context := TJSONObject.Create.AddPair('search_context_size', Value.ToString);
+  if Assigned(Approximation) then
+    Context := Context.AddPair('user_location', TUserLocation.New(Approximation).Detach);
+  Result := TChatParams(Add('web_search_options', Context));
+end;
+
 { TContentParams }
 
 class function TContentParams.AddFile(
@@ -2817,6 +3160,8 @@ destructor TChatMessage.Destroy;
 begin
   for var Item in FToolCalls do
     Item.Free;
+  for var Item in FAnnotations do
+    Item.Free;
   if Assigned(FAudio) then
     FAudio.Free;
   inherited;
@@ -3149,6 +3494,71 @@ end;
 function TAudioData.GetExpiresAtAsString: string;
 begin
   Result := TInt64OrNull(FExpiresAt).ToUtcDateString;
+end;
+
+{ TUserLocation }
+
+function TUserLocation.Approximate(
+  const Value: TUserLocationApproximate): TUserLocation;
+begin
+  Result := TUserLocation(Add('approximate', Value.Detach));
+end;
+
+function TUserLocation.Approximate(const Value: TJSONObject): TUserLocation;
+begin
+  Result := TUserLocation(Add('approximate', Value));
+end;
+
+class function TUserLocation.New(const Value: TJSONObject): TUserLocation;
+begin
+  Result := TUserLocation.Create.&Type('approximate').Approximate(Value);
+end;
+
+class function TUserLocation.New(const Value: TUserLocationApproximate): TUserLocation;
+begin
+  Result := TUserLocation.Create.&Type('approximate').Approximate(Value);
+end;
+
+function TUserLocation.&Type(const Value: string): TUserLocation;
+begin
+  if Value.Trim.ToLower <> 'approximate' then
+    raise Exception.Create('User_location type : always approximate');
+  Result := TUserLocation(Add('type', Value));
+end;
+
+{ TUserLocationApproximate }
+
+function TUserLocationApproximate.City(
+  const Value: string): TUserLocationApproximate;
+begin
+  Result := TUserLocationApproximate(Add('city', Value));
+end;
+
+function TUserLocationApproximate.Country(
+  const Value: string): TUserLocationApproximate;
+begin
+  Result := TUserLocationApproximate(Add('country', Value));
+end;
+
+function TUserLocationApproximate.Region(
+  const Value: string): TUserLocationApproximate;
+begin
+  Result := TUserLocationApproximate(Add('region', Value));
+end;
+
+function TUserLocationApproximate.Timezone(
+  const Value: string): TUserLocationApproximate;
+begin
+  Result := TUserLocationApproximate(Add('timezone', Value));
+end;
+
+{ TAnnotation }
+
+destructor TAnnotation.Destroy;
+begin
+  if Assigned(FUrlCitation) then
+    FUrlCitation.Free;
+  inherited;
 end;
 
 end.
