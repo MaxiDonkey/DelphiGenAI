@@ -1,5 +1,6 @@
 **2025, March 12 version 1.0.2**
-- Web search
+- Web search 
+- Parallel mode - add "system" parameter
 
 <br>
 
