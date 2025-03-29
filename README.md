@@ -1524,6 +1524,7 @@ Among the method's parameters, you can specify the model to be used for the enti
         'How many television channels were there in France in 1980?',
         'How many TV channels were there in Germany in 1980?.'
       ]);
+      Params.System('Write the text in capital letters.');
       Params.Model('gpt-4o-mini');
     end,
     function : TAsynBundleList

@@ -3352,6 +3352,7 @@ begin
     var ErrorExists := False;
 
     var Prompts := BundleParams.GetArrayString('prompts');
+    var System := BundleParams.GetString('system');
     var Counter := Length(Prompts);
 
     var Model := BundleParams.GetString('model');
@@ -3380,7 +3381,10 @@ begin
                   Params.Model(Model);
                   if not ReasoningEffort.IsEmpty then
                     Params.ReasoningEffort(ReasoningEffort);
-                  Params.Messages([TMessagePayload.User(Buffer.Prompt)]);
+                  Params.Messages([
+                    TMessagePayload.Developer(System),
+                    TMessagePayload.User(Buffer.Prompt)
+                  ]);
                 end);
               Inc(Ranking);
               Buffer.FinishIndex := Ranking;

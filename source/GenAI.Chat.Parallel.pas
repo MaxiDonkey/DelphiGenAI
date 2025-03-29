@@ -219,6 +219,21 @@ type
     /// </returns>
     function ReasoningEffort(const Value: TReasoningEffort): TBundleParams;
     /// <summary>
+    /// Sets the system message for the chat request bundle.
+    /// </summary>
+    /// <param name="Value">
+    /// A string containing the system message, which provides context or behavioral instructions
+    /// to guide the AI model's responses across all prompts in the bundle.
+    /// </param>
+    /// <returns>
+    /// The current instance of <c>TBundleParams</c> to allow method chaining.
+    /// </returns>
+    /// <remarks>
+    /// The system message is typically used to influence the tone, format, or perspective
+    /// of the AI responses, acting as a global directive for the conversation context.
+    /// </remarks>
+    function System(const Value: string): TBundleParams;
+    /// <summary>
     /// Initializes a new instance of <c>TBundleParams</c> with default values.
     /// </summary>
     /// <remarks>
@@ -305,6 +320,11 @@ function TBundleParams.ReasoningEffort(
   const Value: TReasoningEffort): TBundleParams;
 begin
   Result := TBundleParams(Add('reasoningEffort', Value.ToString));
+end;
+
+function TBundleParams.System(const Value: string): TBundleParams;
+begin
+  Result := TBundleParams(Add('system', Value));
 end;
 
 { TBundleItem }
