@@ -79,10 +79,13 @@ The Chat API can be used for both single-turn requests and multi-turn, stateless
 //    Value.Free;
 //  end;
 ```
+<br>
 
 >[!NOTE]
 > - Param.store to store the chat completion (Refer to [CRUD section](#crud-operations-on-saved-chat-completions)) 
 > - The stores completions can be retrieved into [Dashboard from plateform](https://platform.openai.com/logs?api=chat-completions)
+
+<br>
 
 By using the GenAI.Tutorial.VCL unit along with the initialization described [above](#Strategies-for-quickly-using-the-code-examples), you can achieve results similar to the example shown below.
 
