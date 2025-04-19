@@ -336,7 +336,7 @@ You can also use reasoning models in parallel processing: <br>
 
 #### Get chat completion
 
-Get a stored chat completion. Only Chat Completions that have been created with the `store` parameter set to `true` will be returned. Refer to [official documentation.](https://platform.openai.com/docs/api-reference/chat/get)
+Get a stored chat completion. Only [Chat Completions](https://github.com/MaxiDonkey/DelphiGenAI/blob/main/ChatCompletion.md#text-generation) that have been created with the `store` parameter set to `true` will be returned. Refer to [official documentation.](https://platform.openai.com/docs/api-reference/chat/get)
 
 ```Delphi
 //uses GenAI, GenAI.Types, GenAI.Tutorial.VCL;
@@ -366,7 +366,7 @@ Get a stored chat completion. Only Chat Completions that have been created with 
 
 #### Get chat messages
 
-Get the messages in a stored chat completion. Only Chat Completions that have been created with the `store` parameter set to `true` will be returned. Refer to [official documentation.](https://platform.openai.com/docs/api-reference/chat/getMessages)
+Get the messages in a stored chat completion. Only [Chat Completions](https://github.com/MaxiDonkey/DelphiGenAI/blob/main/ChatCompletion.md#text-generation) that have been created with the `store` parameter set to `true` will be returned. Refer to [official documentation.](https://platform.openai.com/docs/api-reference/chat/getMessages)
 
 ```Delphi
 //uses GenAI, GenAI.Types, GenAI.Tutorial.VCL;
@@ -406,7 +406,7 @@ Get the messages in a stored chat completion. Only Chat Completions that have be
 
 #### List chat completions
 
-List stored Chat Completions. Only Chat Completions that have been stored with the `store` parameter set to `true` will be returned. Refer to [official documentation.](https://platform.openai.com/docs/api-reference/chat/list)
+List stored Chat Completions. Only [Chat Completions](https://github.com/MaxiDonkey/DelphiGenAI/blob/main/ChatCompletion.md#text-generation) that have been stored with the `store` parameter set to `true` will be returned. Refer to [official documentation.](https://platform.openai.com/docs/api-reference/chat/list)
 
 ```Delphi
 //uses GenAI, GenAI.Types, GenAI.Tutorial.VCL;
@@ -445,7 +445,7 @@ List stored Chat Completions. Only Chat Completions that have been stored with t
 
 #### Update chat completion
 
-Modify a stored chat completion. Only Chat Completions that have been created with the `store` parameter set to `true` can be modified. Currently, the only supported modification is to update the `metadata` field. Refer to [official documentation.](https://platform.openai.com/docs/api-reference/chat/update)
+Modify a stored chat completion. Only [Chat Completions](https://github.com/MaxiDonkey/DelphiGenAI/blob/main/ChatCompletion.md#text-generation) that have been created with the `store` parameter set to `true` can be modified. Currently, the only supported modification is to update the `metadata` field. Refer to [official documentation.](https://platform.openai.com/docs/api-reference/chat/update)
 
 ```Delphi
 //uses GenAI, GenAI.Types, GenAI.Tutorial.VCL;
@@ -483,7 +483,7 @@ Modify a stored chat completion. Only Chat Completions that have been created wi
 
 #### Delete chat completion
 
-Delete a stored chat completion. Only Chat Completions that have been created with the `store` parameter set to `true` can be deleted. Refer to [official documentation.](https://platform.openai.com/docs/api-reference/chat/delete)
+Delete a stored chat completion. Only [Chat Completions](https://github.com/MaxiDonkey/DelphiGenAI/blob/main/ChatCompletion.md#text-generation) that have been created with the `store` parameter set to `true` can be deleted. Refer to [official documentation.](https://platform.openai.com/docs/api-reference/chat/delete)
 
 ```Delphi
 //uses GenAI, GenAI.Types, GenAI.Tutorial.VCL;
