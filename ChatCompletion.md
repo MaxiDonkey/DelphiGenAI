@@ -257,7 +257,7 @@ This approach enables the simultaneous execution of multiple prompts, provided t
     end)
 ```
 
-Vous pouvez aussi utiliser des modèles de raisonnement dans un traitement en parallèle: <br> 
+You can also use reasoning models in parallel processing: <br> 
 
 ```Delphi
 ...
