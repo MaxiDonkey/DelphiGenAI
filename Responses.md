@@ -540,7 +540,7 @@ ___
 
 ## PDF file inputs
 
-OpenAI models with vision capabilities can process PDF files as input. These files can be submitted either as Base64-encoded data or by using a file ID obtained after uploading the file via the dashboard or the `/v1/files` endpoint of the API. 
+OpenAI models with vision capabilities can process PDF files as input. These files can be submitted either as Base64-encoded data or by using a file ID obtained after uploading the file via the dashboard or the `/v1/files` endpoint of the API. [Refer to file upload](https://github.com/MaxiDonkey/DelphiGenAI?tab=readme-ov-file#file-upload)
 
 How it works
 To help models understand the content of a PDF, each page is represented both as extracted text and as an image. These two formats are included in the model's context, allowing it to use both visual and textual information to generate responses. This is especially useful when important details—such as those found in diagrams or charts—are not present in the text alone.
