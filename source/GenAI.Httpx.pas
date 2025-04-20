@@ -80,11 +80,29 @@ type
     /// If the status code indicates success (e.g., 200-299), no exception is thrown.
     /// </remarks>
     class procedure UrlCheck(const Url: string);
+    /// <summary>
+    /// Extracts the file name from the path component of a given URI.
+    /// </summary>
+    /// <param name="Url">
+    /// The full URL or URI from which to extract the file name.
+    /// </param>
+    /// <returns>
+    /// A string containing the file name part of the URI. If no file name is present, returns an empty string.
+    /// </returns>
+    /// <remarks>
+    /// This method removes any leading slashes from the file name. It is useful for extracting resource names from URLs.
+    /// </remarks>
+    class function ExtractURIFileName(const Url: string): string;
   end;
 
 implementation
 
 { THttpx }
+
+class function THttpx.ExtractURIFileName(const Url: string): string;
+begin
+  Result := ExtractFileName(TURI.Create(Url).Path).TrimLeft(['/']);
+end;
 
 class function THttpx.GetMimeType(const Url: string): string;
 begin

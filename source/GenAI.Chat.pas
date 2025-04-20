@@ -1,4 +1,4 @@
-unit GenAI.Chat;
+﻿unit GenAI.Chat;
 
 {-------------------------------------------------------------------------------
 
@@ -1059,7 +1059,7 @@ type
     /// <returns>
     /// Returns an instance of TChatParams with the storage option configured.
     /// </returns>
-    function Store(const Value: Boolean): TChatParams;
+    function Store(const Value: Boolean = True): TChatParams;
     /// <summary>
     /// Specifies the effort level for reasoning when generating responses.
     /// </summary>
@@ -1497,7 +1497,7 @@ type
     /// <returns>
     /// Returns an instance of <c>TChatParams</c> with the configured web search options.
     /// </returns>
-    function WebSearchOptions(const Value: string; const UserLocation: TUserLocation = nil): TChatParams; overload;
+    function WebSearchOptions(const Value: string; const UserLocation: TUserLocation): TChatParams; overload;
     /// <summary>
     /// Configures web search options using a string representation of the search
     /// context size while incorporating an approximate user location.
@@ -1518,7 +1518,7 @@ type
     /// <returns>
     /// Returns an instance of <c>TChatParams</c> with the configured web search options.
     /// </returns>
-    function WebSearchOptions(const Value: string; const Approximation: TUserLocationApproximate = nil): TChatParams; overload;
+    function WebSearchOptions(const Value: string; const Approximation: TUserLocationApproximate): TChatParams; overload;
     /// <summary>
     /// Configures web search options using the user's approximate location.
     /// </summary>
@@ -1551,6 +1551,145 @@ type
     /// Returns an instance of <c>TChatParams</c> with the user location-based web search options configured.
     /// </returns>
     function WebSearchOptions(const Approximation: TUserLocationApproximate): TChatParams; overload;
+    /// <summary>
+    /// Configures web search options using a string representation of the search
+    /// context size and an optional user location.
+    /// </summary>
+    /// <remarks>
+    /// This method allows specifying the size of the search context as a string value.
+    /// It also provides an optional parameter for user location to refine search results.
+    /// </remarks>
+    /// <param name="Value">
+    /// A string representing the search context size, which determines how much
+    /// information should be retrieved from the web during a chat completion request.
+    /// </param>
+    /// <returns>
+    /// Returns an instance of <c>TChatParams</c> with the configured web search options.
+    /// </returns>
+    function WebSearchOptions(const Value: string): TChatParams; overload;
+  end;
+
+  /// <summary>
+  /// Provides URL parameter helpers for retrieving chat messages by completion ID,
+  /// supporting pagination and sort ordering.
+  /// </summary>
+  TUrlChatParams = class(TUrlParam)
+  public
+    /// <summary>
+    /// Sets the cursor for pagination by specifying the ID of the last message
+    /// returned in a previous request. Subsequent calls will retrieve messages
+    /// appearing after this ID.
+    /// </summary>
+    /// <param name="Value">
+    /// The identifier of the last message from the previous page.
+    /// </param>
+    /// <returns>
+    /// A reference to the updated TUrlChatParams instance for method chaining.
+    /// </returns>
+    function After(const Value: string): TUrlChatParams;
+    /// <summary>
+    /// Specifies the maximum number of chat messages to retrieve in the response.
+    /// </summary>
+    /// <param name="Value">
+    /// The limit on the number of messages to return.
+    /// </param>
+    /// <returns>
+    /// A reference to the updated TUrlChatParams instance for method chaining.
+    /// </returns>
+    function Limit(const Value: Integer): TUrlChatParams;
+    /// <summary>
+    /// Determines the sort order for the returned messages based on their timestamp.
+    /// </summary>
+    /// <param name="Value">
+    /// The sort direction: 'asc' for ascending or 'desc' for descending. Defaults to 'asc'.
+    /// </param>
+    /// <returns>
+    /// A reference to the updated TUrlChatParams instance for method chaining.
+    /// </returns>
+    function Order(const Value: string): TUrlChatParams;
+  end;
+
+  /// <summary>
+  /// Provides URL parameter helpers for listing chat completions,
+  /// supporting pagination, metadata filtering, model filtering, and sort ordering.
+  /// </summary>
+  TUrlChatListParams = class(TUrlParam)
+  public
+    /// <summary>
+    /// Sets the cursor for pagination by specifying the ID of the last chat completion
+    /// returned in a previous request. Subsequent calls will retrieve completions
+    /// occurring after this ID.
+    /// </summary>
+    /// <param name="Value">
+    /// The identifier of the last chat completion from the previous page.
+    /// </param>
+    /// <returns>
+    /// A reference to the updated TUrlChatListParams instance for method chaining.
+    /// </returns>
+    function After(const Value: string): TUrlChatListParams;
+    /// <summary>
+    /// Specifies the maximum number of chat completions to retrieve in the response.
+    /// </summary>
+    /// <param name="Value">
+    /// The limit on the number of completions to return.
+    /// </param>
+    /// <returns>
+    /// A reference to the updated TUrlChatListParams instance for method chaining.
+    /// </returns>
+    function Limit(const Value: Integer): TUrlChatListParams;
+    /// <summary>
+    /// Filters the list of chat completions by metadata key‑value pairs.
+    /// </summary>
+    /// <param name="Value">
+    /// A JSON object where each pair represents a metadata key and its required value.
+    /// Example: metadata['environment']='production'.
+    /// </param>
+    /// <returns>
+    /// A reference to the updated TUrlChatListParams instance for method chaining.
+    /// </returns>
+    function Metadata(const Value: TJSONObject): TUrlChatListParams;
+    /// <summary>
+    /// Filters the list of chat completions by the model identifier used to generate them.
+    /// </summary>
+    /// <param name="Value">
+    /// The model name or identifier (e.g., 'gpt-4', 'claude-v1').
+    /// </param>
+    /// <returns>
+    /// A reference to the updated TUrlChatListParams instance for method chaining.
+    /// </returns>
+    function Model(const Value: string): TUrlChatListParams;
+    /// <summary>
+    /// Determines the sort order for the returned completions based on their timestamp.
+    /// </summary>
+    /// <param name="Value">
+    /// The sort direction: 'asc' for ascending or 'desc' for descending. Defaults to 'asc'.
+    /// </param>
+    /// <returns>
+    /// A reference to the updated TUrlChatListParams instance for method chaining.
+    /// </returns>
+    function Order(const Value: string): TUrlChatListParams;
+  end;
+
+  /// <summary>
+  /// Represents the parameters for updating an existing chat completion.
+  /// </summary>
+  /// <remarks>
+  /// Use this class to configure one or more metadata fields on a chat completion
+  /// before sending an update request to the API.
+  /// </remarks>
+  TChatUpdateParams = class(TJSONParam)
+  public
+    /// <summary>
+    /// Adds or replaces metadata for the chat completion update request.
+    /// </summary>
+    /// <param name="Value">
+    /// A <c>TJSONObject</c> containing key-value pairs that describe the metadata
+    /// to apply. Each pair represents a metadata field name and its new value.
+    /// </param>
+    /// <returns>
+    /// Returns the current <c>TChatUpdateParams</c> instance to allow method chaining.
+    /// </returns>
+    function Metadata(const Value: TJSONObject): TChatUpdateParams;
   end;
 
   /// <summary>
@@ -2270,6 +2409,169 @@ type
   end;
 
   /// <summary>
+  /// Represents a single message returned in a chat completion response,
+  /// including its content, author role, optional audio payload, and any
+  /// associated annotations or tool call details.
+  /// </summary>
+  TChatCompletionMessage = class(TJSONFingerprint)
+  private
+    FContent: string;
+    FId: string;
+    FRefusal: string;
+    [JsonReflectAttribute(ctString, rtString, TRoleInterceptor)]
+    FRole: TRole;
+    FAnnotations: TArray<TAnnotation>;
+    FAudio: TAudio;
+    [JsonNameAttribute('tool_calls')]
+    FToolCalls: TArray<TToolcall>;
+  public
+    /// <summary>
+    /// Gets or sets the main textual content of the message.
+    /// </summary>
+    property Content: string read FContent write FContent;
+    /// <summary>
+    /// Gets or sets the unique identifier for this chat message.
+    /// </summary>
+    property Id: string read FId write FId;
+    /// <summary>
+    /// Gets or sets the refusal message, if the model was unable to comply with the request.
+    /// </summary>
+    property Refusal: string read FRefusal write FRefusal;
+    /// <summary>
+    /// Gets or sets the role of the message author (e.g., user, assistant, system, or tool).
+    /// </summary>
+    property Role: TRole read FRole write FRole;
+    /// <summary>
+    /// Gets or sets any annotations attached to the message, such as URL citations.
+    /// </summary>
+    property Annotations: TArray<TAnnotation> read FAnnotations write FAnnotations;
+    /// <summary>
+    /// Gets or sets the audio data associated with this message, if present.
+    /// </summary>
+    property Audio: TAudio read FAudio write FAudio;
+    /// <summary>
+    /// Gets or sets the array of tool calls invoked by this message.
+    /// </summary>
+    property ToolCalls: TArray<TToolcall> read FToolCalls write FToolCalls;
+    /// <summary>
+    /// Frees all owned resources, including annotations, audio data, and tool call objects.
+    /// </summary>
+    destructor Destroy; override;
+  end;
+
+  /// <summary>
+  /// Represents a paginated list of chat completion messages, including
+  /// navigation cursors and flags for additional pages.
+  /// </summary>
+  TChatMessages = class(TJSONFingerprint)
+  private
+    FData: TArray<TChatCompletionMessage>;
+    [JsonNameAttribute('first_id')]
+    FFirstId: string;
+    [JsonNameAttribute('has_more')]
+    FHasMore: Boolean;
+    [JsonNameAttribute('last_id')]
+    FLastId: string;
+    FObject: string;
+  public
+    /// <summary>
+    /// The array of chat messages in the current page of results.
+    /// </summary>
+    property Data: TArray<TChatCompletionMessage> read FData write FData;
+    /// <summary>
+    /// The ID of the first message in this page, useful for paging backwards.
+    /// </summary>
+    property FirstId: string read FFirstId write FFirstId;
+    /// <summary>
+    /// Indicates whether more messages are available after this page.
+    /// </summary>
+    property HasMore: Boolean read FHasMore write FHasMore;
+    /// <summary>
+    /// The ID of the last message in this page, useful for paging forwards.
+    /// </summary>
+    property LastId: string read FLastId write FLastId;
+    /// <summary>
+    /// The object type, typically 'list'.
+    /// </summary>
+    property &Object: string read FObject write FObject;
+    /// <summary>
+    /// Cleans up and frees all owned message instances and resources.
+    /// </summary>
+    destructor Destroy; override;
+  end;
+
+  /// <summary>
+  /// Represents a paginated list of chat completion responses returned by the API.
+  /// </summary>
+  /// <remarks>
+  /// Contains an array of <c>TChat</c> objects along with pagination cursors and a flag
+  /// indicating whether additional pages are available.
+  /// </remarks>
+  TChatCompletion = class(TJSONFingerprint)
+    FData: TArray<TChat>;
+    [JsonNameAttribute('first_id')]
+    FFirstId: string;
+    [JsonNameAttribute('has_more')]
+    FHasMore: Boolean;
+    [JsonNameAttribute('last_id')]
+    FLastId: string;
+    FObject: string;
+  public
+    /// <summary>
+    /// The array of chat messages in the current page of results.
+    /// </summary>
+    property  Data: TArray<TChat> read FData write FData;
+    /// <summary>
+    /// The ID of the first message in this page, useful for paging backwards.
+    /// </summary>
+    property FirstId: string read FFirstId write FFirstId;
+    /// <summary>
+    /// Indicates whether more messages are available after this page.
+    /// </summary>
+    property HasMore: Boolean read FHasMore write FHasMore;
+    /// <summary>
+    /// The ID of the last message in this page, useful for paging forwards.
+    /// </summary>
+    property LastId: string read FLastId write FLastId;
+    /// <summary>
+    /// The object type, typically 'list'.
+    /// </summary>
+    property &Object: string read FObject write FObject;
+    /// <summary>
+    /// Frees all owned <c>TChat</c> instances and associated resources.
+    /// </summary>
+    destructor Destroy; override;
+  end;
+
+  /// <summary>
+  /// Represents the result of a chat completion deletion request.
+  /// </summary>
+  /// <remarks>
+  /// This class is used to deserialize the API response when a chat completion
+  /// is deleted. It includes the identifier of the deleted completion, the
+  /// object type returned by the service, and a flag indicating whether the
+  /// deletion was successful.
+  TChatDelete = class(TJSONFingerprint)
+  private
+    FId: string;
+    FObject: string;
+    FDeleted: Boolean;
+  public
+    /// <summary>
+    /// The ID of the response to delete.
+    /// </summary>
+    property Id: string read FId write FId;
+    /// <summary>
+    /// Allways reponse.deleted
+    /// </summary>
+    property &Object: string read FObject write FObject;
+    /// <summary>
+    /// True if the response has been deleted
+    /// </summary>
+    property Deleted: Boolean read FDeleted write FDeleted;
+  end;
+
+  /// <summary>
   /// Manages asynchronous chat callBacks for a chat request using <c>TChat</c> as the response type.
   /// </summary>
   /// <remarks>
@@ -2288,6 +2590,33 @@ type
   /// This structure is ideal for handling scenarios where the chat response is streamed incrementally, providing real-time updates to the user interface.
   /// </remarks>
   TAsynChatStream = TAsynStreamCallBack<TChat>;
+
+  /// <summary>
+  /// Represents an asynchronous callback structure for retrieving chat messages.
+  /// </summary>
+  /// <remarks>
+  /// Use this callback type to handle the lifecycle events (start, success, error, and cancellation)
+  /// when fetching <see cref="TChatMessages"/> instances asynchronously.
+  /// </remarks>
+  TAsynChatMessages = TAsynCallBack<TChatMessages>;
+
+  /// <summary>
+  /// Represents an asynchronous callback structure for retrieving chat completion results.
+  /// </summary>
+  /// <remarks>
+  /// Use this callback type to handle the lifecycle events (start, success, error, and cancellation)
+  /// when fetching <see cref="TChatCompletion"/> instances asynchronously.
+  /// </remarks>
+  TAsynChatCompletion = TAsynCallBack<TChatCompletion>;
+
+  /// <summary>
+  /// Represents an asynchronous callback structure for deleting a chat completion.
+  /// </summary>
+  /// <remarks>
+  /// Use this callback type to handle the lifecycle events (start, success, error, and cancellation)
+  /// when performing an asynchronous delete operation for a <see cref="TChatDelete"/> instance.
+  /// </remarks>
+  TAsynChatDelete = TAsynCallBack<TChatDelete>;
 
   /// <summary>
   /// Handles the routing and execution of chat-related API requests within the application,
@@ -2325,6 +2654,133 @@ type
     /// </param>
     procedure AsynCreateStream(ParamProc: TProc<TChatParams>; CallBacks: TFunc<TAsynChatStream>);
     /// <summary>
+    /// Asynchronously retrieves a stored chat completion by its unique identifier.
+    /// </summary>
+    /// <param name="CompletionID">
+    /// The identifier of the chat completion to fetch. This must correspond to a completion
+    /// that was created with storage enabled.
+    /// </param>
+    /// <param name="CallBacks">
+    /// A function that returns a <c>TAsynChat</c> record. The record’s callbacks
+    /// (<c>OnStart</c>, <c>OnSuccess</c>, <c>OnError</c>, etc.) are invoked at each stage
+    /// of the asynchronous operation.
+    /// </param>
+    /// <remarks>
+    /// Use this method to perform a non blocking fetch of a previously stored chat.
+    /// <c>OnStart</c> is called before the request is issued.
+    /// <c>OnSuccess</c> is called when the chat is successfully retrieved, passing the <c>TChat</c> instance.
+    /// <c>OnError</c> is called if an exception or network error occurs.
+    /// </remarks>
+    procedure AsynGetCompletion(const CompletionID: string; CallBacks: TFunc<TAsynChat>);
+    /// <summary>
+    /// Asynchronously retrieves the messages of a stored chat completion by its unique identifier.
+    /// </summary>
+    /// <param name="CompletionID">
+    /// The identifier of the chat completion whose messages to retrieve. This must correspond
+    /// to a completion created with storage enabled.
+    /// </param>
+    /// <param name="CallBacks">
+    /// A function that returns a <c>TAsynChatMessages</c> record. The record’s callbacks
+    /// (<c>OnStart</c>, <c>OnSuccess</c>, <c>OnError</c>, etc.) are invoked at each stage
+    /// of the asynchronous retrieval.
+    /// </param>
+    /// <remarks>
+    /// Use this method to perform a non blocking fetch of messages from a stored chat.
+    /// <c>OnStart</c> is called before the request is issued.
+    /// <c>OnSuccess</c> is called when the messages are successfully retrieved, passing the
+    /// <c>TChatMessages</c> instance.
+    /// <c>OnError</c> is called if an exception or network error occurs.
+    /// </remarks>
+    procedure AsynGetMessages(const CompletionID: string; CallBacks: TFunc<TAsynChatMessages>); overload;
+    /// <summary>
+    /// Asynchronously retrieves the messages of a stored chat completion using custom query parameters.
+    /// </summary>
+    /// <param name="CompletionID">
+    /// The identifier of the chat completion whose messages to retrieve. This must correspond
+    /// to a completion created with storage enabled.
+    /// </param>
+    /// <param name="ParamProc">
+    /// A procedure to configure <c>TUrlChatParams</c> for pagination, filtering, and ordering of the messages.
+    /// </param>
+    /// <param name="CallBacks">
+    /// A function that returns a <c>TAsynChatMessages</c> record. The record’s callbacks
+    /// (<c>OnStart</c>, <c>OnSuccess</c>, <c>OnError</c>, etc.) are invoked at each stage
+    /// of the asynchronous retrieval.
+    /// </param>
+    /// <remarks>
+    /// Use this method to perform a non blocking fetch of messages from a stored chat with custom query options.
+    /// <c>OnStart</c> is called before the request is issued.
+    /// <c>OnSuccess</c> is called when the messages are successfully retrieved, passing the <c>TChatMessages</c> instance.
+    /// <c>OnError</c> is called if an exception or network error occurs.
+    /// </remarks>
+    procedure AsynGetMessages(const CompletionID: string; ParamProc: TProc<TUrlChatParams>;
+      CallBacks: TFunc<TAsynChatMessages>); overload;
+    /// <summary>
+    /// Asynchronously retrieves a paginated list of stored chat completions.
+    /// </summary>
+    /// <param name="ParamProc">
+    /// A procedure to configure <c>TUrlChatListParams</c> for pagination, metadata filtering,
+    /// model filtering, and sort order of the chat completions.
+    /// </param>
+    /// <param name="CallBacks">
+    /// A function that returns a <c>TAsynChatCompletion</c> record. The record’s callbacks
+    /// (<c>OnStart</c>, <c>OnSuccess</c>, <c>OnError</c>, etc.) are invoked at each stage
+    /// of the asynchronous list retrieval.
+    /// </param>
+    /// <remarks>
+    /// Use this method to perform a non blocking fetch of stored chat completions.
+    /// <c>OnStart</c> is called before the request is issued.
+    /// <c>OnSuccess</c> is called when the list is successfully retrieved, passing the
+    /// <c>TChatCompletion</c> instance. <c>OnError</c> is called if an exception or network
+    /// error occurs.
+    /// </remarks>
+    procedure AsynList(ParamProc: TProc<TUrlChatListParams>; CallBacks: TFunc<TAsynChatCompletion>);
+    /// <summary>
+    /// Asynchronously updates metadata of a stored chat completion.
+    /// </summary>
+    /// <param name="CompletionID">
+    /// The identifier of the chat completion to update. Must correspond to a completion
+    /// that was created with storage enabled.
+    /// </param>
+    /// <param name="ParamProc">
+    /// A procedure to configure <c>TChatUpdateParams</c> with the metadata modifications
+    /// to apply to the chat completion.
+    /// </param>
+    /// <param name="CallBacks">
+    /// A function that returns a <c>TAsynChat</c> record. The record’s callbacks
+    /// (<c>OnStart</c>, <c>OnSuccess</c>, <c>OnError</c>, etc.) are invoked at each
+    /// stage of the asynchronous update operation.
+    /// </param>
+    /// <remarks>
+    /// Use this method to perform a non blocking update of a stored chat’s metadata.
+    /// <c>OnStart</c> is called before the request is issued.
+    /// <c>OnSuccess</c> is called when the update completes successfully, passing the
+    /// updated <c>TChat</c> instance. <c>OnError</c> is called if an exception
+    /// or network error occurs.
+    /// </remarks>
+    procedure AsynUpdate(const CompletionID: string; ParamProc: TProc<TChatUpdateParams>;
+      CallBacks: TFunc<TAsynChat>);
+    /// <summary>
+    /// Asynchronously deletes a stored chat completion.
+    /// </summary>
+    /// <param name="CompletionID">
+    /// The identifier of the chat completion to delete. Must correspond to a completion
+    /// that was created with storage enabled.
+    /// </param>
+    /// <param name="CallBacks">
+    /// A function that returns a <c>TAsynChatDelete</c> record. The record’s callbacks
+    /// (<c>OnStart</c>, <c>OnSuccess</c>, <c>OnError</c>, etc.) are invoked at each
+    /// stage of the asynchronous deletion operation.
+    /// </param>
+    /// <remarks>
+    /// Use this method to perform a non blocking deletion of a stored chat completion.
+    /// <c>OnStart</c> is called before the delete request is issued.
+    /// <c>OnSuccess</c> is called when the deletion is confirmed, passing the
+    /// <c>TChatDelete</c> instance.
+    /// <c>OnError</c> is called if an exception or network error occurs.
+    /// </remarks>
+    procedure AsynDelete(const CompletionID: string; CallBacks: TFunc<TAsynChatDelete>);
+    /// <summary>
     /// Synchronously creates a chat completion, directly returning the chat completion
     /// object upon completion.
     /// </summary>
@@ -2350,6 +2806,99 @@ type
     /// </returns>
     function CreateStream(ParamProc: TProc<TChatParams>; Event: TStreamCallbackEvent<TChat>): Boolean;
     /// <summary>
+    /// Retrieves a stored chat completion by its unique identifier.
+    /// </summary>
+    /// <param name="CompletionID">
+    /// The identifier of the chat completion to retrieve.
+    /// </param>
+    /// <returns>
+    /// A <see cref="TChat"/> instance containing the retrieved completion data.
+    /// </returns>
+    /// <remarks>
+    /// Only completions that were created with storage enabled (Store = True) can be fetched.
+    /// An exception is raised if the specified CompletionID does not exist or access is denied.
+    /// </remarks>
+    function GetCompletion(const CompletionID: string): TChat;
+    /// <summary>
+    /// Retrieves the messages of a stored chat completion.
+    /// </summary>
+    /// <param name="CompletionID">
+    /// The identifier of the chat completion whose messages to retrieve.
+    /// </param>
+    /// <returns>
+    /// A <see cref="TChatMessages"/> instance containing the list of messages.
+    /// </returns>
+    /// <remarks>
+    /// Only messages from completions created with storage enabled (Store = True) will be returned.
+    /// An exception is raised if the CompletionID does not exist or access is denied.
+    /// </remarks>
+    function GetMessages(const CompletionID: string): TChatMessages; overload;
+    /// <summary>
+    /// Retrieves the messages of a stored chat completion with custom query parameters.
+    /// </summary>
+    /// <param name="CompletionID">
+    /// The identifier of the chat completion whose messages to retrieve.
+    /// </param>
+    /// <param name="ParamProc">
+    /// A procedure to configure <see cref="TUrlChatParams"/> for pagination, filtering, and ordering.
+    /// </param>
+    /// <returns>
+    /// A <see cref="TChatMessages"/> instance containing the list of messages.
+    /// </returns>
+    /// <remarks>
+    /// Only messages from completions created with storage enabled (Store = True) will be returned.
+    /// Use <c>ParamProc</c> to set parameters such as <c>After</c>, <c>Limit</c>, and <c>Order</c>.
+    /// An exception is raised if the specified CompletionID does not exist or access is denied.
+    /// </remarks>
+    function GetMessages(const CompletionID: string; ParamProc: TProc<TUrlChatParams>): TChatMessages; overload;
+    /// <summary>
+    /// Retrieves a paginated list of stored chat completions.
+    /// </summary>
+    /// <param name="ParamProc">
+    /// A procedure to configure <see cref="TUrlChatListParams"/> for pagination, metadata filtering, model filtering, and sort order.
+    /// </param>
+    /// <returns>
+    /// A <see cref="TChatCompletion"/> instance containing the list of chat completions and pagination cursors.
+    /// </returns>
+    /// <remarks>
+    /// Only completions that were created with storage enabled (Store = True) will be included.
+    /// Use <c>ParamProc</c> to set options such as <c>After</c>, <c>Limit</c>, <c>Metadata</c>, <c>Model</c>, and <c>Order</c>.
+    /// An exception is raised if access is denied.
+    /// </remarks>
+    function List(ParamProc: TProc<TUrlChatListParams>): TChatCompletion;
+    /// <summary>
+    /// Updates metadata of a stored chat completion.
+    /// </summary>
+    /// <param name="CompletionID">
+    /// The identifier of the chat completion to update.
+    /// </param>
+    /// <param name="ParamProc">
+    /// A procedure to configure <see cref="TChatUpdateParams"/> for metadata modifications.
+    /// </param>
+    /// <returns>
+    /// A <see cref="TChat"/> instance containing the updated chat completion.
+    /// </returns>
+    /// <remarks>
+    /// Only completions created with storage enabled (Store = True) can be modified.
+    /// Currently, only metadata updates are supported. An exception is raised if the
+    /// specified CompletionID does not exist or access is denied.
+    /// </remarks>
+    function Update(const CompletionID: string; ParamProc: TProc<TChatUpdateParams>): TChat;
+    /// <summary>
+    /// Deletes a stored chat completion.
+    /// </summary>
+    /// <param name="CompletionID">
+    /// The identifier of the chat completion to delete.
+    /// </param>
+    /// <returns>
+    /// A <see cref="TChatDelete"/> instance indicating whether the deletion was successful.
+    /// </returns>
+    /// <remarks>
+    /// Only completions created with storage enabled (<c>Store = True</c>) can be deleted.
+    /// An exception is raised if the specified <paramref name="CompletionID"/> does not exist or access is denied.
+    /// </remarks>
+    function Delete(const CompletionID: string): TChatDelete;
+    /// <summary>
     /// Initiates parallel processing of chat prompts by creating multiple chat completions
     /// asynchronously, with results stored in a bundle and provided back to the callback function.
     /// This method allows for parallel processing of multiple prompts in an efficient manner,
@@ -2370,7 +2919,7 @@ type
     /// If an error occurs, the error handling callback will be triggered, and the rest of the tasks
     /// will continue processing. The success callback is triggered once all tasks are completed.
     /// </remarks>
-    procedure CreateParallel(ParamProc: TProc<TBundleParams>; const CallBacks: TFunc<TAsynBundleList>);
+    procedure CreateParallel(ParamProc: TProc<TBundleParams>; CallBacks: TFunc<TAsynBundleList>);
   end;
 
 implementation
@@ -2820,6 +3369,12 @@ begin
   var Context := TJSONObject.Create.AddPair('search_context_size', Value.ToString);
   if Assigned(Approximation) then
     Context := Context.AddPair('user_location', TUserLocation.New(Approximation).Detach);
+  Result := TChatParams(Add('web_search_options', Context));
+end;
+
+function TChatParams.WebSearchOptions(const Value: string): TChatParams;
+begin
+  var Context := TJSONObject.Create.AddPair('search_context_size', TSearchWebOptions.Create(Value).ToString);
   Result := TChatParams(Add('web_search_options', Context));
 end;
 
@@ -3310,6 +3865,120 @@ begin
   Task.Start;
 end;
 
+procedure TChatRoute.AsynDelete(const CompletionID: string;
+  CallBacks: TFunc<TAsynChatDelete>);
+begin
+  with TAsynCallBackExec<TAsynChatDelete, TChatDelete>.Create(CallBacks) do
+  try
+    Sender := Use.Param.Sender;
+    OnStart := Use.Param.OnStart;
+    OnSuccess := Use.Param.OnSuccess;
+    OnError := Use.Param.OnError;
+    Run(
+      function: TChatDelete
+      begin
+        Result := Self.Delete(CompletionID);
+      end);
+  finally
+    Free;
+  end;
+end;
+
+procedure TChatRoute.AsynGetCompletion(const CompletionID: string;
+  CallBacks: TFunc<TAsynChat>);
+begin
+  with TAsynCallBackExec<TAsynChat, TChat>.Create(CallBacks) do
+  try
+    Sender := Use.Param.Sender;
+    OnStart := Use.Param.OnStart;
+    OnSuccess := Use.Param.OnSuccess;
+    OnError := Use.Param.OnError;
+    Run(
+      function: TChat
+      begin
+        Result := Self.GetCompletion(CompletionID);
+      end);
+  finally
+    Free;
+  end;
+end;
+
+procedure TChatRoute.AsynGetMessages(const CompletionID: string;
+  ParamProc: TProc<TUrlChatParams>; CallBacks: TFunc<TAsynChatMessages>);
+begin
+  with TAsynCallBackExec<TAsynChatMessages, TChatMessages>.Create(CallBacks) do
+  try
+    Sender := Use.Param.Sender;
+    OnStart := Use.Param.OnStart;
+    OnSuccess := Use.Param.OnSuccess;
+    OnError := Use.Param.OnError;
+    Run(
+      function: TChatMessages
+      begin
+        Result := Self.GetMessages(CompletionID, ParamProc);
+      end);
+  finally
+    Free;
+  end;
+end;
+
+procedure TChatRoute.AsynList(ParamProc: TProc<TUrlChatListParams>;
+  CallBacks: TFunc<TAsynChatCompletion>);
+begin
+  with TAsynCallBackExec<TAsynChatCompletion, TChatCompletion>.Create(CallBacks) do
+  try
+    Sender := Use.Param.Sender;
+    OnStart := Use.Param.OnStart;
+    OnSuccess := Use.Param.OnSuccess;
+    OnError := Use.Param.OnError;
+    Run(
+      function: TChatCompletion
+      begin
+        Result := Self.List(ParamProc);
+      end);
+  finally
+    Free;
+  end;
+end;
+
+procedure TChatRoute.AsynUpdate(const CompletionID: string;
+  ParamProc: TProc<TChatUpdateParams>; CallBacks: TFunc<TAsynChat>);
+begin
+   with TAsynCallBackExec<TAsynChat, TChat>.Create(CallBacks) do
+  try
+    Sender := Use.Param.Sender;
+    OnStart := Use.Param.OnStart;
+    OnSuccess := Use.Param.OnSuccess;
+    OnError := Use.Param.OnError;
+    Run(
+      function: TChat
+      begin
+        Result := Self.Update(CompletionID, ParamProc);
+      end);
+  finally
+    Free;
+  end;
+end;
+
+procedure TChatRoute.AsynGetMessages(const CompletionID: string;
+  CallBacks: TFunc<TAsynChatMessages>);
+begin
+  with TAsynCallBackExec<TAsynChatMessages, TChatMessages>.Create(CallBacks) do
+  try
+    Sender := Use.Param.Sender;
+    OnStart := Use.Param.OnStart;
+    OnSuccess := Use.Param.OnSuccess;
+    OnError := Use.Param.OnError;
+    Run(
+      function: TChatMessages
+      begin
+        Result := Self.GetMessages(CompletionID);
+      end);
+  finally
+    Free;
+  end;
+end;
+
 procedure TChatRoute.AsynCreate(ParamProc: TProc<TChatParams>;
   CallBacks: TFunc<TAsynChat>);
 begin
@@ -3335,7 +4004,7 @@ begin
 end;
 
 procedure TChatRoute.CreateParallel(ParamProc: TProc<TBundleParams>;
-  const CallBacks: TFunc<TAsynBundleList>);
+  CallBacks: TFunc<TAsynBundleList>);
 var
   Tasks: TArray<ITask>;
   BundleParams: TBundleParams;
@@ -3350,18 +4019,14 @@ begin
     var Bundle := TBundleList.Create;
     var Ranking := 0;
     var ErrorExists := False;
-
-    var Prompts := BundleParams.GetArrayString('prompts');
-    var System := BundleParams.GetString('system');
+    var Prompts := BundleParams.GetPrompt;
     var Counter := Length(Prompts);
 
-    var Model := BundleParams.GetString('model');
-    case IndexStr(Model.Trim.ToLower, ['o1', 'o3-mini']) of
-      0, 1:
-        ReasoningEffort := BundleParams.GetString('reasoningfEffort');
-      else
-        ReasoningEffort := EmptyStr;
-    end;
+    {--- Set the reasoning effort if necessary }
+    if IsReasoningModel(BundleParams.GetModel) then
+      ReasoningEffort := BundleParams.GetReasoningEffort
+    else
+      ReasoningEffort := EmptyStr;
 
     if Assigned(CallBacks.OnStart) then
       CallBacks.OnStart(CallBacks.Sender);
@@ -3378,13 +4043,45 @@ begin
               var Chat := Create(
                 procedure (Params: TChatParams)
                 begin
-                  Params.Model(Model);
+                  {--- Set the model for the process }
+                  Params.Model(BundleParams.GetModel);
+
+                  {--- If reasoning model then set de reasoning parameters }
                   if not ReasoningEffort.IsEmpty then
                     Params.ReasoningEffort(ReasoningEffort);
+
+                  {--- Set the current prompt and developer message }
                   Params.Messages([
-                    TMessagePayload.Developer(System),
+                    TMessagePayload.Developer(BundleParams.GetSystem),
                     TMessagePayload.User(Buffer.Prompt)
                   ]);
+
+                  {--- Set the web search parameters if necessary }
+                  if not BundleParams.GetSearchSize.IsEmpty then
+                    begin
+                      {---- Set the location if necessary }
+                      if not BundleParams.GetCity.IsEmpty or
+                         not BundleParams.GetCountry.IsEmpty then
+                        begin
+                          var Locate := TUserLocationApproximate.Create;
+
+                          {--- Process for the city location }
+                          if not BundleParams.GetCity.IsEmpty then
+                            Locate.City(BundleParams.GetCity);
+
+                            {--- Process for the country location }
+                          if not BundleParams.GetCountry.IsEmpty then
+                            Locate.Country(BundleParams.GetCountry);
+
+                          {--- Set the web search options }
+                          Params.WebSearchOptions(BundleParams.GetSearchSize, Locate);
+                        end
+                      else
+                        begin
+                          {--- Set the web search options }
+                          Params.WebSearchOptions(BundleParams.GetSearchSize);
+                        end;
+                    end;
                 end);
               Inc(Ranking);
               Buffer.FinishIndex := Ranking;
@@ -3451,6 +4148,38 @@ begin
   finally
     Response.Free;
   end;
+end;
+
+function TChatRoute.Delete(const CompletionID: string): TChatDelete;
+begin
+  Result := API.Delete<TChatDelete>('chat/completions/' + CompletionID);
+end;
+
+function TChatRoute.List(ParamProc: TProc<TUrlChatListParams>): TChatCompletion;
+begin
+  Result := API.Get<TChatCompletion, TUrlChatListParams>('chat/completions', ParamProc);
+end;
+
+function TChatRoute.Update(const CompletionID: string;
+  ParamProc: TProc<TChatUpdateParams>): TChat;
+begin
+  Result := API.Post<TChat, TChatUpdateParams>('chat/completions/' + CompletionID, ParamProc);
+end;
+
+function TChatRoute.GetCompletion(const CompletionID: string): TChat;
+begin
+  Result := API.Get<TChat>('chat/completions/' + CompletionID);
+end;
+
+function TChatRoute.GetMessages(const CompletionID: string;
+  ParamProc: TProc<TUrlChatParams>): TChatMessages;
+begin
+  Result := API.Get<TChatMessages, TUrlChatParams>('chat/completions/' + CompletionID + '/messages', ParamProc);
+end;
+
+function TChatRoute.GetMessages(const CompletionID: string): TChatMessages;
+begin
+  Result := API.Get<TChatMessages>('chat/completions/' + CompletionID + '/messages');
 end;
 
 { TAudio }
@@ -3563,6 +4292,93 @@ begin
   if Assigned(FUrlCitation) then
     FUrlCitation.Free;
   inherited;
+end;
+
+{ TChatCompletionMessage }
+
+destructor TChatCompletionMessage.Destroy;
+begin
+  for var Item in FAnnotations do
+    Item.Free;
+  if Assigned(FAudio) then
+    FAudio.Free;
+  for var Item in FToolCalls do
+    Item.Free;
+  inherited;
+end;
+
+{ TChatMessages }
+
+destructor TChatMessages.Destroy;
+begin
+  for var Item in FData do
+    Item.Free;
+  inherited;
+end;
+
+{ TUrlChatParams }
+
+function TUrlChatParams.After(const Value: string): TUrlChatParams;
+begin
+  Result := TUrlChatParams(Add('after', Value));
+end;
+
+function TUrlChatParams.Limit(const Value: Integer): TUrlChatParams;
+begin
+  Result := TUrlChatParams(Add('limit', Value));
+end;
+
+function TUrlChatParams.Order(const Value: string): TUrlChatParams;
+begin
+  Result := TUrlChatParams(Add('order', Value));
+end;
+
+{ TUrlChatListParams }
+
+function TUrlChatListParams.After(const Value: string): TUrlChatListParams;
+begin
+  Result := TUrlChatListParams(Add('after', Value));
+end;
+
+function TUrlChatListParams.Limit(const Value: Integer): TUrlChatListParams;
+begin
+  Result := TUrlChatListParams(Add('limit', Value));
+end;
+
+function TUrlChatListParams.Metadata(
+  const Value: TJSONObject): TUrlChatListParams;
+begin
+  if not Assigned(Value) then
+    Exit(Self);
+  Result := TUrlChatListParams(Add('metadata', Format('{"metadata": %s}', [Value.ToJSON])));
+  Value.Free;
+end;
+
+function TUrlChatListParams.Model(const Value: string): TUrlChatListParams;
+begin
+  Result := TUrlChatListParams(Add('model', Value));
+end;
+
+function TUrlChatListParams.Order(const Value: string): TUrlChatListParams;
+begin
+  Result := TUrlChatListParams(Add('order', Value));
+end;
+
+{ TChatCompletion }
+
+destructor TChatCompletion.Destroy;
+begin
+  for var Item in FData do
+    Item.Free;
+  inherited;
+end;
+
+{ TChatUpdateParams }
+
+function TChatUpdateParams.Metadata(
+  const Value: TJSONObject): TChatUpdateParams;
+begin
+  Result := TChatUpdateParams(Add('metadata', Value));
 end;
 
 end.

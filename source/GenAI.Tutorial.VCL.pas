@@ -173,13 +173,22 @@ type
   procedure Display(Sender: TObject; Value: TRuns); overload;
   procedure Display(Sender: TObject; Value: TRunStep); overload;
   procedure Display(Sender: TObject; Value: TRunSteps); overload;
+  procedure Display(Sender: TObject; Value: TResponse); overload;
+  procedure Display(Sender: TObject; Value: TResponseDelete); overload;
+  procedure Display(Sender: TObject; Value: TResponses); overload;
+  procedure Display(Sender: TObject; Value: TChatMessages); overload;
+  procedure Display(Sender: TObject; Value: TChatCompletion); overload;
+  procedure Display(Sender: TObject; Value: TChatDelete); overload;
 
   procedure DisplayStream(Sender: TObject; Value: string); overload;
   procedure DisplayStream(Sender: TObject; Value: TChat); overload;
   procedure DisplayStream(Sender: TObject; Value: TCompletion); overload;
+  procedure DisplayStream(Sender: TObject; Value: TResponseStream); overload;
 
+  procedure DisplayChunk(Value: string); overload;
   procedure DisplayChunk(Value: TChat); overload;
   procedure DisplayChunk(Value: TCompletion); overload;
+  procedure DisplayChunk(Value: TResponseStream); overload;
 
   procedure DisplayAudio(Sender: TObject; Value: TChat);
   procedure DisplayAudioEx(Sender: TObject; Value: TChat);
@@ -684,6 +693,69 @@ begin
   Display(Sender);
 end;
 
+procedure Display(Sender: TObject; Value: TResponse);
+begin
+  TutorialHub.JSONResponse := Value.JSONResponse;
+  for var Item in Value.Output do
+    for var SubItem in Item.Content do
+      Display(Sender, SubItem.Text);
+  Display(Sender);
+end;
+
+procedure Display(Sender: TObject; Value: TResponseDelete);
+begin
+  TutorialHub.JSONResponse := Value.JSONResponse;
+  Display(Sender, [
+    F('id', Value.Id),
+    F('object', Value.&Object),
+    F('deleted', BoolToStr(Value.Deleted, True))
+  ]);
+end;
+
+procedure Display(Sender: TObject; Value: TResponses);
+begin
+  TutorialHub.JSONResponse := Value.JSONResponse;
+  for var Item in Value.Data do
+    begin
+      for var SubItem in Item.Content do
+        begin
+          Display(Sender, SubItem.Text);
+          Display(Sender);
+        end;
+    end;
+end;
+
+procedure Display(Sender: TObject; Value: TChatMessages);
+begin
+  TutorialHub.JSONResponse := Value.JSONResponse;
+  for var Item in Value.Data do
+    begin
+      Display(Sender, Item.Content);
+      Display(Sender);
+    end;
+end;
+
+procedure Display(Sender: TObject; Value: TChatCompletion);
+begin
+  TutorialHub.JSONResponse := Value.JSONResponse;
+  for var Item in Value.Data do
+    begin
+      for var SubItem in Item.Choices do
+        begin
+          Display(Sender, SubItem.Message.Content);
+          Display(Sender);
+        end;
+    end;
+end;
+
+procedure Display(Sender: TObject; Value: TChatDelete);
+begin
+  TutorialHub.JSONResponse := Value.JSONResponse;
+  Display(Sender, Value.Id);
+  Display(Sender, F('Deleted', BoolToStr(Value.Deleted, True)));
+  Display(Sender);
+end;
+
 procedure DisplayStream(Sender: TObject; Value: string);
 var
   M: TMemo;
@@ -746,9 +818,23 @@ begin
     end;
 end;
 
+procedure DisplayStream(Sender: TObject; Value: TResponseStream);
+begin
+  if Assigned(Value) then
+    begin
+      DisplayStream(Sender, Value.Delta);
+      DisplayChunk(Value);
+    end;
+end;
+
 procedure DisplayChunk(Value: TChat);
 begin
-  var JSONValue := TJSONObject.ParseJSONValue(Value.JSONResponse);
+  DisplayChunk(Value.JSONResponse);
+end;
+
+procedure DisplayChunk(Value: string);
+begin
+  var JSONValue := TJSONObject.ParseJSONValue(Value);
   TutorialHub.Memo3.Lines.BeginUpdate;
   try
     Display(TutorialHub.Memo3, JSONValue.ToString);
@@ -760,14 +846,12 @@ end;
 
 procedure DisplayChunk(Value: TCompletion);
 begin
-  var JSONValue := TJSONObject.ParseJSONValue(Value.JSONResponse);
-  TutorialHub.Memo3.Lines.BeginUpdate;
-  try
-    Display(TutorialHub.Memo3, JSONValue.ToString);
-  finally
-    TutorialHub.Memo3.Lines.EndUpdate;
-    JSONValue.Free;
-  end;
+  DisplayChunk(Value.JSONResponse);
+end;
+
+procedure DisplayChunk(Value: TResponseStream);
+begin
+  DisplayChunk(Value.JSONResponse);
 end;
 
 procedure DisplayAudio(Sender: TObject; Value: TChat);

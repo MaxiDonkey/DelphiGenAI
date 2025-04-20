@@ -106,8 +106,7 @@ function TOpenAIStream<T>.GetOnStream: TReceiveDataCallback;
 
 begin
   Result :=
-    procedure (const Sender: TObject; AContentLength,
-      AReadCount: Int64; var AAbort: Boolean)
+    procedure(const Sender: TObject; AContentLength, AReadCount: Int64; var AAbort: Boolean)
     var
       ResponseBuffer: string;
       CurrentLine: string;
@@ -115,61 +114,85 @@ begin
       Data: string;
       Chunk: T;
       LineFeed: Integer;
+      NewBuffer: string;
     begin
       try
-        try
-          ResponseBuffer := FResponse.DataString;
-        except
-          on E: EEncodingError do
-            Exit;
-        end;
+        {--- Retrieving the current contents of the buffer }
+        ResponseBuffer := FResponse.DataString;
+      except
+        on E: EEncodingError do
+          Exit;
+      end;
 
-        LineFeed := ResponseBuffer.IndexOf(#10, FLineFeedPosition);
-        while LineFeed >= 0 do
-          begin
-            CurrentLine := ResponseBuffer.Substring(FLineFeedPosition, LineFeed - FLineFeedPosition);
-            FLineFeedPosition := LineFeed + 1;
+      {--- Find the position of the first line break from the stored position }
+      LineFeed := ResponseBuffer.IndexOf(#10, FLineFeedPosition);
+      while LineFeed >= 0 do
+        begin
+          {--- Extraction and cleaning of the current line }
+          CurrentLine := ResponseBuffer.Substring(FLineFeedPosition, LineFeed - FLineFeedPosition).Trim([' ', #13, #10]);
+          {--- Update position in buffer }
+          FLineFeedPosition := LineFeed + 1;
 
-            if CurrentLine.IsEmpty or CurrentLine.StartsWith(#10) then
-              begin
-                LineFeed := ResponseBuffer.IndexOf(#10, FLineFeedPosition);
-                Continue;
-              end;
+          {--- If the line is empty, go to the next one }
+          if CurrentLine.IsEmpty then
+            begin
+              LineFeed := ResponseBuffer.IndexOf(#10, FLineFeedPosition);
+              Continue;
+            end;
 
-            Data := CurrentLine.Replace('data: ', '').Trim([' ', #13, #10]);
-            IsDone := Data.ToUpper = '[DONE]';
+          {--- Data processing: removal of the 'data:' prefix if present }
+          if CurrentLine.StartsWith('data: ') then
+            Data := CurrentLine.Substring(6).Trim
+          else
+            Data := CurrentLine;
 
-            Chunk := nil;
-            if not IsDone then
-              begin
-                try
-                  Chunk := Parse(Data);
-                except
-                  on E: Exception do
+          {--- Checking the end of the stream }
+          IsDone := Data.ToUpper = '[DONE]';
+
+          Chunk := nil;
+          if not IsDone then
+            begin
+              try
+                Chunk := Parse(Data);
+              except
+                on E: Exception do
                   Chunk := nil;
-                end;
               end;
+            end;
 
-            if Assigned(FEvent) then
-              begin
-                try
-                  FEvent(Chunk, IsDone, AAbort);
-                finally
+          {--- Call the callback event with the processed chunk and the completion flag }
+          if Assigned(FEvent) then
+            begin
+              try
+                FEvent(Chunk, IsDone, AAbort);
+              finally
+                {--- Clean up the chunk object }
+                if Assigned(Chunk) then
                   Chunk.Free;
-                end;
               end;
+            end;
 
-            if IsDone then
-              Break;
+          if IsDone then
+            Break;
 
-            LineFeed := ResponseBuffer.IndexOf(#10, FLineFeedPosition);
+          {--- Finding the next line break }
+          LineFeed := ResponseBuffer.IndexOf(#10, FLineFeedPosition);
         end;
 
-        except
-          on E: Exception do
-            raise;
+      {--- Buffer cleaning
+           Only the unprocessed fragment is kept in the stream }
+      if FLineFeedPosition > 0 then
+        begin
+          NewBuffer := ResponseBuffer.Substring(FLineFeedPosition);
+          {--- Resetting stream content }
+          FResponse.Size := 0;
+          if NewBuffer <> '' then
+            FResponse.WriteString(NewBuffer);
+          {--- Reset playback position for next pass }
+          FLineFeedPosition := 0;
         end;
     end;
 end;
+
 
 end.

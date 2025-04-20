@@ -59,7 +59,8 @@ uses
   GenAI.Audio, GenAI.Chat, GenAI.Moderation, GenAI.Images, GenAI.Files, GenAI.Uploads,
   GenAI.Batch, GenAI.Batch.Reader, GenAI.Batch.Builder, GenAI.Completions, GenAI.FineTuning,
   GenAI.Assistants, GenAI.Threads, GenAI.Messages, GenAI.Runs, GenAI.RunSteps,
-  GenAI.Vector, GenAI.VectorFiles, GenAI.VectorBatch, GenAI.Monitoring, GenAI.Chat.Parallel;
+  GenAI.Vector, GenAI.VectorFiles, GenAI.VectorBatch, GenAI.Monitoring, GenAI.Chat.Parallel,
+  GenAI.Responses, GenAI.Responses.InputParams, GenAI.Responses.InputItemList;
 
 type
   /// <summary>
@@ -99,6 +100,7 @@ type
     function GetVectorStoreRoute: TVectorStoreRoute;
     function GetVectorStoreBatchRoute: TVectorStoreBatchRoute;
     function GetVectorStoreFilesRoute: TVectorStoreFilesRoute;
+    function GetResponses: TResponsesRoute;
 
     /// <summary>
     /// Represents the API route handler for managing assistants.
@@ -273,6 +275,8 @@ type
     /// </remarks>
     property VectorStoreFiles: TVectorStoreFilesRoute read GetVectorStoreFilesRoute;
 
+    property Responses: TResponsesRoute read GetResponses;
+
     /// <summary>
     /// the main API object used for making requests.
     /// </summary>
@@ -346,6 +350,7 @@ type
     FVectorStoreRoute: TVectorStoreRoute;
     FVectorStoreBatchRoute: TVectorStoreBatchRoute;
     FVectorStoreFilesRoute: TVectorStoreFilesRoute;
+    FResponsesRoute: TResponsesRoute;
 
     function GetAPI: TGenAIAPI;
     function GetAPIKey: string;
@@ -372,6 +377,7 @@ type
     function GetVectorStoreRoute: TVectorStoreRoute;
     function GetVectorStoreBatchRoute: TVectorStoreBatchRoute;
     function GetVectorStoreFilesRoute: TVectorStoreFilesRoute;
+    function GetResponses: TResponsesRoute;
 
   public
     /// <summary>
@@ -925,6 +931,15 @@ type
   TChatParams = GenAI.Chat.TChatParams;
 
   /// <summary>
+  /// Represents the parameters for updating an existing chat completion.
+  /// </summary>
+  /// <remarks>
+  /// Use this class to configure one or more metadata fields on a chat completion
+  /// before sending an update request to the API.
+  /// </remarks>
+  TChatUpdateParams = GenAI.Chat.TChatUpdateParams;
+
+  /// <summary>
   /// Represents a single token's top log probability details.
   /// </summary>
   TTopLogprobs = GenAI.Chat.TTopLogprobs;
@@ -1106,6 +1121,77 @@ type
   /// This structure is ideal for handling scenarios where the chat response is streamed incrementally, providing real-time updates to the user interface.
   /// </remarks>
   TAsynChatStream = GenAI.Chat.TAsynChatStream;
+
+  /// <summary>
+  /// Provides URL parameter helpers for retrieving chat messages by completion ID,
+  /// supporting pagination and sort ordering.
+  /// </summary>
+  TUrlChatParams = GenAI.Chat.TUrlChatParams;
+
+  /// <summary>
+  /// Provides URL parameter helpers for listing chat completions,
+  /// supporting pagination, metadata filtering, model filtering, and sort ordering.
+  /// </summary>
+  TUrlChatListParams = GenAI.Chat.TUrlChatListParams;
+
+  /// <summary>
+  /// Represents a single message returned in a chat completion response,
+  /// including its content, author role, optional audio payload, and any
+  /// associated annotations or tool call details.
+  /// </summary>
+  TChatCompletionMessage = GenAI.Chat.TChatCompletionMessage;
+
+  /// <summary>
+  /// Represents a paginated list of chat completion messages, including
+  /// navigation cursors and flags for additional pages.
+  /// </summary>
+  TChatMessages = GenAI.Chat.TChatMessages;
+
+  /// <summary>
+  /// Represents a paginated list of chat completion responses returned by the API.
+  /// </summary>
+  /// <remarks>
+  /// Contains an array of <c>TChat</c> objects along with pagination cursors and a flag
+  /// indicating whether additional pages are available.
+  /// </remarks>
+  TChatCompletion = GenAI.Chat.TChatCompletion;
+
+  /// <summary>
+  /// Represents the result of a chat completion deletion request.
+  /// </summary>
+  /// <remarks>
+  /// This class is used to deserialize the API response when a chat completion
+  /// is deleted. It includes the identifier of the deleted completion, the
+  /// object type returned by the service, and a flag indicating whether the
+  /// deletion was successful.
+  TChatDelete = GenAI.Chat.TChatDelete;
+
+  /// <summary>
+  /// Represents an asynchronous callback structure for retrieving chat messages.
+  /// </summary>
+  /// <remarks>
+  /// Use this callback type to handle the lifecycle events (start, success, error, and cancellation)
+  /// when fetching <see cref="TChatMessages"/> instances asynchronously.
+  /// </remarks>
+  TAsynChatMessages = GenAI.Chat.TAsynChatMessages;
+
+  /// <summary>
+  /// Represents an asynchronous callback structure for retrieving chat completion results.
+  /// </summary>
+  /// <remarks>
+  /// Use this callback type to handle the lifecycle events (start, success, error, and cancellation)
+  /// when fetching <see cref="TChatCompletion"/> instances asynchronously.
+  /// </remarks>
+  TAsynChatCompletion = GenAI.Chat.TAsynChatCompletion;
+
+  /// <summary>
+  /// Represents an asynchronous callback structure for deleting a chat completion.
+  /// </summary>
+  /// <remarks>
+  /// Use this callback type to handle the lifecycle events (start, success, error, and cancellation)
+  /// when performing an asynchronous delete operation for a <see cref="TChatDelete"/> instance.
+  /// </remarks>
+  TAsynChatDelete = GenAI.Chat.TAsynChatDelete;
 
   {$ENDREGION}
 
@@ -2490,7 +2576,7 @@ type
   /// This class contains information about a file search result, including the file details, score, and
   /// the content found within the file.
   /// </remarks>
-  TFileSearchResult = GenAI.RunSteps.TFileSearchResult;
+  TRunFileSearchResult = GenAI.RunSteps.TRunFileSearchResult;
 
   /// <summary>
   /// Represents details of a file search tool call within an execution run in the OpenAI API.
@@ -2865,6 +2951,322 @@ type
 
   {$ENDREGION}
 
+  {$REGION 'GenAI.Responses.InputParams'}
+
+  TItemContent = GenAI.Responses.InputParams.TItemContent;
+
+  TInputListItem = GenAI.Responses.InputParams.TInputListItem;
+
+  TInputMessage = GenAI.Responses.InputParams.TInputMessage;
+
+  TItemInputMessage = GenAI.Responses.InputParams.TItemInputMessage;
+
+  TInputItemReference = GenAI.Responses.InputParams.TInputItemReference;
+
+  TOutputNotation = GenAI.Responses.InputParams.TOutputNotation;
+
+  TOutputMessageContent = GenAI.Responses.InputParams.TOutputMessageContent;
+
+  TItemOutputMessage = GenAI.Responses.InputParams.TItemOutputMessage;
+
+  TFileSearchToolCallResult = GenAI.Responses.InputParams.TFileSearchToolCallResult;
+
+  TFileSearchToolCall = GenAI.Responses.InputParams.TFileSearchToolCall;
+
+  TPendingSafetyCheck = GenAI.Responses.InputParams.TPendingSafetyCheck;
+
+  TAcknowledgedSafetyCheckParams = GenAI.Responses.InputParams.TAcknowledgedSafetyCheckParams;
+
+  TComputerToolCallOutputObject = GenAI.Responses.InputParams.TComputerToolCallOutputObject;
+
+  TComputerToolCallAction = GenAI.Responses.InputParams.TComputerToolCallAction;
+
+  TComputerClick = GenAI.Responses.InputParams.TComputerClick;
+
+  TComputerDoubleClick = GenAI.Responses.InputParams.TComputerDoubleClick;
+
+  TComputerToolCallOutput = GenAI.Responses.InputParams.TComputerToolCallOutput;
+
+  TWebSearchToolCall = GenAI.Responses.InputParams.TWebSearchToolCall;
+
+  TFunctionToolCall = GenAI.Responses.InputParams.TFunctionToolCall;
+
+  TFunctionToolCalloutput = GenAI.Responses.InputParams.TFunctionToolCalloutput;
+
+  TReasoningTextContent = GenAI.Responses.InputParams.TReasoningTextContent;
+
+  TReasoningObject = GenAI.Responses.InputParams.TReasoningObject;
+
+  TComputerToolCall = GenAI.Responses.InputParams.TComputerToolCall;
+
+  {$ENDREGION}
+
+  {$REGION 'GenAI.Responses.InputItemList'}
+
+  TFileSearchResult = GenAI.Responses.InputItemList.TFileSearchResult;
+
+  TDragPoint = GenAI.Responses.InputItemList.TDragPoint;
+
+  TPendingSafetyChecks = GenAI.Responses.InputItemList.TPendingSafetyChecks;
+
+  TComputerOutput = GenAI.Responses.InputItemList.TComputerOutput;
+
+  TAcknowledgedSafetyCheck = GenAI.Responses.InputItemList.TAcknowledgedSafetyCheck;
+
+  TComputerActionCommon = GenAI.Responses.InputItemList.TComputerActionCommon;
+
+  TComputerActionClick = GenAI.Responses.InputItemList.TComputerActionClick;
+
+  TComputerActionDoubleClick = GenAI.Responses.InputItemList.TComputerActionDoubleClick;
+
+  TComputerActionDrag = GenAI.Responses.InputItemList.TComputerActionDrag;
+
+  TComputerActionKeyPressed = GenAI.Responses.InputItemList.TComputerActionKeyPressed;
+
+  TComputerActionMove = GenAI.Responses.InputItemList.TComputerActionMove;
+
+  TComputerActionScreenshot = GenAI.Responses.InputItemList.TComputerActionScreenshot;
+
+  TComputerActionScroll = GenAI.Responses.InputItemList.TComputerActionScroll;
+
+  TComputerActionType = GenAI.Responses.InputItemList.TComputerActionType;
+
+  TComputerActionWait = GenAI.Responses.InputItemList.TComputerActionWait;
+
+  TComputerAction = GenAI.Responses.InputItemList.TComputerAction;
+
+  TResponseMessageAnnotationCommon = GenAI.Responses.InputItemList.TResponseMessageAnnotationCommon;
+
+  TAnnotationFileCitation = GenAI.Responses.InputItemList.TAnnotationFileCitation;
+
+  TAnnotationUrlCitation = GenAI.Responses.InputItemList.TAnnotationUrlCitation;
+
+  TAnnotationFilePath = GenAI.Responses.InputItemList.TAnnotationFilePath;
+
+  TResponseMessageAnnotation = GenAI.Responses.InputItemList.TResponseMessageAnnotation;
+
+  TResponseItemContentCommon = GenAI.Responses.InputItemList.TResponseItemContentCommon;
+
+  TResponseItemContentTextInput = GenAI.Responses.InputItemList.TResponseItemContentTextInput;
+
+  TResponseItemContentImageInput = GenAI.Responses.InputItemList.TResponseItemContentImageInput;
+
+  TResponseItemContentFileInput = GenAI.Responses.InputItemList.TResponseItemContentFileInput;
+
+  TResponseItemContentOutputText = GenAI.Responses.InputItemList.TResponseItemContentOutputText;
+
+  TResponseItemContentRefusal = GenAI.Responses.InputItemList.TResponseItemContentRefusal;
+
+  TResponseItemContent = GenAI.Responses.InputItemList.TResponseItemContent;
+
+  TResponseItemCommon = GenAI.Responses.InputItemList.TResponseItemCommon;
+
+  TResponseItemInputMessage = GenAI.Responses.InputItemList.TResponseItemInputMessage;
+
+  TResponseItemOutputMessage = GenAI.Responses.InputItemList.TResponseItemOutputMessage;
+
+  TResponseItemFileSearchToolCall = GenAI.Responses.InputItemList.TResponseItemFileSearchToolCall;
+
+  TResponseItemComputerToolCall = GenAI.Responses.InputItemList.TResponseItemComputerToolCall;
+
+  TResponseItemComputerToolCallOutput = GenAI.Responses.InputItemList.TResponseItemComputerToolCallOutput;
+
+  TResponseItemWebSearchToolCall = GenAI.Responses.InputItemList.TResponseItemWebSearchToolCall;
+
+  TResponseItemFunctionToolCall = GenAI.Responses.InputItemList.TResponseItemFunctionToolCall;
+
+  TResponseItemFunctionToolCallOutput = GenAI.Responses.InputItemList.TResponseItemFunctionToolCallOutput;
+
+  TResponseItem = GenAI.Responses.InputItemList.TResponseItem;
+
+  TResponses = GenAI.Responses.InputItemList.TResponses;
+
+  {$ENDREGION}
+
+  {$REGION 'GenAI.Responses'}
+
+  TReasoningParams = GenAI.Responses.TReasoningParams;
+
+  TTextFormatParams = GenAI.Responses.TTextFormatParams;
+
+  TTextFormatTextPrams = GenAI.Responses.TTextFormatTextPrams;
+
+  TTextJSONSchemaParams = GenAI.Responses.TTextJSONSchemaParams;
+
+  TTextJSONObjectParams = GenAI.Responses.TTextJSONObjectParams;
+
+  TTextParams = GenAI.Responses.TTextParams;
+
+  TResponseToolChoiceParams = GenAI.Responses.TResponseToolChoiceParams;
+
+  THostedToolParams = GenAI.Responses.THostedToolParams;
+
+  TFunctionToolParams = GenAI.Responses.TFunctionToolParams;
+
+  TFileSearchFilters = GenAI.Responses.TFileSearchFilters;
+
+  TComparisonFilter = GenAI.Responses.TComparisonFilter;
+
+  TCompoundFilter = GenAI.Responses.TCompoundFilter;
+
+  TResponseToolParams = GenAI.Responses.TResponseToolParams;
+
+  TResponseFileSearchParams = GenAI.Responses.TResponseFileSearchParams;
+
+  TResponseFunctionParams = GenAI.Responses.TResponseFunctionParams;
+
+  TResponseComputerUseParams = GenAI.Responses.TResponseComputerUseParams;
+
+  TResponseUserLocationParams = GenAI.Responses.TResponseUserLocationParams;
+
+  TResponseWebSearchParams = GenAI.Responses.TResponseWebSearchParams;
+
+  TResponsesParams = GenAI.Responses.TResponsesParams;
+
+  TResponseError = GenAI.Responses.TResponseError;
+
+  TResponseIncompleteDetails = GenAI.Responses.TResponseIncompleteDetails;
+
+  TResponseMessageContentCommon = GenAI.Responses.TResponseMessageContentCommon;
+
+  TResponseMessageContent = GenAI.Responses.TResponseMessageContent;
+
+  TResponseMessageRefusal = GenAI.Responses.TResponseMessageRefusal;
+
+  TResponseContent = GenAI.Responses.TResponseContent;
+
+  TResponseReasoningSummary = GenAI.Responses.TResponseReasoningSummary;
+
+  TResponseReasoning = GenAI.Responses.TResponseReasoning;
+
+  TResponseRankingOptions = GenAI.Responses.TResponseRankingOptions;
+
+  TResponseFileSearchFiltersCommon = GenAI.Responses.TResponseFileSearchFiltersCommon;
+
+  TResponseFileSearchFiltersComparaison = GenAI.Responses.TResponseFileSearchFiltersComparaison;
+
+  TResponseFileSearchFiltersCompound = GenAI.Responses.TResponseFileSearchFiltersCompound;
+
+  TResponseFileSearchFilters = GenAI.Responses.TResponseFileSearchFilters;
+
+  TResponseWebSearchLocation = GenAI.Responses.TResponseWebSearchLocation;
+
+  TResponseOutputCommon = GenAI.Responses.TResponseOutputCommon;
+
+  TResponseOutputMessage = GenAI.Responses.TResponseOutputMessage;
+
+  TResponseOutputFileSearch = GenAI.Responses.TResponseOutputFileSearch;
+
+  TResponseOutputFunction = GenAI.Responses.TResponseOutputFunction;
+
+  TResponseOutputWebSearch = GenAI.Responses.TResponseOutputWebSearch;
+
+  TResponseOutputComputer = GenAI.Responses.TResponseOutputComputer;
+
+  TResponseOutputReasoning = GenAI.Responses.TResponseOutputReasoning;
+
+  TResponseOutput = GenAI.Responses.TResponseOutput;
+
+  TResponseTextFormatCommon = GenAI.Responses.TResponseTextFormatCommon;
+
+  TResponseFormatText = GenAI.Responses.TResponseFormatText;
+
+  TResponseFormatJSONObject = GenAI.Responses.TResponseFormatJSONObject;
+
+  TResponseFormatJSONSchema = GenAI.Responses.TResponseFormatJSONSchema;
+
+  TResponseTextFormat = GenAI.Responses.TResponseTextFormat;
+
+  TResponseText = GenAI.Responses.TResponseText;
+
+  TResponseToolCommon = GenAI.Responses.TResponseToolCommon;
+
+  TResponseToolFileSearch = GenAI.Responses.TResponseToolFileSearch;
+
+  TResponseToolFunction = GenAI.Responses.TResponseToolFunction;
+
+  TResponseToolComputerUse = GenAI.Responses.TResponseToolComputerUse;
+
+  TResponseToolWebSearch = GenAI.Responses.TResponseToolWebSearch;
+
+  TResponseTool = GenAI.Responses.TResponseTool;
+
+  TInputTokensDetails = GenAI.Responses.TInputTokensDetails;
+
+  TOutputTokensDetails = GenAI.Responses.TOutputTokensDetails;
+
+  TResponseUsage = GenAI.Responses.TResponseUsage;
+
+  TResponse = GenAI.Responses.TResponse;
+
+  TUrlIncludeParams = GenAI.Responses.TUrlIncludeParams;
+
+  TUrlResponseListParams = GenAI.Responses.TUrlResponseListParams;
+
+  TResponseDelete = GenAI.Responses.TResponseDelete;
+
+  TResponseStreamingCommon = GenAI.Responses.TResponseStreamingCommon;
+
+  TResponseCreated = GenAI.Responses.TResponseCreated;
+
+  TResponseInProgress = GenAI.Responses.TResponseInProgress;
+
+  TResponseCompleted = GenAI.Responses.TResponseCompleted;
+
+  TResponseFailed = GenAI.Responses.TResponseFailed;
+
+  TRresponseIncomplete = GenAI.Responses.TRresponseIncomplete;
+
+  TResponseOutputItemAdded = GenAI.Responses.TResponseOutputItemAdded;
+
+  TResponseOutputItemDone = GenAI.Responses.TResponseOutputItemDone;
+
+  TResponseContentpartAdded = GenAI.Responses.TResponseContentpartAdded;
+
+  TResponseContentpartDone = GenAI.Responses.TResponseContentpartDone;
+
+  TResponseOutputTextDelta = GenAI.Responses.TResponseOutputTextDelta;
+
+  TResponseOutputTextAnnotationAdded = GenAI.Responses.TResponseOutputTextAnnotationAdded;
+
+  TResponseOutputTextDone = GenAI.Responses.TResponseOutputTextDone;
+
+  TResponseRefusalDelta = GenAI.Responses.TResponseRefusalDelta;
+
+  TResponseRefusalDone = GenAI.Responses.TResponseRefusalDone;
+
+  TResponseFunctionCallArgumentsDelta = GenAI.Responses.TResponseFunctionCallArgumentsDelta;
+
+  TResponseFunctionCallArgumentsDone = GenAI.Responses.TResponseFunctionCallArgumentsDone;
+
+  TResponseFileSearchCallInprogress = GenAI.Responses.TResponseFileSearchCallInprogress;
+
+  TResponseFileSearchCallSearching = GenAI.Responses.TResponseFileSearchCallSearching;
+
+  TResponseFileSearchCallCompleted = GenAI.Responses.TResponseFileSearchCallCompleted;
+
+  TResponseWebSearchCallInprogress = GenAI.Responses.TResponseWebSearchCallInprogress;
+
+  TResponseWebSearchCallSearching = GenAI.Responses.TResponseWebSearchCallSearching;
+
+  TResponseWebSearchCallCompleted = GenAI.Responses.TResponseWebSearchCallCompleted;
+
+  TResponseStreamError = GenAI.Responses.TResponseStreamError;
+
+  TResponseStream = GenAI.Responses.TResponseStream;
+
+  TResponseEvent = GenAI.Responses.TResponseEvent;
+
+  TAsynResponse = GenAI.Responses.TAsynResponse;
+
+  TAsynResponseStream = GenAI.Responses.TAsynResponseStream;
+
+  TAsynResponseDelete = GenAI.Responses.TAsynResponseDelete;
+
+  TAsynResponses = GenAI.Responses.TAsynResponses;
+
+  {$ENDREGION}
+
 function FromDeveloper(const Content: string; const Name: string = ''):TMessagePayload;
 function FromSystem(const Content: string; const Name: string = ''):TMessagePayload;
 function FromUser(const Content: string; const Name: string = ''):TMessagePayload; overload;
@@ -2883,12 +3285,6 @@ function ToolName(const Name: string): TToolChoiceParams;
 function Code_interpreter: TAssistantsToolsParams; overload;
 function Code_interpreter(const FileIds: TArray<string>): TToolResourcesParams; overload;
 
-function File_search: TAssistantsToolsParams; overload;
-function File_search(const MaxNumResults: Integer; const RankingOptions: TRankingOptionsParams = nil): TAssistantsToolsParams; overload;
-function File_search(const RankingOptions: TRankingOptionsParams): TAssistantsToolsParams; overload;
-function File_search(const VectorStoreIds: TArray<string>; const VectorStores: TArray<TVectorStoresParams> = []): TToolResourcesParams; overload;
-function File_search(const VectorStores: TArray<TVectorStoresParams>): TToolResourcesParams; overload;
-
 function RankingOptions(const ScoreThreshold: Double; const Ranker: string = 'auto'): TRankingOptionsParams;
 
 function Vector_store(const FileIds: TArray<string>;
@@ -2896,6 +3292,11 @@ function Vector_store(const FileIds: TArray<string>;
 function Vector_store(const FileIds: TArray<string>;
   const ChunkingStrategy: TChunkingStrategyParams;
   const Metadata: TJSONObject = nil): TVectorStoresParams; overload;
+
+function web_search_preview(const SearchWebOption: string = ''): TResponseWebSearchParams;
+function Locate: TResponseUserLocationParams;
+function file_search(const vector_store_ids: TArray<string> = []): TResponseFileSearchParams;
+
 
 function HttpMonitoring: IRequestMonitor;
 
@@ -2982,43 +3383,6 @@ begin
   Result := TToolResourcesParams.Create.CodeInterpreter(FileIds);
 end;
 
-function File_search: TAssistantsToolsParams;
-begin
-  Result := TAssistantsToolsParams.Create.&Type(TAssistantsToolsType.file_search);
-end;
-
-function File_search(const MaxNumResults: Integer;
-  const RankingOptions: TRankingOptionsParams): TAssistantsToolsParams; overload;
-begin
-  var FileSearchTool := TFileSearchToolParams.Create.MaxNumResults(MaxNumResults);
-  if Assigned(RankingOptions) then
-    FileSearchTool := FileSearchTool.RankingOptions(RankingOptions);
-  Result := File_search.FileSearch(FileSearchTool);
-end;
-
-function File_search(const RankingOptions: TRankingOptionsParams): TAssistantsToolsParams; overload;
-begin
-  var FileSearchTool := TFileSearchToolParams.Create.RankingOptions(RankingOptions);
-  Result := File_search.FileSearch(FileSearchTool);
-end;
-
-function File_search(const VectorStoreIds: TArray<string>;
-  const VectorStores: TArray<TVectorStoresParams> = []): TToolResourcesParams;
-begin
-  var FileSearch := TFileSearchParams.Create.VectorStoreIds(VectorStoreIds);
-  if Length(VectorStores) > 0 then
-    FileSearch := FileSearch.VectorStores(VectorStores);
-  Result := TToolResourcesParams.Create.FileSearch(FileSearch);
-end;
-
-function File_search(const VectorStores: TArray<TVectorStoresParams>): TToolResourcesParams;
-begin
-  if Length(VectorStores) = 0 then
-    raise Exception.Create('Vector stores can''t be null');
-  var FileSearch := TFileSearchParams.Create.VectorStores(VectorStores);
-  Result := TToolResourcesParams.Create.FileSearch(FileSearch);
-end;
-
 function RankingOptions(const ScoreThreshold: Double; const Ranker: string = 'auto'): TRankingOptionsParams;
 begin
   Result := TRankingOptionsParams.Create.Ranker(Ranker).ScoreThreshold(ScoreThreshold);
@@ -3038,6 +3402,25 @@ function Vector_store(const FileIds: TArray<string>;
   const Metadata: TJSONObject = nil): TVectorStoresParams; overload;
 begin
   Result := Vector_store(FileIds, Metadata).ChunkingStrategy(ChunkingStrategy);
+end;
+
+function web_search_preview(const SearchWebOption: string): TResponseWebSearchParams;
+begin
+  Result := TResponseWebSearchParams.New;
+  if not SearchWebOption.Trim.IsEmpty then
+    Result.SearchContextSize(SearchWebOption);
+end;
+
+function Locate: TResponseUserLocationParams;
+begin
+  Result := TResponseUserLocationParams.New;
+end;
+
+function file_search(const vector_store_ids: TArray<string>): TResponseFileSearchParams;
+begin
+  Result := TResponseFileSearchParams.New;
+  if Length(vector_store_ids) > 0 then
+    Result.VectorStoreIds(vector_store_ids);
 end;
 
 function HttpMonitoring: IRequestMonitor;
@@ -3080,6 +3463,7 @@ begin
   FVectorStoreRoute.Free;
   FVectorStoreBatchRoute.Free;
   FVectorStoreFilesRoute.Free;
+  FResponsesRoute.Free;
   FAPI.Free;
   inherited;
 end;
@@ -3155,6 +3539,13 @@ begin
   if not Assigned(FModerationRoute) then
     FModerationRoute := TModerationRoute.CreateRoute(API);
   Result := FModerationRoute;
+end;
+
+function TGenAI.GetResponses: TResponsesRoute;
+begin
+  if not Assigned(FResponsesRoute) then
+    FResponsesRoute := TResponsesRoute.CreateRoute(API);
+  Result := FResponsesRoute;
 end;
 
 function TGenAI.GetRunsRoute: TRunsRoute;

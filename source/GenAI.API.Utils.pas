@@ -17,7 +17,9 @@ const
     '"metadata": {', '"metadata":{',
     '"response_format": {', '"response_format":{', //GenAI.Runs, GenAI.Assistants
     '"parameters": {', '"parameters":{',           //GenAI.Assistants
-    '"tool_choice": {', '"tool_choice":{'          //GenAI.Runs
+    '"tool_choice": {', '"tool_choice":{',         //GenAI.Runs
+    '"attributes": {', '"attributes":{',           //GenAI.Responses
+    '"schema": {', '"schema":{'                    //GenAI.Responses
   ];
 
 (*

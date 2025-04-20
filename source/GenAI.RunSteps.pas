@@ -182,7 +182,7 @@ type
   /// This class contains information about a file search result, including the file details, score, and
   /// the content found within the file.
   /// </remarks>
-  TFileSearchResult = class
+  TRunFileSearchResult = class
   private
     [JsonNameAttribute('file_id')]
     FFileId: string;
@@ -221,7 +221,7 @@ type
   private
     [JsonNameAttribute('ranking_options')]
     FRankingOptions: TRankingOptions;
-    FResults: TArray<TFileSearchResult>;
+    FResults: TArray<TRunFileSearchResult>;
   public
     /// <summary>
     /// Gets or sets the ranking options used to determine the relevance of search results.
@@ -230,7 +230,7 @@ type
     /// <summary>
     /// Gets or sets the array of search results, each containing details about the matching files and content.
     /// </summary>
-    property Results: TArray<TFileSearchResult> read FResults write FResults;
+    property Results: TArray<TRunFileSearchResult> read FResults write FResults;
     destructor Destroy; override;
   end;
 
@@ -720,9 +720,9 @@ begin
   inherited;
 end;
 
-{ TFileSearchResult }
+{ TRunFileSearchResult }
 
-destructor TFileSearchResult.Destroy;
+destructor TRunFileSearchResult.Destroy;
 begin
   for var Item in FContent do
     Item.Free;

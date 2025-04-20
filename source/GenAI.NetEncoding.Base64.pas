@@ -243,8 +243,12 @@ begin
     Exit(Value);
 
   var MimeType := GetMimeType(Value);
-  if IndexStr(MimeType, ImageTypeAccepted) = -1 then
-    raise Exception.Create('Unsupported image format');
+  var AcceptedMimeType :=
+        (IndexStr(MimeType, ImageTypeAccepted) > -1) or
+        (IndexStr(MimeType, DocTypeAccepted) > -1);
+
+  if not AcceptedMimeType then
+    raise Exception.Create('Unsupported mime type');
   Result :=  Format('data:%s;base64,%s', [MimeType, EncodeBase64(Value)]);
 end;
 

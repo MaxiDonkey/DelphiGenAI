@@ -160,7 +160,7 @@ type
     /// <returns>
     /// The HTTP status code returned by the server.
     /// </returns>
-    function Patch(const URL: string; Body: TJSONObject; Response: TStringStream; const Headers: TNetHeaders): Integer;
+    function Patch(const URL: string; Body: TJSONObject; Response: TStringStream; const Headers: TNetHeaders): Integer; overload;
     /// <summary>
     /// Initializes a new instance of the <c>THttpClientAPI</c> class.
     /// </summary>

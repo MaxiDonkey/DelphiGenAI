@@ -187,6 +187,14 @@ type
   /// It is used to structure and pass multiple requests efficiently in parallel processing.
   /// </remarks>
   TBundleParams = class(TParameters)
+  const
+    S_PROMPT = 'prompts';
+    S_SYSTEM = 'system';
+    S_MODEL = 'model';
+    S_REASONING_EFFORT = 'reasoningEffort';
+    S_SEARCH_SIZE = 'searchSize';
+    S_CITY = 'city';
+    S_COUNTRY = 'country';
   public
     /// <summary>
     /// Sets the prompts for the chat request bundle.
@@ -217,7 +225,60 @@ type
     /// <returns>
     /// The current instance of <c>TBundleParams</c> for method chaining.
     /// </returns>
-    function ReasoningEffort(const Value: TReasoningEffort): TBundleParams;
+    function ReasoningEffort(const Value: TReasoningEffort): TBundleParams; overload;
+    /// <summary>
+    /// Sets the reasoning effort level for the chat requests.
+    /// </summary>
+    /// <param name="Value">
+    /// A string value. One of low, medium or high
+    /// </param>
+    /// <returns>
+    /// The current instance of <c>TBundleParams</c> for method chaining.
+    /// </returns>
+    function ReasoningEffort(const Value: string): TBundleParams; overload;
+    /// <summary>
+    /// Sets the search size parameter for the chat request bundle.
+    /// </summary>
+    /// <param name="Value">
+    /// A string specifying the desired search size. One of low, medium or high.
+    /// </param>
+    /// <returns>
+    /// The current instance of <c>TBundleParams</c>, allowing for method chaining.
+    /// </returns>
+    /// <remarks>
+    /// The search size parameter is used to control web search.
+    /// </remarks>
+    function SearchSize(const Value: string): TBundleParams;
+    /// <summary>
+    /// Sets the city parameter to influence web-based search results based on location.
+    /// </summary>
+    /// <param name="Value">
+    /// A string representing the name of the city to be used for location-aware search context.
+    /// </param>
+    /// <returns>
+    /// The current instance of <c>TBundleParams</c>, enabling method chaining.
+    /// </returns>
+    /// <remarks>
+    /// This parameter helps refine the AI's response by providing geographical context, allowing it
+    /// to tailor answers or search results to the specified city. It is particularly useful when
+    /// generating location-relevant information.
+    /// </remarks>
+    function City(const Value: string): TBundleParams;
+    /// <summary>
+    /// Sets the country parameter to influence web-based search results based on geographic location.
+    /// </summary>
+    /// <param name="Value">
+    /// A string representing the name of the country to be used for location-aware search context.
+    /// </param>
+    /// <returns>
+    /// The current instance of <c>TBundleParams</c>, enabling method chaining.
+    /// </returns>
+    /// <remarks>
+    /// This parameter allows the AI to adjust its responses based on the specified country, enabling
+    /// more accurate and relevant information retrieval for location-sensitive queries. It works in
+    /// conjunction with the city parameter to provide regional context.
+    /// </remarks>
+    function Country(const Value: string): TBundleParams;
     /// <summary>
     /// Sets the system message for the chat request bundle.
     /// </summary>
@@ -233,6 +294,55 @@ type
     /// of the AI responses, acting as a global directive for the conversation context.
     /// </remarks>
     function System(const Value: string): TBundleParams;
+    /// <summary>
+    /// Returns prompt array
+    /// </summary>
+    function GetPrompt: TArray<string>;
+    /// <summary>
+    /// Returns system or developer instructions
+    /// </summary>
+    function GetSystem: string;
+    /// <summary>
+    /// Returns the model name
+    /// </summary>
+    function GetModel: string;
+    /// <summary>
+    /// Returns reasoning effort for reasoning model
+    /// </summary>
+    function GetReasoningEffort: string;
+    /// <summary>
+    /// Retrieves the value of the search size parameter used in the chat request bundle.
+    /// </summary>
+    /// <returns>
+    /// A string representing the configured search size. Expected values are typically "low", "medium", or "high".
+    /// </returns>
+    /// <remarks>
+    /// This parameter influences the breadth of the AI's web search during response generation.
+    /// It can be used to adjust the scope of information retrieval, with higher values allowing broader searches.
+    /// </remarks>
+    function GetSearchSize: string;
+    /// <summary>
+    /// Retrieves the value of the city parameter configured for the chat request bundle.
+    /// </summary>
+    /// <returns>
+    /// A string representing the name of the city set to provide location-based context.
+    /// </returns>
+    /// <remarks>
+    /// This parameter helps the AI tailor responses based on geographical context,
+    /// allowing for more accurate and localized results when location relevance is important.
+    /// </remarks>
+    function GetCity: string;
+    /// <summary>
+    /// Retrieves the configured city parameter used to influence AI responses.
+    /// </summary>
+    /// <returns>
+    /// A string containing the name of the city that provides geographic context for the request.
+    /// </returns>
+    /// <remarks>
+    /// The city parameter is used to enhance the relevance of AI-generated content by tailoring responses
+    /// based on the specified location. It is especially useful when handling queries with a regional focus.
+    /// </remarks>
+    function GetCountry: string;
     /// <summary>
     /// Initializes a new instance of <c>TBundleParams</c> with default values.
     /// </summary>
@@ -299,6 +409,16 @@ end;
 
 { TBundleParams }
 
+function TBundleParams.City(const Value: string): TBundleParams;
+begin
+  Result := TBundleParams(Add(S_CITY, Value));
+end;
+
+function TBundleParams.Country(const Value: string): TBundleParams;
+begin
+  Result := TBundleParams(Add(S_COUNTRY, Value));
+end;
+
 constructor TBundleParams.Create;
 begin
   inherited Create;
@@ -306,25 +426,70 @@ begin
   ReasoningEffort(TReasoningEffort.medium);
 end;
 
+function TBundleParams.GetCity: string;
+begin
+  Result := GetString(S_CITY);
+end;
+
+function TBundleParams.GetCountry: string;
+begin
+  Result := GetString(S_COUNTRY);
+end;
+
+function TBundleParams.GetModel: string;
+begin
+  Result := GetString(S_MODEL);
+end;
+
+function TBundleParams.GetPrompt: TArray<string>;
+begin
+  Result := GetArrayString(S_PROMPT);
+end;
+
+function TBundleParams.GetReasoningEffort: string;
+begin
+  Result := GetString(S_REASONING_EFFORT);
+end;
+
+function TBundleParams.GetSearchSize: string;
+begin
+  Result := GetString(S_SEARCH_SIZE);
+end;
+
+function TBundleParams.GetSystem: string;
+begin
+  Result := GetString(S_SYSTEM);
+end;
+
 function TBundleParams.Model(const Value: string): TBundleParams;
 begin
-  Result := TBundleParams(Add('model', Value));
+  Result := TBundleParams(Add(S_MODEL, Value));
 end;
 
 function TBundleParams.Prompts(const Value: TArray<string>): TBundleParams;
 begin
-  Result := TBundleParams(Add('prompts', Value));
+  Result := TBundleParams(Add(S_PROMPT, Value));
+end;
+
+function TBundleParams.ReasoningEffort(const Value: string): TBundleParams;
+begin
+  Result := TBundleParams(Add(S_REASONING_EFFORT, TReasoningEffort.Create(Value).ToString));
 end;
 
 function TBundleParams.ReasoningEffort(
   const Value: TReasoningEffort): TBundleParams;
 begin
-  Result := TBundleParams(Add('reasoningEffort', Value.ToString));
+  Result := TBundleParams(Add(S_REASONING_EFFORT, Value.ToString));
+end;
+
+function TBundleParams.SearchSize(const Value: string): TBundleParams;
+begin
+  Result := TBundleParams(Add(S_SEARCH_SIZE, Value));
 end;
 
 function TBundleParams.System(const Value: string): TBundleParams;
 begin
-  Result := TBundleParams(Add('system', Value));
+  Result := TBundleParams(Add(S_SYSTEM, Value));
 end;
 
 { TBundleItem }

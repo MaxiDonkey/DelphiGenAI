@@ -34,6 +34,14 @@ type
     /// </summary>
     function GetParameters: string;
     /// <summary>
+    /// Retrieves the strict schema adherence switch value.
+    /// </summary>
+    function GetStrict: Boolean;
+    /// <summary>
+    /// Set value to the strict schema adherence switch.
+    /// </summary>
+    procedure SetStrict(const Value: Boolean);
+    /// <summary>
     /// Retrieves the type of the function, typically "function".
     /// </summary>
     function GetType: string;
@@ -69,6 +77,10 @@ type
     /// The type of the tool. Currently, only "function" is supported.
     /// </summary>
     property &Type: string read GetType;
+    /// <summary>
+    /// Retrieves the strict schema adherence switch value.
+    /// </summary>
+    property &Strict: Boolean read GetStrict write SetStrict;
   end;
 
   /// <summary>

@@ -1,562 +1,70 @@
 # Beyond the Basics Advanced Usage
 
-- [Function calling](#Function-calling)
-- [Models](#Models)
-    - [List of models](#List-of-models)
-    - [Retrieve a model](#Retrieve-a-model)
-    - [Delete a model](#Delete-a-model)
-- [Files](#Files)
-    - [Files list](#Files-list)
-    - [File upload](#File-upload)
-    - [File retrieve](#File-retrieve)
-    - [File retrieve content](#File-retrieve-content)
-    - [File Deletion](#File-Deletion)
 - [Uploads](#Uploads)
-    - [Upload create](#Upload-create)
-    - [Upload cancel](#Upload-cancel)
-    - [Upload add part](#Upload-add-part)
-    - [Upload complete](#Upload-complete)
-- [Batch](#Batch)
-    - [Batch create](#Batch-create)
-    - [Batch List](#Batch-List)
-    - [Batch retrieve](#Batch-retrieve)
-    - [Batch cancel](#Batch-cancel)
-    - [Batch output viewer](#Batch-output-viewer)
-- [Fine tuning](#Fine-tuning)
-    - [Fine tuning create](#Fine-tuning-create)
-    - [Fine tuning list](#Fine-tuning-list)
-    - [Fine tuning cancel](#Fine-tuning-cancel)
-    - [Fine tuning events](#Fine-tuning-events)
-    - [Fine tuning check point](#Fine-tuning-check-point)
-    - [Fine tuning retrieve](#Fine-tuning-retrieve)
-    - [Difference Between Supervised and DPO](#Difference-Between-Supervised-and-DPO)
-- [Vector store](#Vector-store)
-    - [Vector store create](#Vector-store-create) 
-    - [Vector store list](#Vector-store-list) 
-    - [Vector store retrieve](#Vector-store-retrieve) 
-    - [Vector store modify](#Vector-store-modify) 
-    - [Vector store delete](#Vector-store-delete) 
-- [Vector store files](#Vector-store-files)
-    - [Vsf create](#Vsf-create)
-    - [Vsf list](#Vsf-list)
-    - [Vsf retrieve](#Vsf-retrieve)
-    - [Vsf delete](#Vsf-delete)
-- [Vector store batches](#Vector-store-batches)
-    - [Vsb create](#Vsb-create)
-    - [Vsb list](#Vsb-list)
-    - [Vsb retrieve](#Vsb-retrieve)
-    - [Vsb cancel](#Vsb-cancel)
-- [Assistants](#Assistants)
-    - [Create assistant](#Create-assistant)
-    - [List assistants](#List-assistants)
-    - [Retrieve assistant](#Retrieve-assistant)
-    - [Modify assistant](#Modify-assistant)
-    - [Delete assistant](#Delete-assistant)
-- [Threads](#Threads)
-    - [Create thread](#Create-thread)
-    - [Retrieve thread](#Retrieve-thread)
-    - [Modify thread](#Modify-thread)
-    - [Delete thread](#Delete-thread)
-- [Messages](#Messages)
-    - [Create message](#Create-message)
-    - [List messages](#List-messages)
-    - [Retrieve message](#Retrieve-message)
-    - [Modify message](#Modify-message)
-    - [Delete message](#Delete-message)
-- [Runs](#Runs)
-    - [Create run](#Create-run)
-    - [Create thread and run](#Create-thread-and-run)
-    - [List runs](#List-runs)
-    - [Retrieve run](#Retrieve-run)
-    - [Modify run](#Modify-run)
-    - [Submit tool outputs](#Submit-tool-outputs)
-    - [Cancel run](#Cancel-run)
-- [Runs steps](#Runs-steps)
-    - [List run steps](#List-run-steps)
-    - [Retrieve run steps](#Retrieve-run-steps)
-- [Model distilation](#Model-distilation)
-
+    - [Upload create](#upload-create)
+    - [Upload cancel](#upload-cancel)
+    - [Upload add part](#upload-add-part)
+    - [Upload complete](#upload-complete)
+- [Batch](#batch)
+    - [Batch create](#batch-create)
+    - [Batch List](#batch-List)
+    - [Batch retrieve](#batch-retrieve)
+    - [Batch cancel](#batch-cancel)
+    - [Batch output viewer](#batch-output-viewer)
+- [Fine tuning](#fine-tuning)
+    - [Fine tuning create](#fine-tuning-create)
+    - [Fine tuning list](#fine-tuning-list)
+    - [Fine tuning cancel](#fine-tuning-cancel)
+    - [Fine tuning events](#fine-tuning-events)
+    - [Fine tuning check point](#fine-tuning-check-point)
+    - [Fine tuning retrieve](#fine-tuning-retrieve)
+    - [Difference Between Supervised and DPO](#difference-Between-Supervised-and-DPO)
+- [Vector store](#vector-store)
+    - [Vector store create](#vector-store-create) 
+    - [Vector store list](#vector-store-list) 
+    - [Vector store retrieve](#vector-store-retrieve) 
+    - [Vector store modify](#vector-store-modify) 
+    - [Vector store delete](#vector-store-delete) 
+- [Vector store files](#vector-store-files)
+    - [Vsf create](#vsf-create)
+    - [Vsf list](#vsf-list)
+    - [Vsf retrieve](#vsf-retrieve)
+    - [Vsf delete](#vsf-delete)
+- [Vector store batches](#vector-store-batches)
+    - [Vsb create](#vsb-create)
+    - [Vsb list](#vsb-list)
+    - [Vsb retrieve](#vsb-retrieve)
+    - [Vsb cancel](#vsb-cancel)
+- [Assistants](#assistants)
+    - [Create assistant](#create-assistant)
+    - [List assistants](#list-assistants)
+    - [Retrieve assistant](#retrieve-assistant)
+    - [Modify assistant](#modify-assistant)
+    - [Delete assistant](#delete-assistant)
+- [Threads](#threads)
+    - [Create thread](#create-thread)
+    - [Retrieve thread](#retrieve-thread)
+    - [Modify thread](#modify-thread)
+    - [Delete thread](#delete-thread)
+- [Messages](#messages)
+    - [Create message](#create-message)
+    - [List messages](#list-messages)
+    - [Retrieve message](#retrieve-message)
+    - [Modify message](#modify-message)
+    - [Delete message](#delete-message)
+- [Runs](#runs)
+    - [Create run](#create-run)
+    - [Create thread and run](#create-thread-and-run)
+    - [List runs](#list-runs)
+    - [Retrieve run](#retrieve-run)
+    - [Modify run](#modify-run)
+    - [Submit tool outputs](#submit-tool-outputs)
+    - [Cancel run](#cancel-run)
+- [Runs steps](#runs-steps)
+    - [List run steps](#list-run-steps)
+    - [Retrieve run steps](#retrieve-run-steps)
+- [Model distilation](#model-distilation)
 ___
-
-## Function calling
-
-Allow models to access data and execute actions. <br/>
-Function calling offers a robust and versatile method for OpenAI models to interact with your code or external services, serving two main purposes:
-
-- **Data Retrieval:** Access real-time information to enhance the model's responses (RAG). This is particularly beneficial for searching knowledge bases and extracting specific data from APIs (e.g., obtaining the current weather).
-
-- **Action Execution:** Carry out tasks such as form submissions, API calls, updating the application state (UI/frontend or backend), or executing agent-driven workflows (e.g., transferring a conversation).
-
-Refer to the [official documentation](https://platform.openai.com/docs/guides/function-calling?example=get-weather).
-
-<br/>
-
-#### How build a plugin
-
-Use case : **What’s the weather in Paris?**
-
-In the `GenAI.Functions.Example` unit, there is a class that defines a function which OpenAI can choose to use or not, depending on the options provided. This class inherits from a parent class defined in the `GenAI.Functions.Core` unit. To create new functions, you can derive from the `TFunctionCore` class and define a new plugin.
-
-#### Use a schema
-
-In this unit, this schema will be used for function calls.
-```Json
-{
-    "type": "object",
-    "properties": {
-         "location": {
-             "type": "string",
-             "description": "The city and department, e.g. Marseille, 13"
-         },
-         "unit": {
-             "type": "string",
-             "enum": ["celsius", "fahrenheit"]
-         }
-     },
-     "required": ["location"],
-     "additionalProperties": false
-}
-```
-
-<br/>
-
-We will use the TWeatherReportFunction plugin defined in the `GenAI.Functions.Example` unit.
-
-```Delphi
-  var Weather := TWeatherReportFunction.CreateInstance;
-  //or
-  var Weather := TWeatherReportFunction.CreateInstance(True);  //To activate `Strict` option
-
-  //See step : Main method
-```
-<br/>
-
-#### Methods to display result
-
-We then define a method to display the result of the query using the Weather tool.
-
-With this tutorial, a method is defined within TutorialHub. Let’s take a closer look at how this method works.
-
-##### Display a stream text
-
-```Delphi
-procedure TVCLTutorialHub.DisplayWeatherStream(const Value: string);
-begin
-  //Asynchronous example
-  Client.Chat.AsynCreateStream(
-    procedure(Params: TChatParams)
-    begin
-      Params.Model('gpt-4o');
-      Params.Messages([
-          FromSystem('You are a weather presenter on a prime time TV channel.'),
-          FromUser(Value)]);
-      Params.MaxCompletionTokens(1024);
-      Params.Stream;
-    end,
-    function : TAsynChatStream
-    begin
-      Result.Sender := TutorialHub;
-      Result.OnProgress := DisplayStream;
-      Result.OnError := Display;
-      Result.OnDoCancel := DoCancellation;
-      Result.OnCancellation := Cancellation;
-    end);
-end;
-```
-
-<br/>
-
-##### Use audio with response
-
-```Delphi
-procedure TVCLTutorialHub.DisplayWeatherAudio(const Value: string);
-begin
-  FileName := 'AudioWeather.mp3';
-
-  //Asynchronous example
-  Client.Chat.AsynCreate(
-    procedure (Params: TChatParams)
-    begin
-      Params.Model('gpt-4o-audio-preview');
-      Params.Modalities(['text', 'audio']);
-      Params.Audio('verse', 'mp3');
-      Params.Messages([
-        FromSystem('You are a weather presenter on a prime time TV channel.'),
-        FromUser(Value)
-      ]);
-      Params.MaxCompletionTokens(1024);
-    end,
-    function : TAsynChat
-    begin
-      Result.Sender := TutorialHub;
-      Result.OnStart := Start;
-      Result.OnSuccess := DisplayAudio;
-      Result.OnError := Display;
-    end);
-end;
-```
-
-<br/>
-
-#### Main method
-
-Building the query using the Weather tool. (Simply copy/paste this last code to test the usage of the functions.)
-
-```Delphi
-//uses GenAI, GenAI.Types, GenAI.Tutorial.VCL, GenAI.Functions.Example;
-
-  TutorialHub.JSONRequestClear;
-  var Weather := TWeatherReportFunction.CreateInstance(True);
-//  TutorialHub.ToolCall := TutorialHub.DisplayWeatherStream;
-// or
-  TutorialHub.ToolCall := TutorialHub.DisplayWeatherAudio;
-  TutorialHub.Tool := Weather;
-
-  //Synchronous example
-  var Value := Client.Chat.Create(
-    procedure (Params: TChatParams)
-    begin
-      Params.Model('gpt-4o');
-      Params.Messages([
-        FromUser('What is the weather in Paris?')
-      ]);
-      Params.Tools([Weather]);
-      Params.ToolChoice(TToolChoice.auto);
-      Params.MaxCompletionTokens(1024);
-      TutorialHub.JSONRequest := Params.ToFormat();
-    end);
-  try
-    Display(TutorialHub, Value);
-  finally
-    Value.Free;
-  end;
-```
-
-#### FinishReason
-
-Let's look at how the display method handles the function call.
-
-```Delphi
-procedure Display(Sender: TObject; Value: TChat);
-begin
-  TutorialHub.JSONResponse := Value.JSONResponse;
-  for var Item in Value.Choices do
-    {--- Examine FinishReason }
-    if Item.FinishReason = TFinishReason.tool_calls then
-      begin
-        if Assigned(TutorialHub.ToolCall) then
-          begin
-            for var Func in Item.Message.ToolCalls do
-              begin
-                Display(Sender, Func.&function.Arguments);
-                var Evaluation := TutorialHub.Tool.Execute(Func.&function.Arguments);
-                Display(Sender, Evaluation);
-                Display(Sender);
-                TutorialHub.ToolCall(Evaluation);
-              end;
-          end;
-      end
-    else
-      begin
-        Display(Sender, Item.Message.Content);
-      end;
-  Display(Sender, sLineBreak);
-end;
-```
-
-<br/>
-
->[!WARNING]
->Ensure user confirmation for actions like sending emails or making purchases to avoid unintended consequences.
-
-<br/>
-
-## Models
-
-Refert to [official documentation](https://platform.openai.com/docs/models).
-
-### List of models
-
-The list of available models can be retrieved from the Models API response. The models are ordered by release date, with the most recently published appearing first.
-
-```Delphi
-//uses GenAI, GenAI.Types, GenAI.Tutorial.VCL;
-
-  TutorialHub.JSONRequestClear;
-
-  //Asynchronous example
-  Client.Models.AsynList(
-    function : TAsynModels
-    begin
-      Result.Sender := TutorialHub;
-      Result.OnStart := Start;
-      Result.OnSuccess := Display;
-      Result.OnError := Display;
-    end);
-
-  //Synchronous example
-//  var Value := Client.Models.List;
-//  try
-//    Display(TutorialHub, Value);
-//  finally
-//    Value.Free;
-//  end;
-```
-
-<br/>
-
-### Retrieve a model
-
-Retrieve a model using its ID.
-
-```Delphi
-//uses GenAI, GenAI.Types, GenAI.Tutorial.VCL;
-
-  TutorialHub.JSONRequestClear;
-  TutorialHub.ModelId := '...the id tio retrieve...';
-
-  //Asynchronous example
-  Client.Models.AsynRetrieve(TutorialHub.ModelId,
-    function : TAsynModel
-    begin
-      Result.Sender := TutorialHub;
-      Result.OnStart := Start;
-      Result.OnSuccess := Display;
-      Result.OnError := Display;
-    end);
-
-  //Synchronous example
-//  var Value := Client.Models.Retrieve(TutorialHub.ModelId);
-//  try
-//    Display(TutorialHub, Value);
-//  finally
-//    Value.Free;
-//  end;
-```
-
-<br/>
-
-### Delete a model
-
-Deleting a model is only possible if the model is one of your fine-tuned models.
-
-```Delphi
-//uses GenAI, GenAI.Types, GenAI.Tutorial.VCL;
-
-  TutorialHub.JSONRequestClear;
-  TutorialHub.ModelId := '...Id of the model to delete...';
-
-  //Asynchronous example
-  Client.Models.AsynDelete(TutorialHub.ModelId,
-    function : TAsynDeletion
-    begin
-      Result.Sender := TutorialHub;
-      Result.OnStart := Start;
-      Result.OnSuccess := Display;
-      Result.OnError := Display;
-    end);
-
-  //Synchronous example
-//  var Value := Client.Models.Delete(TutorialHub.ModelId);
-//  try
-//    Display(TutorialHub, Value);
-//  finally
-//    Value.Free;
-//  end;
-```
-
-<br/>
-
-## Files
-
-Files are used to upload documents that can be used with features like **Assistants**, **Fine-tuning**, and **Batch API**.
-
-<br/>
-
-### Files list
-
-Example without parameters
-
-```Delphi
-//uses GenAI, GenAI.Types, GenAI.Tutorial.VCL;
-
-  //Asynchronous example
-  Client.Files.AsynList(
-    function : TAsynFiles
-    begin
-      Result.Sender := TutorialHub;
-      Result.OnStart := Start;
-      Result.OnSuccess := Display;
-      Result.OnError := Display;
-    end);
-
-  //Synchronous example
-//  var Value := Client.Files.List;
-//  try
-//    Display(TutorialHub, Value);
-//  finally
-//    Value.Free;
-//  end;
-```
-
-Example using parameters
-
-```Delphi
-//uses GenAI, GenAI.Types, GenAI.Tutorial.VCL;
-
-  //Asynchronous example
-  Client.Files.AsynList(
-    procedure (Params: TFileUrlParams)
-    begin
-      Params.Purpose('batch');
-      Params.Limit(10);
-    end,
-    function : TAsynFiles
-    begin
-      Result.Sender := TutorialHub;
-      Result.OnStart := Start;
-      Result.OnSuccess := Display;
-      Result.OnError := Display;
-    end);
-
-  //Synchronous example
-//  var Value := Client.Files.List(
-//    procedure (Params: TFileUrlParams)
-//    begin
-//      Params.Purpose('batch');
-//      Params.Limit(10);
-//    end);
-//  try
-//    Display(TutorialHub, Value);
-//  finally
-//    Value.Free;
-//  end;
-```
-
-Refer to [parameters documentation](https://platform.openai.com/docs/api-reference/files/list).
-
-<br/>
-
-### File upload
-
-You can upload files for use across multiple endpoints. Each file can be as large as 512 MB, with a maximum combined storage limit of 100 GB per organization.
-
-The Assistants API accommodates files containing up to 2 million tokens and accepts specific file formats. For more information, refer to the [Assistants Tools guide](https://platform.openai.com/docs/assistants/tools).
-
-```Delphi
-//uses GenAI, GenAI.Types, GenAI.Tutorial.VCL;
-
-  //Asynchronous example
-  Client.Files.AsynUpload(
-    procedure (Params: TFileUploadParams)
-    begin
-      Params.&File('BatchExample.jsonl');
-      Params.Purpose(TFilesPurpose.batch);
-    end,
-    function : TAsynFile
-    begin
-      Result.Sender := TutorialHub;
-      Result.OnStart := Start;
-      Result.OnSuccess := Display;
-      Result.OnError := Display;
-    end);
-
-  //Synchronous example
-//  var Value := Client.Files.Upload(
-//    procedure (Params: TFileUploadParams)
-//    begin
-//      Params.&File('BatchExample.jsonl');
-//      Params.Purpose(fp_batch);
-//    end);
-//  try
-//    Display(TutorialHub, Value);
-//  finally
-//    Value.Free;
-//  end;
-```
-Example with batch file.
-
-<br/>
-
-### File retrieve
-
-Returns information about a specific file.
-
-```Delphi
-//uses GenAI, GenAI.Types, GenAI.Tutorial.VCL;
-
-  TutorialHub.Id := '...Id file to retrieve...';
-
-  //Asynchronous example
-  Client.Files.AsynRetrieve(TutorialHub.Id,
-    function : TAsynFile
-    begin
-      Result.Sender := TutorialHub;
-      Result.OnStart := Start;
-      Result.OnSuccess := Display;
-      Result.OnError := Display;
-    end);
-
-  //Synchronous example
-//  var Value := Client.Files.Retrieve(TutorialHub.Id);
-//  try
-//    Display(TutorialHub, Value);
-//  finally
-//    Value.Free;
-//  end;
-```
-
-<br/>
-
-### File retrieve content
-
-Returns the contents of the specified file.
-
-```Delphi
-//uses GenAI, GenAI.Types, GenAI.Tutorial.VCL;
-
-  TutorialHub.Id := '...Id of the file to retrieve content...';
-
-  //Asynchronous example
-  Client.Files.AsynRetrieveContent(TutorialHub.Id,
-    function : TAsynFileContent
-    begin
-      Result.Sender := TutorialHub;
-      Result.OnStart := Start;
-      Result.OnSuccess := Display;
-      Result.OnError := Display;
-    end);
-
-  //Synchronous example
-//  var Value := Client.Files.RetrieveContent(TutorialHub.Id);
-//  try
-//    Display(TutorialHub, Value);
-//  finally
-//    Value.Free;
-//  end;
-```
-
-<br/>
-
-### File Deletion
-
-Delete a file.
-
-```Delphi
-//uses GenAI, GenAI.Types, GenAI.Tutorial.VCL;
-
-  TutorialHub.Id := '...Id file to delete...';
-
-  //Synchronous example
-  var Value := Client.Files.Delete(TutorialHub.Id);
-  try
-    Display(TutorialHub, F('Deleted', BoolToStr(Value.Deleted, True)));
-  finally
-    Value.Free;
-  end;
-```
-
-<br/>
 
 ## Uploads
 
@@ -728,6 +236,8 @@ The number of bytes uploaded upon completion must match the number of bytes init
 ```
 
 <br/>
+
+___
 
 ## Batch
 
@@ -956,6 +466,8 @@ Open and view the results obtained after processing the batch.
 > `GenAI` provides, through the `IJSONLReader` interface (available in the `GenAI.Batch.Interfaces` unit and implemented in the `GenAI.Batch.Reader` unit), powerful tools to easily read batch files content. For further details, refer to the two units mentioned above.
 
 <br/>
+
+___
 
 ## Fine tuning
 
@@ -1332,6 +844,8 @@ In summary, the  supervised method  is ideal for  well-defined tasks, while  DPO
 
  <br/>
 
+___
+
 ## Vector store
 
 Vector stores are used to store files for use by the [`file_search`](https://platform.openai.com/docs/assistants/tools/file-search) tool.
@@ -1573,6 +1087,8 @@ The JSON response.
 ```
 
 <br/>
+
+___
 
 ## Vector store files
 
@@ -1891,6 +1407,8 @@ The JSON response:
 
 <br/>
 
+___
+
 ## Vector store batches
 
 Vector store file batches represent operations to add multiple files to a vector store. Related guide: [File Search](https://platform.openai.com/docs/assistants/tools/file-search)
@@ -2193,6 +1711,8 @@ The JSON response:
 
 <br/>
 
+___
+
 ## Assistants
 
 Build assistants that can call models and use tools to perform tasks.
@@ -2215,12 +1735,17 @@ The version of assistants integrated by `GenAI` is version 2, currently offered 
   TutorialHub.JSONRequestClear;
 
   //Asynchronous example
-  Client.Assistants.AsynCreate(
+ Client.Assistants.AsynCreate(
     procedure (Params: TAssistantsParams)
     begin
       Params.Model('gpt-4o');
-      Params.Instructions('You are a personal math tutor. When asked a question, write and run Python code to answer the question.');
-      Params.Name('Math Tutor');
+      Params.Instructions('You are an HR bot, and you have access to files to answer employee questions about company policies.');
+      Params.Name('HR Bot');
+
+      // ---> Change github documentation
+
+      Params.Tools([file_search]);
+      Params.ToolResources(file_search_storeId);
       TutorialHub.JSONRequest := Params.ToFormat();
     end,
     function : TAsynAssistant
@@ -2236,8 +1761,10 @@ The version of assistants integrated by `GenAI` is version 2, currently offered 
 //    procedure (Params: TAssistantsParams)
 //    begin
 //      Params.Model('gpt-4o');
-//      Params.Instructions('You are a personal math tutor. When asked a question, write and run Python code to answer the question.');
-//      Params.Name('Math Tutor');
+//      Params.Instructions('You are an HR bot, and you have access to files to answer employee questions about company policies.');
+//      Params.Name('HR Bot');
+//      Params.Tools([file_search]);
+//      Params.ToolResources(file_search_storeId);
 //      TutorialHub.JSONRequest := Params.ToFormat();
 //    end);
 //  try
@@ -2530,6 +2057,8 @@ Delete an assistant by its ID.
 
 <br/>
 
+___
+
 ## Threads
 
 Create threads that assistants can interact with.
@@ -2684,6 +2213,8 @@ Delete a thread by its ID.
 ```
 
 <br/>
+
+___
 
 ## Messages
 
@@ -3009,6 +2540,8 @@ The JSON response:
 ```
 
 <br/>
+
+___
 
 ## Runs
 
@@ -3551,6 +3084,8 @@ Cancels a run that is `in_progress`.
 
 <br/>
 
+___
+
 ## Runs steps
 
 Represents the steps (model and tool calls) taken during the run.
@@ -3713,6 +3248,8 @@ Retrieves a run step.
 ```
 
 <br/>
+
+___
 
 ## Model distilation
 

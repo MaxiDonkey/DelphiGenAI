@@ -309,6 +309,11 @@ type
     function ToString: string;
   end;
 
+  TImageDetailInterceptor = class(TJSONInterceptorStringToString)
+    function StringConverter(Data: TObject; Field: string): string; override;
+    procedure StringReverter(Data: TObject; Field: string; Arg: string); override;
+  end;
+
   /// <summary>
   /// Specifies the level of reasoning effort used by the o1 series models during a completion request.
   /// </summary>
@@ -348,6 +353,11 @@ type
   TReasoningEffortHelper = record Helper for TReasoningEffort
     constructor Create(const Value: string);
     function ToString: string;
+  end;
+
+  TReasoningEffortInterceptor = class(TJSONInterceptorStringToString)
+    function StringConverter(Data: TObject; Field: string): string; override;
+    procedure StringReverter(Data: TObject; Field: string; Arg: string); override;
   end;
 
   /// <summary>
@@ -1225,6 +1235,11 @@ type
     function ToString: string;
   end;
 
+  TResponseFormatTypeInterceptor = class(TJSONInterceptorStringToString)
+    function StringConverter(Data: TObject; Field: string): string; override;
+    procedure StringReverter(Data: TObject; Field: string; Arg: string); override;
+  end;
+
   {$ENDREGION}
 
   {$REGION 'GenAI.Assistants'}
@@ -1316,6 +1331,328 @@ type
   end;
 
   TRunStepTypeInterceptor = class(TJSONInterceptorStringToString)
+    function StringConverter(Data: TObject; Field: string): string; override;
+    procedure StringReverter(Data: TObject; Field: string; Arg: string); override;
+  end;
+
+  {$ENDREGION}
+
+  {$REGION 'GenAI.Responses'}
+
+  TOutputIncluding = (
+    file_search_result,
+    input_image_url,
+    computer_call_image_url
+  );
+
+  TOutputIncludingHelper = record Helper for TOutputIncluding
+    constructor Create(const Value: string);
+    function ToString: string;
+  end;
+
+  TReasoningGenerateSummary = (
+    concise,
+    detailed
+  );
+
+  TReasoningGenerateSummaryHelper = record Helper for TReasoningGenerateSummary
+    constructor Create(const Value: string);
+    function ToString: string;
+  end;
+
+  TInputItemType = (
+    input_text,
+    input_image,
+    input_file
+  );
+
+  TInputItemTypeHelper = record Helper for TInputItemType
+    constructor Create(const Value: string);
+    function ToString: string;
+  end;
+
+  TFileSearchToolCallType = (
+    in_progress,
+    searching,
+    incomplete,
+    failed
+  );
+
+  TFileSearchToolCallTypeHelper = record Helper for TFileSearchToolCallType
+    constructor Create(const Value: string);
+    function ToString: string;
+  end;
+
+  TFileSearchToolCallTypeInterceptor = class(TJSONInterceptorStringToString)
+    function StringConverter(Data: TObject; Field: string): string; override;
+    procedure StringReverter(Data: TObject; Field: string; Arg: string); override;
+  end;
+
+  TMouseButton = (
+    left,
+    right,
+    wheel,
+    back,
+    forward
+  );
+
+  TMouseButtonHelper = record Helper for TMouseButton
+    constructor Create(const Value: string);
+    function ToString: string;
+  end;
+
+  TMouseButtonInterceptor = class(TJSONInterceptorStringToString)
+    function StringConverter(Data: TObject; Field: string): string; override;
+    procedure StringReverter(Data: TObject; Field: string; Arg: string); override;
+  end;
+
+  TResponseOption = (
+    text,
+    json_schema,
+    json_object
+  );
+
+  TResponseOptionHelper = record Helper for TResponseOption
+    constructor Create(const Value: string);
+    function ToString: string;
+  end;
+
+  THostedTooltype = (
+    file_search,
+    web_search_preview,
+    computer_use_preview
+  );
+
+  THostedTooltypeHelper = record Helper for THostedTooltype
+    constructor Create(const Value: string);
+    function ToString: string;
+  end;
+
+  TComparisonFilterType = (
+    eq,
+    ne,
+    gt,
+    gte,
+    lt,
+    lte
+  );
+
+  TComparisonFilterTypeHelper = record Helper for TComparisonFilterType
+    constructor Create(const Value: string);
+    function ToString: string;
+    class function ToOperator(const Value: string): TComparisonFilterType; static;
+  end;
+
+  TCompoundFilterType = (
+    &and,
+    &or
+  );
+
+  TCompoundFilterTypeHelper = record Helper for TCompoundFilterType
+    constructor Create(const Value: string);
+    function ToString: string;
+  end;
+
+  TWebSearchType = (
+    web_search_preview,
+    web_search_preview_2025_03_11
+  );
+
+  TWebSearchTypeHelper = record Helper for TWebSearchType
+    constructor Create(const Value: string);
+    function ToString: string;
+  end;
+
+  TResponseTruncationType = (
+    auto,
+    disabled
+  );
+
+  TResponseTruncationTypeHelper = record Helper for TResponseTruncationType
+    constructor Create(const Value: string);
+    function ToString: string;
+  end;
+
+  TResponseTypes = (
+    message,
+    file_search_call,
+    function_call,
+    web_search_call,
+    computer_call,
+    reasoning,
+    computer_call_output,
+    function_call_output
+  );
+
+  TResponseTypesHelper = record Helper for TResponseTypes
+    constructor Create(const Value: string);
+    function ToString: string;
+  end;
+
+  TResponseTypesInterceptor = class(TJSONInterceptorStringToString)
+    function StringConverter(Data: TObject; Field: string): string; override;
+    procedure StringReverter(Data: TObject; Field: string; Arg: string); override;
+  end;
+
+  TResponseContentType = (
+    output_text,
+    refusal
+  );
+
+  TResponseContentTypeHelper = record Helper for TResponseContentType
+    constructor Create(const Value: string);
+    function ToString: string;
+  end;
+
+  TResponseContentTypeInterceptor = class(TJSONInterceptorStringToString)
+    function StringConverter(Data: TObject; Field: string): string; override;
+    procedure StringReverter(Data: TObject; Field: string; Arg: string); override;
+  end;
+
+  TResponseAnnotationType = (
+    file_citation,
+    url_citation,
+    file_path
+  );
+
+  TResponseAnnotationTypeHelper = record Helper for TResponseAnnotationType
+    constructor Create(const Value: string);
+    function ToString: string;
+  end;
+
+  TResponseAnnotationTypeInterceptor = class(TJSONInterceptorStringToString)
+    function StringConverter(Data: TObject; Field: string): string; override;
+    procedure StringReverter(Data: TObject; Field: string; Arg: string); override;
+  end;
+
+  TResponseComputerType = (
+    click,
+    double_click,
+    drag,
+    keypress,
+    move,
+    screenshot,
+    scroll,
+    &type,
+    wait
+  );
+
+  TResponseComputerTypeHelper = record Helper for TResponseComputerType
+    constructor Create(const Value: string);
+    function ToString: string;
+  end;
+
+  TResponseComputerTypeInterceptor = class(TJSONInterceptorStringToString)
+    function StringConverter(Data: TObject; Field: string): string; override;
+    procedure StringReverter(Data: TObject; Field: string; Arg: string); override;
+  end;
+
+  TResponseStatus = (
+    in_progress,
+    incomplete,
+    completed,
+    failed
+  );
+
+  TResponseStatusHelper = record Helper for TResponseStatus
+    constructor Create(const Value: string);
+    function ToString: string;
+  end;
+
+  TResponseStatusInterceptor = class(TJSONInterceptorStringToString)
+    function StringConverter(Data: TObject; Field: string): string; override;
+    procedure StringReverter(Data: TObject; Field: string; Arg: string); override;
+  end;
+
+  TResponseToolsType = (
+    file_search,
+    &function,
+    computer_use_preview,
+    web_search_preview,
+    web_search_preview_2025_03_11
+  );
+
+  TResponseToolsTypeHelper = record Helper for TResponseToolsType
+    constructor Create(const Value: string);
+    function ToString: string;
+  end;
+
+  TResponseToolsTypeInterceptor = class(TJSONInterceptorStringToString)
+    function StringConverter(Data: TObject; Field: string): string; override;
+    procedure StringReverter(Data: TObject; Field: string; Arg: string); override;
+  end;
+
+  TResponseToolsFilterType = (
+    eq,
+    ne,
+    gt,
+    gte,
+    lt,
+    lte,
+    &and,
+    &or
+  );
+
+  TResponseToolsFilterTypeHelper = record Helper for TResponseToolsFilterType
+    constructor Create(const Value: string);
+    function ToString: string;
+  end;
+
+  TResponseToolsFilterTypeInterceptor = class(TJSONInterceptorStringToString)
+    function StringConverter(Data: TObject; Field: string): string; override;
+    procedure StringReverter(Data: TObject; Field: string; Arg: string); override;
+  end;
+
+  TResponseItemContentType = (
+    input_text,
+    input_image,
+    input_file,
+    output_text,
+    refusal
+  );
+
+  TResponseItemContentTypeHelper = record Helper for TResponseItemContentType
+    constructor Create(const Value: string);
+    function ToString: string;
+  end;
+
+  TResponseItemContentTypeInterceptor = class(TJSONInterceptorStringToString)
+    function StringConverter(Data: TObject; Field: string): string; override;
+    procedure StringReverter(Data: TObject; Field: string; Arg: string); override;
+  end;
+
+  TResponseStreamType = (
+    created,
+    in_progress,
+    completed,
+    failed,
+    incomplete,
+    output_item_added,
+    output_item_done,
+    content_part_added,
+    content_part_done,
+    output_text_delta,
+    output_text_annotation_added,
+    output_text_done,
+    refusal_delta,
+    refusal_done,
+    function_call_arguments_delta,
+    function_call_arguments_done,
+    file_search_call_in_progress,
+    file_search_call_searching,
+    file_search_call_completed,
+    web_search_call_in_progress,
+    web_search_call_searching,
+    web_search_call_completed,
+    error
+  );
+
+  TResponseStreamTypeHelper = record Helper for TResponseStreamType
+    constructor Create(const Value: string);
+    function ToString: string;
+  end;
+
+  TResponseStreamTypeInterceptor = class(TJSONInterceptorStringToString)
     function StringConverter(Data: TObject; Field: string): string; override;
     procedure StringReverter(Data: TObject; Field: string; Arg: string); override;
   end;
@@ -1441,6 +1778,20 @@ begin
   end;
 end;
 
+{ TImageDetailInterceptor }
+
+function TImageDetailInterceptor.StringConverter(Data: TObject;
+  Field: string): string;
+begin
+  Result := RTTI.GetType(Data.ClassType).GetField(Field).GetValue(Data).AsType<TImageDetail>.ToString;
+end;
+
+procedure TImageDetailInterceptor.StringReverter(Data: TObject; Field,
+  Arg: string);
+begin
+  RTTI.GetType(Data.ClassType).GetField(Field).SetValue(Data, TValue.From(TImageDetail.Create(Arg)));
+end;
+
 { TReasoningEffortHelper }
 
 constructor TReasoningEffortHelper.Create(const Value: string);
@@ -1458,6 +1809,20 @@ begin
     TReasoningEffort.high:
       Exit('high');
   end;
+end;
+
+{ TReasoningEffortInterceptor }
+
+function TReasoningEffortInterceptor.StringConverter(Data: TObject;
+  Field: string): string;
+begin
+  Result := RTTI.GetType(Data.ClassType).GetField(Field).GetValue(Data).AsType<TReasoningEffort>.ToString;
+end;
+
+procedure TReasoningEffortInterceptor.StringReverter(Data: TObject; Field,
+  Arg: string);
+begin
+  RTTI.GetType(Data.ClassType).GetField(Field).SetValue(Data, TValue.From(TReasoningEffort.Create(Arg)));
 end;
 
 { TModalitiesHelper }
@@ -2089,6 +2454,20 @@ begin
   end;
 end;
 
+{ TResponseFormatTypeInterceptor }
+
+function TResponseFormatTypeInterceptor.StringConverter(Data: TObject;
+  Field: string): string;
+begin
+  Result := RTTI.GetType(Data.ClassType).GetField(Field).GetValue(Data).AsType<TResponseFormatType>.ToString;
+end;
+
+procedure TResponseFormatTypeInterceptor.StringReverter(Data: TObject; Field,
+  Arg: string);
+begin
+  RTTI.GetType(Data.ClassType).GetField(Field).SetValue(Data, TValue.From(TResponseFormatType.Create(Arg)));
+end;
+
 { TThreadsContentTypeHelper }
 
 constructor TThreadsContentTypeHelper.Create(const Value: string);
@@ -2453,6 +2832,682 @@ begin
     TSearchWebOptions.high:
       Exit('high');
   end;
+end;
+
+{ TOutputIncludingHelper }
+
+constructor TOutputIncludingHelper.Create(const Value: string);
+begin
+  Self := TEnumValueRecovery.TypeRetrieve<TOutputIncluding>(Value,
+            ['file_search_call.results',
+             'message.input_image.image_url',
+             'computer_call_output.output.image_url']);
+end;
+
+function TOutputIncludingHelper.ToString: string;
+begin
+  case self of
+    TOutputIncluding.file_search_result:
+      Exit('file_search_call.results');
+    TOutputIncluding.input_image_url:
+      Exit('message.input_image.image_url');
+    TOutputIncluding.computer_call_image_url:
+      Exit('computer_call_output.output.image_url');
+  end;
+end;
+
+{ TReasoningGenerateSummaryHelper }
+
+constructor TReasoningGenerateSummaryHelper.Create(const Value: string);
+begin
+  Self := TEnumValueRecovery.TypeRetrieve<TReasoningGenerateSummary>(Value,
+            ['concise', 'detailed']);
+end;
+
+function TReasoningGenerateSummaryHelper.ToString: string;
+begin
+  case self of
+    TReasoningGenerateSummary.concise:
+      Exit('concise');
+    TReasoningGenerateSummary.detailed:
+      Exit('detailed');
+  end;
+end;
+
+{ TInputItemTypeHelper }
+
+constructor TInputItemTypeHelper.Create(const Value: string);
+begin
+  Self := TEnumValueRecovery.TypeRetrieve<TInputItemType>(Value,
+            ['input_text', 'input_image', 'input_file']);
+end;
+
+function TInputItemTypeHelper.ToString: string;
+begin
+  case self of
+    TInputItemType.input_text:
+      Exit('input_text');
+    TInputItemType.input_image:
+      Exit('input_image');
+    TInputItemType.input_file:
+      Exit('input_file');
+  end;
+end;
+
+{ TFileSearchToolCallTypeHelper }
+
+constructor TFileSearchToolCallTypeHelper.Create(const Value: string);
+begin
+  Self := TEnumValueRecovery.TypeRetrieve<TFileSearchToolCallType>(Value,
+            ['in_progress', 'searching', 'incomplete', 'failed']);
+end;
+
+function TFileSearchToolCallTypeHelper.ToString: string;
+begin
+  case Self of
+    TFileSearchToolCallType.in_progress:
+      Exit('in_progress');
+    TFileSearchToolCallType.searching:
+      Exit('searching');
+    TFileSearchToolCallType.incomplete:
+      Exit('incomplete');
+    TFileSearchToolCallType.failed:
+      Exit('failed');
+  end;
+end;
+
+{ TFileSearchToolCallTypeInterceptor }
+
+function TFileSearchToolCallTypeInterceptor.StringConverter(Data: TObject;
+  Field: string): string;
+begin
+  Result := RTTI.GetType(Data.ClassType).GetField(Field).GetValue(Data).AsType<TFileSearchToolCallType>.ToString;
+end;
+
+procedure TFileSearchToolCallTypeInterceptor.StringReverter(Data: TObject;
+  Field, Arg: string);
+begin
+  RTTI.GetType(Data.ClassType).GetField(Field).SetValue(Data, TValue.From(TFileSearchToolCallType.Create(Arg)));
+end;
+
+{ TMouseButtonHelper }
+
+constructor TMouseButtonHelper.Create(const Value: string);
+begin
+  Self := TEnumValueRecovery.TypeRetrieve<TMouseButton>(Value,
+            ['left', 'right', 'wheel', 'back', 'forward']);
+end;
+
+function TMouseButtonHelper.ToString: string;
+begin
+  case self of
+    TMouseButton.left:
+      Exit('left');
+    TMouseButton.right:
+      Exit('right');
+    TMouseButton.wheel:
+      Exit('wheel');
+    TMouseButton.back:
+      Exit('back');
+    TMouseButton.forward:
+      Exit('forward');
+  end;
+end;
+
+{ TMouseButtonInterceptor }
+
+function TMouseButtonInterceptor.StringConverter(Data: TObject;
+  Field: string): string;
+begin
+  Result := RTTI.GetType(Data.ClassType).GetField(Field).GetValue(Data).AsType<TMouseButton>.ToString;
+end;
+
+procedure TMouseButtonInterceptor.StringReverter(Data: TObject; Field,
+  Arg: string);
+begin
+  RTTI.GetType(Data.ClassType).GetField(Field).SetValue(Data, TValue.From(TMouseButton.Create(Arg)));
+end;
+
+{ TResponseOptionHelper }
+
+constructor TResponseOptionHelper.Create(const Value: string);
+begin
+  Self := TEnumValueRecovery.TypeRetrieve<TResponseOption>(Value,
+            ['text', 'json_schema', 'json_object']);
+end;
+
+function TResponseOptionHelper.ToString: string;
+begin
+  case self of
+    TResponseOption.text:
+      Exit('text');
+    TResponseOption.json_schema:
+      Exit('json_schema');
+    TResponseOption.json_object:
+      Exit('json_object');
+  end;
+end;
+
+{ THostedTooltypeHelper }
+
+constructor THostedTooltypeHelper.Create(const Value: string);
+begin
+  Self := TEnumValueRecovery.TypeRetrieve<THostedTooltype>(Value,
+            ['file_search', 'web_search_preview', 'computer_use_preview']);
+end;
+
+function THostedTooltypeHelper.ToString: string;
+begin
+  case self of
+    THostedTooltype.file_search:
+      Exit('file_search');
+    THostedTooltype.web_search_preview:
+      Exit('web_search_preview');
+    THostedTooltype.computer_use_preview:
+      Exit('computer_use_preview');
+  end;
+end;
+
+{ TComparisonFilterTypeHelper }
+
+constructor TComparisonFilterTypeHelper.Create(const Value: string);
+begin
+  Self := TEnumValueRecovery.TypeRetrieve<TComparisonFilterType>(Value,
+            ['eq', 'ne', 'gt', 'gte', 'lt', 'lte']);
+end;
+
+class function TComparisonFilterTypeHelper.ToOperator(
+  const Value: string): TComparisonFilterType;
+begin
+  Result := TEnumValueRecovery.TypeRetrieve<TComparisonFilterType>(Value,
+            ['equals', 'notEqual'.ToLower, 'greaterThan'.ToLower,
+             'greaterThanOrEqual'.ToLower, 'lessThan'.ToLower, 'lessThanOrEqual'.ToLower]);
+end;
+
+function TComparisonFilterTypeHelper.ToString: string;
+begin
+  case self of
+    TComparisonFilterType.eq:
+      Exit('eq');
+    TComparisonFilterType.ne:
+      Exit('ne');
+    TComparisonFilterType.gt:
+      Exit('gt');
+    TComparisonFilterType.gte:
+      Exit('gte');
+    TComparisonFilterType.lt:
+      Exit('lt');
+    TComparisonFilterType.lte:
+      Exit('lte');
+  end;
+end;
+
+{ TCompoundFilterTypeHelper }
+
+constructor TCompoundFilterTypeHelper.Create(const Value: string);
+begin
+  Self := TEnumValueRecovery.TypeRetrieve<TCompoundFilterType>(Value,
+            ['and', 'or']);
+end;
+
+function TCompoundFilterTypeHelper.ToString: string;
+begin
+  case self of
+    TCompoundFilterType.and:
+      Exit('and');
+    TCompoundFilterType.or:
+      Exit('or');
+  end;
+end;
+
+{ TWebSearchTypeHelper }
+
+constructor TWebSearchTypeHelper.Create(const Value: string);
+begin
+  Self := TEnumValueRecovery.TypeRetrieve<TWebSearchType>(Value,
+            ['web_search_preview', 'web_search_preview_2025_03_11']);
+end;
+
+function TWebSearchTypeHelper.ToString: string;
+begin
+  case self of
+    TWebSearchType.web_search_preview:
+      Exit('web_search_preview');
+    TWebSearchType.web_search_preview_2025_03_11:
+      Exit('web_search_preview_2025_03_11');
+  end;
+end;
+
+{ TResponseTruncationTypeHelper }
+
+constructor TResponseTruncationTypeHelper.Create(const Value: string);
+begin
+  Self := TEnumValueRecovery.TypeRetrieve<TResponseTruncationType>(Value,
+            ['auto', 'disabled']);
+end;
+
+function TResponseTruncationTypeHelper.ToString: string;
+begin
+  case self of
+    TResponseTruncationType.auto:
+      Exit('auto');
+    TResponseTruncationType.disabled:
+      Exit('disabled');
+  end;
+end;
+
+{ TResponseTypesHelper }
+
+constructor TResponseTypesHelper.Create(const Value: string);
+begin
+  Self := TEnumValueRecovery.TypeRetrieve<TResponseTypes>(Value,
+            ['message', 'file_search_call', 'function_call', 'web_search_call',
+             'computer_call', 'reasoning', 'computer_call_output', 'function_call_output']);
+end;
+
+function TResponseTypesHelper.ToString: string;
+begin
+  case self of
+    TResponseTypes.message:
+      Exit('message');
+    TResponseTypes.file_search_call:
+      Exit('file_search_call');
+    TResponseTypes.function_call:
+      Exit('function_call');
+    TResponseTypes.web_search_call:
+      Exit('web_search_call');
+    TResponseTypes.computer_call:
+      Exit('computer_call');
+    TResponseTypes.reasoning:
+      Exit('reasoning');
+    TResponseTypes.computer_call_output:
+      Exit('computer_call_outpu');
+    TResponseTypes.function_call_output:
+      Exit('function_call_output');
+  end;
+end;
+
+{ TResponseTypesInterceptor }
+
+function TResponseTypesInterceptor.StringConverter(Data: TObject;
+  Field: string): string;
+begin
+  Result := RTTI.GetType(Data.ClassType).GetField(Field).GetValue(Data).AsType<TResponseTypes>.ToString;
+end;
+
+procedure TResponseTypesInterceptor.StringReverter(Data: TObject; Field,
+  Arg: string);
+begin
+  RTTI.GetType(Data.ClassType).GetField(Field).SetValue(Data, TValue.From(TResponseTypes.Create(Arg)));
+end;
+
+{ TResponseContentTypeHelper }
+
+constructor TResponseContentTypeHelper.Create(const Value: string);
+begin
+  Self := TEnumValueRecovery.TypeRetrieve<TResponseContentType>(Value,
+            ['output_text', 'refusal']);
+end;
+
+function TResponseContentTypeHelper.ToString: string;
+begin
+  case Self of
+    TResponseContentType.output_text:
+      Exit('output_text');
+    TResponseContentType.refusal:
+      Exit('refusal');
+  end;
+end;
+
+{ TResponseContentTypeInterceptor }
+
+function TResponseContentTypeInterceptor.StringConverter(Data: TObject;
+  Field: string): string;
+begin
+  Result := RTTI.GetType(Data.ClassType).GetField(Field).GetValue(Data).AsType<TResponseContentType>.ToString;
+end;
+
+procedure TResponseContentTypeInterceptor.StringReverter(Data: TObject; Field,
+  Arg: string);
+begin
+  RTTI.GetType(Data.ClassType).GetField(Field).SetValue(Data, TValue.From(TResponseContentType.Create(Arg)));
+end;
+
+{ TResponseAnnotationTypeHelper }
+
+constructor TResponseAnnotationTypeHelper.Create(const Value: string);
+begin
+  Self := TEnumValueRecovery.TypeRetrieve<TResponseAnnotationType>(Value,
+            ['file_citation', 'url_citation', 'file_path']);
+end;
+
+function TResponseAnnotationTypeHelper.ToString: string;
+begin
+  case self of
+    TResponseAnnotationType.file_citation:
+      Exit('file_citation');
+    TResponseAnnotationType.url_citation:
+      Exit('url_citation');
+    TResponseAnnotationType.file_path:
+      Exit('file_path');
+  end;
+end;
+
+{ TResponseAnnotationTypeInterceptor }
+
+function TResponseAnnotationTypeInterceptor.StringConverter(Data: TObject;
+  Field: string): string;
+begin
+  Result := RTTI.GetType(Data.ClassType).GetField(Field).GetValue(Data).AsType<TResponseAnnotationType>.ToString;
+end;
+
+procedure TResponseAnnotationTypeInterceptor.StringReverter(Data: TObject;
+  Field, Arg: string);
+begin
+  RTTI.GetType(Data.ClassType).GetField(Field).SetValue(Data, TValue.From(TResponseAnnotationType.Create(Arg)));
+end;
+
+{ TResponseComputerTypeHelper }
+
+constructor TResponseComputerTypeHelper.Create(const Value: string);
+begin
+  Self := TEnumValueRecovery.TypeRetrieve<TResponseComputerType>(Value,
+            ['click', 'double_click', 'drag',
+             'keypress', 'move', 'screenshot',
+             'scroll', 'type', 'wait']);
+end;
+
+function TResponseComputerTypeHelper.ToString: string;
+begin
+  case self of
+    TResponseComputerType.click:
+      Exit('click');
+    TResponseComputerType.double_click:
+      Exit('double_click');
+    TResponseComputerType.drag:
+      Exit('drag');
+    TResponseComputerType.keypress:
+      Exit('keypress');
+    TResponseComputerType.move:
+      Exit('move');
+    TResponseComputerType.screenshot:
+      Exit('screenshot');
+    TResponseComputerType.scroll:
+      Exit('scroll');
+    TResponseComputerType.type:
+      Exit('type');
+    TResponseComputerType.wait:
+      Exit('wait');
+  end;
+end;
+
+{ TResponseComputerTypeInterceptor }
+
+function TResponseComputerTypeInterceptor.StringConverter(Data: TObject;
+  Field: string): string;
+begin
+  Result := RTTI.GetType(Data.ClassType).GetField(Field).GetValue(Data).AsType<TResponseComputerType>.ToString;
+end;
+
+procedure TResponseComputerTypeInterceptor.StringReverter(Data: TObject; Field,
+  Arg: string);
+begin
+  RTTI.GetType(Data.ClassType).GetField(Field).SetValue(Data, TValue.From(TResponseComputerType.Create(Arg)));
+end;
+
+{ TResponseStatusHelper }
+
+constructor TResponseStatusHelper.Create(const Value: string);
+begin
+  Self := TEnumValueRecovery.TypeRetrieve<TResponseStatus>(Value,
+            ['in_progress', 'incomplete', 'completed', 'failed']);
+end;
+
+function TResponseStatusHelper.ToString: string;
+begin
+  case self of
+    TResponseStatus.in_progress:
+      Exit('in_progress');
+    TResponseStatus.incomplete:
+      Exit('incomplete');
+    TResponseStatus.completed:
+      Exit('completed');
+    TResponseStatus.failed:
+      Exit('failed');
+  end;
+end;
+
+{ TResponseStatusInterceptor }
+
+function TResponseStatusInterceptor.StringConverter(Data: TObject;
+  Field: string): string;
+begin
+  Result := RTTI.GetType(Data.ClassType).GetField(Field).GetValue(Data).AsType<TResponseStatus>.ToString;
+end;
+
+procedure TResponseStatusInterceptor.StringReverter(Data: TObject; Field,
+  Arg: string);
+begin
+  RTTI.GetType(Data.ClassType).GetField(Field).SetValue(Data, TValue.From(TResponseStatus.Create(Arg)));
+end;
+
+{ TResponseToolsTypeHelper }
+
+constructor TResponseToolsTypeHelper.Create(const Value: string);
+begin
+  Self := TEnumValueRecovery.TypeRetrieve<TResponseToolsType>(Value,
+            ['file_search', 'function', 'computer_use_preview', 'web_search_preview',
+             'web_search_preview_2025_03_11']);
+end;
+
+function TResponseToolsTypeHelper.ToString: string;
+begin
+  case self of
+    TResponseToolsType.file_search:
+      Exit('file_search');
+    TResponseToolsType.function:
+      Exit('function');
+    TResponseToolsType.computer_use_preview:
+      Exit('computer_use_preview');
+    TResponseToolsType.web_search_preview:
+      Exit('web_search_preview');
+    TResponseToolsType.web_search_preview_2025_03_11:
+      Exit('web_search_preview_2025_03_11');
+  end;
+end;
+
+{ TResponseToolsTypeInterceptor }
+
+function TResponseToolsTypeInterceptor.StringConverter(Data: TObject;
+  Field: string): string;
+begin
+  Result := RTTI.GetType(Data.ClassType).GetField(Field).GetValue(Data).AsType<TResponseToolsType>.ToString;
+end;
+
+procedure TResponseToolsTypeInterceptor.StringReverter(Data: TObject; Field,
+  Arg: string);
+begin
+  RTTI.GetType(Data.ClassType).GetField(Field).SetValue(Data, TValue.From(TResponseToolsType.Create(Arg)));
+end;
+
+{ TResponseToolsFilterTypeHelper }
+
+constructor TResponseToolsFilterTypeHelper.Create(const Value: string);
+begin
+  Self := TEnumValueRecovery.TypeRetrieve<TResponseToolsFilterType>(Value,
+            ['eq', 'ne', 'gt', 'gte',
+             'lt', 'lte', 'and', 'or']);
+end;
+
+function TResponseToolsFilterTypeHelper.ToString: string;
+begin
+  case self of
+    TResponseToolsFilterType.eq:
+      Exit('eq');
+    TResponseToolsFilterType.ne:
+      Exit('ne');
+    TResponseToolsFilterType.gt:
+      Exit('gt');
+    TResponseToolsFilterType.gte:
+      Exit('gte');
+    TResponseToolsFilterType.lt:
+      Exit('lt');
+    TResponseToolsFilterType.lte:
+      Exit('lte');
+    TResponseToolsFilterType.and:
+      Exit('and');
+    TResponseToolsFilterType.or:
+      Exit('or');
+  end;
+end;
+
+{ TResponseToolsFilterTypeInterceptor }
+
+function TResponseToolsFilterTypeInterceptor.StringConverter(Data: TObject;
+  Field: string): string;
+begin
+  Result := RTTI.GetType(Data.ClassType).GetField(Field).GetValue(Data).AsType<TResponseToolsFilterType>.ToString;
+end;
+
+procedure TResponseToolsFilterTypeInterceptor.StringReverter(Data: TObject;
+  Field, Arg: string);
+begin
+  RTTI.GetType(Data.ClassType).GetField(Field).SetValue(Data, TValue.From(TResponseToolsFilterType.Create(Arg)));
+end;
+
+{ TResponseItemContentTypeHelper }
+
+constructor TResponseItemContentTypeHelper.Create(const Value: string);
+begin
+  Self := TEnumValueRecovery.TypeRetrieve<TResponseItemContentType>(Value,
+            ['input_text', 'input_image', 'input_file', 'output_text', 'refusal']);
+end;
+
+function TResponseItemContentTypeHelper.ToString: string;
+begin
+  case self of
+    TResponseItemContentType.input_text:
+      Exit('input_text');
+    TResponseItemContentType.input_image:
+      Exit('input_image');
+    TResponseItemContentType.input_file:
+      Exit('input_file');
+    TResponseItemContentType.output_text:
+      Exit('output_text');
+    TResponseItemContentType.refusal:
+      Exit('refusal');
+  end;
+end;
+
+{ TResponseItemContentTypeInterceptor }
+
+function TResponseItemContentTypeInterceptor.StringConverter(Data: TObject;
+  Field: string): string;
+begin
+  Result := RTTI.GetType(Data.ClassType).GetField(Field).GetValue(Data).AsType<TResponseItemContentType>.ToString;
+end;
+
+procedure TResponseItemContentTypeInterceptor.StringReverter(Data: TObject;
+  Field, Arg: string);
+begin
+  RTTI.GetType(Data.ClassType).GetField(Field).SetValue(Data, TValue.From(TResponseItemContentType.Create(Arg)));
+end;
+
+{ TResponseStreamTypeHelper }
+
+constructor TResponseStreamTypeHelper.Create(const Value: string);
+begin
+  Self := TEnumValueRecovery.TypeRetrieve<TResponseStreamType>(Value,
+            [ 'response.created',
+              'response.in_progress',
+              'response.completed',
+              'response.failed',
+              'response.incomplete',
+              'response.output_item.added',
+              'response.output_item.done',
+              'response.content_part.added',
+              'response.content_part.done',
+              'response.output_text.delta',
+              'response.output_text.annotation.added',
+              'response.output_text.done',
+              'response.refusal.delta',
+              'response.refusal.done',
+              'response.function_call_arguments.delta',
+              'response.function_call_arguments.done',
+              'response.file_search_call.in_progress',
+              'response.file_search_call.searching',
+              'response.file_search_call.completed',
+              'response.web_search_call.in_progress',
+              'response.web_search_call.searching',
+              'response.web_search_call.completed',
+              'error'
+            ]);
+end;
+
+function TResponseStreamTypeHelper.ToString: string;
+begin
+  case self of
+    TResponseStreamType.created:
+      Exit('response.created');
+    TResponseStreamType.in_progress:
+      Exit('response.in_progress');
+    TResponseStreamType.completed:
+      Exit('response.completed');
+    TResponseStreamType.failed:
+      Exit('response.failed');
+    TResponseStreamType.incomplete:
+      Exit('response.incomplete');
+    TResponseStreamType.output_item_added:
+      Exit('response.output_item.added');
+    TResponseStreamType.output_item_done:
+      Exit('response.output_item.done');
+    TResponseStreamType.content_part_added:
+      Exit('response.content_part.added');
+    TResponseStreamType.content_part_done:
+      Exit('response.content_part.done');
+    TResponseStreamType.output_text_delta:
+      Exit('response.output_text.delta');
+    TResponseStreamType.output_text_annotation_added:
+      Exit('response.output_text.annotation.added');
+    TResponseStreamType.output_text_done:
+      Exit('response.output_text.done');
+    TResponseStreamType.refusal_delta:
+      Exit('response.refusal.delta');
+    TResponseStreamType.refusal_done:
+      Exit('response.refusal.done');
+    TResponseStreamType.function_call_arguments_delta:
+      Exit('response.function_call_arguments.delta');
+    TResponseStreamType.function_call_arguments_done:
+      Exit('response.function_call_arguments.done');
+    TResponseStreamType.file_search_call_in_progress:
+      Exit('response.file_search_call.in_progress');
+    TResponseStreamType.file_search_call_searching:
+      Exit('response.file_search_call.searching');
+    TResponseStreamType.file_search_call_completed:
+      Exit('response.file_search_call.completed');
+    TResponseStreamType.web_search_call_in_progress:
+      Exit('response.web_search_call.in_progress');
+    TResponseStreamType.web_search_call_searching:
+      Exit('response.web_search_call.searching');
+    TResponseStreamType.web_search_call_completed:
+      Exit('response.web_search_call.completed');
+    TResponseStreamType.error:
+      Exit('error');
+  end;
+end;
+
+{ TResponseStreamTypeInterceptor }
+
+function TResponseStreamTypeInterceptor.StringConverter(Data: TObject;
+  Field: string): string;
+begin
+  Result := RTTI.GetType(Data.ClassType).GetField(Field).GetValue(Data).AsType<TResponseStreamType>.ToString;
+end;
+
+procedure TResponseStreamTypeInterceptor.StringReverter(Data: TObject; Field,
+  Arg: string);
+begin
+  RTTI.GetType(Data.ClassType).GetField(Field).SetValue(Data, TValue.From(TResponseStreamType.Create(Arg)));
 end;
 
 end.
