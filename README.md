@@ -2,7 +2,7 @@
 
 
 Welcome to `GenAI`, a powerful and flexible **Delphi library** integrating the latest innovations from `OpenAI` APIs. Designed for comprehensive support, it enables content generation, dialogue management, vision and speech processing, as well as audio interactions with precise control.
-Built on advanced models with reasoning capabilities, such as `o1`, `o3` and `o4`, it provides tools for data manipulation, batch processing, function calling, file management, and content moderation. It also supports the `GPT-4.1`, `GPT-4.5` models, the teminaison points `v1/chat/completion`, `v1/responses` and offers seamless agent construction.
+Built on advanced models with reasoning capabilities, such as `o1`, `o3` and `o4`, it provides tools for data manipulation, batch processing, function calling, file management, and content moderation. It also supports the `GPT-4.1` models, the teminaison points `v1/chat/completion`, `v1/responses` and offers seamless agent construction.
 Additionally, `GenAI` streamlines assistant orchestration, message management, threads, and execution (runs), meeting the demands of modern projects. <br> <br>
 Integrating OpenAI APIs into your Delphi apps has never been easier: enjoy streamlined network‑call management, built‑in unit testing, and a modular JSON‑configuration approach.
 Check out the full [GenAI project](https://github.com/MaxiDonkey/DelphiGenAI/blob/main/GenAI.md)
