@@ -70,7 +70,7 @@ This interface represents OpenAI’s most advanced environment for driving model
 
 By using the GenAI.Tutorial.VCL unit along with the initialization described [above](#Strategies-for-quickly-using-the-code-examples), you can achieve results similar to the example shown below.
 
-![Preview](/../main/assets/images/images/GenAIResponseRequest.png?raw=true "Preview")
+![Preview](/../main/images/GenAIResponseRequest.png?raw=true "Preview")
 
 <br>
 
