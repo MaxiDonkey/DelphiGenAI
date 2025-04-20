@@ -74,3 +74,52 @@ By using the GenAI.Tutorial.VCL unit along with the initialization described [ab
 
 <br>
 
+### Streamed
+
+```Delphi
+//uses GenAI, GenAI.Types, GenAI.Tutorial.VCL;
+
+  TutorialHub.JSONRequestClear;
+
+  //Asynchronous example
+  Client.Responses.AsynCreateStream(
+    procedure(Params: TResponsesParams)
+    begin
+      Params.Model('gpt-4.1-nano');
+      Params.Input('What is the difference between a mathematician and a physicist?');
+      //Params.Store(False);  // Response not stored
+      Params.Stream;
+      TutorialHub.JSONRequest := Params.ToFormat();
+    end,
+    function : TAsynResponseStream
+    begin
+      Result.Sender := TutorialHub;
+      Result.OnStart := Start;
+      Result.OnProgress := DisplayStream;
+      Result.OnError := Display;
+      Result.OnDoCancel := DoCancellation;
+      Result.OnCancellation := Cancellation;
+    end);
+
+  //Synchronous example
+//  Client.Responses.CreateStream(
+//    procedure (Params: TResponsesParams)
+//    begin
+//      Params.Model('gpt-4.1-nano');
+//      Params.Input('What is the difference between a mathematician and a physicist?');
+//      //Params.Store(False);  // Response not stored
+//      Params.Stream;
+//      TutorialHub.JSONRequest := Params.ToFormat();
+//    end,
+//    procedure (var Chat: TResponseStream; IsDone: Boolean; var Cancel: Boolean)
+//    begin
+//      if (not IsDone) and Assigned(Chat) then
+//        begin
+//          DisplayStream(TutorialHub, Chat);
+//        end;
+//    end);
+```
+
+![Preview](/../main/images/GenAIResponseStreamedRequest.png?raw=true "Preview")
+
+<br>
