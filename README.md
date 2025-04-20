@@ -223,13 +223,16 @@ To help you get up to speed on both endpoints, the two following documents provi
 
 Check out the full [documentation](https://github.com/MaxiDonkey/DelphiGenAI/blob/main/ChatCompletion.md#chat-completion)
 
-[Text generation (Non streamed, Streamed, Multi-turn conversations), Generating Audio Responses with Chat (Audio and Text to Text, Audio to Audio, Audio multi-turn conversations), Vision (Analyze single source, Analyze multi-source, Low or high fidelity image understanding), Reasoning with o1, o3 or o4 and Web search.](https://github.com/MaxiDonkey/DelphiGenAI/blob/main/ChatCompletion.md#chat-completion)
+[Text generation (Non streamed, Streamed, Multi-turn conversations), Generating Audio Responses with Chat (Audio and Text to Text, Audio to Audio, Audio multi-turn conversations), Vision (Analyze single source, Analyze multi-source, Low or high fidelity image understanding), Reasoning with o1, o3 or o4,  Web search...](https://github.com/MaxiDonkey/DelphiGenAI/blob/main/ChatCompletion.md#chat-completion)
 
 <br>
 
 ### Responses
 
 Check out the full [documentation](https://github.com/MaxiDonkey/DelphiGenAI/blob/main/Responses.md)
+
+[Text generation (Non streamed, Streamed, Multi-turn conversations), Vision (Analyze single source, Analyze multi-source, Low or high fidelity image understanding), Reasoning with o1, o3 or o4, Web search, File search...](https://github.com/MaxiDonkey/DelphiGenAI/blob/main/Responses.md)
+
 
 <br>
 
