@@ -809,6 +809,8 @@ In other words, it enables the model’s behavior to be refined ***without requi
 >[!NOTE]
 > The PDF file used is written in French. However, thanks to the `file_search` tool, the content can be queried regardless of the document’s language, allowing for efficient multilingual search.
 
+<br>
+
 ##### [--STEP 1--] Upload
 
 **Upload the PDF file and retrieve the upload ID.**
