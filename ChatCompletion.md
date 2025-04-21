@@ -1312,7 +1312,7 @@ Building the query using the Weather tool. (Simply copy/paste this last code to 
 //uses GenAI, GenAI.Types, GenAI.Tutorial.VCL, GenAI.Functions.Example;
 
   TutorialHub.JSONRequestClear;
-  var Weather := TWeatherReportFunction.CreateInstance(True);
+  var Weather := TWeatherReportFunction.CreateInstance(False);
 //  TutorialHub.ToolCall := TutorialHub.DisplayWeatherStream;
 // or
   TutorialHub.ToolCall := TutorialHub.DisplayWeatherAudio;
