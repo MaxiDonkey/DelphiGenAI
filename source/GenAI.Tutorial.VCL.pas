@@ -487,8 +487,8 @@ begin
   TutorialHub.JSONResponse := Value.JSONResponse;
   Display(TutorialHub, [
       Value.Id,
-      F(Value.&Object, F('upload_id', Value.UploadId)),
-      Value.CreatedAtAsString
+      F(Value.&Object, F('upload_id', Value.UploadId)) //,
+//      Value.CreatedAtAsString
     ]);
   Display(Sender);
 end;
@@ -697,8 +697,21 @@ procedure Display(Sender: TObject; Value: TResponse);
 begin
   TutorialHub.JSONResponse := Value.JSONResponse;
   for var Item in Value.Output do
-    for var SubItem in Item.Content do
-      Display(Sender, SubItem.Text);
+    begin
+      if Item.&Type = TResponseTypes.function_call then
+        begin
+           Display(Sender, Item.Arguments);
+           var Evaluation := TutorialHub.Tool.Execute(Item.Arguments);
+           Display(Sender, Evaluation);
+           Display(Sender);
+           TutorialHub.ToolCall(Evaluation);
+        end
+      else
+        begin
+          for var SubItem in Item.Content do
+            Display(Sender, SubItem.Text);
+        end;
+    end;
   Display(Sender);
 end;
 

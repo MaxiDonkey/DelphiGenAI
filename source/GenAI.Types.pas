@@ -1081,7 +1081,15 @@ type
     /// Files uploaded with this purpose are intended for vision tasks supported
     /// by the Assistants API, such as image analysis or processing.
     /// </remarks>
-    vision
+    vision,
+    /// <summary>
+    /// Used for eval data sets
+    /// </summary>
+    evals,
+    /// <summary>
+    /// Flexible file type for any purpose
+    /// </summary>
+    user_data
   );
 
   TFilesPurposeHelper = record Helper for TFilesPurpose
@@ -2170,7 +2178,7 @@ constructor TFilesPurposeHelper.Create(const Value: string);
 begin
   Self := TEnumValueRecovery.TypeRetrieve<TFilesPurpose>(Value,
             ['assistants', 'assistants_output', 'batch', 'batch_output',
-             'fine-tune', 'fine-tune-results', 'vision']);
+             'fine-tune', 'fine-tune-results', 'vision', 'evals', 'user_data']);
 end;
 
 function TFilesPurposeHelper.ToString: string;
@@ -2190,6 +2198,10 @@ begin
       Exit('fine-tune-results');
     TFilesPurpose.vision:
       Exit('vision');
+    TFilesPurpose.evals:
+      Exit('evals');
+    TFilesPurpose.user_data:
+      Exit('user_data')
   end;
 end;
 

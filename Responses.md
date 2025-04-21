@@ -1017,6 +1017,146 @@ ___
 
 ## Function calling
 
+Allow models to access data and execute actions. <br/>
+Function calling offers a robust and versatile method for OpenAI models to interact with your code or external services, serving two main purposes:
+
+- **Data Retrieval:** Access real-time information to enhance the model's responses (RAG). This is particularly beneficial for searching knowledge bases and extracting specific data from APIs (e.g., obtaining the current weather).
+
+- **Action Execution:** Carry out tasks such as form submissions, API calls, updating the application state (UI/frontend or backend), or executing agent-driven workflows (e.g., transferring a conversation).
+
+Refer to the [official documentation](https://platform.openai.com/docs/guides/function-calling?example=get-weather).
+
+#### How build a plugin
+
+Use case : **What’s the weather in Paris?**
+
+In the `GenAI.Functions.Example` unit, there is a class that defines a function which OpenAI can choose to use or not, depending on the options provided. This class inherits from a parent class defined in the `GenAI.Functions.Core` unit. To create new functions, you can derive from the `TFunctionCore` class and define a new plugin.
+
+#### Use a schema
+
+In this unit, this schema will be used for function calls.
+```Json
+{
+    "type": "object",
+    "properties": {
+         "location": {
+             "type": "string",
+             "description": "The city and department, e.g. Marseille, 13"
+         },
+         "unit": {
+             "type": "string",
+             "enum": ["celsius", "fahrenheit"]
+         }
+     },
+     "required": ["location"],
+     "additionalProperties": false
+}
+```
+
+<br/>
+
+We will use the TWeatherReportFunction plugin defined in the `GenAI.Functions.Example` unit.
+
+```Delphi
+  var Weather := TWeatherReportFunction.CreateInstance;
+  //or
+  var Weather := TWeatherReportFunction.CreateInstance(True);  //To activate `Strict` option
+
+  //See step : Main method
+```
+<br/>
+
+#### Methods to display result
+
+Next, we define a method to display the results obtained using the Weather tool.
+
+We will use a method defined in TutorialHub whose purpose is to handle the data returned from the function call; however, this is not the main concept to focus on. For final information processing, we will use only the voice-based method. This method uses the *chat/completion* endpoint, which is perfectly suitable in this context.
+
+However, our primary focus will be on the method that triggers the function call via the `/responses` endpoint.
+
 <br>
 
+#### Main method
 
+Building the query using the Weather tool. (Simply copy/paste this last code to test the usage of the functions.)
+
+```Delphi
+//uses GenAI, GenAI.Types, GenAI.Tutorial.VCL, GenAI.Functions.Example;
+  
+  TutorialHub.JSONRequestClear;
+  var Weather := TWeatherReportFunction.CreateInstance(False);
+//  TutorialHub.ToolCall := TutorialHub.DisplayWeatherStream;
+  TutorialHub.ToolCall := TutorialHub.DisplayWeatherAudio;
+  TutorialHub.Tool := Weather;
+
+  //Synchronous example
+  var Value := Client.Responses.Create(
+    procedure (Params: TResponsesParams)
+    begin
+      Params.Model('gpt-4.1');
+      Params.Input('What is the weather in Paris?');
+      Params.Tools([TResponseFunctionParams.New(Weather)]);
+      Params.ToolChoice(TToolChoice.required);
+      TutorialHub.JSONRequest := Params.ToFormat();
+    end);
+  try
+    Display(TutorialHub, Value); //see below
+  finally
+    Value.Free;
+  end;
+```
+
+Result
+```Json
+{
+    "id": "resp_6806368aff1c81918a2af800894a5ae405b956e8d8bc9a97",
+    "object": "response",
+    "created_at": 1745237643,
+    "status": "completed",
+    "error": null,
+    "incomplete_details": null,
+    "instructions": null,
+    "max_output_tokens": null,
+    "model": "gpt-4.1-2025-04-14",
+    "output": [
+        {
+            "id": "fc_6806368b70c88191bf8a10a576d24f1905b956e8d8bc9a97",
+            "type": "function_call",
+            "status": "completed",
+            "arguments": "{\"location\":\"paris\",\"unit\":\"celsius\"}",
+            "call_id": "call_eo97T3wRgwvxZhUJ2nTat3jf",
+            "name": "get_weather"
+        }
+...
+```
+
+It is important to review the `display(TutorialHub, Value);` method here, as it is responsible for handling the function call.
+
+```Delphi
+  procedure Display(Sender: TObject; Value: TResponse);
+begin
+  TutorialHub.JSONResponse := Value.JSONResponse;
+  for var Item in Value.Output do
+    begin
+      if Item.&Type = TResponseTypes.function_call then  //identifies the request as a function call
+        begin
+           Display(Sender, Item.Arguments);
+           var Evaluation := TutorialHub.Tool.Execute(Item.Arguments);
+           Display(Sender, Evaluation);
+           Display(Sender);
+           TutorialHub.ToolCall(Evaluation);
+        end
+      else
+        begin
+          for var SubItem in Item.Content do
+            Display(Sender, SubItem.Text);
+        end;
+    end;
+  Display(Sender);
+end;
+```
+
+<br/>
+
+>[!WARNING]
+>Ensure user confirmation for actions like sending emails or making purchases to avoid unintended consequences.
