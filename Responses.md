@@ -775,7 +775,237 @@ ___
 
 ## File search
 
+### Let your models query your own files before generating a response
+
+#### 1. Overview
+
+The Responses API includes a document‑search tool that lets the model draw—prior to answering—from a knowledge base made up of files you have previously uploaded. This search blends both keyword matching and semantic retrieval within a vector database.
+
+#### 2. How it works
+
+1. Create a vector database
+    - Build a vector store and upload your documents. Refer to [Files upload](https://github.com/MaxiDonkey/DelphiGenAI?tab=readme-ov-file#file-upload), [vector store](https://github.com/MaxiDonkey/DelphiGenAI/blob/main/BeyondBasics.md#vector-store) and [vector store file.](https://github.com/MaxiDonkey/DelphiGenAI/blob/main/BeyondBasics.md#vector-store-files)
+    - These files expand the model’s built‑in knowledge, allowing it to rely on your private sources.
+2. Model‑triggered retrieval
+    - When the model decides it’s helpful to consult your base, it automatically calls the tool.
+    - The tool then queries the vector database, fetches the relevant passages, and returns them to the model, which weaves them into its reply.
+3. No infrastructure to manage
+    - The tool is fully hosted and managed by OpenAI, so no additional code is required on your end.
+
+#### 3. Learn more
+
+Want a deeper dive into vector storage and semantic search? See our Information [Retrieval Guide.](https://platform.openai.com/docs/guides/retrieval)
+
 <br>
+
+#### 4. Use case
+
+To demonstrate how this tool works, we will create a vector store from a PDF file, which will then be accessed via the `/responses` endpoint.
+This approach allows the model to be enriched with specific information, thereby enhancing the relevance and contextual accuracy of the responses it generates.
+In other words, it enables the model’s behavior to be refined ***without requiring an explicit fine-tuning phase.***
+
+>[!NOTE]
+> The PDF file used is written in French. However, thanks to the `file_search` tool, the content can be queried regardless of the document’s language, allowing for efficient multilingual search.
+
+##### [--STEP 1--] Upload
+
+**Upload the PDF file and retrieve the upload ID.**
+
+The first step is to upload the PDF file, which returns a unique identifier. This `ID` will be used to reference the document in subsequent requests.
+
+The PDF file is located in the sample directory of this repository.
+The file is named `File_Search_file.pdf`.
+
+```Delphi
+//uses GenAI, GenAI.Types, GenAI.Tutorial.VCL;
+
+  var Value := Client.Files.Upload(
+    procedure (Params: TFileUploadParams)
+    begin
+      Params.&File('File_Search_file.pdf');
+      Params.Purpose(TFilesPurpose.user_data);
+    end);
+  try
+    File_ID := Value.Id; //Retrieving the ID and then providing it to the file vector store
+  finally
+    Value.Free;
+  end;
+```
+
+Result
+```Json
+{
+    "object": "file",
+    "id": "file-WNEwgxSLvUgXMk56HhyzAY",
+    "purpose": "user_data",
+    "filename": "File_Search_file.pdf",
+    "bytes": 334640,
+    "created_at": 1745216687,
+    "expires_at": null,
+    "status": "processed",
+    "status_details": null
+}
+```
+
+<br>
+
+##### [--STEP 2--] Create store
+
+**We now need to create a vector store and retrieve its ID.**
+
+This step initializes a vector storage space, which will later be used to index the contents of the uploaded PDF file.
+
+```Delphi
+//uses GenAI, GenAI.Types, GenAI.Tutorial.VCL;
+
+  var Value := Client.VectorStore.Create(
+    procedure (Params: TVectorStoreCreateParams)
+    begin
+      Params.Name('PDF Data for the tutorial');
+      TutorialHub.JSONRequest := Params.ToFormat();
+    end);
+  try
+    Display(TutorialHub, Value);
+  finally
+    Value.Free;
+  end;
+```
+
+Result
+```Json
+{
+    "id": "vs_6805e821210081919a4aabae08c63a14",
+    "object": "vector_store",
+    "created_at": 1745217569,
+    "name": "PDF Data for the tutorial",
+    "usage_bytes": 0,
+    "file_counts": {
+        "in_progress": 0,
+        "completed": 0,
+        "failed": 0,
+        "cancelled": 0,
+        "total": 0
+    },
+    "status": "completed",
+    "expires_after": null,
+    "expires_at": null,
+    "last_active_at": 1745217569,
+    "metadata": {
+    }
+}
+```
+
+<br>
+
+##### [--STEP 3--] Link File
+
+To complete the vector store setup, we will now attach the uploaded file to the vector store by providing both the `file ID` and the vector `store ID`.
+
+```Delphi
+//uses GenAI, GenAI.Types, GenAI.Tutorial.VCL;
+
+  var Value := Client.VectorStoreFiles.Create('vs_6805e821210081919a4aabae08c63a14',
+    procedure (Params: TVectorStoreFilesCreateParams)
+    begin
+      Params.FileId('file-WNEwgxSLvUgXMk56HhyzAY');
+      TutorialHub.JSONRequest := Params.ToFormat();
+    end);
+  try
+    Display(TutorialHub, Value);
+  finally
+    Value.Free;
+  end;
+```
+
+Result
+```Json
+{
+    "id": "file-WNEwgxSLvUgXMk56HhyzAY",
+    "object": "vector_store.file",
+    "usage_bytes": 0,
+    "created_at": 1745218347,
+    "vector_store_id": "vs_6805e821210081919a4aabae08c63a14",
+    "status": "in_progress",
+    "last_error": null,
+    "chunking_strategy": {
+        "type": "static",
+        "static": {
+            "max_chunk_size_tokens": 800,
+            "chunk_overlap_tokens": 400
+        }
+    },
+    "attributes": {
+    }
+}
+```
+
+<br>
+
+##### [--STEP 4--] Exploit Store
+
+We will now leverage our vector store to allow the model to optionally use the information extracted from the PDF when generating its response.
+
+```Delphi
+//uses GenAI, GenAI.Types, GenAI.Tutorial.VCL;
+
+  TutorialHub.JSONRequestClear;
+
+  //Asynchronous example
+  Client.Responses.AsynCreateStream(
+    procedure(Params: TResponsesParams)
+    begin
+      Params.Model('gpt-4.1-mini');
+      Params.Input('Identify all the conjectures and provide guidance or evidence to support their validation or refutation.');
+      Params.Tools([file_search(['vs_6805e821210081919a4aabae08c63a14'])]);
+//      Params.ToolChoice(TToolChoice.auto);
+//  or   
+//      Params.ToolChoice(THostedToolParams.New('file_search'));
+      Params.Store(False);
+      Params.Stream;
+      TutorialHub.JSONRequest := Params.ToFormat();
+    end,
+    function : TAsynResponseStream
+    begin
+      Result.Sender := TutorialHub;
+      Result.OnStart := Start;
+      Result.OnProgress := DisplayStream;
+      Result.OnError := Display;
+      Result.OnDoCancel := DoCancellation;
+      Result.OnCancellation := Cancellation;
+    end);
+```
+
+<br>
+
+#### Note 1 : Tool_choice
+
+```Delphi
+   Params.ToolChoice(TToolChoice.auto); //none or required
+//or
+   Params.ToolChoice(THostedToolParams.New('file_search'));  //web_search_preview or  computer_use_preview
+```
+Refer to the [official documentation](https://platform.openai.com/docs/api-reference/responses/create#responses-create-tool_choice)
+
+<br>
+
+#### Note 2 : Include search results in the response
+
+```Delphi
+  Params.Include([TOutputIncluding.file_search_result]);
+```
+
+Refer to the [official documentation](https://platform.openai.com/docs/guides/tools-file-search#include-search-results-in-the-response)
+
+<br>
+
+#### 5. Final thoughts
+
+Just like the `search_web` tool, the `file_search` tool stands out for both its precision and its practical value, making it a particularly powerful component.
+Moreover, using the `/responses` endpoint proves to be a more effective approach than `/chat/completion`, as it significantly simplifies the integration of tools into queries.
+ 
+We will not cover the `computer_use` tool here, as it requires implementing all the methods to handle the passed actions — a level of complexity that goes beyond the intended scope of this wrapper.
+
+A GitHub repository may be shared in the future if the need to leverage this functionality becomes compelling.
 
 ___
 
