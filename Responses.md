@@ -820,6 +820,8 @@ The first step is to upload the PDF file, which returns a unique identifier. Thi
 The PDF file is located in the sample directory of this repository.
 The file is named `File_Search_file.pdf`.
 
+[Supported file by Mime type](https://platform.openai.com/docs/assistants/tools/file-search#supported-files)
+
 ```Delphi
 //uses GenAI, GenAI.Types, GenAI.Tutorial.VCL;
 
