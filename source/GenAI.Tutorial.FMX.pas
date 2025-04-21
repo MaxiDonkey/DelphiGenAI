@@ -687,8 +687,21 @@ procedure Display(Sender: TObject; Value: TResponse);
 begin
   TutorialHub.JSONResponse := Value.JSONResponse;
   for var Item in Value.Output do
-    for var SubItem in Item.Content do
-      Display(Sender, SubItem.Text);
+    begin
+      if Item.&Type = TResponseTypes.function_call then
+        begin
+           Display(Sender, Item.Arguments);
+           var Evaluation := TutorialHub.Tool.Execute(Item.Arguments);
+           Display(Sender, Evaluation);
+           Display(Sender);
+           TutorialHub.ToolCall(Evaluation);
+        end
+      else
+        begin
+          for var SubItem in Item.Content do
+            Display(Sender, SubItem.Text);
+        end;
+    end;
   Display(Sender);
 end;
 
