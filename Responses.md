@@ -783,16 +783,16 @@ The Responses API includes a document‑search tool that lets the model draw—
 
 #### 2. How it works
 
-*(a)* **Create a vector database**
-    - Build a vector store and upload your documents. Refer to [Files upload](https://github.com/MaxiDonkey/DelphiGenAI?tab=readme-ov-file#file-upload), [vector store](https://github.com/MaxiDonkey/DelphiGenAI/blob/main/BeyondBasics.md#vector-store) and [vector store file.](https://github.com/MaxiDonkey/DelphiGenAI/blob/main/BeyondBasics.md#vector-store-files)
-    - These files expand the model’s built‑in knowledge, allowing it to rely on your private sources.
+- **Create a vector database**  
+        - Build a vector store and upload your documents. Refer to [Files upload](https://github.com/MaxiDonkey/DelphiGenAI?tab=readme-ov-file#file-upload), [vector store](https://github.com/MaxiDonkey/DelphiGenAI/blob/main/BeyondBasics.md#vector-store) and [vector store file.](https://github.com/MaxiDonkey/DelphiGenAI/blob/main/BeyondBasics.md#vector-store-files) <br>
+        - These files expand the model’s built‑in knowledge, allowing it to rely on your private sources. 
 
-*(b)* **Model‑triggered retrieval**
-    - When the model decides it’s helpful to consult your base, it automatically calls the tool.
-    - The tool then queries the vector database, fetches the relevant passages, and returns them to the model, which weaves them into its reply.
+- **Model‑triggered retrieval**  
+        - When the model decides it’s helpful to consult your base, it automatically calls the tool. <br>
+        - The tool then queries the vector database, fetches the relevant passages, and returns them to the model, which weaves them into its reply. 
 
-*(c)* **No infrastructure to manage**
-    - The tool is fully hosted and managed by OpenAI, so no additional code is required on your end.
+- **No infrastructure to manage**  
+       - The tool is fully hosted and managed by OpenAI, so no additional code is required on your end.
 
 #### 3. Learn more
 
