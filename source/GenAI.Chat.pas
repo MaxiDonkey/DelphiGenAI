@@ -3803,8 +3803,8 @@ begin
                         procedure
                         begin
                           OnCancellation(Sender);
-                          Inc(CancelTag);
                         end);
+                      Inc(CancelTag);
                       Cancel := True;
                       Exit;
                     end;

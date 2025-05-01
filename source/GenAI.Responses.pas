@@ -2400,7 +2400,7 @@ end;
 
 function TResponsesParams.Reasoning(const Value: string): TResponsesParams;
 begin
-  Result := TResponsesParams(Add('reasoning', TReasoningParams.New.Effort(Value)));
+  Result := TResponsesParams(Add('reasoning', TReasoningParams.New.Effort(Value).Detach));
 end;
 
 function TResponsesParams.Store(const Value: Boolean): TResponsesParams;
@@ -3149,8 +3149,8 @@ begin
                         procedure
                         begin
                           OnCancellation(Sender);
-                          Inc(CancelTag);
                         end);
+                      Inc(CancelTag);
                       Cancel := True;
                       Exit;
                     end;
@@ -3530,8 +3530,7 @@ begin
                         if (CurrentData.Trim.StartsWith('{')) or (CurrentData.Trim.StartsWith('[')) then
                           begin
                             try
-                              ResponseData := TJson.JsonToObject<TResponseStream>(CurrentData);
-                              ResponseData.JSONResponse := CurrentData;
+                              ResponseData := TApiDeserializer.Parse<TResponseStream>(CurrentData);
                             except
                               {--- If there is a mistake, nothing will be done. }
                               ResponseData := nil;
@@ -3571,16 +3570,16 @@ begin
 
         {--- Buffer cleanup: keep only the incomplete portion }
         if BufferPos > 0 then
-        begin
-          NewBuffer := Buffer.Substring(BufferPos);
+          begin
+            NewBuffer := Buffer.Substring(BufferPos);
 
-          {--- We empty the stream }
-          Response.Size := 0;
+            {--- We empty the stream }
+            Response.Size := 0;
 
-          {--- then we rewrite the remaining fragment. }
-          if not NewBuffer.IsEmpty then
-            Response.WriteString(NewBuffer);
-        end;
+            {--- then we rewrite the remaining fragment. }
+            if not NewBuffer.IsEmpty then
+              Response.WriteString(NewBuffer);
+          end;
       end);
   finally
     Response.Free;

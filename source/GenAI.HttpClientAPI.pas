@@ -11,8 +11,7 @@ interface
 
 uses
   System.SysUtils, System.Classes, System.Net.HttpClient, System.Net.URLClient,
-  System.Net.Mime, System.JSON, System.NetConsts, GenAI.API.Params, GenAI.Errors,
-  GenAI.Exceptions, GenAI.HttpClientInterface;
+  System.Net.Mime, System.JSON, System.NetConsts, GenAI.API.Params, GenAI.HttpClientInterface;
 
 type
   /// <summary>

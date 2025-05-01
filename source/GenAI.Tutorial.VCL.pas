@@ -769,45 +769,72 @@ begin
   Display(Sender);
 end;
 
+//procedure DisplayStream(Sender: TObject; Value: string);
+//var
+//  M: TMemo;
+//  CurrentLine: string;
+//  Lines: TArray<string>;
+//begin
+//  if Value.Trim.IsEmpty then
+//    Exit;
+//  if Sender is TMemo then
+//    M := TMemo(Sender) else
+//    M := (Sender as TVCLTutorialHub).Memo1;
+//  var OldSelStart := M.SelStart;
+//  var ShouldScroll := (OldSelStart = M.GetTextLen);
+//  M.Lines.BeginUpdate;
+//  try
+//    Lines := Value.Split([#10]);
+//    if System.Length(Lines) > 0 then
+//    begin
+//      if M.Lines.Count > 0 then
+//        CurrentLine := M.Lines[M.Lines.Count - 1]
+//      else
+//        CurrentLine := '';
+//      CurrentLine := CurrentLine + Lines[0];
+//      if M.Lines.Count > 0 then
+//        M.Lines[M.Lines.Count - 1] := CurrentLine
+//      else
+//        M.Lines.Add(CurrentLine);
+//      for var i := 1 to High(Lines) do
+//        M.Lines.Add(Lines[i]);
+//    end;
+//  finally
+//    M.Lines.EndUpdate;
+//  end;
+//  if ShouldScroll then
+//  begin
+//    M.SelStart := M.GetTextLen;
+//    M.SelLength := 0;
+//    M.Perform(EM_SCROLLCARET, 0, 0);
+//  end;
+//end;
+
 procedure DisplayStream(Sender: TObject; Value: string);
 var
-  M: TMemo;
-  CurrentLine: string;
-  Lines: TArray<string>;
+  M   : TMemo;
+  Txt : string;
 begin
-  if Value.Trim.IsEmpty then
-    Exit;
+  if Value.IsEmpty then Exit;
+
   if Sender is TMemo then
-    M := TMemo(Sender) else
+    M := TMemo(Sender)
+  else
     M := (Sender as TVCLTutorialHub).Memo1;
-  var OldSelStart := M.SelStart;
-  var ShouldScroll := (OldSelStart = M.GetTextLen);
+
+  Txt := StringReplace(Value, '\n', sLineBreak, [rfReplaceAll]);
+  Txt := StringReplace(Txt, #10,  sLineBreak, [rfReplaceAll]);
+
   M.Lines.BeginUpdate;
   try
-    Lines := Value.Split([#10]);
-    if System.Length(Lines) > 0 then
-    begin
-      if M.Lines.Count > 0 then
-        CurrentLine := M.Lines[M.Lines.Count - 1]
-      else
-        CurrentLine := '';
-      CurrentLine := CurrentLine + Lines[0];
-      if M.Lines.Count > 0 then
-        M.Lines[M.Lines.Count - 1] := CurrentLine
-      else
-        M.Lines.Add(CurrentLine);
-      for var i := 1 to High(Lines) do
-        M.Lines.Add(Lines[i]);
-    end;
+    M.SelStart   := M.GetTextLen;
+    M.SelLength  := 0;
+    M.SelText    := Txt;
   finally
     M.Lines.EndUpdate;
   end;
-  if ShouldScroll then
-  begin
-    M.SelStart := M.GetTextLen;
-    M.SelLength := 0;
-    M.Perform(EM_SCROLLCARET, 0, 0);
-  end;
+
+  M.Perform(EM_SCROLLCARET, 0, 0);
 end;
 
 procedure DisplayStream(Sender: TObject; Value: TChat);
