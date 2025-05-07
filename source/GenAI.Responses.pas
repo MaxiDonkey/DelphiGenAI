@@ -1736,10 +1736,33 @@ type
          are inherited from its ancestor. }
   end;
 
+  TResponseReasoningSummaryPartAdded = class(TResponseWebSearchCallCompleted)
+  private
+    [JsonNameAttribute('summary_index')]
+    FSummaryIndex: Int64;
+  public
+    property SummaryIndex: Int64 read FSummaryIndex write FSummaryIndex;
+  end;
+
+  TResponseReasoningSummaryPartDone = class(TResponseReasoningSummaryPartAdded)
+    {--- This class does not introduce any new functionality; all methods and properties
+         are inherited from its ancestor. }
+  end;
+
+  TResponseReasoningSummaryTextDelta = class(TResponseReasoningSummaryPartDone)
+    {--- This class does not introduce any new functionality; all methods and properties
+         are inherited from its ancestor. }
+  end;
+
+  TResponseReasoningSummaryTextDone = class(TResponseReasoningSummaryTextDelta)
+    {--- This class does not introduce any new functionality; all methods and properties
+         are inherited from its ancestor. }
+  end;
+
   /// <summary>
   /// response.error: Emitted when an error occurs.
   /// </summary>
-  TResponseStreamError = class(TResponseWebSearchCallCompleted)
+  TResponseStreamError = class(TResponseReasoningSummaryTextDone)
   private
     FCode: string;
     FMessage: string;
@@ -1767,7 +1790,9 @@ type
      TResponseOutputTextDone, TResponseRefusalDelta, TResponseRefusalDone,
      TResponseFunctionCallArgumentsDelta, TResponseFunctionCallArgumentsDone, TResponseFileSearchCallInprogress,
      TResponseFileSearchCallSearching, TResponseFileSearchCallCompleted, TResponseWebSearchCallInprogress,
-     TResponseWebSearchCallSearching, TResponseWebSearchCallCompleted, TResponseStreamError }
+     TResponseWebSearchCallSearching, TResponseWebSearchCallCompleted, TResponseReasoningSummaryPartAdded,
+     TResponseReasoningSummaryPartDone, TResponseReasoningSummaryTextDelta, TResponseReasoningSummaryTextDone,
+     TResponseStreamError }
   TResponseStream = class(TResponseStreamError);
 
   /// <summary>
@@ -3135,16 +3160,18 @@ begin
                 procedure (var Response: TResponseStream; IsDone: Boolean; var Cancel: Boolean)
                 begin
                   {--- Check that the process has not been canceled }
-                  if Assigned(OnDoCancel) then
+                  if Assigned(OnDoCancel) and (CancelTag = 0) then
                     TThread.Queue(nil,
                         procedure
                         begin
                           Stop := OnDoCancel();
+                          if Stop then
+                            Inc(CancelTag);
                         end);
                   if Stop then
                     begin
                       {--- Trigger when processus was stopped }
-                      if (CancelTag = 0) and Assigned(OnCancellation) then
+                      if (CancelTag = 1) and Assigned(OnCancellation) then
                         TThread.Queue(nil,
                         procedure
                         begin

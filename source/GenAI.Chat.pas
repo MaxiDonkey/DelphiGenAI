@@ -3789,16 +3789,18 @@ begin
                 procedure (var Chat: TChat; IsDone: Boolean; var Cancel: Boolean)
                 begin
                   {--- Check that the process has not been canceled }
-                  if Assigned(OnDoCancel) then
+                  if Assigned(OnDoCancel) and (CancelTag = 0) then
                     TThread.Queue(nil,
                         procedure
                         begin
                           Stop := OnDoCancel();
+                          if Stop then
+                            Inc(CancelTag);
                         end);
                   if Stop then
                     begin
                       {--- Trigger when processus was stopped }
-                      if (CancelTag = 0) and Assigned(OnCancellation) then
+                      if (CancelTag = 1) and Assigned(OnCancellation) then
                         TThread.Queue(nil,
                         procedure
                         begin

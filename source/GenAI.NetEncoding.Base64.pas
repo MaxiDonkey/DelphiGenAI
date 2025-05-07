@@ -10,7 +10,8 @@ unit GenAI.NetEncoding.Base64;
 interface
 
 uses
-  System.SysUtils, System.Classes, System.NetEncoding, System.Net.Mime, GenAI.Consts;
+  System.SysUtils, System.Classes, System.NetEncoding, System.Net.Mime,
+  GenAI.Consts;
 
   /// <summary>
   /// Retrieves the MIME type of the specified file based on its location.

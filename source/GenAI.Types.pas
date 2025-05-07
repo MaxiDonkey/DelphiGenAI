@@ -1504,7 +1504,8 @@ type
 
   TResponseContentType = (
     output_text,
-    refusal
+    refusal,
+    summary_text
   );
 
   TResponseContentTypeHelper = record Helper for TResponseContentType
@@ -1652,6 +1653,12 @@ type
     web_search_call_in_progress,
     web_search_call_searching,
     web_search_call_completed,
+
+    reasoning_summary_part_add,
+    reasoning_summary_part_done,
+    reasoning_summary_text_delta,
+    reasoning_summary_text_done,
+
     error
   );
 
@@ -3158,7 +3165,7 @@ end;
 constructor TResponseContentTypeHelper.Create(const Value: string);
 begin
   Self := TEnumValueRecovery.TypeRetrieve<TResponseContentType>(Value,
-            ['output_text', 'refusal']);
+            ['output_text', 'refusal', 'summary_text']);
 end;
 
 function TResponseContentTypeHelper.ToString: string;
@@ -3168,6 +3175,8 @@ begin
       Exit('output_text');
     TResponseContentType.refusal:
       Exit('refusal');
+    TResponseContentType.summary_text:
+      Exit('summary_text');
   end;
 end;
 
@@ -3452,6 +3461,10 @@ begin
               'response.web_search_call.in_progress',
               'response.web_search_call.searching',
               'response.web_search_call.completed',
+              'response.reasoning_summary_part.added',
+              'response.reasoning_summary_part.done',
+              'response.reasoning_summary_text.delta',
+              'response.reasoning_summary_text.done',
               'error'
             ]);
 end;
@@ -3503,6 +3516,17 @@ begin
       Exit('response.web_search_call.searching');
     TResponseStreamType.web_search_call_completed:
       Exit('response.web_search_call.completed');
+
+    TResponseStreamType.reasoning_summary_part_add:
+      Exit('response.reasoning_summary_part.added');
+    TResponseStreamType.reasoning_summary_part_done:
+      Exit('response.reasoning_summary_part.done');
+    TResponseStreamType.reasoning_summary_text_delta:
+      Exit('response.reasoning_summary_text.delta');
+    TResponseStreamType.reasoning_summary_text_done:
+      Exit('response.reasoning_summary_text.done');
+
+
     TResponseStreamType.error:
       Exit('error');
   end;
