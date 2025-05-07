@@ -1,3 +1,11 @@
+#### 2025
+- Fix GenAI.Schema.pas, (issue #6)[https://github.com/MaxiDonkey/DelphiGenAI/issues/6] 
+- `v1/responses` add streaming events : Allowing you to follow reasoning during a streamed call <br>
+      - response.reasoning_summary_part (added & done )  <br>
+      - response.reasoning_summary_text (delta & done)  <br>
+
+<br>
+
 #### 2025, April 19 version 1.0.3
 - `v1/responses` end point management for agent construction : <br>
  The Responses API combines the simplicity of `v1/chat/completions` with built‑in tools (web search, file exploration, system automation) to power action‑oriented applications.
