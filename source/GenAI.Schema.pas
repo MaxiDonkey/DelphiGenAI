@@ -230,7 +230,7 @@ end;
 
 function TSchemaParams.Items(const Value: TSchemaParams): TSchemaParams;
 begin
-  Result := TSchemaParams(Add('items', Value));
+  Result := TSchemaParams(Add('items', Value.Detach));
 end;
 
 function TSchemaParams.MaxItems(const Value: string): TSchemaParams;
