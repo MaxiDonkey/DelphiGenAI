@@ -114,24 +114,24 @@ begin
 
 
 // for Delphi 12 with triple quotes
-  Result :=
-    '''
-      {
-        "type": "object",
-        "properties": {
-             "location": {
-                 "type": "string",
-                 "description": "The city and department, e.g. Marseille, 13"
-             },
-             "unit": {
-                 "type": "string",
-                 "enum": ["celsius", "fahrenheit"]
-             }
-         },
-         "required": ["location"],
-         "additionalProperties": false
-      }
-    ''';
+//  Result :=
+//    '''
+//      {
+//        "type": "object",
+//        "properties": {
+//             "location": {
+//                 "type": "string",
+//                 "description": "The city and department, e.g. Marseille, 13"
+//             },
+//             "unit": {
+//                 "type": "string",
+//                 "enum": ["celsius", "fahrenheit"]
+//             }
+//         },
+//         "required": ["location"],
+//         "additionalProperties": false
+//      }
+//    ''';
 
 
   {--- If we use the TSchemaParams class defined in the MistralAI.Schema.pas unit }
@@ -160,24 +160,24 @@ begin
 //    end);
 //  Result := Schema.ToJsonString(True);
 
-//  var Schema := TSchemaParams.Create
-//        .&Type(TSchemaType.object)
-//        .Properties('properties',
-//          TSchemaParams.Create
-//            .Properties('location',
-//               TSchemaParams.Create
-//                 .&Type(TSchemaType.string)
-//                 .Description('The city and state, e.g. San Francisco, CA')
-//               )
-//            .Properties('unit',
-//               TSchemaParams.Create
-//                 .&Type(TSchemaType.string)
-//                 .Enum(['celsius', 'fahrenheit'])
-//               )
-//            )
-//        .Required(['location', 'unit'])
-//        .Add('additionalProperties', false);
-//  Result := Schema.ToJsonString(True);
+  var Schema := TSchemaParams.Create
+        .&Type(TSchemaType.object)
+        .Properties('properties',
+          TSchemaParams.Create
+            .Properties('location',
+               TSchemaParams.Create
+                 .&Type(TSchemaType.string)
+                 .Description('The city and state, e.g. San Francisco, CA')
+               )
+            .Properties('unit',
+               TSchemaParams.Create
+                 .&Type(TSchemaType.string)
+                 .Enum(['celsius', 'fahrenheit'])
+               )
+            )
+        .Required(['location', 'unit'])
+        .Add('additionalProperties', false);
+  Result := Schema.ToJsonString(True);
 end;
 
 end.
