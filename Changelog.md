@@ -1,4 +1,5 @@
 #### 2025
+- `gpt-image-1`: Support for new image creation and editing model
 - Fix GenAI.Schema.pas, [issue #6.](https://github.com/MaxiDonkey/DelphiGenAI/issues/6)
 - `v1/responses` add streaming events : Allowing you to follow reasoning during a streamed call <br>
       - response.reasoning_summary_part (added & done )  <br>
