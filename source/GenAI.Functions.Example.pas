@@ -45,28 +45,11 @@ function TWeatherReportFunction.Execute(const Arguments: string): string;
 
 begin
   Result := EmptyStr;
-
-  var CurrentData := EmptyStr;
-  var JSON := TJSONObject.ParseJSONValue(Arguments) as TJSONObject;
-  try
-    if Assigned(JSON) then
-    try
-      CurrentData := JSON.GetValue('current_date', '');
-    finally
-      JSON.Free;
-    end;
-  except
-    CurrentData := EmptyStr;
-  end;
-
-   if not CurrentData.IsEmpty then
-       Exit;
-
   var Location := EmptyStr;
   var UnitType := EmptyStr;
 
   {--- Parse arguments to retrieve parameters }
-  JSON := TJSONObject.ParseJSONValue(Arguments) as TJSONObject;
+  var JSON := TJSONObject.ParseJSONValue(Arguments) as TJSONObject;
   try
     if Assigned(JSON) then
     try
