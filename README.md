@@ -433,7 +433,7 @@ end;
 
 ### Gpt-image-1 model
 
-Since May 5, 2025, OpenAI has offered the `gpt-image-1` model for image creation and editing. This new model delivers higher quality compared to DALL·E 2 and DALL·E 3.
+Since May 5, 2025, OpenAI has offered the `gpt-image-1` model for image creation and editing. This new model delivers higher quality compared to `dall-e-2` and `dall-e-3`.
 
 In the configuration, you now have four additional parameters for image generation:
 - **background:** Allows you to set the transparency of the generated image’s background. Only supported by gpt-image-1. Must be one of `transparent`, `opaque`, or `auto` (default).
@@ -452,7 +452,7 @@ quality: Supports `high`, `medium`, and `low`.
 
 size: Supports `1536×1024` (landscape), `1024×1536` (portrait), or `auto` (default).
 
-prompt: Allows up to 32,000 characters for gpt-image-1 (versus 1,000 for dall-e-2 and 4,000 for dall-e-3).
+prompt: Allows up to 32,000 characters for `gpt-image-1` (versus 1,000 for `dall-e-2` and 4,000 for `dall-e-3`).
 
 <br>
 
