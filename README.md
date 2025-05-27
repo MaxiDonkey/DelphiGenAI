@@ -14,10 +14,10 @@ ___
 <br>
 
 NEW: 
+- [Mini-lab to experiment with the v1/responses endpoint](https://github.com/MaxiDonkey/file2knowledge)
 - [Gpt-image-1 model](#gpt-image-1-model)
 - [Responses vs. Chat Completions](#responses-vs-chat-completions)
 - [Responses](https://github.com/MaxiDonkey/DelphiGenAI/blob/main/Responses.md)
-- [How do you structure advanced reasoning using Promises and pipelines?](#how-do-you-structure-advanced-reasoning-using-promises-and-pipelines)
 ___
 
 <br>

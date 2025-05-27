@@ -2920,7 +2920,6 @@ begin
   Result := TResponseWebSearchParams(Add('type', TWebSearchType.Create(Value).ToString));
 end;
 
-
 function TResponseWebSearchParams.UserLocation(
   const Value: TResponseUserLocationParams): TResponseWebSearchParams;
 begin

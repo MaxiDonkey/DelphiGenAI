@@ -29,7 +29,7 @@ type
     /// <summary>
     /// Set of 16 key-value pairs that can be attached to an object. This can be useful for storing additional information
     /// about the object in a structured format, and querying for objects via API or the dashboard. Keys are strings with
-    ///a maximum length of 64 characters. Values are strings with a maximum length of 512 characters, booleans, or numbers.
+    /// a maximum length of 64 characters. Values are strings with a maximum length of 512 characters, booleans, or numbers.
     /// </summary>
     property Attributes: string read FAttributes write FAttributes;
     /// <summary>
@@ -252,6 +252,7 @@ type
     [JsonNameAttribute('file_id')]
     FFileId: string;
     FIndex: Int64;
+    FFilename: string;
   public
     /// <summary>
     /// The ID of the file.
@@ -261,6 +262,10 @@ type
     /// The index of the file in the list of files.
     /// </summary>
     property Index: Int64 read FIndex write FIndex;
+    /// <summary>
+    /// The name of the file.
+    /// </summary>
+    property Filename: string read FFilename write FFilename;
   end;
 
   TAnnotationUrlCitation = class(TAnnotationFileCitation)

@@ -1422,9 +1422,25 @@ type
   {$REGION 'GenAI.Responses'}
 
   TOutputIncluding = (
+    /// <summary>
+    /// Include the search results of the file search tool call.
+    /// </summary>
     file_search_result,
+    /// <summary>
+    /// Include image urls from the input message.
+    /// </summary>
     input_image_url,
-    computer_call_image_url
+    /// <summary>
+    /// Include image urls from the computer call output.
+    /// </summary>
+    computer_call_image_url,
+    /// <summary>
+    /// Includes an encrypted version of reasoning tokens in reasoning item outputs. This enables reasoning
+    /// items to be used in multi-turn conversations when using the Responses API statelessly (like when
+    /// the store parameter is set to false, or when an organization is enrolled in the zero data retention
+    /// program).
+    /// </summary>
+    reasoning_encrypted_content
   );
 
   TOutputIncludingHelper = record Helper for TOutputIncluding
@@ -2939,7 +2955,8 @@ begin
   Self := TEnumValueRecovery.TypeRetrieve<TOutputIncluding>(Value,
             ['file_search_call.results',
              'message.input_image.image_url',
-             'computer_call_output.output.image_url']);
+             'computer_call_output.output.image_url',
+             'reasoning.encrypted_content']);
 end;
 
 function TOutputIncludingHelper.ToString: string;
@@ -2951,6 +2968,8 @@ begin
       Exit('message.input_image.image_url');
     TOutputIncluding.computer_call_image_url:
       Exit('computer_call_output.output.image_url');
+    TOutputIncluding.reasoning_encrypted_content:
+      Exit('reasoning.encrypted_content');
   end;
 end;
 
