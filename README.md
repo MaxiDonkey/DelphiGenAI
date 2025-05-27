@@ -14,7 +14,7 @@ ___
 <br>
 
 NEW: 
-- [Mini-lab to experiment with the v1/responses endpoint](https://github.com/MaxiDonkey/file2knowledge)
+- [Mini-lab to experiment with the v1/responses endpoint](https://github.com/MaxiDonkey/file2knowledge) `File2knowledge`
 - [Gpt-image-1 model](#gpt-image-1-model)
 - [Responses vs. Chat Completions](#responses-vs-chat-completions)
 - [Responses](https://github.com/MaxiDonkey/DelphiGenAI/blob/main/Responses.md)
