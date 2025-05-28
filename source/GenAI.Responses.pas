@@ -1869,6 +1869,18 @@ type
   /// overloads that allow additional parameter configuration.
   /// </remarks>
   TResponsesRoute = class(TGenAIRoute)
+  private
+    {--- Persistent state for an SSE stream }
+    FDecoder: TEncoding;
+    FByteBuffer: TBytes;
+    FCharBuffer: TStringBuilder;
+    FCurrentEvent: string;
+    FCurrentData: string;
+
+    function ProcessLines(Event: TResponseEvent): Boolean;
+    function DecodeChunk(const ABytes: TBytes; Event: TResponseEvent): Boolean;
+
+  public
     /// <summary>
     /// Asynchronously creates a new AI response.
     /// </summary>
@@ -3487,6 +3499,112 @@ begin
   Result := API.Get<TResponse>('responses/' + ResponseID);
 end;
 
+const
+  MaxTrail = 3;
+
+function TResponsesRoute.ProcessLines(Event: TResponseEvent): Boolean;
+var
+  RespObj: TResponseStream;
+  IsDone: Boolean;
+begin
+  Result := False;
+
+  var StartPos := 0;
+  while True do
+    begin
+      var LFPos := FCharBuffer.ToString.IndexOf(#10, StartPos);
+      if LFPos = -1 then Break;
+
+      var Line := FCharBuffer.ToString.Substring(StartPos, LFPos - StartPos)
+                         .Trim([' ', #13, #10]);
+      StartPos := LFPos + 1;
+
+      if Line = '' then
+        begin
+          if not FCurrentData.Trim.IsEmpty then
+            begin
+              IsDone  := SameText(FCurrentEvent, 'response.completed');
+              RespObj := nil;
+              if not IsDone and
+                 ((FCurrentData[1] = '{') or (FCurrentData[1] = '[')) then
+              try
+                RespObj := TApiDeserializer.Parse<TResponseStream>(FCurrentData);
+              except
+                RespObj := nil;
+              end;
+
+              Event(RespObj, IsDone, Result);
+              RespObj.Free;
+            end;
+
+          FCurrentEvent := EmptyStr;
+          FCurrentData  := EmptyStr;
+        end
+      else
+        if Line.StartsWith('event: ') then
+          FCurrentEvent := Line.Substring(7).Trim
+        else if Line.StartsWith('data: ') then
+          begin
+            if not FCurrentData.IsEmpty then
+              FCurrentData := FCurrentData + sLineBreak;
+            FCurrentData := FCurrentData + Line.Substring(6).Trim;
+          end;
+    end;
+
+  if StartPos > 0 then
+    FCharBuffer.Remove(0, StartPos);
+end;
+
+function TResponsesRoute.DecodeChunk(const ABytes: TBytes; Event: TResponseEvent): Boolean;
+var
+  SafeLen: Integer;
+  Utf8Enc: TEncoding;
+  ChunkStr: string;
+begin
+  Result := False;
+
+  {--- Stacks the data }
+  FByteBuffer := FByteBuffer + ABytes;
+
+  {--- Search for the last safe UTF-8 boundary }
+  SafeLen := Length(FByteBuffer);
+  if SafeLen > 0 then
+    begin
+      var i := 0;
+      Utf8Enc := TEncoding.UTF8;
+      while (i < MaxTrail) and (SafeLen - i > 0) do
+        begin
+          if Utf8Enc.IsBufferValid(@FByteBuffer[0], SafeLen - i) then
+            begin
+              SafeLen := SafeLen - i;
+              Break;
+            end;
+          Inc(i);
+        end;
+      if (i = MaxTrail) and (not Utf8Enc.IsBufferValid(@FByteBuffer[0], SafeLen)) then
+        {--- No complete ending yet }
+        Exit(False);
+    end;
+
+  {--- Decodes the complete part, stores the remainder }
+  if SafeLen > 0 then
+  begin
+    SetLength(ChunkStr, 0);
+    SetString(ChunkStr, PChar(nil), 0);
+    ChunkStr := TEncoding.UTF8.GetString(FByteBuffer, 0, SafeLen);
+    FCharBuffer.Append(ChunkStr);
+
+    if SafeLen < Length(FByteBuffer) then
+      FByteBuffer := Copy(FByteBuffer, SafeLen, MaxInt)
+    else
+      SetLength(FByteBuffer, 0);
+  end;
+
+  {--- Processes complete lines }
+  if FCharBuffer.Length > 0 then
+    Result := ProcessLines(Event);
+end;
+
 function TResponsesRoute.CreateStream(ParamProc: TProc<TResponsesParams>;
   Event: TResponseEvent): Boolean;
 
@@ -3503,114 +3621,175 @@ function TResponsesRoute.CreateStream(ParamProc: TProc<TResponsesParams>;
 *)
 
 var
-  Response: TStringStream;
+  Response : TMemoryStream;
+  Consumed : Int64;
 
-  {--- Persistent variables between callbacks }
-  CurrentEvent, CurrentData: string;
 begin
-  Response := TStringStream.Create('', TEncoding.UTF8);
+  {--- Initialization of streaming fields }
+  FDecoder := TEncoding.UTF8;
+  FByteBuffer := nil;
+  FCharBuffer := TStringBuilder.Create;
+  FCurrentEvent := '';
+  FCurrentData := '';
+
+  Response := TMemoryStream.Create;
+  Consumed := 0;
+
   try
-    CurrentEvent := EmptyStr;
-    CurrentData := EmptyStr;
-
     Result := API.Post<TResponsesParams>('responses', ParamProc, Response,
-      procedure(const Sender: TObject; AContentLength, AReadCount: Int64; var AAbort: Boolean)
+      procedure(const Sender: TObject;
+                AContentLength, AReadCount: Int64;
+                var AAbort: Boolean)
       var
-        IsDone: Boolean;
-        ResponseData: TResponseStream;
-
-        {--- Local buffer containing only the part not yet processed }
-        Buffer: string;
-        BufferPos, PosLineEnd: Integer;
-        Line: string;
-        NewBuffer: string;
+        Delta : Int64;
+        Chunk : TBytes;
       begin
-        {--- Retrieve only the new portion of the stream }
-        Buffer := Response.DataString;
+        Delta := Response.Size - Consumed;
+        if Delta <= 0 then Exit;
 
-        {--- local position in Buffer }
-        BufferPos := 0;
+        SetLength(Chunk, Delta);
+        Response.Position := Consumed;
+        Response.ReadBuffer(Chunk[0], Delta);
+        Consumed := Consumed + Delta;
 
-        {--- As long as a complete line (terminated by LF) is available }
-        while True do
-          begin
-            PosLineEnd := Buffer.IndexOf(#10, BufferPos);
-            if PosLineEnd < 0 then
-              {--- incomplete line, wait for the rest }
-              Break;
-
-            {--- Line extraction }
-            Line := Buffer.Substring(BufferPos, PosLineEnd - BufferPos).Trim([' ', #13, #10]);
-            BufferPos := PosLineEnd + 1;
-
-            if Line.IsEmpty then
-              begin
-                {--- End of event block }
-                if not CurrentData.Trim.IsEmpty then
-                  begin
-                    IsDone := CurrentEvent = 'response.completed';
-                    ResponseData := nil;
-                    if not IsDone then
-                      begin
-                        {--- Quick check before JSON parsing (potential optimization) }
-                        if (CurrentData.Trim.StartsWith('{')) or (CurrentData.Trim.StartsWith('[')) then
-                          begin
-                            try
-                              ResponseData := TApiDeserializer.Parse<TResponseStream>(CurrentData);
-                            except
-                              {--- If there is a mistake, nothing will be done. }
-                              ResponseData := nil;
-                            end;
-                          end;
-                      end;
-
-                    try
-                      {--- Call the callback with the event, the cat object and the end flag }
-                      Event(ResponseData, IsDone, AAbort);
-                    finally
-                      ResponseData.Free;
-                    end;
-                  end;
-
-                {--- Reset for next block }
-                CurrentEvent := EmptyStr;
-                CurrentData := EmptyStr;
-              end
-            else
-              begin
-                {--- Retrieving the information "event: ..." }
-                if Line.StartsWith('event: ') then
-                  begin
-                    CurrentEvent := Line.Substring(7).Trim([' ', #13, #10])
-                  end
-                else
-                {--- Retrieving the information "data: ..." }
-                if Line.StartsWith('data: ') then
-                  begin
-                    if not CurrentData.IsEmpty then
-                      CurrentData := CurrentData + sLineBreak;
-                    CurrentData := CurrentData + Line.Substring(6).Trim([' ', #13, #10]);
-                  end;
-              end;
-          end;
-
-        {--- Buffer cleanup: keep only the incomplete portion }
-        if BufferPos > 0 then
-          begin
-            NewBuffer := Buffer.Substring(BufferPos);
-
-            {--- We empty the stream }
-            Response.Size := 0;
-
-            {--- then we rewrite the remaining fragment. }
-            if not NewBuffer.IsEmpty then
-              Response.WriteString(NewBuffer);
-          end;
+        DecodeChunk(Chunk, Event);
       end);
   finally
+    {--- Process any remaining balance }
+    if FCharBuffer.Length > 0 then
+    begin
+      Result := ProcessLines(Event);
+    end;
+
+    FCharBuffer.Free;
     Response.Free;
   end;
 end;
+
+//function TResponsesRoute.CreateStream(ParamProc: TProc<TResponsesParams>;
+//  Event: TResponseEvent): Boolean;
+//
+(*
+    {"type":"response.created","response":{"id":"resp_67ffeb4f88f4819183b0c7bfd76270970c4424583b6f214d","object":"response","created_at":1744825167,"status":"in_progress","error":null,"incomplete_details":null,"instructions":null,"max_output_tokens":null,"model":"gpt-4.1-nano-2025-04-14","output":[],"parallel_tool_calls":true,"previous_response_id":null,"reasoning":{"effort":null,"summary":null},"store":false,"temperature":1.0,"text":{"format":{"type":"text"}},"tool_choice":"auto","tools":[],"top_p":1.0,"truncation":"disabled","usage":null,"user":null,"metadata":{}}}
+    {"type":"response.in_progress","response":{"id":"resp_67ffeb4f88f4819183b0c7bfd76270970c4424583b6f214d","object":"response","created_at":1744825167,"status":"in_progress","error":null,"incomplete_details":null,"instructions":null,"max_output_tokens":null,"model":"gpt-4.1-nano-2025-04-14","output":[],"parallel_tool_calls":true,"previous_response_id":null,"reasoning":{"effort":null,"summary":null},"store":false,"temperature":1.0,"text":{"format":{"type":"text"}},"tool_choice":"auto","tools":[],"top_p":1.0,"truncation":"disabled","usage":null,"user":null,"metadata":{}}}
+    {"type":"response.output_item.added","output_index":0,"item":{"id":"msg_67ffeb4fbe28819193360cdfa54b544e0c4424583b6f214d","type":"message","status":"in_progress","content":[],"role":"assistant"}}
+    {"type":"response.content_part.added","item_id":"msg_67ffeb4fbe28819193360cdfa54b544e0c4424583b6f214d","output_index":0,"content_index":0,"part":{"type":"output_text","annotations":[],"text":""}}
+    {"type":"response.output_text.delta","item_id":"msg_67ffeb4fbe28819193360cdfa54b544e0c4424583b6f214d","output_index":0,"content_index":0,"delta":"Great"}
+    ...
+    {"type":"response.output_text.done","item_id":"msg_67ffeb4fbe28819193360cdfa54b544e0c4424583b6f214d","output_index":0,"content_index":0,"text":"message."}
+    {"type":"response.content_part.done","item_id":"msg_67ffeb4fbe28819193360cdfa54b544e0c4424583b6f214d","output_index":0,"content_index":0,"part":{"type":"output_text","annotations":[],"text":"message"}}
+    {"type":"response.output_item.done","output_index":0,"item":{"id":"msg_67ffeb4fbe28819193360cdfa54b544e0c4424583b6f214d","type":"message","status":"completed","content":[{"type":"output_text","annotations":[],"text":"messagele":"assistant"}}
+*)
+//
+//var
+//  Response: TStringStream;
+//
+//  {--- Persistent variables between callbacks }
+//  CurrentEvent, CurrentData: string;
+//begin
+//  Response := TStringStream.Create('', TEncoding.UTF8);
+//  try
+//    CurrentEvent := EmptyStr;
+//    CurrentData := EmptyStr;
+//
+//    Result := API.Post<TResponsesParams>('responses', ParamProc, Response,
+//      procedure(const Sender: TObject; AContentLength, AReadCount: Int64; var AAbort: Boolean)
+//      var
+//        IsDone: Boolean;
+//        ResponseData: TResponseStream;
+//
+//        {--- Local buffer containing only the part not yet processed }
+//        Buffer: string;
+//        BufferPos, PosLineEnd: Integer;
+//        Line: string;
+//        NewBuffer: string;
+//      begin
+//        {--- Retrieve only the new portion of the stream }
+//        Buffer := Response.DataString;
+//
+//        {--- local position in Buffer }
+//        BufferPos := 0;
+//
+//        {--- As long as a complete line (terminated by LF) is available }
+//        while True do
+//          begin
+//            PosLineEnd := Buffer.IndexOf(#10, BufferPos);
+//            if PosLineEnd < 0 then
+//              {--- incomplete line, wait for the rest }
+//              Break;
+//
+//            {--- Line extraction }
+//            Line := Buffer.Substring(BufferPos, PosLineEnd - BufferPos).Trim([' ', #13, #10]);
+//            BufferPos := PosLineEnd + 1;
+//
+//            if Line.IsEmpty then
+//              begin
+//                {--- End of event block }
+//                if not CurrentData.Trim.IsEmpty then
+//                  begin
+//                    IsDone := CurrentEvent = 'response.completed';
+//                    ResponseData := nil;
+//                    if not IsDone then
+//                      begin
+//                        {--- Quick check before JSON parsing (potential optimization) }
+//                        if (CurrentData.Trim.StartsWith('{')) or (CurrentData.Trim.StartsWith('[')) then
+//                          begin
+//                            try
+//                              ResponseData := TApiDeserializer.Parse<TResponseStream>(CurrentData);
+//                            except
+//                              {--- If there is a mistake, nothing will be done. }
+//                              ResponseData := nil;
+//                            end;
+//                          end;
+//                      end;
+//
+//                    try
+//                      {--- Call the callback with the event, the cat object and the end flag }
+//                      Event(ResponseData, IsDone, AAbort);
+//                    finally
+//                      ResponseData.Free;
+//                    end;
+//                  end;
+//
+//                {--- Reset for next block }
+//                CurrentEvent := EmptyStr;
+//                CurrentData := EmptyStr;
+//              end
+//            else
+//              begin
+//                {--- Retrieving the information "event: ..." }
+//                if Line.StartsWith('event: ') then
+//                  begin
+//                    CurrentEvent := Line.Substring(7).Trim([' ', #13, #10])
+//                  end
+//                else
+//                {--- Retrieving the information "data: ..." }
+//                if Line.StartsWith('data: ') then
+//                  begin
+//                    if not CurrentData.IsEmpty then
+//                      CurrentData := CurrentData + sLineBreak;
+//                    CurrentData := CurrentData + Line.Substring(6).Trim([' ', #13, #10]);
+//                  end;
+//              end;
+//          end;
+//
+//        {--- Buffer cleanup: keep only the incomplete portion }
+//        if BufferPos > 0 then
+//          begin
+//            NewBuffer := Buffer.Substring(BufferPos);
+//
+//            {--- We empty the stream }
+//            Response.Size := 0;
+//
+//            {--- then we rewrite the remaining fragment. }
+//            if not NewBuffer.IsEmpty then
+//              Response.WriteString(NewBuffer);
+//          end;
+//      end);
+//  finally
+//    Response.Free;
+//  end;
+//end;
 
 function TResponsesRoute.Delete(const ResponseId: string): TResponseDelete;
 begin

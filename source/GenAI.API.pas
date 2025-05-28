@@ -243,7 +243,7 @@ type
   /// </remarks>
   TGenAIAPI = class(TApiDeserializer)
   private
-    function MockJsonResponse(const FieldName: string; Response: TStringStream): string;
+    function MockJsonResponse(const FieldName: string; Response: TStringStream): string; overload;
     function MockJsonFile(const FieldName: string; Response: TStringStream): string;
   public
     /// <summary>
@@ -361,6 +361,31 @@ type
     /// Raised if the response cannot be deserialized or is non-compliant.
     /// </exception>
     function Post<TParams: TJSONParam>(const Endpoint: string; ParamProc: TProc<TParams>; Response: TStringStream; Event: TReceiveDataCallback): Boolean; overload;
+    /// <summary>
+    /// Sends a POST request with parameters and streams the response.
+    /// </summary>
+    /// <typeparam name="TParams">
+    /// The type of the parameters object for the request.
+    /// </typeparam>
+    /// <param name="Endpoint">
+    /// The relative endpoint to send the POST request to.
+    /// </param>
+    /// <param name="ParamProc">
+    /// A callback procedure to configure the request parameters.
+    /// </param>
+    /// <param name="Response">
+    /// A string stream where the response will be written.
+    /// </param>
+    /// <param name="Event">
+    /// A callback procedure for handling the received data during streaming.
+    /// </param>
+    /// <returns>
+    /// A boolean value indicating whether the request was successful.
+    /// </returns>
+    /// <exception cref="GenAIInvalidResponseError">
+    /// Raised if the response cannot be deserialized or is non-compliant.
+    /// </exception>
+    function Post<TParams: TJSONParam>(const Endpoint: string; ParamProc: TProc<TParams>; Response: TStream; Event: TReceiveDataCallback): Boolean; overload;
     /// <summary>
     /// Sends a POST request with parameters and returns a strongly typed object.
     /// </summary>
@@ -486,6 +511,38 @@ constructor TGenAIAPI.Create(const AAPIKey: string);
 begin
   Create;
   APIKey := AAPIKey;
+end;
+
+function TGenAIAPI.Post<TParams>(const Endpoint: string;
+  ParamProc: TProc<TParams>; Response: TStream;
+  Event: TReceiveDataCallback): Boolean;
+var
+  Params: TParams;
+begin
+  Monitoring.Inc;
+  Params := TParams.Create;
+  try
+    if Assigned(ParamProc) then
+      ParamProc(Params);
+    var Code := HttpClient.Post(BuildUrl(Endpoint), Params.JSON, Response, BuildJsonHeaders, Event);
+    Result := (Code > 200) and (Code < 299);
+    case Code of
+      200..299:
+        Result := True;
+      else
+        begin
+          Response.Position := 0;
+          var ErrBytes: TBytes;
+          SetLength(ErrBytes, Response.Size);
+          Response.ReadBuffer(ErrBytes, Length(ErrBytes));
+          DeserializeErrorData(Code, TEncoding.UTF8.GetString(ErrBytes));
+        end;
+    end;
+  finally
+    Params.Free;
+    ResetCustomHeader;
+    Monitoring.Dec;
+  end;
 end;
 
 function TGenAIAPI.Post<TResult, TParams>(const Endpoint: string; ParamProc: TProc<TParams>;
