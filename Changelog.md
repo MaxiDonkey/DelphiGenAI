@@ -1,3 +1,7 @@
+#### 2025, May 27 version 1.0.6
+-Fix “No mapping for the Unicode character exists in the target multi-byte code page.” <br > 
+For the `v1/responses` endpoint, buffer the incoming chunks and process them only once they’re fully received to avoid the error. 
+
 #### 2025, May 27 version 1.0.5
 - Fix Stream Events v1/responses endpoint
 - `gpt-image-1`: Support for new image creation and editing model
