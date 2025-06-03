@@ -5,7 +5,7 @@ ___
 ![GitHub](https://img.shields.io/badge/IDE%20Version-Delphi%2010.4/11/12-ffffba)
 [![GetIt – Available](https://img.shields.io/badge/GetIt-Available-baffc9?logo=delphi&logoColor=white)](https://getitnow.embarcadero.com/genai-optimized-openai-integration-wrapper/)
 ![GitHub](https://img.shields.io/badge/platform-all%20platforms-baffc9)
-![GitHub](https://img.shields.io/badge/Updated%20on%20June%2003,%202025-a7c7e7)
+![GitHub](https://img.shields.io/badge/Updated%20on%20June%2003,%202025-blue)
 
 <br>
 
