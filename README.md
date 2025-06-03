@@ -22,6 +22,7 @@ ___
     - [Strategies for quickly using the code examples](#strategies-for-quickly-using-the-code-examples)
     - [Use file2knowledge](#use-file2knowledge)
     - [Obtain an api key](#obtain-an-api-key)
+- [GenAI functional coverage](#genai-functional-coverage)
 - [Quick Start Guide](#quick-start-guide)
     - [Responses vs. Chat Completions](#responses-vs-chat-completions)
         - [Functional differences between the two endpoints](#functional-differences-between-the-two-endpoints)
@@ -56,7 +57,6 @@ ___
     - [How to execute multiple background requests to process a batch of responses?](#how-to-execute-multiple-background-requests-to-process-a-batch-of-responses)
     - [How to structure a chain of thought and develop advanced processing with GenAI?](#how-to-structure-a-chain-of-thought-and-develop-advanced-processing-with-genai)
     - [How do you structure advanced reasoning using Promises and pipelines?](#how-do-you-structure-advanced-reasoning-using-promises-and-pipelines)
-- [GenAI functional coverage](#genai-functional-coverage)
 - [Contributing](#contributing)
 - [License](#license)
 
@@ -148,6 +148,37 @@ To streamline the use of the API wrapper, the process for declaring units has be
 >[!TIP]
 > To effectively use the examples in this tutorial, particularly when working with asynchronous methods, it is recommended to define the client interfaces with the broadest possible scope. For optimal implementation, these clients should be declared in the application's `OnCreate` method.
 >
+
+<br>
+
+___
+
+# GenAI functional coverage
+
+Below, the table succinctly summarizes all OpenAI endpoints supported by the GenAI.
+
+|End point | supported | 
+|--- |:---: | 
+| [/assistants](https://github.com/MaxiDonkey/DelphiGenAI/blob/main/BeyondBasics.md#assistants) | <div align="center"><span style="color: green;">●</span></div> |
+| [/audio/speech](https://github.com/MaxiDonkey/DelphiGenAI/tree/main?tab=readme-ov-file#text-to-speech) | <div align="center"><span style="color: green;">●</span></div> |
+| [/audio/transcriptions](https://github.com/MaxiDonkey/DelphiGenAI/tree/main?tab=readme-ov-file#speech-to-text) | <div align="center"><span style="color: green;">●</span></div> |
+| [/audio/translations](https://github.com/MaxiDonkey/DelphiGenAI/tree/main?tab=readme-ov-file#speech-to-text) | <div align="center"><span style="color: green;">●</span></div> |
+| [/batches](https://github.com/MaxiDonkey/DelphiGenAI/blob/main/BeyondBasics.md#batch) | <div align="center"><span style="color: green;">●</span></div> |
+| [/chat/completions](https://github.com/MaxiDonkey/DelphiGenAI/blob/main/ChatCompletion.md#chat-completion) | <div align="center"><span style="color: green;">●</span></div> |
+| [/completions](https://github.com/MaxiDonkey/DelphiGenAI/tree/main?tab=readme-ov-file#legacy) | <div align="center"><span style="color: green;">●</span></div> |
+| [/embeddings](https://github.com/MaxiDonkey/DelphiGenAI/tree/main?tab=readme-ov-file#embeddings) | <div align="center"><span style="color: green;">●</span></div> |
+| /evals |  |
+| [/files](https://github.com/MaxiDonkey/DelphiGenAI/tree/main?tab=readme-ov-file#files) | <div align="center"><span style="color: green;">●</span></div> |
+| [/fine_tuning](https://github.com/MaxiDonkey/DelphiGenAI/blob/main/BeyondBasics.md#fine-tuning) | <div align="center"><span style="color: green;">●</span></div> |
+| [/images](https://github.com/MaxiDonkey/DelphiGenAI/tree/main?tab=readme-ov-file#image-generation) | <div align="center"><span style="color: green;">●</span></div> |
+| [/models](https://github.com/MaxiDonkey/DelphiGenAI/tree/main?tab=readme-ov-file#models) | <div align="center"><span style="color: green;">●</span></div> |
+| [/moderations](https://github.com/MaxiDonkey/DelphiGenAI/tree/main?tab=readme-ov-file#moderation) | <div align="center"><span style="color: green;">●</span></div> |
+| /organization |  |
+| /realtime |  |
+| [/responses](https://github.com/MaxiDonkey/DelphiGenAI/blob/main/Responses.md#responses) | <div align="center"><span style="color: green;">●</span></div> |
+| [/threads](https://github.com/MaxiDonkey/DelphiGenAI/blob/main/BeyondBasics.md#threads) | <div align="center"><span style="color: green;">●</span></div> |
+| [/uploads](https://github.com/MaxiDonkey/DelphiGenAI/blob/main/BeyondBasics.md#uploads) | <div align="center"><span style="color: green;">●</span></div> |
+| [/vector_stores](https://github.com/MaxiDonkey/DelphiGenAI/blob/main/BeyondBasics.md#vector-store) | <div align="center"><span style="color: green;">●</span></div> |
 
 <br>
 
@@ -1220,36 +1251,7 @@ Orchestrate AI thought chains elegantly and efficiently. By leveraging a dynamic
 
 ___
 
-# GenAI functional coverage
 
-Below, the table succinctly summarizes all OpenAI endpoints supported by the GenAI.
-
-|End point | supported | 
-|--- |:---: | 
-| /assistants | <div align="center"><span style="color: green;">●</span></div> |
-| /audio/speech | <div align="center"><span style="color: green;">●</span></div> |
-| /audio/transcriptions | <div align="center"><span style="color: green;">●</span></div> |
-| /audio/translations | <div align="center"><span style="color: green;">●</span></div> |
-| /batches | <div align="center"><span style="color: green;">●</span></div> |
-| /chat/completions | <div align="center"><span style="color: green;">●</span></div> |
-| /completions | <div align="center"><span style="color: green;">●</span></div> |
-| /embeddings | <div align="center"><span style="color: green;">●</span></div> |
-| /evals |  |
-| /files | <div align="center"><span style="color: green;">●</span></div> |
-| /fine_tuning/ | <div align="center"><span style="color: green;">●</span></div> |
-| /images | <div align="center"><span style="color: green;">●</span></div> |
-| /models | <div align="center"><span style="color: green;">●</span></div> |
-| /moderations | <div align="center"><span style="color: green;">●</span></div> |
-| /organization |  |
-| /realtime |  |
-| /responses | <div align="center"><span style="color: green;">●</span></div> |
-| /threads | <div align="center"><span style="color: green;">●</span></div> |
-| /uploads | <div align="center"><span style="color: green;">●</span></div> |
-| /vector_stores | <div align="center"><span style="color: green;">●</span></div> |
-
-<br>
-
-___
 
 # Contributing
 
