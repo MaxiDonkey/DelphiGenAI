@@ -118,7 +118,7 @@ To streamline the implementation of the code examples provided in this tutorial,
 
 ## [Use file2knowledge](https://github.com/MaxiDonkey/file2knowledge)
 
-This project, built with `DelphiGenAI` , allows you to consult GenAI documentation and code in order to streamline and accelerate your upskilling.
+This [project](https://github.com/MaxiDonkey/file2knowledge), built with `DelphiGenAI` , allows you to consult GenAI documentation and code in order to streamline and accelerate your upskilling.
 
 ![Preview](https://github.com/MaxiDonkey/DelphiGenAI/blob/main/images/File2knowledge.png?raw=true "Preview")
 
