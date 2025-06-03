@@ -20,6 +20,7 @@ ___
 - [Documentation Overview](#documentation-overview)
 - [TIPS for using the tutorial effectively](#tips-for-using-the-tutorial-effectively)
     - [Strategies for quickly using the code examples](#strategies-for-quickly-using-the-code-examples)
+    - [Use file2knowledge](#use-file2knowledge)
     - [Obtain an api key](#obtain-an-api-key)
 - [Quick Start Guide](#quick-start-guide)
     - [Responses vs. Chat Completions](#responses-vs-chat-completions)
