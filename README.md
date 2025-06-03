@@ -4,7 +4,7 @@ ___
 ![Delphi Next Gen Ready](https://img.shields.io/badge/Delphi--Next--Gen-ready-brightgreen)
 ![GitHub](https://img.shields.io/badge/IDE%20Version-Delphi%2010.4/11/12-yellow)
 ![GitHub](https://img.shields.io/badge/platform-all%20platforms-green)
-[![GetIt – Disponible](https://img.shields.io/badge/GetIt-Disponible-brightgreen?logo=delphi&logoColor=white)](https://getitnow.embarcadero.com/genai-optimized-openai-integration-wrapper/)
+[![GetIt – Available](https://img.shields.io/badge/GetIt-Disponible-brightorange?logo=delphi&logoColor=white)](https://getitnow.embarcadero.com/genai-optimized-openai-integration-wrapper/)
 ![GitHub](https://img.shields.io/badge/Updated%20on%20June%2003,%202025-blue)
 
 <br>
