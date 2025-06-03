@@ -180,7 +180,7 @@ To help you get up to speed on both endpoints, the two following documents provi
 
 ### Functional differences between the two endpoints
 
-|Capabilities | Chat Completions API | Responses API |
+|Capabilities | [Chat Completions API](https://github.com/MaxiDonkey/DelphiGenAI/blob/main/ChatCompletion.md#chat-completion) | [Responses API](https://github.com/MaxiDonkey/DelphiGenAI/blob/main/Responses.md) |
 |--- |:---: | :---: |
 |Text generation | <div align="center"><span style="color: green;">●</span></div> | <div align="center"><span style="color: green;">●</span></div> |
 | Audio  | <div align="center"><span style="color: green;">●</span></div> | Coming soon | 
