@@ -19,7 +19,10 @@ const
     '"parameters": {', '"parameters":{',           //GenAI.Assistants
     '"tool_choice": {', '"tool_choice":{',         //GenAI.Runs
     '"attributes": {', '"attributes":{',           //GenAI.Responses
-    '"schema": {', '"schema":{'                    //GenAI.Responses
+    '"schema": {', '"schema":{',                   //GenAI.Responses
+    '"env": {', '"env":{',                         //GenAI.Responses
+    '"headers": {', '"headers":{',                 //GenAI.Responses
+    '"input_schema": {', '"input_schema":{'        //GenAI.Responses
   ];
 
 (*

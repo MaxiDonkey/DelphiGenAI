@@ -1440,7 +1440,11 @@ type
     /// the store parameter is set to false, or when an organization is enrolled in the zero data retention
     /// program).
     /// </summary>
-    reasoning_encrypted_content
+    reasoning_encrypted_content,
+    /// <summary>
+    ///  Includes the outputs of python code execution in code interpreter tool call items.
+    /// </summary>
+    code_interpreter_call
   );
 
   TOutputIncludingHelper = record Helper for TOutputIncluding
@@ -1449,6 +1453,7 @@ type
   end;
 
   TReasoningGenerateSummary = (
+    auto,
     concise,
     detailed
   );
@@ -1518,7 +1523,10 @@ type
   THostedTooltype = (
     file_search,
     web_search_preview,
-    computer_use_preview
+    computer_use_preview,
+    code_interpreter,
+    mcp,
+    image_generation
   );
 
   THostedTooltypeHelper = record Helper for THostedTooltype
@@ -1579,7 +1587,14 @@ type
     computer_call,
     reasoning,
     computer_call_output,
-    function_call_output
+    function_call_output,
+
+    image_generation_call,
+    code_interpreter_call,
+    local_shell_call,
+    mcp_call,
+    mcp_list_tools,
+    mcp_approval_request
   );
 
   TResponseTypesHelper = record Helper for TResponseTypes
@@ -1668,7 +1683,11 @@ type
     &function,
     computer_use_preview,
     web_search_preview,
-    web_search_preview_2025_03_11
+    web_search_preview_2025_03_11,
+    mcp,
+    code_interpreter,
+    image_generation,
+    local_shell
   );
 
   TResponseToolsTypeHelper = record Helper for TResponseToolsType
@@ -1748,6 +1767,24 @@ type
     reasoning_summary_part_done,
     reasoning_summary_text_delta,
     reasoning_summary_text_done,
+
+    image_generation_call_completed,
+    image_generation_call_generating,
+    image_generation_call_in_progress,
+    image_generation_call_partial_image,
+    mcp_call_arguments_delta,
+    mcp_call_arguments_done,
+    mcp_call_completed,
+    mcp_call_failed,
+    mcp_call_in_progress,
+    mcp_list_tools_completed,
+    mcp_list_tools_failed,
+    mcp_list_tools_in_progress,
+    queued,
+    reasoning_delta,
+    reasoning_done,
+    reasoning_summary_delta,
+    reasoning_summary_done,
 
     error
   );
@@ -2956,7 +2993,8 @@ begin
             ['file_search_call.results',
              'message.input_image.image_url',
              'computer_call_output.output.image_url',
-             'reasoning.encrypted_content']);
+             'reasoning.encrypted_content',
+             'code_interpreter_call.outputs']);
 end;
 
 function TOutputIncludingHelper.ToString: string;
@@ -2970,6 +3008,8 @@ begin
       Exit('computer_call_output.output.image_url');
     TOutputIncluding.reasoning_encrypted_content:
       Exit('reasoning.encrypted_content');
+    TOutputIncluding.code_interpreter_call:
+      Exit('code_interpreter_call.outputs');
   end;
 end;
 
@@ -2978,12 +3018,14 @@ end;
 constructor TReasoningGenerateSummaryHelper.Create(const Value: string);
 begin
   Self := TEnumValueRecovery.TypeRetrieve<TReasoningGenerateSummary>(Value,
-            ['concise', 'detailed']);
+            ['auto', 'concise', 'detailed']);
 end;
 
 function TReasoningGenerateSummaryHelper.ToString: string;
 begin
   case self of
+    TReasoningGenerateSummary.auto:
+      Exit('auto');
     TReasoningGenerateSummary.concise:
       Exit('concise');
     TReasoningGenerateSummary.detailed:
@@ -3110,7 +3152,8 @@ end;
 constructor THostedTooltypeHelper.Create(const Value: string);
 begin
   Self := TEnumValueRecovery.TypeRetrieve<THostedTooltype>(Value,
-            ['file_search', 'web_search_preview', 'computer_use_preview']);
+            ['file_search', 'web_search_preview', 'computer_use_preview',
+             'code_interpreter', 'mcp', 'image_generation' ]);
 end;
 
 function THostedTooltypeHelper.ToString: string;
@@ -3122,6 +3165,12 @@ begin
       Exit('web_search_preview');
     THostedTooltype.computer_use_preview:
       Exit('computer_use_preview');
+    THostedTooltype.code_interpreter:
+      Exit('code_interpreter');
+    THostedTooltype.mcp:
+      Exit('mcp');
+    THostedTooltype.image_generation:
+      Exit('image_generation')
   end;
 end;
 
@@ -3218,8 +3267,20 @@ end;
 constructor TResponseTypesHelper.Create(const Value: string);
 begin
   Self := TEnumValueRecovery.TypeRetrieve<TResponseTypes>(Value,
-            ['message', 'file_search_call', 'function_call', 'web_search_call',
-             'computer_call', 'reasoning', 'computer_call_output', 'function_call_output']);
+            ['message',
+             'file_search_call',
+             'function_call',
+             'web_search_call',
+             'computer_call',
+             'reasoning',
+             'computer_call_output',
+             'function_call_output',
+             'image_generation_call',
+             'code_interpreter_call',
+             'local_shell_call',
+             'mcp_call',
+             'mcp_list_tools',
+             'mcp_approval_request']);
 end;
 
 function TResponseTypesHelper.ToString: string;
@@ -3241,6 +3302,18 @@ begin
       Exit('computer_call_outpu');
     TResponseTypes.function_call_output:
       Exit('function_call_output');
+    TResponseTypes.image_generation_call:
+      Exit('image_generation_call');
+    TResponseTypes.code_interpreter_call:
+      Exit('code_interpreter_call');
+    TResponseTypes.local_shell_call:
+      Exit('local_shell_call');
+    TResponseTypes.mcp_call:
+      Exit('mcp_call');
+    TResponseTypes.mcp_list_tools:
+      Exit('mcp_list_tools');
+    TResponseTypes.mcp_approval_request:
+      Exit('mcp_approval_request');
   end;
 end;
 
@@ -3416,7 +3489,8 @@ constructor TResponseToolsTypeHelper.Create(const Value: string);
 begin
   Self := TEnumValueRecovery.TypeRetrieve<TResponseToolsType>(Value,
             ['file_search', 'function', 'computer_use_preview', 'web_search_preview',
-             'web_search_preview_2025_03_11']);
+             'web_search_preview_2025_03_11', 'mcp', 'code_interpreter', 'image_generation',
+             'local_shell']);
 end;
 
 function TResponseToolsTypeHelper.ToString: string;
@@ -3432,6 +3506,14 @@ begin
       Exit('web_search_preview');
     TResponseToolsType.web_search_preview_2025_03_11:
       Exit('web_search_preview_2025_03_11');
+    TResponseToolsType.mcp:
+      Exit('mcp');
+    TResponseToolsType.code_interpreter:
+      Exit('code_interpreter');
+    TResponseToolsType.image_generation:
+      Exit('image_generation');
+    TResponseToolsType.local_shell:
+      Exit('local_shell');
   end;
 end;
 
@@ -3563,6 +3645,23 @@ begin
               'response.reasoning_summary_part.done',
               'response.reasoning_summary_text.delta',
               'response.reasoning_summary_text.done',
+              'response.image_generation_call.completed',
+              'response.image_generation_call.generating',
+              'response.image_generation_call.in_progress',
+              'response.image_generation_call.partial_image',
+              'response.mcp_call.arguments.delta',
+              'response.mcp_call.arguments.done',
+              'response.mcp_call.completed',
+              'response.mcp_call.failed',
+              'response.mcp_call.in_progress',
+              'response.mcp_list_tools.completed',
+              'response.mcp_list_tools.failed',
+              'response.mcp_list_tools.in_progress',
+              'response.queued',
+              'response.reasoning.delta',
+              'response.reasoning.done',
+              'response.reasoning_summary.delta',
+              'response.reasoning_summary.done',
               'error'
             ]);
 end;
@@ -3614,7 +3713,6 @@ begin
       Exit('response.web_search_call.searching');
     TResponseStreamType.web_search_call_completed:
       Exit('response.web_search_call.completed');
-
     TResponseStreamType.reasoning_summary_part_add:
       Exit('response.reasoning_summary_part.added');
     TResponseStreamType.reasoning_summary_part_done:
@@ -3623,6 +3721,40 @@ begin
       Exit('response.reasoning_summary_text.delta');
     TResponseStreamType.reasoning_summary_text_done:
       Exit('response.reasoning_summary_text.done');
+    TResponseStreamType.image_generation_call_completed:
+      Exit('response.image_generation_call.completed');
+    TResponseStreamType.image_generation_call_generating:
+      Exit('response.image_generation_call.generating');
+    TResponseStreamType.image_generation_call_in_progress:
+      Exit('response.image_generation_call.in_progress');
+    TResponseStreamType.image_generation_call_partial_image:
+      Exit('response.image_generation_call.partial_image');
+    TResponseStreamType.mcp_call_arguments_delta:
+      Exit('response.mcp_call.arguments.delta');
+    TResponseStreamType.mcp_call_arguments_done:
+      Exit('response.mcp_call.arguments.done');
+    TResponseStreamType.mcp_call_completed:
+      Exit('response.mcp_call.completed');
+    TResponseStreamType.mcp_call_failed:
+      Exit('response.mcp_call.failed');
+    TResponseStreamType.mcp_call_in_progress:
+      Exit('response.mcp_call.in_progress');
+    TResponseStreamType.mcp_list_tools_completed:
+      Exit('response.mcp_list_tools.completed');
+    TResponseStreamType.mcp_list_tools_failed:
+      Exit('response.mcp_list_tools.failed');
+    TResponseStreamType.mcp_list_tools_in_progress:
+      Exit('response.mcp_list_tools.in_progress');
+    TResponseStreamType.queued:
+      Exit('response.queued');
+    TResponseStreamType.reasoning_delta:
+      Exit('response.reasoning.delta');
+    TResponseStreamType.reasoning_done:
+      Exit('response.reasoning.done');
+    TResponseStreamType.reasoning_summary_delta:
+      Exit('response.reasoning_summary.delta');
+    TResponseStreamType.reasoning_summary_done:
+      Exit('response.reasoning_summary.done');
 
 
     TResponseStreamType.error:

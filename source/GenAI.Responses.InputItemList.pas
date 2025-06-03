@@ -16,7 +16,54 @@ uses
   GenAI.Async.Params, GenAI.Async.Support, GenAI.Assistants;
 
 type
-  TFileSearchResult = class
+  /// <summary>
+  /// The output of a code interpreter tool call that is a file.
+  /// </summary>
+  TCodeInterpreterResultFiles = class
+  private
+    [JsonNameAttribute('file_id')]
+    FFileId: string;
+    [JsonNameAttribute('mime_type')]
+    FMimeType: string;
+  public
+    /// <summary>
+    /// The ID of the file.
+    /// </summary>
+    property FileId: string read FFileId write FFileId;
+    /// <summary>
+    /// The MIME type of the file.
+    /// </summary>
+    property MimeType: string read FMimeType write FMimeType;
+  end;
+
+  TCodeInterpreterResult = class
+  private
+    FLogs: string;
+    FType: string;
+    FFiles: TArray<TCodeInterpreterResultFiles>;
+  public
+    /// <summary>
+    /// The logs of the code interpreter tool call.
+    /// </summary>
+    property Logs: string read FLogs write FLogs;
+    /// <summary>
+    /// The output of a code interpreter tool call that is a file.
+    /// </summary>
+    property &Type: string read FType write FType;
+    /// <summary>
+    /// The output of a code interpreter tool call that is a file.
+    /// </summary>
+    property Files: TArray<TCodeInterpreterResultFiles> read FFiles write FFiles;
+    destructor Destroy; override;
+  end;
+
+  /// <summary>
+  /// The results of the file search tool call.
+  /// </summary>
+  /// <remarks>
+  /// Inherits from TCodeInterpreterResult because both tools have a Results field in common !!!
+  /// </remarks>
+  TFileSearchResult = class(TCodeInterpreterResult)
   private
     [JsonReflectAttribute(ctString, rtString, TMetadataInterceptor)]
     FAttributes: string;
@@ -48,6 +95,28 @@ type
     /// The text that was retrieved from the file.
     /// </summary>
     property Text: string read FText write FText;
+  end;
+
+  TMCPListTool = class
+  private
+    [JsonNameAttribute('input_schema')]
+    FInputSchema: string;
+    FDescription: string;
+    {---
+         FAnnotations: string > Automatic deserialization not possible-
+            Ambiguous object or name already used
+
+         Access to field contents from JSONResponse string possible
+    }
+  public
+    /// <summary>
+    /// The JSON schemas string describing the tool's input.
+    /// </summary>
+    property InputSchema: string read FInputSchema write FInputSchema;
+    /// <summary>
+    /// The description of the tool.
+    /// </summary>
+    property Description: string read FDescription write FDescription;
   end;
 
   TDragPoint = class
@@ -129,13 +198,12 @@ type
 
   TComputerActionCommon = class
   private
-    [JsonReflectAttribute(ctString, rtString, TResponseComputerTypeInterceptor)]
-    FType: TResponseComputerType;
+    FType: string;
   public
     /// <summary>
     /// Specifies the event type.
     /// </summary>
-    property &Type: TResponseComputerType read FType write FType;
+    property &Type: string read FType write FType;
   end;
 
   TComputerActionClick = class(TComputerActionCommon)
@@ -230,11 +298,57 @@ type
   end;
 
   {--- This class is made up of the following classes:
-     TComputerActionCommon, TComputerActionClick, TComputerActionDoubleClick,
-     TComputerActionDrag, TComputerActionKeyPressed, TComputerActionMove,
-     TComputerActionScreenshot, TComputerActionScroll, TComputerActionType
-     TComputerActionWait }
+     TComputerActionCommon,
+     TComputerActionClick,
+     TComputerActionDoubleClick,
+     TComputerActionDrag,
+     TComputerActionKeyPressed,
+     TComputerActionMove,
+     TComputerActionScreenshot,
+     TComputerActionScroll,
+     TComputerActionType
+     TComputerActionWait}
   TComputerAction = class(TComputerActionWait);
+
+  /// <summary>
+  /// The results of the file search tool call.
+  /// </summary>
+  /// <remarks>
+  /// Inherits from TComputerAction because both tools have "Action" field in common !!!
+  /// </remarks>
+  TToolCallAction = class(TComputerAction)
+  private
+    FCommand: TArray<string>;
+    FEnv: string;
+    [JsonNameAttribute('timeout_ms')]
+    FTimeout: Int64;
+    FUser: string;
+    [JsonNameAttribute('working_directory')]
+    FWorkingDirectory: string;
+  public
+    /// <summary>
+    /// The command to run.
+    /// </summary>
+    property Command: TArray<string> read FCommand write FCommand;
+    /// <summary>
+    /// Environment variables to set for the command.
+    /// </summary>
+    property Env: string read FEnv write FEnv;
+    /// <summary>
+    /// Optional timeout in milliseconds for the command.
+    /// </summary>
+    property Timeout: Int64 read FTimeout write FTimeout;
+    /// <summary>
+    /// Optional user to run the command as.
+    /// </summary>
+    property User: string read FUser write FUser;
+    /// <summary>
+    /// Optional working directory to run the command in.
+    /// </summary>
+    property WorkingDirectory: string read FWorkingDirectory write FWorkingDirectory;
+  end;
+
+  TAction = class(TToolCallAction);
 
   TResponseMessageAnnotationCommon = class
   private
@@ -301,7 +415,9 @@ type
   end;
 
   {--- This class is made up of the following classes:
-     TResponseMessageAnnotationCommon, TAnnotationFileCitation, TAnnotationUrlCitation,
+     TResponseMessageAnnotationCommon,
+     TAnnotationFileCitation,
+     TAnnotationUrlCitation,
      TAnnotationFilePath }
   TResponseMessageAnnotation = class(TAnnotationFilePath);
 
@@ -387,9 +503,30 @@ type
   end;
 
   {--- This class is made up of the following classes:
-     TResponseItemContentCommon, TResponseItemContentTextInput, TResponseItemContentImageInput,
-     TResponseItemContentFileInput, TResponseItemContentOutputText, TResponseItemContentRefusal}
+     TResponseItemContentCommon,
+     TResponseItemContentTextInput,
+     TResponseItemContentImageInput,
+     TResponseItemContentFileInput,
+     TResponseItemContentOutputText,
+     TResponseItemContentRefusal}
   TResponseItemContent = class(TResponseItemContentRefusal);
+
+(******************************************************************************
+
+  TResponseItem différent from TResponseOutput from GenAI.Responses unit
+  ======================================================================
+
+  At first glance, one might think to directly reuse the architecture of the
+  TResponseOutput class (from the GenAI.Responses unit). In reality, however,
+  the classes that make it up differ slightly—or are even missing
+  entirely—depending on the category.
+
+  Therefore, we need to build TResponseItem entirely from scratch. Although
+  this makes the code more substantial, it guarantees that the class retains
+  a single, focused responsibility and continues to support automatic
+  deserialization.
+
+*******************************************************************************)
 
   TResponseItemCommon = class
   private
@@ -452,7 +589,7 @@ type
 
   TResponseItemComputerToolCall = class(TResponseItemFileSearchToolCall)
   private
-    FAction: TComputerAction;
+    FAction: TAction;
     [JsonNameAttribute('call_id')]
     FCallId: string;
     [JsonNameAttribute('pending_safety_checks')]
@@ -461,7 +598,7 @@ type
     /// <summary>
     /// Action to execute on computer
     /// </summary>
-    property Action: TComputerAction read FAction write FAction;
+    property Action: TAction read FAction write FAction;
     /// <summary>
     /// An identifier used when responding to the tool call with output.
     /// </summary>
@@ -512,17 +649,111 @@ type
 
   TResponseItemFunctionToolCallOutput = class(TResponseItemFunctionToolCall)
   private
-//    FOutput: string;
+    {---
+         FOutput: string > Automatic deserialization not possible-
+            name already used as TComputerOutput by TResponseItemComputerToolCallOutput class
+
+         Access to field contents from JSONResponse string possible
+    }
+  end;
+
+  TResponseItemImageGeneration = class(TResponseItemFunctionToolCallOutput)
+  private
+    FResult: string;
   public
-//    property Output: string read FOutput write FOutput;
+    /// <summary>
+    /// The generated image encoded in base64.
+    /// </summary>
+    property Result: string read FResult write FResult;
+  end;
+
+  TResponseItemCodeInterpreter = class(TResponseItemImageGeneration)
+  private
+    FCode: string;
+    [JsonNameAttribute('container_id')]
+    FContainerId: string;
+    {
+      FResults: intercepted by TResponseOutputFileSearch (property in common)
+    }
+  public
+    /// <summary>
+    /// The code to run.
+    /// </summary>
+    property Code: string read FCode write FCode;
+    /// <summary>
+    /// The ID of the container used to run the code.
+    /// </summary>
+    property ContainerId: string read FContainerId write FContainerId;
+  end;
+
+  TResponseItemLocalShell = class(TResponseItemCodeInterpreter)
+    {
+      FAction: intercepted by TResponseOutputComputer (property in common)
+      FCallId: intercepted by TResponseOutputFunction (property in common)
+    }
+  end;
+
+  TResponseItemMCPTool = class(TResponseItemLocalShell)
+  private
+    {
+      FArguments: intercepted by TResponseOutputFunction (property in common)
+    }
+    [JsonNameAttribute('server_label')]
+    FServerLabel: string;
+    FError: string;
+    FOutput: string;
+  public
+    /// <summary>
+    /// The label of the MCP server running the tool.
+    /// </summary>
+    property ServerLabel: string read FServerLabel write FServerLabel;
+    /// <summary>
+    /// The error from the tool call, if any.
+    /// </summary>
+    property Error: string read FError write FError;
+    /// <summary>
+    /// The output from the tool call.
+    /// </summary>
+    property Output: string read FOutput write FOutput;
+  end;
+
+  TResponseItemMCPList = class(TResponseItemMCPTool)   
+  private
+    FTools: TArray<TMCPListTool>;
+  public
+    property Tools: TArray<TMCPListTool> read FTools write FTools;
+    destructor Destroy; override;
+  end;
+
+  TResponseItemMCPApproval = class(TResponseItemMCPList)
+    {
+      FArguments: intercepted by TResponseOutputFunction (property in common)
+      FServerLabel: intercepted by TResponseOutputMCPTool (property in common)
+    }
   end;
 
   {--- This class is made up of the following classes:
-    TResponseItemCommon, TResponseItemInputMessage, TResponseItemOutputMessage,
-    TResponseItemFileSearchToolCall, TResponseItemComputerToolCall,
-    TResponseItemComputerToolCallOutput, TResponseItemWebSearchToolCall,
-    TResponseItemFunctionToolCall, TResponseItemFunctionToolCallOutput}
-  TResponseItem = class(TResponseItemFunctionToolCallOutput);
+    TResponseItemCommon,
+    TResponseItemInputMessage,
+    TResponseItemOutputMessage,
+    TResponseItemFileSearchToolCall,
+    TResponseItemComputerToolCall,
+    TResponseItemComputerToolCallOutput,
+    TResponseItemWebSearchToolCall,
+    TResponseItemFunctionToolCall,
+    TResponseItemFunctionToolCallOutput,
+    TResponseItemImageGeneration,
+    TResponseItemCodeInterpreter,
+    TResponseItemLocalShell,
+    TResponseItemMCPTool,
+    TResponseItemMCPApproval
+  }
+  TResponseItem = class(TResponseItemMCPApproval);
+
+(*
+    End TResponseItem definition
+
+ ******************************************************************************)
 
   TResponses = class(TJSONFingerprint)
   private
@@ -623,6 +854,24 @@ end;
 destructor TResponses.Destroy;
 begin
   for var Item in FData do
+    Item.Free;
+  inherited;
+end;
+
+{ TCodeInterpreterResult }
+
+destructor TCodeInterpreterResult.Destroy;
+begin
+  for var Item in FFiles do
+    Item.Free;
+  inherited;
+end;
+
+{ TResponseItemMCPList }
+
+destructor TResponseItemMCPList.Destroy;
+begin
+  for var Item in FTools do
     Item.Free;
   inherited;
 end;

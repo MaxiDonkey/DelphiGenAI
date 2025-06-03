@@ -494,7 +494,7 @@ type
     /// <summary>
     /// The GenAI API instance associated with this route.
     /// </summary>
-    constructor CreateRoute(AAPI: TGenAIAPI); reintroduce;
+    constructor CreateRoute(AAPI: TGenAIAPI); reintroduce; virtual;
   end;
 
 var

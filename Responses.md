@@ -5,6 +5,9 @@
     - [Streamed](#streamed)
     - [Multi-turn conversations](#multi-turn-conversations) 
     - [Parallel method for generating text](#parallel-method-for-generating-text)
+        - [Example 1 : Two prompts processed in parallel](#example-1--two-prompts-processed-in-parallel)
+        - [Example 2 : Three web search processed in parallel.](#example-2--three-web-search-processed-in-parallel)
+        - [Example 3 : Parallel web search processed with asynchrone promise chaining.](#example-3--parallel-web-search-processed-with-asynchrone-promise-chaining)
     - [CRUD operations on saved responses](#crud-operations-on-saved-responses)
         - [Get a model response](#get-a-model-response)
         - [Delete a model response](#delete-a-model-response)
@@ -20,7 +23,15 @@
     - [Web_search code exemple](#web-search-code-exemple)
     - [Limitations](#limitations)
 - [File search](#file-search)
+    - [Overview](#1-overview)
+    - [How it works](#2-how-it-works)
+    - [Learn more](#3-learn-more)
+    - [Use case](#4-use-case)
+    - [Final thoughts](#5-final-thoughts)
 - [Function calling](#function-calling)
+- [Image generation](#image-generation)
+- [Remote MCP](#remote-mcp)
+- [Code Interpreter](#code-interpreter)
 
 <br>
 
@@ -35,7 +46,7 @@ This interface represents OpenAI’s most advanced environment for driving model
 ```Delphi
 //uses GenAI, GenAI.Types, GenAI.Tutorial.VCL;
 
-    TutorialHub.JSONRequestClear;
+  TutorialHub.JSONRequestClear;
 
   //Asynchronous example
   Client.Responses.AsynCreate(
@@ -73,6 +84,40 @@ This interface represents OpenAI’s most advanced environment for driving model
 //  finally
 //    Value.Free;
 //  end;
+
+  //Asynchronous promise example
+//  var Promise := Client.Responses.AsyncAwaitCreate(
+//    procedure (Params: TResponsesParams)
+//    begin
+//      Params.Model('gpt-4.1-mini');
+//      Params.Input('What is the difference between a mathematician and a physicist?');
+//      //Params.Store(False);  // Response not stored
+//      TutorialHub.JSONRequest := Params.ToFormat();
+//    end,
+//    function : TPromiseResponse
+//    begin
+//      Result.Sender := TutorialHub;
+//      Result.OnStart := Start;
+//      Result.OnSuccess :=
+//        function (Sender: TObject; Response: TResponse): string
+//        begin
+//          Result := Response.Output[0].Content[0].Text;
+//          TutorialHub.JSONResponse := Response.JSONResponse; //Display the JSON response
+//        end;
+//    end);
+//
+//  promise
+//    .&Then<string>(
+//      function (Value: string): string
+//      begin
+//        Result := Value;
+//        Display(TutorialHub, Value);
+//      end)
+//    .&Catch(
+//      procedure (E: Exception)
+//      begin
+//        Display(TutorialHub, E.Message);
+//      end);
 ```
 
 <br>
@@ -135,6 +180,57 @@ When you create a Response with `stream` set to `true`, the server will emit ser
 //          DisplayStream(TutorialHub, Chat);
 //        end;
 //    end);
+
+    //Asynchronous promise example
+//  var Buffer := EmptyStr;
+//  var Promise := Client.Responses.AsyncAwaitCreateStream(
+//    procedure(Params: TResponsesParams)
+//    begin
+//      Params.Model('gpt-4.1-nano');
+//      Params.Input('What is the difference between a mathematician and a physicist?');
+//      //Params.Store(False);  // Response not stored
+//      Params.Stream;
+//      TutorialHub.JSONRequest := Params.ToFormat();
+//    end,
+//    function : TPromiseResponseStream
+//    begin
+//      Result.Sender := TutorialHub;
+//      Result.OnStart := Start;
+//
+//      Result.OnProgress :=
+//        procedure (Sender: TObject; Chunk: TResponseStream)
+//        begin
+//          DisplayStream(Sender, Chunk);
+//          Buffer := Buffer + Chunk.Delta;
+//        end;
+//
+//      Result.OnSuccess :=
+//        function (Sender: TObject): string
+//        begin
+//          Result := Buffer;
+//        end;
+//
+//      Result.OnDoCancel := DoCancellation;
+//
+//      Result.OnCancellation :=
+//        function (Sender: TObject): string
+//        begin
+//          Cancellation(Sender);
+//        end
+//    end);
+//
+//  Promise
+//    .&Then<string>(
+//      function (Value: string): string
+//      begin
+//        Result := Value;
+//        ShowMessage(Value);
+//      end)
+//    .&Catch(
+//      procedure (E: Exception)
+//      begin
+//        Display(TutorialHub, E.Message);
+//      end);
 ```
 
 ![Preview](/../main/images/GenAIResponseStreamedRequest.png?raw=true "Preview")
@@ -284,13 +380,100 @@ You can also use reasoning models in parallel processing: <br>
         end;
 
       Result.OnError := Display;
-    end)
+    end);
 ```
 
 To perform a web search, use the `gpt-4.1` or `gpt-4.1-mini` models with the `responses` endpoint. However, web search is not supported with these models when using the `chat/completion` endpoint; in that case, you should use the `gpt-4o-search-preview` model. Lastly, the `gpt-4.1-nano` model does not support web search, regardless of the endpoint used.
 
 <br>
+
+#### Example 3 : Parallel web search processed with asynchrone promise chaining.
+
+```Delphi
+//uses GenAI, GenAI.Types, GenAI.Tutorial.VCL;
+
+  var Buffer := EmptyStr;
+  var Promise := Client.Responses.AsyncAwaitCreateParallel(
+    procedure (Params: TBundleParams)
+    begin
+      Params.Prompts([
+        'How many television channels were there in France in 1980?',
+        'How many TV channels were there in Germany in 1980?.'
+      ]);
+      Params.System('Search on the web');
+      Params.Model('gpt-4.1-mini');
+      Params.SearchSize('medium');
+      Params.Country('US');
+    end,
+    function : TPromiseBundleList
+    begin
+      Result.Sender := TutorialHub;
+      Result.OnStart :=
+        procedure (Sender: TObject)
+        begin
+          Display(Sender, 'Start the parallel job' + sLineBreak);
+        end;
+      Result.OnSuccess :=
+        function (Sender: TObject; Bundle: TBundleList): string
+        begin
+          for var Item in Bundle.Items do
+            begin
+              Result := Result + 'Question : ' + Item.Prompt + sLineBreak + sLineBreak;
+              Result := Result + 'Response : ' + Item.Response + sLineBreak + sLineBreak;
+              Display(Sender, Result);
+            end;
+        end;
+    end);
+
+  Promise
+    .&Then(
+      function (Value: string): TStringPromise
+      begin
+        Result := Client.Responses.AsyncAwaitCreateStream(
+          procedure (Params: TResponsesParams)
+          begin
+            Params.Input(Format('Summarize in a JSON array and keep web''s Url: %s', [Value]));
+            Params.Model('gpt-4.1-mini');
+            Params.Store(False);
+            Params.Stream;
+            TutorialHub.JSONRequest := Params.ToFormat();
+          end,
+          function : TPromiseResponseStream
+          begin
+            Result.Sender := TutorialHub;
+            Result.OnStart := Start;
+            Result.OnProgress :=
+              procedure (Sender: TObject; Response: TResponseStream)
+              begin
+                if Response.&Type = TResponseStreamType.output_text_delta then
+                  Buffer := Buffer + Response.Delta;
+                DisplayStream(Sender, Response);
+              end;
+            Result.OnSuccess :=
+              function (Sender: TObject): string
+              begin
+                Result := Buffer;
+              end;
+            Result.OnDoCancel := DoCancellation;
+            Result.OnCancellation := nil;
+          end);
+      end)
+    .&Then<string>(
+      function (Value: string): string
+      begin
+        Result := Value;
+        ShowMessage(Result);
+      end)
+    .&Catch(
+      procedure (E: Exception)
+      begin
+        Display(TutorialHub, E.Message);
+      end);  
+```
  
+
+<br>
+
 ### CRUD operations on saved responses
 
 >
@@ -332,6 +515,34 @@ Retrieves a model response with the given ID. Refer to the [official documentati
 //  finally
 //    Value.Free;
 //  end;
+
+    //Asynchronous promise example
+//  var Promise := Client.Responses.ASyncAwaitRetrieve('Response_ID',
+//    function : TPromiseResponse
+//    begin
+//      Result.Sender := TutorialHub;
+//      Result.OnStart := Start;
+//      Result.OnSuccess :=
+//        function (Sender: TObject; Response: TResponse): string
+//        begin
+//          Result := Response.Model;
+//          Display(Sender, Response.Id + ': ' + Result);
+//        end;
+//    end);
+//
+//  Promise
+//    .&Then<TResponse>(
+//      function (Value: TResponse): TResponse
+//      begin
+//        Display(TutorialHub, Value.Output[0].Content[0].Text);
+//        Result := Value;
+//      end)
+//    .&Catch(
+//      procedure (E: Exception)
+//      begin
+//        Display(TutorialHub, E.Message);
+//      end
+//    );
 ```
 
 <br>
@@ -361,6 +572,32 @@ Deletes a model response with the given ID. Refer to the [official documentation
 //  finally
 //    Value.Free;
 //  end;
+
+    //Asynchronous promise example
+//  var Promise := Client.Responses.AsyncAwaitDelete(Edit1.Text,
+//    function : TPromiseResponseDelete
+//    begin
+//      Result.Sender := TutorialHub;
+//      Result.OnStart := Start;
+//      Result.OnSuccess :=
+//        function (Sender: TObject; Deleted: TResponseDelete): string
+//        begin
+//          Display(Sender, Deleted.Id + ' [deleted]');
+//        end
+//    end);
+//
+//  Promise
+//    .&Then<TResponseDelete>(
+//      function (Value: TResponseDelete): TResponseDelete
+//      begin
+//        Display(TutorialHub, Value);
+//        Result := Value;
+//      end)
+//    .&Catch(
+//      procedure (E: Exception)
+//      begin
+//        Display(TutorialHub, E.Message);
+//      end);
 ```
 
 <br>
@@ -401,6 +638,34 @@ Returns a list of input items for a given response. Refer to the [official docum
 //  finally
 //    Value.Free;
 //  end;
+
+    //Asynchronous promise example
+//  var Promise := Client.Responses.AsyncAwaitList(
+//    Edit1.Text,
+//    procedure (Params: TUrlResponseListParams)
+//    begin
+//      Params.Order('asc');
+//      Params.Limit(15);
+//    end,
+//    function : TPromiseResponses
+//    begin
+//      Result.Sender := TutorialHub;
+//      Result.OnStart := Start;
+//    end);
+//
+//  Promise
+//    .&Then<TResponses>(
+//      function (Value: TResponses): TResponses
+//      begin
+//        Result := Value;
+//        for var Item in Value.Data do
+//          Display(TutorialHub, Item.Id + Item.Content[0].Text);
+//      end)
+//    .&Catch(
+//      procedure (E: Exception)
+//      begin
+//        Display(TutorialHub, E.Message);
+//      end);
 ```
 
 <br>
@@ -754,6 +1019,58 @@ To fine‑tune search results by geography, you can supply an approximate locati
 //          DisplayStream(TutorialHub, Response);
 //        end;
 //    end);
+
+    //Asynchronous promise example
+//  var Buffer := EmptyStr;
+//  var promise := Client.Responses.AsyncAwaitCreateStream(
+//    procedure(Params: TResponsesParams)
+//    begin
+//      Params.Model('gpt-4.1-mini');
+//      Params.Input('What are the cultural news in France today?');
+//      Params.Tools([web_search_preview('high').UserLocation(Locate.City('Reims').Country('FR'))]);
+//      Params.Store(False);
+//      Params.Stream;
+//      TutorialHub.JSONRequest := Params.ToFormat();
+//    end,
+//    function : TPromiseResponseStream
+//    begin
+//      Result.Sender := TutorialHub;
+//      Result.OnStart := Start;
+//
+//      Result.OnProgress :=
+//        procedure (Sender: TObject; Chunk: TResponseStream)
+//        begin
+//          DisplayStream(Sender, Chunk);
+//          Buffer := Buffer + Chunk.Delta;
+//        end;
+//
+//      Result.OnSuccess :=
+//        function (Sender: TObject): string
+//        begin
+//          Result := Buffer;
+//        end;
+//
+//      Result.OnDoCancel := DoCancellation;
+//
+//      Result.OnCancellation :=
+//        function (Sender: TObject): string
+//        begin
+//          Cancellation(Sender);
+//        end
+//    end);
+//
+//  promise
+//    .&Then<string>(
+//      function (Value: string): string
+//      begin
+//        Result := Value;
+//        ShowMessage(Value);
+//      end)
+//    .&Catch(
+//      procedure (E: Exception)
+//      begin
+//        Display(TutorialHub, E.Message);
+//      end);
 ```
 
 <br>
@@ -1013,6 +1330,10 @@ We will not cover the `computer_use` tool here, as it requires implementing all 
 
 A GitHub repository may be shared in the future if the need to leverage this functionality becomes compelling.
 
+- Following the May 27, 2025 update, the [File2Knowledge](https://github.com/MaxiDonkey/file2knowledge) project is built on the `file_search` tool and, through its source code, demonstrates a concrete implementation of this tool for creating assistants specialized in specific domains.
+
+<br>
+
 ___
 
 ## Function calling
@@ -1133,7 +1454,7 @@ Result
 It is important to review the `display(TutorialHub, Value);` method here, as it is responsible for handling the function call.
 
 ```Delphi
-  procedure Display(Sender: TObject; Value: TResponse);
+procedure Display(Sender: TObject; Value: TResponse);
 begin
   TutorialHub.JSONResponse := Value.JSONResponse;
   for var Item in Value.Output do
@@ -1160,3 +1481,125 @@ end;
 
 >[!WARNING]
 >Ensure user confirmation for actions like sending emails or making purchases to avoid unintended consequences.
+
+___
+
+## Image generation
+
+The `v1/responses` endpoint enables direct integration of the ***image_generation*** tool into a conversational interaction, allowing you to create and insert images into the session context. In practice, it is often more efficient to modify these images or enhance them using complementary tools.
+
+We will demonstrate this concept in practice through several examples. Please note that the code snippets will utilize ***asynchrony***, since operations can be lengthy, as well as ***Promises*** to orchestrate the ***chaining of asynchronous calls***.
+
+### Non streamed example
+
+```Delphi
+//uses GenAI, GenAI.Types, GenAI.Tutorial.VCL, GenAI.Responses.ImageHelper;
+
+  TutorialHub.JSONRequestClear;
+
+  //Asynchronous promise example
+  var Promise := Client.Responses.AsyncAwaitCreate(
+    procedure (Params: TResponsesParams)
+    begin
+      Params.Model('gpt-4.1-mini');
+      Params.Input('Create a realistic image of a cup of coffee on a transparent background.');
+      
+      Params.Tools([   
+        TResponseImageGenerationParams.New //Use the image generation tool 
+          .Background('transparent')
+          .model('gpt-image-1')
+          .Size(TImageSize.r1024x1024)
+      ]);
+      
+      Params.Store(False);
+      TutorialHub.JSONRequest := Params.ToFormat();
+    end,
+    function : TPromiseResponse
+    begin
+      Result.Sender := TutorialHub;
+
+      Result.OnStart := Start;
+
+      Result.OnSuccess :=
+        function (Sender: TObject; Response: TResponse): string
+        begin
+          Display(Sender, Response);
+          Result := Response.Output[0].Result;  //Retrieving the image in base64
+        end;
+    end
+  );
+
+  promise
+    .&Then<string>(
+      function (Value: string): string
+      begin
+        Result := Value;
+        var Stream := TImageHelper.Create(Value).GetStream;
+        try
+          Image1.Picture.LoadFromStream(Stream);
+        finally
+          Stream.Free;
+        end;
+      end)
+    .&Catch(
+      procedure (E: Exception)
+      begin
+        Display(TutorialHub, E.Message);
+      end);
+```
+You could rewrite this example completely differently, but the idea is there.
+
+<br>
+
+___
+
+## Remote MCP
+
+Allow models to use remote MCP servers to perform tasks.
+
+The Model Context Protocol (MCP) is an open protocol that standardizes how applications provide tools and context to LLMs. With the MCP tool in the Responses API, developers can give the model access to tools hosted on remote MCP servers; these servers, maintained by teams and organizations across the web, expose their tools to MCP clients, like the Responses API.
+
+Refer to [official documentation](https://platform.openai.com/docs/guides/tools-remote-mcp)
+
+```Delphi
+...
+    Params.Tools([   
+        TResponseMCPToolParams.New //Use MCP tool 
+          .ServerLabel('my server label')
+          .ServerUrl('https://mcp.my_server.com/mcp')
+          .RequireApproval('never')
+      ]);
+...
+```
+
+<br>
+
+___
+
+
+## Code Interpreter
+
+Allow models to write and run Python to solve problems.
+
+The Code Interpreter lets the model write and run Python code in a secure sandbox to tackle complex problems—especially in data analysis, programming, and pure math. In practical terms, it can:
+
+- Handle files with data in all sorts of formats.
+
+- Create files that include both data and charts (even images).
+
+- Write and re-run code over and over: if the first version fails, the model rewrites it and tests it until it works.
+
+You’ll find this feature available in the Responses API for every model.
+
+The newest reasoning models (o3 and o4-mini) are also trained to use the Code Interpreter to get a much better grip on images. They can crop, zoom, rotate, and do other manipulations to boost their visual analysis.
+
+Refer to [official documentation](https://platform.openai.com/docs/guides/tools-code-interpreter)
+
+```Delphi
+...
+    Params.Tools([   
+        TResponseCodeInterpreterParams.New //Use code interpreter tool 
+          .Container('auto')
+      ]);
+...
+```

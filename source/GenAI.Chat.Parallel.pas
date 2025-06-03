@@ -131,7 +131,7 @@ type
   end;
 
   /// <summary>
-  /// Represents an asynchronous callback buffer for handling chat responses.
+  /// Represents an asynchronous callback buffer for handling parallele chat responses.
   /// </summary>
   /// <remarks>
   /// This class is a specialized type used to manage asynchronous operations
@@ -139,6 +139,16 @@ type
   /// enabling structured handling of callback events.
   /// </remarks>
   TAsynBundleList = TAsynCallBack<TBundleList>;
+
+  /// <summary>
+  /// Represents an asynchronous callback buffer for handling parallele chat responses for promise chaining
+  /// </summary>
+  /// <remarks>
+  /// This class is a specialized type used to manage asynchronous operations
+  /// related to chat request processing. It inherits from <c>TAsynCallBack&lt;TBundleList&gt;</c>,
+  /// enabling structured handling of callback events.
+  /// </remarks>
+  TPromiseBundleList = TPromiseCallBack<TBundleList>;
 
   /// <summary>
   /// Provides helper methods for managing asynchronous tasks.

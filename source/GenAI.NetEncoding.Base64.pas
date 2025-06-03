@@ -11,7 +11,7 @@ interface
 
 uses
   System.SysUtils, System.Classes, System.NetEncoding, System.Net.Mime,
-  GenAI.Consts;
+  GenAI.Consts, System.IOUtils;
 
   /// <summary>
   /// Retrieves the MIME type of the specified file based on its location.
@@ -172,6 +172,7 @@ uses
   /// Ensure that the stream is properly managed and freed after use to avoid memory leaks.
   /// </remarks>
   procedure DecodeBase64ToStream(const Base64Str: string; const Stream: TStream);
+
   /// <summary>
   /// Retrieves the size of the specified file in bytes.
   /// </summary>
@@ -191,10 +192,14 @@ uses
   /// </remarks>
   function FileSize(const FileLocation: string): Int64;
 
+  procedure SaveAsBase64(const FileLocation, Content: string);
+
+  function LoadAsBase64(const FileLocation: string): string;
+
 implementation
 
 uses
-  System.StrUtils, System.IOUtils;
+  System.StrUtils;
 
 function EncodeBase64(FileLocation : string): string;
 begin
@@ -341,6 +346,23 @@ begin
   except
     raise;
   end;
+end;
+
+procedure SaveAsBase64(const FileLocation, Content: string);
+begin
+  var FullPath := TPath.GetDirectoryName(FileLocation);
+  if not FullPath.isEmpty and not TDirectory.Exists(FullPath) then
+    TDirectory.CreateDirectory(FullPath);
+
+  TFile.WriteAllText(FileLocation, Content, TEncoding.UTF8);
+end;
+
+function LoadAsBase64(const FileLocation: string): string;
+begin
+  if TFile.Exists(FileLocation) then
+    Result := TFile.ReadAllText(FileLocation, TEncoding.UTF8)
+  else
+    raise Exception.CreateFmt('The template file was not found : %s', [FileLocation]);
 end;
 
 end.

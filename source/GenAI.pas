@@ -60,7 +60,8 @@ uses
   GenAI.Batch, GenAI.Batch.Reader, GenAI.Batch.Builder, GenAI.Completions, GenAI.FineTuning,
   GenAI.Assistants, GenAI.Threads, GenAI.Messages, GenAI.Runs, GenAI.RunSteps,
   GenAI.Vector, GenAI.VectorFiles, GenAI.VectorBatch, GenAI.Monitoring, GenAI.Chat.Parallel,
-  GenAI.Responses, GenAI.Responses.InputParams, GenAI.Responses.InputItemList;
+  GenAI.Responses, GenAI.Responses.InputParams, GenAI.Responses.InputItemList,
+  GenAI.Responses.OutputParams, GenAI.Async.Promise, GenAI.Responses.Internal;
 
 type
   /// <summary>
@@ -413,6 +414,12 @@ type
     constructor Create(const AAPIKey: string); overload;
     destructor Destroy; override;
   end;
+
+  {$REGION 'GenAI.Async.Promise'}
+
+  TStringPromise = GenAI.Async.Promise.TStringPromise;
+
+  {$ENDREGION}
 
   {$REGION 'GenAI.API'}
 
@@ -2940,6 +2947,16 @@ type
   TAsynBuffer = TAsynBundleList; //deprecated : naming error
 
   /// <summary>
+  /// Represents an asynchronous callback buffer for handling parallele chat responses for promise chaining
+  /// </summary>
+  /// <remarks>
+  /// This class is a specialized type used to manage asynchronous operations
+  /// related to chat request processing. It inherits from <c>TAsynCallBack&lt;TBundleList&gt;</c>,
+  /// enabling structured handling of callback events.
+  /// </remarks>
+  TPromiseBundleList = GenAI.Chat.Parallel.TPromiseBundleList;
+
+  /// <summary>
   /// Represents the parameters used for configuring a chat request bundle.
   /// </summary>
   /// <remarks>
@@ -2985,6 +3002,22 @@ type
 
   TComputerDoubleClick = GenAI.Responses.InputParams.TComputerDoubleClick;
 
+  TComputerDragPoint = GenAI.Responses.InputParams.TComputerDragPoint;
+
+  TComputerDrag = GenAI.Responses.InputParams.TComputerDrag;
+
+  TComputerKeyPressed = GenAI.Responses.InputParams.TComputerKeyPressed;
+
+  TComputerMove = GenAI.Responses.InputParams.TComputerMove;
+
+  TComputerScreenshot = GenAI.Responses.InputParams.TComputerScreenshot;
+
+  TComputerScroll = GenAI.Responses.InputParams.TComputerScroll;
+
+  TComputerType = GenAI.Responses.InputParams.TComputerType;
+
+  TComputerWait = GenAI.Responses.InputParams.TComputerWait;
+
   TComputerToolCallOutput = GenAI.Responses.InputParams.TComputerToolCallOutput;
 
   TWebSearchToolCall = GenAI.Responses.InputParams.TWebSearchToolCall;
@@ -2999,9 +3032,97 @@ type
 
   TComputerToolCall = GenAI.Responses.InputParams.TComputerToolCall;
 
+  TImageGeneration = GenAI.Responses.InputParams.TImageGeneration;
+
+  TCodeInterpreterToolCallResult = GenAI.Responses.InputParams.TCodeInterpreterToolCallResult;
+
+  TCodeInterpreterTextOutput = GenAI.Responses.InputParams.TCodeInterpreterTextOutput;
+
+  TCodeInterpreterFile = GenAI.Responses.InputParams.TCodeInterpreterFile;
+
+  TCodeInterpreterFileOutput = GenAI.Responses.InputParams.TCodeInterpreterFileOutput;
+
+  TCodeInterpreterToolCall = GenAI.Responses.InputParams.TCodeInterpreterToolCall;
+
+  TLocalShellCallAction = GenAI.Responses.InputParams.TLocalShellCallAction;
+
+  TLocalShellCall = GenAI.Responses.InputParams.TLocalShellCall;
+
+  TLocalShellCallOutput = GenAI.Responses.InputParams.TLocalShellCallOutput;
+
+  TMCPTools = GenAI.Responses.InputParams.TMCPTools;
+
+  TMCPListTools = GenAI.Responses.InputParams.TMCPListTools;
+
+  TMCPApprovalRequest = GenAI.Responses.InputParams.TMCPApprovalRequest;
+
+  TMCPApprovalResponse = GenAI.Responses.InputParams.TMCPApprovalResponse;
+
+  TMCPToolCall = GenAI.Responses.InputParams.TMCPToolCall;
+
+  TReasoningParams = GenAI.Responses.InputParams.TReasoningParams;
+
+  TTextFormatParams = GenAI.Responses.InputParams.TTextFormatParams;
+
+  TTextFormatTextPrams = GenAI.Responses.InputParams.TTextFormatTextPrams;
+
+  TTextJSONSchemaParams = GenAI.Responses.InputParams.TTextJSONSchemaParams;
+
+  TTextJSONObjectParams = GenAI.Responses.InputParams.TTextJSONObjectParams;
+
+  TTextParams = GenAI.Responses.InputParams.TTextParams;
+
+  TResponseToolChoiceParams = GenAI.Responses.InputParams.TResponseToolChoiceParams;
+
+  THostedToolParams = GenAI.Responses.InputParams.THostedToolParams;
+
+  TFunctionToolParams = GenAI.Responses.InputParams.TFunctionToolParams;
+
+  TFileSearchFilters = GenAI.Responses.InputParams.TFileSearchFilters;
+
+  TComparisonFilter = GenAI.Responses.InputParams.TComparisonFilter;
+
+  TCompoundFilter = GenAI.Responses.InputParams.TCompoundFilter;
+
+  TResponseToolParams = GenAI.Responses.InputParams.TResponseToolParams;
+
+  TResponseFileSearchParams = GenAI.Responses.InputParams.TResponseFileSearchParams;
+
+  TResponseFunctionParams = GenAI.Responses.InputParams.TResponseFunctionParams;
+
+  TResponseComputerUseParams = GenAI.Responses.InputParams.TResponseComputerUseParams;
+
+  TResponseUserLocationParams = GenAI.Responses.InputParams.TResponseUserLocationParams;
+
+  TResponseWebSearchParams = GenAI.Responses.InputParams.TResponseWebSearchParams;
+
+  TMCPToolsListParams = GenAI.Responses.InputParams.TMCPToolsListParams;
+
+  TMCPAllowedToolsParams = GenAI.Responses.InputParams.TMCPAllowedToolsParams;
+
+  TMCPRequireApprovalParams = GenAI.Responses.InputParams.TMCPRequireApprovalParams;
+
+  TResponseMCPToolParams = GenAI.Responses.InputParams.TResponseMCPToolParams;
+
+  TCodeInterpreterContainerAutoParams = GenAI.Responses.InputParams.TCodeInterpreterContainerAutoParams;
+
+  TResponseCodeInterpreterParams = GenAI.Responses.InputParams.TResponseCodeInterpreterParams;
+
+  TLocalShellToolParams = GenAI.Responses.InputParams.TLocalShellToolParams;
+
+  TResponsesParams = GenAI.Responses.InputParams.TResponsesParams;
+
+  TInputImageMaskParams = GenAI.Responses.InputParams.TInputImageMaskParams;
+
+  TResponseImageGenerationParams = GenAI.Responses.InputParams.TResponseImageGenerationParams;
+
   {$ENDREGION}
 
   {$REGION 'GenAI.Responses.InputItemList'}
+
+  TCodeInterpreterResultFiles = GenAI.Responses.InputItemList.TCodeInterpreterResultFiles;
+
+  TCodeInterpreterResult = GenAI.Responses.InputItemList.TCodeInterpreterResult;
 
   TFileSearchResult = GenAI.Responses.InputItemList.TFileSearchResult;
 
@@ -3032,6 +3153,8 @@ type
   TComputerActionType = GenAI.Responses.InputItemList.TComputerActionType;
 
   TComputerActionWait = GenAI.Responses.InputItemList.TComputerActionWait;
+
+  TToolCallAction = GenAI.Responses.InputItemList.TToolCallAction;
 
   TComputerAction = GenAI.Responses.InputItemList.TComputerAction;
 
@@ -3077,193 +3200,199 @@ type
 
   TResponseItemFunctionToolCallOutput = GenAI.Responses.InputItemList.TResponseItemFunctionToolCallOutput;
 
+  TResponseItemImageGeneration = GenAI.Responses.InputItemList.TResponseItemImageGeneration;
+
+  TResponseItemCodeInterpreter = GenAI.Responses.InputItemList.TResponseItemCodeInterpreter;
+
+  TResponseItemLocalShell = GenAI.Responses.InputItemList.TResponseItemLocalShell;
+
+  TResponseItemMCPTool = GenAI.Responses.InputItemList.TResponseItemMCPTool;
+
+  TResponseItemMCPList = GenAI.Responses.InputItemList.TResponseItemMCPList;
+
+  TResponseItemMCPApproval = GenAI.Responses.InputItemList.TResponseItemMCPApproval;
+
   TResponseItem = GenAI.Responses.InputItemList.TResponseItem;
 
   TResponses = GenAI.Responses.InputItemList.TResponses;
 
   {$ENDREGION}
 
-  {$REGION 'GenAI.Responses'}
+  {$REGION 'GenAI.Responses.Internal'}
 
-  TReasoningParams = GenAI.Responses.TReasoningParams;
+  TPromiseResponse = GenAI.Responses.Internal.TPromiseResponse;
 
-  TTextFormatParams = GenAI.Responses.TTextFormatParams;
+  TPromiseResponseStream = GenAI.Responses.Internal.TPromiseResponseStream;
 
-  TTextFormatTextPrams = GenAI.Responses.TTextFormatTextPrams;
+  TPromiseResponseDelete = GenAI.Responses.Internal.TPromiseResponseDelete;
 
-  TTextJSONSchemaParams = GenAI.Responses.TTextJSONSchemaParams;
+  TPromiseResponses = GenAI.Responses.Internal.TPromiseResponses;
 
-  TTextJSONObjectParams = GenAI.Responses.TTextJSONObjectParams;
+  TResponseEvent = GenAI.Responses.Internal.TResponseEvent;
 
-  TTextParams = GenAI.Responses.TTextParams;
+  TAsynResponse = GenAI.Responses.Internal.TAsynResponse;
 
-  TResponseToolChoiceParams = GenAI.Responses.TResponseToolChoiceParams;
+  TAsynResponseStream = GenAI.Responses.Internal.TAsynResponseStream;
 
-  THostedToolParams = GenAI.Responses.THostedToolParams;
+  TAsynResponseDelete = GenAI.Responses.Internal.TAsynResponseDelete;
 
-  TFunctionToolParams = GenAI.Responses.TFunctionToolParams;
+  TAsynResponses = GenAI.Responses.Internal.TAsynResponses;
 
-  TFileSearchFilters = GenAI.Responses.TFileSearchFilters;
+  {$ENDREGION}
 
-  TComparisonFilter = GenAI.Responses.TComparisonFilter;
+  {$REGION 'GenAI.Responses.OutputParams'}
 
-  TCompoundFilter = GenAI.Responses.TCompoundFilter;
+  TResponseError = GenAI.Responses.OutputParams.TResponseError;
 
-  TResponseToolParams = GenAI.Responses.TResponseToolParams;
+  TResponseIncompleteDetails = GenAI.Responses.OutputParams.TResponseIncompleteDetails;
 
-  TResponseFileSearchParams = GenAI.Responses.TResponseFileSearchParams;
+  TResponseMessageContentCommon = GenAI.Responses.OutputParams.TResponseMessageContentCommon;
 
-  TResponseFunctionParams = GenAI.Responses.TResponseFunctionParams;
+  TResponseMessageContent = GenAI.Responses.OutputParams.TResponseMessageContent;
 
-  TResponseComputerUseParams = GenAI.Responses.TResponseComputerUseParams;
+  TResponseMessageRefusal = GenAI.Responses.OutputParams.TResponseMessageRefusal;
 
-  TResponseUserLocationParams = GenAI.Responses.TResponseUserLocationParams;
+  TResponseContent = GenAI.Responses.OutputParams.TResponseContent;
 
-  TResponseWebSearchParams = GenAI.Responses.TResponseWebSearchParams;
+  TResponseReasoningSummary = GenAI.Responses.OutputParams.TResponseReasoningSummary;
 
-  TResponsesParams = GenAI.Responses.TResponsesParams;
+  TResponseReasoning = GenAI.Responses.OutputParams.TResponseReasoning;
 
-  TResponseError = GenAI.Responses.TResponseError;
+  TResponseRankingOptions = GenAI.Responses.OutputParams.TResponseRankingOptions;
 
-  TResponseIncompleteDetails = GenAI.Responses.TResponseIncompleteDetails;
+  TResponseFileSearchFiltersCommon = GenAI.Responses.OutputParams.TResponseFileSearchFiltersCommon;
 
-  TResponseMessageContentCommon = GenAI.Responses.TResponseMessageContentCommon;
+  TResponseFileSearchFiltersComparaison = GenAI.Responses.OutputParams.TResponseFileSearchFiltersComparaison;
 
-  TResponseMessageContent = GenAI.Responses.TResponseMessageContent;
+  TResponseFileSearchFiltersCompound = GenAI.Responses.OutputParams.TResponseFileSearchFiltersCompound;
 
-  TResponseMessageRefusal = GenAI.Responses.TResponseMessageRefusal;
+  TResponseFileSearchFilters = GenAI.Responses.OutputParams.TResponseFileSearchFilters;
 
-  TResponseContent = GenAI.Responses.TResponseContent;
+  TResponseWebSearchLocation = GenAI.Responses.OutputParams.TResponseWebSearchLocation;
 
-  TResponseReasoningSummary = GenAI.Responses.TResponseReasoningSummary;
+  TResponseOutputCommon = GenAI.Responses.OutputParams.TResponseOutputCommon;
 
-  TResponseReasoning = GenAI.Responses.TResponseReasoning;
+  TResponseOutputMessage = GenAI.Responses.OutputParams.TResponseOutputMessage;
 
-  TResponseRankingOptions = GenAI.Responses.TResponseRankingOptions;
+  TResponseOutputFileSearch = GenAI.Responses.OutputParams.TResponseOutputFileSearch;
 
-  TResponseFileSearchFiltersCommon = GenAI.Responses.TResponseFileSearchFiltersCommon;
+  TResponseOutputFunction = GenAI.Responses.OutputParams.TResponseOutputFunction;
 
-  TResponseFileSearchFiltersComparaison = GenAI.Responses.TResponseFileSearchFiltersComparaison;
+  TResponseOutputWebSearch = GenAI.Responses.OutputParams.TResponseOutputWebSearch;
 
-  TResponseFileSearchFiltersCompound = GenAI.Responses.TResponseFileSearchFiltersCompound;
+  TResponseOutputComputer = GenAI.Responses.OutputParams.TResponseOutputComputer;
 
-  TResponseFileSearchFilters = GenAI.Responses.TResponseFileSearchFilters;
+  TResponseOutputReasoning = GenAI.Responses.OutputParams.TResponseOutputReasoning;
 
-  TResponseWebSearchLocation = GenAI.Responses.TResponseWebSearchLocation;
+  TResponseOutputImageGeneration = GenAI.Responses.OutputParams.TResponseOutputImageGeneration;
 
-  TResponseOutputCommon = GenAI.Responses.TResponseOutputCommon;
+  TResponseOutputCodeInterpreter = GenAI.Responses.OutputParams.TResponseOutputCodeInterpreter;
 
-  TResponseOutputMessage = GenAI.Responses.TResponseOutputMessage;
+  TResponseOutputLocalShell = GenAI.Responses.OutputParams.TResponseOutputLocalShell;
 
-  TResponseOutputFileSearch = GenAI.Responses.TResponseOutputFileSearch;
+  TResponseOutputMCPTool = GenAI.Responses.OutputParams.TResponseOutputMCPTool;
 
-  TResponseOutputFunction = GenAI.Responses.TResponseOutputFunction;
+  TResponseOutputMCPList = GenAI.Responses.OutputParams.TResponseOutputMCPList;
 
-  TResponseOutputWebSearch = GenAI.Responses.TResponseOutputWebSearch;
+  TResponseMCPApproval = GenAI.Responses.OutputParams.TResponseMCPApproval;
 
-  TResponseOutputComputer = GenAI.Responses.TResponseOutputComputer;
+  TResponseOutput = GenAI.Responses.OutputParams.TResponseOutput;
 
-  TResponseOutputReasoning = GenAI.Responses.TResponseOutputReasoning;
+  TResponseTextFormatCommon = GenAI.Responses.OutputParams.TResponseTextFormatCommon;
 
-  TResponseOutput = GenAI.Responses.TResponseOutput;
+  TResponseFormatText = GenAI.Responses.OutputParams.TResponseFormatText;
 
-  TResponseTextFormatCommon = GenAI.Responses.TResponseTextFormatCommon;
+  TResponseFormatJSONObject = GenAI.Responses.OutputParams.TResponseFormatJSONObject;
 
-  TResponseFormatText = GenAI.Responses.TResponseFormatText;
+  TResponseFormatJSONSchema = GenAI.Responses.OutputParams.TResponseFormatJSONSchema;
 
-  TResponseFormatJSONObject = GenAI.Responses.TResponseFormatJSONObject;
+  TResponseTextFormat = GenAI.Responses.OutputParams.TResponseTextFormat;
 
-  TResponseFormatJSONSchema = GenAI.Responses.TResponseFormatJSONSchema;
+  TResponseText = GenAI.Responses.OutputParams.TResponseText;
 
-  TResponseTextFormat = GenAI.Responses.TResponseTextFormat;
+  TResponseToolCommon = GenAI.Responses.OutputParams.TResponseToolCommon;
 
-  TResponseText = GenAI.Responses.TResponseText;
+  TResponseToolFileSearch = GenAI.Responses.OutputParams.TResponseToolFileSearch;
 
-  TResponseToolCommon = GenAI.Responses.TResponseToolCommon;
+  TResponseToolFunction = GenAI.Responses.OutputParams.TResponseToolFunction;
 
-  TResponseToolFileSearch = GenAI.Responses.TResponseToolFileSearch;
+  TResponseToolComputerUse = GenAI.Responses.OutputParams.TResponseToolComputerUse;
 
-  TResponseToolFunction = GenAI.Responses.TResponseToolFunction;
+  TResponseToolWebSearch = GenAI.Responses.OutputParams.TResponseToolWebSearch;
 
-  TResponseToolComputerUse = GenAI.Responses.TResponseToolComputerUse;
+  TResponseMCPTool = GenAI.Responses.OutputParams.TResponseMCPTool;
 
-  TResponseToolWebSearch = GenAI.Responses.TResponseToolWebSearch;
+  TResponseCodeInterpreter = GenAI.Responses.OutputParams.TResponseCodeInterpreter;
 
-  TResponseTool = GenAI.Responses.TResponseTool;
+  TResponseImageGenerationTool = GenAI.Responses.OutputParams.TResponseImageGenerationTool;
 
-  TInputTokensDetails = GenAI.Responses.TInputTokensDetails;
+  TResponseLocalShellTool = GenAI.Responses.OutputParams.TResponseLocalShellTool;
 
-  TOutputTokensDetails = GenAI.Responses.TOutputTokensDetails;
+  TResponseTool = GenAI.Responses.OutputParams.TResponseTool;
 
-  TResponseUsage = GenAI.Responses.TResponseUsage;
+  TInputTokensDetails = GenAI.Responses.OutputParams.TInputTokensDetails;
 
-  TResponse = GenAI.Responses.TResponse;
+  TOutputTokensDetails = GenAI.Responses.OutputParams.TOutputTokensDetails;
 
-  TUrlIncludeParams = GenAI.Responses.TUrlIncludeParams;
+  TResponseUsage = GenAI.Responses.OutputParams.TResponseUsage;
 
-  TUrlResponseListParams = GenAI.Responses.TUrlResponseListParams;
+  TResponse = GenAI.Responses.OutputParams.TResponse;
 
-  TResponseDelete = GenAI.Responses.TResponseDelete;
+  TUrlIncludeParams = GenAI.Responses.OutputParams.TUrlIncludeParams;
 
-  TResponseStreamingCommon = GenAI.Responses.TResponseStreamingCommon;
+  TUrlResponseListParams = GenAI.Responses.OutputParams.TUrlResponseListParams;
 
-  TResponseCreated = GenAI.Responses.TResponseCreated;
+  TResponseDelete = GenAI.Responses.OutputParams.TResponseDelete;
 
-  TResponseInProgress = GenAI.Responses.TResponseInProgress;
+  TResponseStreamingCommon = GenAI.Responses.OutputParams.TResponseStreamingCommon;
 
-  TResponseCompleted = GenAI.Responses.TResponseCompleted;
+  TResponseCreated = GenAI.Responses.OutputParams.TResponseCreated;
 
-  TResponseFailed = GenAI.Responses.TResponseFailed;
+  TResponseInProgress = GenAI.Responses.OutputParams.TResponseInProgress;
 
-  TRresponseIncomplete = GenAI.Responses.TRresponseIncomplete;
+  TResponseCompleted = GenAI.Responses.OutputParams.TResponseCompleted;
 
-  TResponseOutputItemAdded = GenAI.Responses.TResponseOutputItemAdded;
+  TResponseFailed = GenAI.Responses.OutputParams.TResponseFailed;
 
-  TResponseOutputItemDone = GenAI.Responses.TResponseOutputItemDone;
+  TResponseIncomplete = GenAI.Responses.OutputParams.TResponseIncomplete;
 
-  TResponseContentpartAdded = GenAI.Responses.TResponseContentpartAdded;
+  TResponseOutputItemAdded = GenAI.Responses.OutputParams.TResponseOutputItemAdded;
 
-  TResponseContentpartDone = GenAI.Responses.TResponseContentpartDone;
+  TResponseOutputItemDone = GenAI.Responses.OutputParams.TResponseOutputItemDone;
 
-  TResponseOutputTextDelta = GenAI.Responses.TResponseOutputTextDelta;
+  TResponseContentpartAdded = GenAI.Responses.OutputParams.TResponseContentpartAdded;
 
-  TResponseOutputTextAnnotationAdded = GenAI.Responses.TResponseOutputTextAnnotationAdded;
+  TResponseContentpartDone = GenAI.Responses.OutputParams.TResponseContentpartDone;
 
-  TResponseOutputTextDone = GenAI.Responses.TResponseOutputTextDone;
+  TResponseOutputTextDelta = GenAI.Responses.OutputParams.TResponseOutputTextDelta;
 
-  TResponseRefusalDelta = GenAI.Responses.TResponseRefusalDelta;
+  TResponseOutputTextAnnotationAdded = GenAI.Responses.OutputParams.TResponseOutputTextAnnotationAdded;
 
-  TResponseRefusalDone = GenAI.Responses.TResponseRefusalDone;
+  TResponseOutputTextDone = GenAI.Responses.OutputParams.TResponseOutputTextDone;
 
-  TResponseFunctionCallArgumentsDelta = GenAI.Responses.TResponseFunctionCallArgumentsDelta;
+  TResponseRefusalDelta = GenAI.Responses.OutputParams.TResponseRefusalDelta;
 
-  TResponseFunctionCallArgumentsDone = GenAI.Responses.TResponseFunctionCallArgumentsDone;
+  TResponseRefusalDone = GenAI.Responses.OutputParams.TResponseRefusalDone;
 
-  TResponseFileSearchCallInprogress = GenAI.Responses.TResponseFileSearchCallInprogress;
+  TResponseFunctionCallArgumentsDelta = GenAI.Responses.OutputParams.TResponseFunctionCallArgumentsDelta;
 
-  TResponseFileSearchCallSearching = GenAI.Responses.TResponseFileSearchCallSearching;
+  TResponseFunctionCallArgumentsDone = GenAI.Responses.OutputParams.TResponseFunctionCallArgumentsDone;
 
-  TResponseFileSearchCallCompleted = GenAI.Responses.TResponseFileSearchCallCompleted;
+  TResponseFileSearchCallInprogress = GenAI.Responses.OutputParams.TResponseFileSearchCallInprogress;
 
-  TResponseWebSearchCallInprogress = GenAI.Responses.TResponseWebSearchCallInprogress;
+  TResponseFileSearchCallSearching = GenAI.Responses.OutputParams.TResponseFileSearchCallSearching;
 
-  TResponseWebSearchCallSearching = GenAI.Responses.TResponseWebSearchCallSearching;
+  TResponseFileSearchCallCompleted = GenAI.Responses.OutputParams.TResponseFileSearchCallCompleted;
 
-  TResponseWebSearchCallCompleted = GenAI.Responses.TResponseWebSearchCallCompleted;
+  TResponseWebSearchCallInprogress = GenAI.Responses.OutputParams.TResponseWebSearchCallInprogress;
 
-  TResponseStreamError = GenAI.Responses.TResponseStreamError;
+  TResponseWebSearchCallSearching = GenAI.Responses.OutputParams.TResponseWebSearchCallSearching;
 
-  TResponseStream = GenAI.Responses.TResponseStream;
+  TResponseWebSearchCallCompleted = GenAI.Responses.OutputParams.TResponseWebSearchCallCompleted;
 
-  TResponseEvent = GenAI.Responses.TResponseEvent;
+  TResponseStreamError = GenAI.Responses.OutputParams.TResponseStreamError;
 
-  TAsynResponse = GenAI.Responses.TAsynResponse;
-
-  TAsynResponseStream = GenAI.Responses.TAsynResponseStream;
-
-  TAsynResponseDelete = GenAI.Responses.TAsynResponseDelete;
-
-  TAsynResponses = GenAI.Responses.TAsynResponses;
+  TResponseStream = GenAI.Responses.OutputParams.TResponseStream;
 
   {$ENDREGION}
 

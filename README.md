@@ -1,22 +1,16 @@
 # **Delphi GenAI - Optimized OpenAI Integration**
 
-
-Welcome to `GenAI`, a powerful and flexible **Delphi library** integrating the latest innovations from `OpenAI` APIs. Designed for comprehensive support, it enables content generation, dialogue management, vision and speech processing, as well as audio interactions with precise control.
-Built on advanced models with reasoning capabilities, such as `o1`, `o3` and `o4`, it provides tools for data manipulation, batch processing, function calling, file management, and content moderation. It also supports the `GPT-4.1` models, the teminaison points `v1/chat/completion`, `v1/responses` and offers seamless agent construction.
-Additionally, `GenAI` streamlines assistant orchestration, message management, threads, and execution (runs), meeting the demands of modern projects. <br> <br>
-Integrating OpenAI APIs into your Delphi apps has never been easier: enjoy streamlined network‑call management, built‑in unit testing, and a modular JSON‑configuration approach.
-Check out the full [GenAI project](https://github.com/MaxiDonkey/DelphiGenAI/blob/main/GenAI.md)
 ___
-![GitHub](https://img.shields.io/badge/IDE%20Version-Delphi%2010.3/11/12-yellow)
+![Delphi Next Gen Ready](https://img.shields.io/badge/Delphi--Next--Gen-ready-brightgreen)
+![GitHub](https://img.shields.io/badge/IDE%20Version-Delphi%2010.4/11/12-yellow)
 ![GitHub](https://img.shields.io/badge/platform-all%20platforms-green)
-![GitHub](https://img.shields.io/badge/Updated%20on%20may%2027,%202025-blue)
+![GitHub](https://img.shields.io/badge/Updated%20on%20June%2003,%202025-blue)
 
 <br>
 
 NEW: 
+- [Changelog v1.0.7](https://github.com/MaxiDonkey/DelphiGenAI/blob/main/Changelog.md)
 - [Mini-lab to experiment with the v1/responses endpoint](https://github.com/MaxiDonkey/file2knowledge) `File2knowledge`
-- [Gpt-image-1 model](#gpt-image-1-model)
-- [Responses vs. Chat Completions](#responses-vs-chat-completions)
 - [Responses](https://github.com/MaxiDonkey/DelphiGenAI/blob/main/Responses.md)
 ___
 
@@ -25,8 +19,8 @@ ___
 - [Introduction](#introduction)
 - [Documentation Overview](#documentation-overview)
 - [TIPS for using the tutorial effectively](#tips-for-using-the-tutorial-effectively)
-    - [Obtain an api key](#obtain-an-api-key)
     - [Strategies for quickly using the code examples](#strategies-for-quickly-using-the-code-examples)
+    - [Obtain an api key](#obtain-an-api-key)
 - [Quick Start Guide](#quick-start-guide)
     - [Responses vs. Chat Completions](#responses-vs-chat-completions)
         - [Functional differences between the two endpoints](#functional-differences-between-the-two-endpoints)
@@ -71,36 +65,11 @@ ___
 
 # Introduction
 
-Following the development of several wrappers integrating solutions from [Anthropic (Claude)](https://github.com/MaxiDonkey/DelphiAnthropic), [Google (Gemini)](https://github.com/MaxiDonkey/DelphiGemini), [Mistral](https://github.com/MaxiDonkey/DelphiMistralAI), [GroqCloud](https://github.com/MaxiDonkey/DelphiStabilityAI), [Hugging Face](https://github.com/MaxiDonkey/DelphiHuggingFace), and [Deepseek](https://github.com/MaxiDonkey/DelphiDeepseek), `GenAI` now benefits from extensive feedback and experience. This feedback has enabled the creation of an optimized and advanced framework, specifically designed to meet the demands of large-scale projects developed using **Delphi**.
-
-In its latest version, `GenAI` has been primarily optimized to fully leverage OpenAI’s endpoints while remaining easily adaptable for the integration of the other aforementioned wrappers.
-
-<br>
-
-**Comprehensive Integration with OpenAI** <br>
-- `GenAI` is designed to support the **gpt-4o**, **chatgpt-4o**, **gpt-4.1**, **o1-pro**, **o3** and **o4** models, along with the latest developments in `OpenAI’s APIs`. This extensive coverage ensures maximum flexibility for projects leveraging the latest advancements in OpenAI's offerings.
-
-<br>
-
-**Document Structure** <br>
-- This document is divided into two main sections:
-
-   1. **Quick Start Guide** <br>
-   A practical introduction to generating text or audio responses from various types of inputs:
-      - Plain text
-      - Image/text combinations
-      - Document-based inputs (text)
-      - Audio and audio/text data
-
-  2. **Advanced Features in a Cookbook Format**
-      - A detailed guide showcasing advanced features available through OpenAI, complete with practical code examples for easy integration into your applications.
-
-<br>
-
-**Technical Support and Code Examples**<br>
-- Two support units, **VCL** and **FMX**, are included in the provided sources. These units simplify the implementation of the code examples and facilitate learning, with a focus on best practices for using `GenAI`.
-
-For more information about the architecture of GenAI, please refer to [the dedicated page](https://github.com/MaxiDonkey/DelphiGenAI/blob/main/GenAI.md). 
+Welcome to `GenAI`, a powerful and flexible **Delphi library** integrating the latest innovations from `OpenAI` APIs. Designed for comprehensive support, it enables content generation, dialogue management, vision and speech processing, as well as audio interactions with precise control.
+Built on advanced models with reasoning capabilities, such as `o1`, `o3` and `o4`, it provides tools for data manipulation, batch processing, function calling, file management, and content moderation. It also supports the `GPT-4.1` models, the teminaison points `v1/chat/completion`, `v1/responses` and offers seamless agent construction.
+Additionally, `GenAI` streamlines assistant orchestration, message management, threads, and execution (runs), meeting the demands of modern projects. <br> <br>
+Integrating OpenAI APIs into your Delphi apps has never been easier: enjoy streamlined network‑call management, built‑in unit testing, and a modular JSON‑configuration approach.
+Check out the full [GenAI project](https://github.com/MaxiDonkey/DelphiGenAI/blob/main/GenAI.md)
 
 <br>
 
@@ -125,7 +94,34 @@ Comprehensive Project Documentation Reference
 
 <br>
 
+___
+
 # TIPS for using the tutorial effectively
+
+## Strategies for quickly using the code examples
+
+To streamline the implementation of the code examples provided in this tutorial, two support units have been included in the source code: `Deepseek.Tutorial.VCL` and `Deepseek.Tutorial.FMX` Based on the platform selected for testing the provided examples, you will need to initialize either the `TVCLTutorialHub` or `TFMXTutorialHub` class within the application's OnCreate event, as illustrated below:
+
+>[!IMPORTANT]
+>In this repository, you will find in the [`sample`](https://github.com/MaxiDonkey/DelphiGenAI/tree/main/sample) folder two ***ZIP archives***, each containing a template to easily test all the code examples provided in this tutorial. 
+>Extract the `VCL` or `FMX` version depending on your target platform for testing. 
+>Next, add the path to the DelphiGenAI library in your project’s options, then copy and paste the code examples for immediate execution. 
+>
+>These two archives have been designed to fully leverage the TutorialHub middleware and enable rapid upskilling with DelphiGenAI.
+
+- [**`VCL`**](https://github.com/MaxiDonkey/DelphiGenAI/tree/main/sample) support with TutorialHUB: ***TestGenAI_VCL.zip***
+
+- [**`FMX`**](https://github.com/MaxiDonkey/DelphiGenAI/tree/main/sample) support with TutorialHUB: ***TestGenAI_FMX.zip***
+
+<br>
+
+## [Use file2knowledge](https://github.com/MaxiDonkey/file2knowledge)
+
+This project, built with `DelphiGenAI{ , allows you to consult GenAI documentation and code in order to streamline and accelerate your upskilling.
+
+![Preview](https://github.com/MaxiDonkey/DelphiGenAI/blob/main/images/File2knowledge.png?raw=true "Preview")
+
+<br>
 
 ## Obtain an api key
 
@@ -151,30 +147,6 @@ To streamline the use of the API wrapper, the process for declaring units has be
 >[!TIP]
 > To effectively use the examples in this tutorial, particularly when working with asynchronous methods, it is recommended to define the client interfaces with the broadest possible scope. For optimal implementation, these clients should be declared in the application's `OnCreate` method.
 >
-
-<br>
-
-## Strategies for quickly using the code examples
-
-To streamline the implementation of the code examples provided in this tutorial, two support units have been included in the source code: `Deepseek.Tutorial.VCL` and `Deepseek.Tutorial.FMX` Based on the platform selected for testing the provided examples, you will need to initialize either the `TVCLTutorialHub` or `TFMXTutorialHub` class within the application's OnCreate event, as illustrated below:
-
->[!NOTE]
->```Delphi
->//uses GenAI.Tutorial.VCL;
->TutorialHub := TVCLTutorialHub.Create(Client, Memo1, Memo2, Memo3, Image1, Button1, MediaPlayer1);
->```
-
-or
-
->[!NOTE]
->```Delphi
->//uses GenAI.Tutorial.FMX;
->TutorialHub := TFMXTutorialHub.Create(Client, Memo1, Memo2, Memo3, Image1, Button1, MediaPlayer1);
->```
-
-Make sure to add a three ***TMemo***, a ***TImage***, a ***TButton*** and a ***TMediaPlayer*** components to your form beforehand.
-
-The TButton will allow the interruption of any streamed reception.
 
 <br>
 
@@ -214,7 +186,9 @@ To help you get up to speed on both endpoints, the two following documents provi
 | Web search | <div align="center"><span style="color: green;">●</span></div> | <div align="center"><span style="color: green;">●</span></div> |
 | File search |  | <div align="center"><span style="color: green;">●</span></div> |
 | Computer use |  | <div align="center"><span style="color: green;">●</span></div> |
-| Code interpreter |  | Coming soon |
+| Code interpreter |  | <div align="center"><span style="color: green;">●</span></div> |
+| Image generation | | <div align="center"><span style="color: green;">●</span></div> |
+| Remote MCP | | <div align="center"><span style="color: green;">●</span></div> |
 
 >[!WARNING]
 > [Note from OpenAI](https://platform.openai.com/docs/guides/responses-vs-chat-completions#the-chat-completions-api-is-not-going-away) <br>
@@ -222,19 +196,19 @@ To help you get up to speed on both endpoints, the two following documents provi
 
 <br>
 
-### Chat completion
+### [Chat completion](https://github.com/MaxiDonkey/DelphiGenAI/blob/main/ChatCompletion.md#chat-completion)
 
 Check out the full [documentation](https://github.com/MaxiDonkey/DelphiGenAI/blob/main/ChatCompletion.md#chat-completion)
 
-[Text generation (Non streamed, Streamed, Multi-turn conversations), Generating Audio Responses with Chat (Audio and Text to Text, Audio to Audio, Audio multi-turn conversations), Vision (Analyze single source, Analyze multi-source, Low or high fidelity image understanding), Reasoning with o1, o3 or o4,  Web search...](https://github.com/MaxiDonkey/DelphiGenAI/blob/main/ChatCompletion.md#chat-completion)
+Text generation (Non streamed, Streamed, Multi-turn conversations), Generating Audio Responses with Chat (Audio and Text to Text, Audio to Audio, Audio multi-turn conversations), Vision (Analyze single source, Analyze multi-source, Low or high fidelity image understanding), Reasoning with o1, o3 or o4,  Web search...
 
 <br>
 
-### Responses
+### [Responses](https://github.com/MaxiDonkey/DelphiGenAI/blob/main/Responses.md)
 
 Check out the full [documentation](https://github.com/MaxiDonkey/DelphiGenAI/blob/main/Responses.md)
 
-[Text generation (Non streamed, Streamed, Multi-turn conversations), Vision (Analyze single source, Analyze multi-source, Low or high fidelity image understanding), Reasoning with o1, o3 or o4, Web search, File search...](https://github.com/MaxiDonkey/DelphiGenAI/blob/main/Responses.md)
+Text generation (Non streamed, Streamed, Multi-turn conversations), Vision (Analyze single source, Analyze multi-source, Low or high fidelity image understanding), Reasoning with o1, o3 or o4, Web search, File search...
 
 
 <br>
@@ -1044,7 +1018,7 @@ Delete a file.
 
 <br/>
 
-# Beyond the Basics Advanced Usage
+# [Beyond the Basics Advanced Usage](https://github.com/MaxiDonkey/DelphiGenAI/blob/main/BeyondBasics.md)
 
 [This section](https://github.com/MaxiDonkey/DelphiGenAI/blob/main/BeyondBasics.md) covers the advanced use of OpenAI's APIs, including key features such as `upload` management, `batch` processing, `vector` stores, and the use of `assistants`, `threads`, `messages`, and `runs`. It also addresses model `fine-tuning` and includes a note on `distillation`.
 
