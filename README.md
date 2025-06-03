@@ -41,8 +41,8 @@ ___
     - [Speech to text](#speech-to-text)
     - [Embeddings](#embeddings)
     - [Moderation](#moderation)
-        - [Modarate text inputs](#modarate-text-inputs)
-        - [Modarate images and text](#modarate-images-and-text)
+        - [Moderate text inputs](#modarate-text-inputs)
+        - [Moderate images and text](#modarate-images-and-text)
     - [Files](#files)
         - [Files list](#files-list)
         - [File upload](#file-upload)
@@ -757,7 +757,7 @@ Refer to the [official documentation](https://platform.openai.com/docs/guides/mo
 
 <br>
 
-### Modarate text inputs
+### Moderate text inputs
 
 ```Delphi
 //uses GenAI, GenAI.Types, GenAI.Tutorial.VCL;
@@ -796,7 +796,7 @@ Refer to the [official documentation](https://platform.openai.com/docs/guides/mo
 
 <br>
 
-### Modarate images and text
+### Moderate images and text
 
 ```Delphi
 //uses GenAI, GenAI.Types, GenAI.Tutorial.VCL;
