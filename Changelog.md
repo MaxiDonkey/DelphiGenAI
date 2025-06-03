@@ -25,7 +25,7 @@
 
 - Introduced `AsyncAwaitCreate` and `AsyncAwaitCreateStream` methods for `v1/responses`; these are intended to replace `AsyncCreate` and `AsyncCreateStream`. 
     - Allow chaining of asynchronous processing in the form of a pipeline
-    - Refer to `GenAI.Responses.pas` unit.
+    - Refer to [`GenAI.Responses.pas`](https://github.com/MaxiDonkey/DelphiGenAI/blob/main/source/GenAI.Responses.pas) unit.
     - Eventually, many other wrapper methods will be adapted to meet this principle.
 
 - Added the `GenAI.Async.Promise` unit, providing **JavaScript-style** asynchronous task chaining.
