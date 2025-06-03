@@ -11,7 +11,7 @@ ___
 
 NEW: 
 - [Changelog v1.0.7](https://github.com/MaxiDonkey/DelphiGenAI/blob/main/Changelog.md)
-- [Mini-lab to experiment with the v1/responses endpoint](https://github.com/MaxiDonkey/file2knowledge) <mark> `File2knowledge` </mark>
+- [Mini-lab to experiment with the v1/responses endpoint](https://github.com/MaxiDonkey/file2knowledge) `File2knowledge` 
 - [Responses](https://github.com/MaxiDonkey/DelphiGenAI/blob/main/Responses.md)
 ___
 
