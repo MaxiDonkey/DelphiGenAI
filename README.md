@@ -161,6 +161,9 @@ The `v1/responses` API is the new core API, designed as an agentic primitive tha
 - Web search
 - File search
 - Computer control
+- Image generation
+- Remote MCP
+- Code interpreter
 
 With these integrated capabilities, you can build more autonomous, agent‑oriented applications that not only generate text but also interact with their environment.
 
