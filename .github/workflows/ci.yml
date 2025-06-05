@@ -1,4 +1,4 @@
-name: DelphiGenAI – build non-régression
+name: DelphiGenAI – CI
 
 on:
   push:
@@ -7,30 +7,20 @@ on:
 
 jobs:
   build:
-    runs-on: [ self-hosted, Windows, X64 ]   # <- les labels de TON runner
-    timeout-minutes: 15
-
+    runs-on: self-hosted        
     defaults:
-      run:
-        shell: cmd
+      run: { shell: cmd }       
 
     steps:
       - uses: actions/checkout@v4
 
-      # ----- Win64 Release ----------------------------------------------------
+      - name: Affiche le runner pour debug
+        run: echo Running on %COMPUTERNAME%
+
       - name: Build Win64 Release
         run: |
           call "%BDS%\bin\rsvars.bat"
           "%BDS%\bin\MSBuild.exe" OpenAITest.dproj ^
             /p:Config=Release ^
             /p:Platform=Win64 ^
-            /m
-
-      # ----- Win32 Debug ------------------------------------------------------
-      - name: Build Win32 Debug
-        run: |
-          call "%BDS%\bin\rsvars.bat"
-          "%BDS%\bin\MSBuild.exe" OpenAITest.dproj ^
-            /p:Config=Debug ^
-            /p:Platform=Win32 ^
             /m
