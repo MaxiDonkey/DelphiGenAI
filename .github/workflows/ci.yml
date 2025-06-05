@@ -19,4 +19,4 @@ jobs:
       - name: Build avec dcc64 (Win64 Release)
         shell: cmd
         run: |
-          call "C:\Program Files (x86)\Embarcadero\Studio\23.0\bin\rsvars.bat" dcc64.exe -B OpenAITest.dpr
+          call "C:\Program Files (x86)\Embarcadero\Studio\23.0\bin\rsvars.bat" dcc64.exe -B D:\2026-developpement\OpenAI\OpenAITest.dpr
