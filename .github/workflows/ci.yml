@@ -8,19 +8,32 @@ on:
 jobs:
   build:
     runs-on: self-hosted
+
+    defaults:
+      run:
+        shell: cmd
+
     steps:
       - name: Checkout du code
         uses: actions/checkout@v4
 
-      - name: Affiche le runner pour debug
-        shell: cmd
-        run: echo Running on S7700
-
-      - name: Build Win64 Release
-        shell: cmd
+      - name: Affiche les infos du runner pour debug
         run: |
-          call "%BDS%\bin\rsvars.bat"
-          "%BDS%\bin\MSBuild.exe" OpenAITest.dproj ^
-            /p:Config=Release ^
-            /p:Platform=Win64 ^
-            /m
+          echo ─────────────── Runner Info ───────────────
+          echo RUNNER_NAME   = %RUNNER_NAME%
+          echo RUNNER_OS     = %RUNNER_OS%
+          echo RUNNER_LABELS = %RUNNER_LABELS%
+          echo ────────────────────────────────────────────
+
+      - name: Vérifie la présence de dcc64.exe
+        run: |
+          if exist "C:\Program Files (x86)\Embarcadero\Studio\23.0\bin\dcc64.exe" (
+            echo dcc64.exe trouvé
+          ) else (
+            echo *** dcc64.exe introuvable *** & exit /b 1
+          )
+
+      - name: Build avec dcc64 (Win64 Release)
+        run: |
+          call "C:\Program Files (x86)\Embarcadero\Studio\23.0\bin\rsvars.bat"
+          dcc64.exe -B OpenAITest.dpr
