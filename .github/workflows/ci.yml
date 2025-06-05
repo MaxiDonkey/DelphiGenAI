@@ -1,3 +1,5 @@
+name: DelphiGenAI – CI
+
 on:
   push:
     branches: [ main ]
@@ -15,5 +17,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Compilation Delphi (Win64 Release)
+        shell: cmd
         run: |
-          cmd.exe /C "cd /d D:\2026-developpement\OpenAI && call \"C:\Program Files (x86)\Embarcadero\Studio\23.0\bin\rsvars.bat\" && dcc64.exe -B OpenAITest.dpr"
+          cd /d D:\2026-developpement\OpenAI
+
