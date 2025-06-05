@@ -16,27 +16,22 @@ jobs:
       - name: Checkout du dépôt
         uses: actions/checkout@v4
 
-      - name: Compilation du projet Delphi externe
+      - name: Copier le dossier de travail externe
         shell: cmd
         run: |
-          cd /d D:\2026-developpement\OpenAI
+          xcopy /E /I "D:\2026-developpement\OpenAI" "%GITHUB_WORKSPACE%\OpenAI"
+
+      - name: Compiler le projet Delphi
+        shell: cmd
+        run: |
+          cd /d "%GITHUB_WORKSPACE%\OpenAI"
           call "C:\Program Files (x86)\Embarcadero\Studio\23.0\bin\rsvars.bat"
           dcc64.exe -B OpenAITest.dpr
-
-      - name: Vérification rapide : liste des .exe générés
-        shell: cmd
-        run: |
-          cd /d D:\2026-developpement\OpenAI\Win64
-          dir /b *.exe || dir /b **\*.exe
 
       - name: Upload de l’artefact
         uses: actions/upload-artifact@v3
         with:
           name: OpenAITest-Binaries
-          # Adapte ce chemin en fonction de l’endroit où Delphi a bien généré OpenAITest.exe.
-          # Ici on part du principe que l’EXE se trouve dans Win64 (sans sous-dossier Release).
-          path: D:\2026-developpement\OpenAI\Win64\OpenAITest.exe
-          # Si tu veux être sûr de tout récupérer (EXE + éventuelles DLL), tu peux faire :
-          # path: |
-          #   D:\2026-developpement\OpenAI\Win64\OpenAITest.exe
-          #   D:\2026-developpement\OpenAI\Win64\*.dll
+          path: |
+            "%GITHUB_WORKSPACE%\OpenAI\Win64\OpenAITest.exe"
+            "%GITHUB_WORKSPACE%\OpenAI\Win64\*.dll"
