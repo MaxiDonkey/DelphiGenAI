@@ -7,12 +7,11 @@ on:
 
 jobs:
   build:
-    runs-on: self-hosted        
-    defaults:
-      run: { shell: cmd }       
+    runs-on: self-hosted
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout du code
+        uses: actions/checkout@v4
 
       - name: Affiche le runner pour debug
         run: echo Running on S7700
