@@ -20,14 +20,6 @@ jobs:
       - name: Checkout du code
         uses: actions/checkout@v4
 
-      - name: Affiche les infos du runner pour debug
-        run: |
-          echo ─────────────── Runner Info ───────────────
-          echo RUNNER_NAME   = %RUNNER_NAME%
-          echo RUNNER_OS     = %RUNNER_OS%
-          echo RUNNER_LABELS = %RUNNER_LABELS%
-          echo ────────────────────────────────────────────
-
       - name: Vérifie la présence de dcc64.exe
         run: |
           if exist "C:\Program Files (x86)\Embarcadero\Studio\23.0\bin\dcc64.exe" (
