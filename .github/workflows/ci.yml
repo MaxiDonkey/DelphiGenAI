@@ -14,12 +14,12 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Affiche le runner pour debug
-        run: cmd.exe /C "echo Running on S7700"
+        run: echo "Running on S7700"
 
       - name: Build Win64 Release
         run: |
-          call "%BDS%\bin\rsvars.bat"
-          "%BDS%\bin\MSBuild.exe" OpenAITest.dproj ^
-            /p:Config=Release ^
-            /p:Platform=Win64 ^
+          & "${env:BDS}\bin\rsvars.bat"
+          & "${env:BDS}\bin\MSBuild.exe" OpenAITest.dproj `
+            /p:Config=Release `
+            /p:Platform=Win64 `
             /m
