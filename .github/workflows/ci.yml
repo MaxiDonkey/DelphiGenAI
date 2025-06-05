@@ -16,19 +16,8 @@ jobs:
       - name: Checkout du code
         uses: actions/checkout@v4
 
-      - name: Vérifie la présence de dcc64.exe
+      - name: Compilation Delphi (Win64 Release)
         shell: cmd
         run: |
-          if exist "C:\Program Files (x86)\Embarcadero\Studio\23.0\bin\dcc64.exe" (
-            echo dcc64.exe trouvé
-          ) else (
-            echo *** dcc64.exe introuvable ***
-            exit /b 1
-          )
-
-      - name: Compilation Delphi avec dcc64
-        shell: cmd
-        working-directory: D:\2026-developpement\OpenAI
-        run: |
-          call "C:\Program Files (x86)\Embarcadero\Studio\23.0\bin\rsvars.bat"
-          dcc64.exe -B OpenAITest.dpr
+          cd D:\2026-developpement\OpenAI
+          call "C:\Program Files (x86)\Embarcadero\Studio\23.0\bin\rsvars.bat" dcc64.exe -B OpenAITest.dpr
