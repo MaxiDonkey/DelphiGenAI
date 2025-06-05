@@ -12,23 +12,22 @@ jobs:
       - Windows
       - X64
 
-    defaults:
-      run:
-        shell: cmd
-
     steps:
       - name: Checkout du code
         uses: actions/checkout@v4
 
       - name: Vérifie la présence de dcc64.exe
+        shell: cmd
         run: |
           if exist "C:\Program Files (x86)\Embarcadero\Studio\23.0\bin\dcc64.exe" (
             echo dcc64.exe trouvé
           ) else (
-            echo *** dcc64.exe introuvable *** & exit /b 1
+            echo *** dcc64.exe introuvable ***
+            exit /b 1
           )
 
       - name: Build avec dcc64 (Win64 Release)
+        shell: cmd
         run: |
           call "C:\Program Files (x86)\Embarcadero\Studio\23.0\bin\rsvars.bat"
           dcc64.exe -B OpenAITest.dpr
