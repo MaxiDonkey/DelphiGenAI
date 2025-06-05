@@ -19,5 +19,6 @@ jobs:
       - name: Compilation Delphi (Win64 Release)
         shell: cmd
         run: |
-          cd /d D:\2026-developpement\OpenAI
+          cd D:\
+          cd D:\2026-developpement\OpenAI
 
