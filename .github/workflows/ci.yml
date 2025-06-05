@@ -1,0 +1,32 @@
+name: Build-only (non-régression)
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: self-hosted       
+    timeout-minutes: 15        
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Build Win64 Release
+        run: >
+          "C:\Program Files (x86)\MSBuild\Current\Bin\MSBuild.exe"
+          OpenAITest.dproj
+          /p:Config=Release
+          /p:Platform=Win64
+          /m
+
+      - name: Build Win32 Debug
+        run: >
+          "C:\Program Files (x86)\MSBuild\Current\Bin\MSBuild.exe"
+          OpenAITest.dproj
+          /p:Config=Debug
+          /p:Platform=Win32
+          /m
+
