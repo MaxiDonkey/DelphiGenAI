@@ -1,25 +1,19 @@
-name: DelphiGenAI – CI
-
-on:
-  push:
-    branches: [ main ]
-  workflow_dispatch:
-
 jobs:
   build:
     runs-on: self-hosted
-
     steps:
       - name: Checkout du code
         uses: actions/checkout@v4
 
       - name: Affiche le runner pour debug
-        run: echo "Running on S7700"
+        shell: cmd
+        run: echo Running on S7700
 
       - name: Build Win64 Release
+        shell: cmd
         run: |
-          & "${env:BDS}\bin\rsvars.bat"
-          & "${env:BDS}\bin\MSBuild.exe" OpenAITest.dproj `
-            /p:Config=Release `
-            /p:Platform=Win64 `
+          call "%BDS%\bin\rsvars.bat"
+          "%BDS%\bin\MSBuild.exe" OpenAITest.dproj ^
+            /p:Config=Release ^
+            /p:Platform=Win64 ^
             /m
