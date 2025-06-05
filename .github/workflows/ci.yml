@@ -13,12 +13,12 @@ jobs:
       - X64
 
     steps:
-      - name: Checkout du code
+      - name: Checkout du dépôt (utile si tu veux l'utiliser pour autre chose)
         uses: actions/checkout@v4
 
-      - name: Compilation Delphi (Win64 Release)
+      - name: Compilation du projet Delphi externe (non inclus dans le dépôt)
         shell: cmd
         run: |
-          cd D:\
-          cd D:\2026-developpement\OpenAI
-
+          cd /d D:\2026-developpement\OpenAI
+          call "C:\Program Files (x86)\Embarcadero\Studio\23.0\bin\rsvars.bat"
+          dcc64.exe -B OpenAITest.dpr
