@@ -13,7 +13,8 @@ uses
   System.SysUtils, System.Classes, System.Threading, System.JSON, REST.Json.Types,
   REST.JsonReflect, System.Net.URLClient,
   GenAI.API.Params, GenAI.API, GenAI.Consts, GenAI.Types, GenAI.Async.Support,
-  GenAI.API.Lists, GenAI.Assistants, GenAI.Runs, GenAI.Vector, GenAI.VectorFiles;
+  GenAI.Async.Promise, GenAI.API.Lists, GenAI.Assistants, GenAI.Runs, GenAI.Vector,
+  GenAI.VectorFiles;
 
 type
   /// <summary>
@@ -50,6 +51,7 @@ type
     /// when creating a new vector store entry.
     /// </remarks>
     function FileId(const Value: TArray<string>): TVectorStoreBatchCreateParams;
+
     /// <summary>
     /// Specifies the chunking strategy to be used when processing the file.
     /// </summary>
@@ -99,14 +101,17 @@ type
     /// or canceling the batch.
     /// </remarks>
     property Id: string read FId write FId;
+
     /// <summary>
     /// Gets or sets the object type, which is always <c>vector_store.file_batch</c>.
     /// </summary>
     property &Object: string read FObject write FObject;
+
     /// <summary>
     /// Gets Unix timestamp (in seconds) indicating when the file batch was created.
     /// </summary>
     property CreatedAt: Int64 read GetCreatedAt;
+
     /// <summary>
     /// Gets the human-readable representation of the creation timestamp.
     /// </summary>
@@ -115,10 +120,12 @@ type
     /// to understand when the batch was created.
     /// </remarks>
     property CreatedAtAsString: string read GetCreatedAtAsString;
+
     /// <summary>
     /// Gets or sets the identifier of the vector store to which this file batch belongs.
     /// </summary>
     property VectorStoreId: string read FVectorStoreId write FVectorStoreId;
+
     /// <summary>
     /// Gets or sets the current processing status of the file batch.
     /// </summary>
@@ -127,11 +134,13 @@ type
     /// or <c>cancelled</c>. This status helps in monitoring the batch processing progress.
     /// </remarks>
     property Status: TRunStatus read FStatus write FStatus;
+
     /// <summary>
     /// Gets or sets the statistics of the files within the batch, including the counts of completed,
     /// failed, and in-progress files.
     /// </summary>
     property FileCounts: TVectorFileCounts read FFileCounts write FFileCounts;
+
     destructor Destroy; override;
   end;
 
@@ -156,6 +165,21 @@ type
   TAsynVectorStoreBatch = TAsynCallBack<TVectorStoreBatch>;
 
   /// <summary>
+  /// Defines a promise-style callback type for operations that return a single vector store batch.
+  /// </summary>
+  /// <remarks>
+  /// <para>
+  /// <c>TPromiseVectorStoreBatch</c> is an alias for <c>TPromiseCallBack&lt;TVectorStoreBatch&gt;</c>.
+  /// It represents an asynchronous operation that resolves with a <see cref="TVectorStoreBatch"/> instance.
+  /// </para>
+  /// <para>
+  /// Use this type when you need a promise-based API for creating, retrieving, canceling,
+  /// or otherwise managing file batches in a vector store.
+  /// </para>
+  /// </remarks>
+  TPromiseVectorStoreBatch = TPromiseCallBack<TVectorStoreBatch>;
+
+  /// <summary>
   /// Manages asynchronous callBacks for a request using <c>TVectorStoreBatches</c> as the response type.
   /// </summary>
   /// <remarks>
@@ -164,6 +188,21 @@ type
   /// This structure facilitates non-blocking operations.
   /// </remarks>
   TAsynVectorStoreBatches = TAsynCallBack<TVectorStoreBatches>;
+
+  /// <summary>
+  /// Defines a promise-style callback type for operations that return a collection of vector store batches.
+  /// </summary>
+  /// <remarks>
+  /// <para>
+  /// <c>TPromiseVectorStoreBatches</c> is an alias for <c>TPromiseCallBack&lt;TVectorStoreBatches&gt;</c>.
+  /// It represents an asynchronous operation that resolves with a <see cref="TVectorStoreBatches"/> list.
+  /// </para>
+  /// <para>
+  /// Use this type when you need a promise-based API for listing, filtering, or retrieving
+  /// multiple file batches in a vector store.
+  /// </para>
+  /// </remarks>
+  TPromiseVectorStoreBatches = TPromiseCallBack<TVectorStoreBatches>;
 
   /// <summary>
   /// Provides methods to manage file batches within a vector store using the OpenAI API.
@@ -181,6 +220,181 @@ type
     procedure HeaderCustomize; override;
   public
     /// <summary>
+    /// Initiates an asynchronous request to create a new file batch in the specified vector store and returns a promise.
+    /// </summary>
+    /// <param name="VectorStoreId">
+    /// The unique identifier of the vector store where the file batch will be created.
+    /// </param>
+    /// <param name="ParamProc">
+    /// A procedure to configure the parameters for the new batch, such as the list of file IDs and chunking strategy.
+    /// </param>
+    /// <param name="CallBacks">
+    /// Optional promise-style callbacks for handling start, success, or error events before the promise resolves.
+    /// </param>
+    /// <returns>
+    /// A <see cref="TPromise&lt;TVectorStoreBatch&gt;"/> that resolves with the created <see cref="TVectorStoreBatch"/>.
+    /// </returns>
+    function AsyncAwaitCreate(const VectorStoreId: string;
+      const ParamProc: TProc<TVectorStoreBatchCreateParams>;
+      const CallBacks: TFunc<TPromiseVectorStoreBatch>): TPromise<TVectorStoreBatch>;
+
+    /// <summary>
+    /// Initiates an asynchronous request to retrieve details of a specific file batch from the specified vector store and returns a promise.
+    /// </summary>
+    /// <param name="VectorStoreId">
+    /// The unique identifier of the vector store containing the batch.
+    /// </param>
+    /// <param name="BatchId">
+    /// The unique identifier of the file batch to retrieve.
+    /// </param>
+    /// <param name="CallBacks">
+    /// Optional promise-style callbacks for handling start, success, or error events before the promise resolves.
+    /// </param>
+    /// <returns>
+    /// A <see cref="TPromise&lt;TVectorStoreBatch&gt;"/> that resolves with the requested <see cref="TVectorStoreBatch"/>.
+    /// </returns>
+    function AsyncAwaitRetrieve(const VectorStoreId: string;
+      const BatchId: string;
+      const CallBacks: TFunc<TPromiseVectorStoreBatch>): TPromise<TVectorStoreBatch>;
+
+    /// <summary>
+    /// Initiates an asynchronous request to cancel a file batch in the specified vector store and returns a promise.
+    /// </summary>
+    /// <param name="VectorStoreId">
+    /// The unique identifier of the vector store containing the batch to cancel.
+    /// </param>
+    /// <param name="BatchId">
+    /// The unique identifier of the file batch to cancel.
+    /// </param>
+    /// <param name="CallBacks">
+    /// Optional promise-style callbacks for handling start, success, or error events before the promise resolves.
+    /// </param>
+    /// <returns>
+    /// A <see cref="TPromise&lt;TVectorStoreBatch&gt;"/> that resolves with the <see cref="TVectorStoreBatch"/> after cancellation.
+    /// </returns>
+    function AsyncAwaitCancel(const VectorStoreId: string;
+      const BatchId: string;
+      const CallBacks: TFunc<TPromiseVectorStoreBatch>): TPromise<TVectorStoreBatch>;
+
+    /// <summary>
+    /// Initiates an asynchronous request to retrieve all file batches from the specified vector store and returns a promise.
+    /// </summary>
+    /// <param name="VectorStoreId">
+    /// The unique identifier of the vector store whose file batches you want to list.
+    /// </param>
+    /// <param name="BatchId">
+    /// The unique identifier of the file batch context (use when listing files within a specific batch).
+    /// </param>
+    /// <param name="CallBacks">
+    /// Optional promise-style callbacks for handling start, success, or error events before the promise resolves.
+    /// </param>
+    /// <returns>
+    /// A <see cref="TPromise&lt;TVectorStoreBatches&gt;"/> that resolves with a <see cref="TVectorStoreBatches"/> list.
+    /// </returns>
+    function AsyncAwaitList(const VectorStoreId: string;
+      const BatchId: string;
+      const CallBacks: TFunc<TPromiseVectorStoreBatches>): TPromise<TVectorStoreBatches>; overload;
+
+    /// <summary>
+    /// Initiates an asynchronous request to retrieve a filtered list of file batches from the specified vector store and returns a promise.
+    /// </summary>
+    /// <param name="VectorStoreId">
+    /// The unique identifier of the vector store whose file batches you want to list.
+    /// </param>
+    /// <param name="BatchId">
+    /// The unique identifier of the file batch context for which to list files.
+    /// </param>
+    /// <param name="ParamProc">
+    /// A procedure to configure URL parameters—such as status filters or pagination—via a <see cref="TVectorStoreBatchUrlParams"/> instance.
+    /// </param>
+    /// <param name="CallBacks">
+    /// Optional promise-style callbacks for handling start, success, or error events before the promise resolves.
+    /// </param>
+    /// <returns>
+    /// A <see cref="TPromise&lt;TVectorStoreBatches&gt;"/> that resolves with a filtered <see cref="TVectorStoreBatches"/> list.
+    /// </returns>
+    function AsyncAwaitList(const VectorStoreId: string;
+      const BatchId: string;
+      const ParamProc: TProc<TVectorStoreBatchUrlParams>;
+      const CallBacks: TFunc<TPromiseVectorStoreBatches>): TPromise<TVectorStoreBatches>; overload;
+
+    /// <summary>
+    /// Synchronously creates a new file batch in the specified vector store.
+    /// </summary>
+    /// <param name="VectorStoreId">
+    /// The unique identifier of the vector store where the file batch will be created.
+    /// </param>
+    /// <param name="ParamProc">
+    /// A procedure to configure the parameters for creating the batch, such as file IDs
+    /// and chunking strategy.
+    /// </param>
+    /// <returns>
+    /// A <c>TVectorStoreBatch</c> object representing the created batch.
+    /// </returns>
+    function Create(const VectorStoreId: string;
+      const ParamProc: TProc<TVectorStoreBatchCreateParams>): TVectorStoreBatch;
+
+    /// <summary>
+    /// Synchronously retrieves details of a specific file batch within a vector store.
+    /// </summary>
+    /// <param name="VectorStoreId">
+    /// The unique identifier of the vector store containing the batch.
+    /// </param>
+    /// <param name="BatchId">
+    /// The unique identifier of the file batch to be retrieved.
+    /// </param>
+    /// <returns>
+    /// A <c>TVectorStoreBatch</c> object containing details about the specified batch.
+    /// </returns>
+    function Retrieve(const VectorStoreId: string; const BatchId: string): TVectorStoreBatch;
+
+    /// <summary>
+    /// Synchronously cancels a file batch that is currently being processed.
+    /// </summary>
+    /// <param name="VectorStoreId">
+    /// The unique identifier of the vector store containing the batch.
+    /// </param>
+    /// <param name="BatchId">
+    /// The unique identifier of the file batch to be canceled.
+    /// </param>
+    /// <returns>
+    /// A <c>TVectorStoreBatch</c> object representing the batch after cancellation.
+    /// </returns>
+    function Cancel(const VectorStoreId: string; const BatchId: string): TVectorStoreBatch;
+
+    /// <summary>
+    /// Synchronously lists all files within a specific batch of the vector store.
+    /// </summary>
+    /// <param name="VectorStoreId">
+    /// The unique identifier of the vector store containing the file batch.
+    /// </param>
+    /// <param name="BatchId">
+    /// The unique identifier of the file batch.
+    /// </param>
+    /// <returns>
+    /// A list of file batches as a <c>TVectorStoreBatches</c> object.
+    /// </returns>
+    function List(const VectorStoreId: string; const BatchId: string): TVectorStoreBatches; overload;
+
+    /// <summary>
+    /// Synchronously lists files in the specified file batch using filters and URL parameters.
+    /// </summary>
+    /// <param name="VectorStoreId">
+    /// The unique identifier of the vector store containing the file batch.
+    /// </param>
+    /// <param name="BatchId">
+    /// The unique identifier of the file batch.
+    /// </param>
+    /// <param name="ParamProc">
+    /// A procedure to configure filters or pagination options for the file listing.
+    /// </param>
+    /// <returns>
+    /// A list of file batches as a <c>TVectorStoreBatches</c> object.
+    /// </returns>
+    function List(const VectorStoreId: string; const BatchId: string;
+      const ParamProc: TProc<TVectorStoreBatchUrlParams>): TVectorStoreBatches; overload;
+
+    /// <summary>
     /// Asynchronously creates a new file batch in the specified vector store.
     /// </summary>
     /// <param name="VectorStoreId">
@@ -196,6 +410,7 @@ type
     procedure AsynCreate(const VectorStoreId: string;
       const ParamProc: TProc<TVectorStoreBatchCreateParams>;
       const CallBacks: TFunc<TAsynVectorStoreBatch>);
+
     /// <summary>
     /// Asynchronously retrieves details of a specific file batch within a vector store.
     /// </summary>
@@ -211,6 +426,7 @@ type
     procedure AsynRetrieve(const VectorStoreId: string;
       const BatchId: string;
       const CallBacks: TFunc<TAsynVectorStoreBatch>);
+
     /// <summary>
     /// Asynchronously cancels a file batch that is currently being processed.
     /// </summary>
@@ -229,6 +445,7 @@ type
     procedure AsynCancel(const VectorStoreId: string;
       const BatchId: string;
       const CallBacks: TFunc<TAsynVectorStoreBatch>);
+
     /// <summary>
     /// Asynchronously lists all files within a specific batch of the vector store.
     /// </summary>
@@ -244,6 +461,7 @@ type
     procedure AsynList(const VectorStoreId: string;
       const BatchId: string;
       const CallBacks: TFunc<TAsynVectorStoreBatches>); overload;
+
     /// <summary>
     /// Asynchronously lists files in the specified file batch using filters and URL parameters.
     /// </summary>
@@ -263,76 +481,6 @@ type
       const BatchId: string;
       const ParamProc: TProc<TVectorStoreBatchUrlParams>;
       const CallBacks: TFunc<TAsynVectorStoreBatches>); overload;
-    /// <summary>
-    /// Synchronously creates a new file batch in the specified vector store.
-    /// </summary>
-    /// <param name="VectorStoreId">
-    /// The unique identifier of the vector store where the file batch will be created.
-    /// </param>
-    /// <param name="ParamProc">
-    /// A procedure to configure the parameters for creating the batch, such as file IDs
-    /// and chunking strategy.
-    /// </param>
-    /// <returns>
-    /// A <c>TVectorStoreBatch</c> object representing the created batch.
-    /// </returns>
-    function Create(const VectorStoreId: string; const ParamProc: TProc<TVectorStoreBatchCreateParams>): TVectorStoreBatch;
-    /// <summary>
-    /// Synchronously retrieves details of a specific file batch within a vector store.
-    /// </summary>
-    /// <param name="VectorStoreId">
-    /// The unique identifier of the vector store containing the batch.
-    /// </param>
-    /// <param name="BatchId">
-    /// The unique identifier of the file batch to be retrieved.
-    /// </param>
-    /// <returns>
-    /// A <c>TVectorStoreBatch</c> object containing details about the specified batch.
-    /// </returns>
-    function Retrieve(const VectorStoreId: string; const BatchId: string): TVectorStoreBatch;
-    /// <summary>
-    /// Synchronously cancels a file batch that is currently being processed.
-    /// </summary>
-    /// <param name="VectorStoreId">
-    /// The unique identifier of the vector store containing the batch.
-    /// </param>
-    /// <param name="BatchId">
-    /// The unique identifier of the file batch to be canceled.
-    /// </param>
-    /// <returns>
-    /// A <c>TVectorStoreBatch</c> object representing the batch after cancellation.
-    /// </returns>
-    function Cancel(const VectorStoreId: string; const BatchId: string): TVectorStoreBatch;
-    /// <summary>
-    /// Synchronously lists all files within a specific batch of the vector store.
-    /// </summary>
-    /// <param name="VectorStoreId">
-    /// The unique identifier of the vector store containing the file batch.
-    /// </param>
-    /// <param name="BatchId">
-    /// The unique identifier of the file batch.
-    /// </param>
-    /// <returns>
-    /// A list of file batches as a <c>TVectorStoreBatches</c> object.
-    /// </returns>
-    function List(const VectorStoreId: string; const BatchId: string): TVectorStoreBatches; overload;
-    /// <summary>
-    /// Synchronously lists files in the specified file batch using filters and URL parameters.
-    /// </summary>
-    /// <param name="VectorStoreId">
-    /// The unique identifier of the vector store containing the file batch.
-    /// </param>
-    /// <param name="BatchId">
-    /// The unique identifier of the file batch.
-    /// </param>
-    /// <param name="ParamProc">
-    /// A procedure to configure filters or pagination options for the file listing.
-    /// </param>
-    /// <returns>
-    /// A list of file batches as a <c>TVectorStoreBatches</c> object.
-    /// </returns>
-    function List(const VectorStoreId: string; const BatchId: string;
-      const ParamProc: TProc<TVectorStoreBatchUrlParams>): TVectorStoreBatches; overload;
   end;
 
 implementation
@@ -356,6 +504,20 @@ begin
   Result := TInt64OrNull(FCreatedAt).ToUtcDateString;
 end;
 
+{ TVectorStoreBatchCreateParams }
+
+function TVectorStoreBatchCreateParams.ChunkingStrategy(
+  const Value: TChunkingStrategyParams): TVectorStoreBatchCreateParams;
+begin
+  Result := TVectorStoreBatchCreateParams(Add('chunking_strategy', Value.Detach));
+end;
+
+function TVectorStoreBatchCreateParams.FileId(
+  const Value: TArray<string>): TVectorStoreBatchCreateParams;
+begin
+  Result := TVectorStoreBatchCreateParams(Add('file_ids', Value));
+end;
+
 { TVectorStoreBatchRoute }
 
 procedure TVectorStoreBatchRoute.AsynCancel(const VectorStoreId,
@@ -375,6 +537,66 @@ begin
   finally
     Free;
   end;
+end;
+
+function TVectorStoreBatchRoute.AsyncAwaitCancel(const VectorStoreId,
+  BatchId: string;
+  const CallBacks: TFunc<TPromiseVectorStoreBatch>): TPromise<TVectorStoreBatch>;
+begin
+  Result := TAsyncAwaitHelper.WrapAsyncAwait<TVectorStoreBatch>(
+    procedure(const CallBackParams: TFunc<TAsynVectorStoreBatch>)
+    begin
+      AsynCancel(VectorStoreId, BatchId, CallBackParams);
+    end,
+    CallBacks);
+end;
+
+function TVectorStoreBatchRoute.AsyncAwaitCreate(const VectorStoreId: string;
+  const ParamProc: TProc<TVectorStoreBatchCreateParams>;
+  const CallBacks: TFunc<TPromiseVectorStoreBatch>): TPromise<TVectorStoreBatch>;
+begin
+  Result := TAsyncAwaitHelper.WrapAsyncAwait<TVectorStoreBatch>(
+    procedure(const CallBackParams: TFunc<TAsynVectorStoreBatch>)
+    begin
+      AsynCreate(VectorStoreId, ParamProc, CallBackParams);
+    end,
+    CallBacks);
+end;
+
+function TVectorStoreBatchRoute.AsyncAwaitList(const VectorStoreId,
+  BatchId: string; const ParamProc: TProc<TVectorStoreBatchUrlParams>;
+  const CallBacks: TFunc<TPromiseVectorStoreBatches>): TPromise<TVectorStoreBatches>;
+begin
+  Result := TAsyncAwaitHelper.WrapAsyncAwait<TVectorStoreBatches>(
+    procedure(const CallBackParams: TFunc<TAsynVectorStoreBatches>)
+    begin
+      AsynList(VectorStoreId, BatchId, ParamProc, CallBackParams);
+    end,
+    CallBacks);
+end;
+
+function TVectorStoreBatchRoute.AsyncAwaitList(const VectorStoreId,
+  BatchId: string;
+  const CallBacks: TFunc<TPromiseVectorStoreBatches>): TPromise<TVectorStoreBatches>;
+begin
+  Result := TAsyncAwaitHelper.WrapAsyncAwait<TVectorStoreBatches>(
+    procedure(const CallBackParams: TFunc<TAsynVectorStoreBatches>)
+    begin
+      AsynList(VectorStoreId, BatchId, CallBackParams);
+    end,
+    CallBacks);
+end;
+
+function TVectorStoreBatchRoute.AsyncAwaitRetrieve(const VectorStoreId,
+  BatchId: string;
+  const CallBacks: TFunc<TPromiseVectorStoreBatch>): TPromise<TVectorStoreBatch>;
+begin
+  Result := TAsyncAwaitHelper.WrapAsyncAwait<TVectorStoreBatch>(
+    procedure(const CallBackParams: TFunc<TAsynVectorStoreBatch>)
+    begin
+      AsynRetrieve(VectorStoreId, BatchId, CallBackParams);
+    end,
+    CallBacks);
 end;
 
 procedure TVectorStoreBatchRoute.AsynCreate(const VectorStoreId: string;
@@ -494,20 +716,6 @@ function TVectorStoreBatchRoute.Retrieve(const VectorStoreId,
 begin
   HeaderCustomize;
   Result := API.Get<TVectorStoreBatch>('vector_stores/' + VectorStoreId + '/file_batches/' + BatchId);
-end;
-
-{ TVectorStoreBatchCreateParams }
-
-function TVectorStoreBatchCreateParams.ChunkingStrategy(
-  const Value: TChunkingStrategyParams): TVectorStoreBatchCreateParams;
-begin
-  Result := TVectorStoreBatchCreateParams(Add('chunking_strategy', Value.Detach));
-end;
-
-function TVectorStoreBatchCreateParams.FileId(
-  const Value: TArray<string>): TVectorStoreBatchCreateParams;
-begin
-  Result := TVectorStoreBatchCreateParams(Add('file_ids', Value));
 end;
 
 end.

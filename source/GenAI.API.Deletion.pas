@@ -56,6 +56,22 @@ type
   /// </remarks>
   TAsynDeletion = TAsynCallBack<TDeletion>;
 
+  /// <summary>
+  /// Represents a promise-based callback for handling asynchronous deletion operations.
+  /// </summary>
+  /// <remarks>
+  /// <para>
+  /// This type alias specializes <c>TPromiseCallBack</c> with <c>TDeletion</c>,
+  /// providing a promise-style mechanism to process the result of a deletion request.
+  /// It encapsulates both success and error handling for operations that return a <c>TDeletion</c> response.
+  /// </para>
+  /// <para>
+  /// Use <c>TPromiseDeletion</c> whenever you need to initiate a deletion request
+  /// and react to its completion (successful or failed) in a non-blocking, promise-like fashion.
+  /// </para>
+  /// </remarks>
+  TPromiseDeletion = TPromiseCallBack<TDeletion>;
+
 implementation
 
 end.

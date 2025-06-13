@@ -13,7 +13,7 @@ uses
   System.SysUtils, System.Classes, System.Threading, System.JSON, REST.Json.Types,
   REST.JsonReflect, System.Net.URLClient,
   GenAI.API.Params, GenAI.API, GenAI.Consts, GenAI.Types, GenAI.Async.Support,
-  GenAI.API.Lists, GenAI.API.Deletion, GenAI.Assistants;
+  GenAI.Async.Promise, GenAI.API.Lists, GenAI.API.Deletion, GenAI.Assistants;
 
 type
   /// <summary>
@@ -46,6 +46,7 @@ type
     /// Returns the current instance of <c>TExpiresAfterParams</c>, enabling method chaining.
     /// </returns>
     function Anchor(const Value: string): TExpiresAfterParams;
+
     /// <summary>
     /// Specifies the number of days after the anchor timestamp when the vector store should expire.
     /// </summary>
@@ -78,6 +79,7 @@ type
     /// Returns the current instance of <c>TVectorStoreCreateParams</c>, enabling method chaining.
     /// </returns>
     function FileIds(const Value: TArray<string>): TVectorStoreCreateParams;
+
     /// <summary>
     /// Sets the name of the vector store.
     /// </summary>
@@ -88,6 +90,7 @@ type
     /// Returns the current instance of <c>TVectorStoreCreateParams</c>, enabling method chaining.
     /// </returns>
     function Name(const Value: string): TVectorStoreCreateParams;
+
     /// <summary>
     /// Configures the expiration policy for the vector store.
     /// </summary>
@@ -99,6 +102,7 @@ type
     /// Returns the current instance of <c>TVectorStoreCreateParams</c>, enabling method chaining.
     /// </returns>
     function ExpiresAfter(const Value: TExpiresAfterParams): TVectorStoreCreateParams;
+
     /// <summary>
     /// Defines the chunking strategy to be used for processing the files in the vector store.
     /// </summary>
@@ -109,6 +113,7 @@ type
     /// Returns the current instance of <c>TVectorStoreCreateParams</c>, enabling method chaining.
     /// </returns>
     function ChunkingStrategy(const Value: TChunkingStrategyParams): TVectorStoreCreateParams;
+
     /// <summary>
     /// Attaches metadata to the vector store as a set of key-value pairs.
     /// </summary>
@@ -141,6 +146,7 @@ type
     /// Returns the current instance of <c>TVectorStoreUpdateParams</c>, enabling method chaining.
     /// </returns>
     function Name(const Value: string): TVectorStoreUpdateParams;
+
     /// <summary>
     /// Updates the expiration policy of the vector store.
     /// </summary>
@@ -152,6 +158,7 @@ type
     /// Returns the current instance of <c>TVectorStoreUpdateParams</c>, enabling method chaining.
     /// </returns>
     function ExpiresAfter(const Value: TExpiresAfterParams): TVectorStoreUpdateParams;
+
     /// <summary>
     /// Updates the metadata associated with the vector store.
     /// </summary>
@@ -186,18 +193,22 @@ type
     /// Gets or sets the number of files currently being processed in the vector store.
     /// </summary>
     property InProgress: Int64 read FInProgress write FInProgress;
+
     /// <summary>
     /// Gets or sets the number of files that have been successfully processed and completed.
     /// </summary>
     property Completed: Int64 read FCompleted write FCompleted;
+
     /// <summary>
     /// Gets or sets the number of files that failed during processing.
     /// </summary>
     property Failed: Int64 read FFailed write FFailed;
+
     /// <summary>
     /// Gets or sets the number of files whose processing was canceled.
     /// </summary>
     property Cancelled: Int64 read FCancelled write FCancelled;
+
     /// <summary>
     /// Gets or sets the total number of files associated with the vector store.
     /// </summary>
@@ -225,6 +236,7 @@ type
     /// such as <c>last_active_at</c>.
     /// </remarks>
     property Anchor: string read FAnchor write FAnchor;
+
     /// <summary>
     /// Gets or sets the number of days after the anchor timestamp when the vector store should expire.
     /// </summary>
@@ -289,10 +301,12 @@ type
     /// Gets or sets the unique identifier of the vector store.
     /// </summary>
     property Id: string read FId write FId;
+
     /// <summary>
     /// Gets or sets the object type, which is always <c>vector_store</c>.
     /// </summary>
     property &Object: string read FObject write FObject;
+
     /// <summary>
     /// Gets the Unix timestamp (in seconds) for when the vector store was created.
     /// </summary>
@@ -300,26 +314,32 @@ type
     /// If is null then resturns 0
     /// </remarks>
     property CreatedAt: Int64 read GetCreatedAt;
+
     /// <summary>
     /// Gets the name of the vector store.
     /// </summary>
     property Name: string read GetName;
+
     /// <summary>
     /// Gets or sets the total number of bytes used by the files in the vector store.
     /// </summary>
     property UsageBytes: Int64 read FUsageBytes write FUsageBytes;
+
     /// <summary>
     /// Gets or sets the file count details, including the number of completed, failed, or in-progress files.
     /// </summary>
     property FileCounts: TVectorFileCounts read FFileCounts write FFileCounts;
+
     /// <summary>
     /// Gets or sets the status of the vector store, which can be <c>expired</c>, <c>in_progress</c>, or <c>completed</c>.
     /// </summary>
     property Status: TRunStatus read FStatus write FStatus;
+
     /// <summary>
     /// Gets or sets the expiration policy for the vector store.
     /// </summary>
     property ExpiresAfter: TExpiresAfter read FExpiresAfter write FExpiresAfter;
+
     /// <summary>
     /// Gets the Unix timestamp (in seconds) for when the vector store will expire.
     /// </summary>
@@ -327,6 +347,7 @@ type
     /// If null then returns 0.
     /// </remarks>
     property ExpiresAt: Int64 read GetExpiresAt;
+
     /// <summary>
     /// Gets the Unix timestamp (in seconds) for when the vector store was last active.
     /// </summary>
@@ -334,10 +355,12 @@ type
     /// If null then returns 0
     /// </remarks>
     property LastActiveAt: Int64 read GetLastActiveAt;
+
     /// <summary>
     /// Gets or sets metadata associated with the vector store, represented as key-value pairs.
     /// </summary>
     property Metadata: string read FMetadata write FMetadata;
+
     destructor Destroy; override;
   end;
 
@@ -362,6 +385,15 @@ type
   TAsynVectorStore = TAsynCallBack<TVectorStore>;
 
   /// <summary>
+  /// Represents a promise-based callback for asynchronous operations returning a <see cref="TVectorStore"/> instance.
+  /// </summary>
+  /// <remarks>
+  /// Specializes <see cref="TPromiseCallBack{TVectorStore}"/> to streamline handling of vector store API responses.
+  /// Use this type when you need a <c>TPromise</c> that resolves with a <c>TVectorStore</c>.
+  /// </remarks>
+  TPromiseVectorStore = TPromiseCallBack<TVectorStore>;
+
+  /// <summary>
   /// Manages asynchronous callBacks for a request using <c>TVectorStores</c> as the response type.
   /// </summary>
   /// <remarks>
@@ -370,6 +402,15 @@ type
   /// This structure facilitates non-blocking operations.
   /// </remarks>
   TAsynVectorStores = TAsynCallBack<TVectorStores>;
+
+  /// <summary>
+  /// Represents a promise-based callback for asynchronous operations returning a <see cref="TVectorStores"/> collection.
+  /// </summary>
+  /// <remarks>
+  /// Specializes <see cref="TPromiseCallBack{TVectorStores}"/> to streamline handling of vector store list API responses.
+  /// Use this type when you need a <c>TPromise</c> that resolves with a <c>TVectorStores</c> instance.
+  /// </remarks>
+  TPromiseVectorStores = TPromiseCallBack<TVectorStores>;
 
   /// <summary>
   /// Provides methods to manage vector stores in the OpenAI API.
@@ -387,6 +428,187 @@ type
     procedure HeaderCustomize; override;
   public
     /// <summary>
+    /// Creates a new vector store asynchronously and returns a promise that resolves with the created <see cref="TVectorStore"/>.
+    /// </summary>
+    /// <param name="ParamProc">
+    /// A procedure to configure the creation parameters via a <see cref="TVectorStoreCreateParams"/> instance.
+    /// </param>
+    /// <param name="CallBacks">
+    /// An optional function providing <see cref="TPromiseVectorStore"/> callbacks for start, success, and error handling.
+    /// </param>
+    /// <returns>
+    /// A <c>TPromise&lt;TVectorStore&gt;</c> that completes when the vector store creation succeeds or fails.
+    /// </returns>
+    /// <remarks>
+    /// Internally wraps the <see cref="AsynCreate"/> method to enable awaiting the result within promise chains.
+    /// If <c>CallBacks</c> is omitted, a default promise with only success and error resolution is used.
+    /// </remarks>
+    function AsyncAwaitCreate(const ParamProc: TProc<TVectorStoreCreateParams>;
+      const CallBacks: TFunc<TPromiseVectorStore> = nil): TPromise<TVectorStore>;
+
+    /// <summary>
+    /// Retrieves a list of vector stores asynchronously and returns a promise that resolves with the result.
+    /// </summary>
+    /// <param name="CallBacks">
+    /// An optional function providing <see cref="TPromiseVectorStores"/> callbacks for start, success, and error handling.
+    /// </param>
+    /// <returns>
+    /// A <c>TPromise&lt;TVectorStores&gt;</c> that completes when the vector store list request succeeds or fails.
+    /// </returns>
+    /// <remarks>
+    /// Wraps the <see cref="AsynList"/> method for use in promise-based workflows.
+    /// If <c>CallBacks</c> is omitted, the promise will only handle resolution and rejection.
+    /// </remarks>
+    function AsyncAwaitList(const CallBacks: TFunc<TPromiseVectorStores> = nil): TPromise<TVectorStores>; overload;
+
+    /// <summary>
+    /// Retrieves a filtered list of vector stores asynchronously and returns a promise that resolves with the result.
+    /// </summary>
+    /// <param name="ParamProc">
+    /// A procedure to configure URL parameters via a <see cref="TVectorStoreUrlParam"/> instance for filtering the list.
+    /// </param>
+    /// <param name="CallBacks">
+    /// An optional function providing <see cref="TPromiseVectorStores"/> callbacks for start, success, and error handling.
+    /// </param>
+    /// <returns>
+    /// A <c>TPromise&lt;TVectorStores&gt;</c> that completes when the filtered vector store list request succeeds or fails.
+    /// </returns>
+    /// <remarks>
+    /// Internally wraps the <see cref="AsynList"/> method with parameter support to enable promise-based workflows.
+    /// If <c>CallBacks</c> is omitted, the promise only handles resolution and rejection.
+    /// </remarks>
+    function AsyncAwaitList(const ParamProc: TProc<TVectorStoreUrlParam>;
+      const CallBacks: TFunc<TPromiseVectorStores> = nil): TPromise<TVectorStores>; overload;
+
+    /// <summary>
+    /// Retrieves a specific vector store asynchronously and returns a promise that resolves with the retrieved <see cref="TVectorStore"/>.
+    /// </summary>
+    /// <param name="VectorStoreId">
+    /// The unique identifier of the vector store to retrieve.
+    /// </param>
+    /// <param name="CallBacks">
+    /// An optional function providing <see cref="TPromiseVectorStore"/> callbacks for start, success, and error handling.
+    /// </param>
+    /// <returns>
+    /// A <c>TPromise&lt;TVectorStore&gt;</c> that completes when the vector store retrieval succeeds or fails.
+    /// </returns>
+    /// <remarks>
+    /// Wraps the <see cref="AsynRetrieve"/> method to enable promise-based retrieval of vector store details.
+    /// If <c>CallBacks</c> is omitted, the promise only handles resolution and rejection.
+    /// </remarks>
+    function AsyncAwaitRetrieve(const VectorStoreId: string;
+      const CallBacks: TFunc<TPromiseVectorStore> = nil): TPromise<TVectorStore>;
+
+    /// <summary>
+    /// Updates an existing vector store asynchronously and returns a promise that resolves with the updated <see cref="TVectorStore"/>.
+    /// </summary>
+    /// <param name="VectorStoreId">
+    /// The unique identifier of the vector store to update.
+    /// </param>
+    /// <param name="ParamProc">
+    /// A procedure to configure update parameters via a <see cref="TVectorStoreUpdateParams"/> instance.
+    /// </param>
+    /// <param name="CallBacks">
+    /// An optional function providing <see cref="TPromiseVectorStore"/> callbacks for start, success, and error handling.
+    /// </param>
+    /// <returns>
+    /// A <c>TPromise&lt;TVectorStore&gt;</c> that completes when the update operation succeeds or fails.
+    /// </returns>
+    /// <remarks>
+    /// Internally invokes <see cref="AsynUpdate"/> to perform the HTTP POST request with the specified parameters.
+    /// If <c>CallBacks</c> is omitted, the promise will only manage resolution and rejection.
+    /// </remarks>
+    function AsyncAwaitUpdate(const VectorStoreId: string;
+      const ParamProc: TProc<TVectorStoreUpdateParams>;
+      const CallBacks: TFunc<TPromiseVectorStore> = nil): TPromise<TVectorStore>;
+
+    /// <summary>
+    /// Deletes a vector store asynchronously and returns a promise that resolves with the deletion result.
+    /// </summary>
+    /// <param name="VectorStoreId">
+    /// The unique identifier of the vector store to delete.
+    /// </param>
+    /// <param name="CallBacks">
+    /// An optional function providing <see cref="TPromiseDeletion"/> callbacks for start, success, and error handling.
+    /// </param>
+    /// <returns>
+    /// A <c>TPromise&lt;TDeletion&gt;</c> that completes when the deletion request succeeds or fails.
+    /// </returns>
+    /// <remarks>
+    /// Internally wraps the <see cref="AsynDelete"/> method to enable promise-based workflows for vector store removal.
+    /// If <c>CallBacks</c> is omitted, the promise will handle only resolution and rejection.
+    /// </remarks>
+    function AsyncAwaitDelete(const VectorStoreId: string;
+      const CallBacks: TFunc<TPromiseDeletion> = nil): TPromise<TDeletion>;
+
+    /// <summary>
+    /// Synchronously creates a new vector store.
+    /// </summary>
+    /// <param name="ParamProc">
+    /// A procedure for configuring the parameters of the new vector store.
+    /// </param>
+    /// <returns>
+    /// A <c>TVectorStore</c> object representing the created vector store.
+    /// </returns>
+    function Create(const ParamProc: TProc<TVectorStoreCreateParams>): TVectorStore;
+
+    /// <summary>
+    /// Synchronously retrieves a list of vector stores.
+    /// </summary>
+    /// <returns>
+    /// A list of <c>TVectorStore</c> objects representing the vector stores.
+    /// </returns>
+    function List: TVectorStores; overload;
+
+    /// <summary>
+    /// Synchronously retrieves a filtered list of vector stores.
+    /// </summary>
+    /// <param name="ParamProc">
+    /// A procedure for setting the filtering parameters for the list request.
+    /// </param>
+    /// <returns>
+    /// A list of <c>TVectorStore</c> objects that match the specified criteria.
+    /// </returns>
+    function List(const ParamProc: TProc<TVectorStoreUrlParam>): TVectorStores; overload;
+
+    /// <summary>
+    /// Synchronously retrieves details of a specific vector store.
+    /// </summary>
+    /// <param name="VectorStoreId">
+    /// The unique identifier of the vector store to retrieve.
+    /// </param>
+    /// <returns>
+    /// A <c>TVectorStore</c> object containing the details of the specified vector store.
+    /// </returns>
+    function Retrieve(const VectorStoreId: string): TVectorStore;
+
+    /// <summary>
+    /// Synchronously updates an existing vector store.
+    /// </summary>
+    /// <param name="VectorStoreId">
+    /// The unique identifier of the vector store to update.
+    /// </param>
+    /// <param name="ParamProc">
+    /// A procedure for configuring the update parameters, such as name and expiration settings.
+    /// </param>
+    /// <returns>
+    /// A <c>TVectorStore</c> object representing the updated vector store.
+    /// </returns>
+    function Update(const VectorStoreId: string;
+      const ParamProc: TProc<TVectorStoreUpdateParams>): TVectorStore;
+
+    /// <summary>
+    /// Synchronously deletes a vector store.
+    /// </summary>
+    /// <param name="VectorStoreId">
+    /// The unique identifier of the vector store to delete.
+    /// </param>
+    /// <returns>
+    /// A <c>TDeletion</c> object indicating the status of the deletion.
+    /// </returns>
+    function Delete(const VectorStoreId: string): TDeletion;
+
+    /// <summary>
     /// Asynchronously creates a new vector store.
     /// </summary>
     /// <param name="ParamProc">
@@ -397,6 +619,7 @@ type
     /// </param>
     procedure AsynCreate(const ParamProc: TProc<TVectorStoreCreateParams>;
       const CallBacks: TFunc<TAsynVectorStore>);
+
     /// <summary>
     /// Asynchronously retrieves a list of vector stores.
     /// </summary>
@@ -404,6 +627,7 @@ type
     /// The callback functions to handle asynchronous execution and results.
     /// </param>
     procedure AsynList(const CallBacks: TFunc<TAsynVectorStores>); overload;
+
     /// <summary>
     /// Asynchronously retrieves a filtered list of vector stores.
     /// </summary>
@@ -415,6 +639,7 @@ type
     /// </param>
     procedure AsynList(const ParamProc: TProc<TVectorStoreUrlParam>;
       const CallBacks: TFunc<TAsynVectorStores>); overload;
+
     /// <summary>
     /// Asynchronously retrieves details of a specific vector store.
     /// </summary>
@@ -426,6 +651,7 @@ type
     /// </param>
     procedure AsynRetrieve(const VectorStoreId: string;
       const CallBacks: TFunc<TAsynVectorStore>);
+
     /// <summary>
     /// Asynchronously updates an existing vector store.
     /// </summary>
@@ -441,6 +667,7 @@ type
     procedure AsynUpdate(const VectorStoreId: string;
       const ParamProc: TProc<TVectorStoreUpdateParams>;
       const CallBacks: TFunc<TAsynVectorStore>);
+
     /// <summary>
     /// Asynchronously deletes an existing vector store.
     /// </summary>
@@ -452,66 +679,6 @@ type
     /// </param>
     procedure AsynDelete(const VectorStoreId: string;
       const CallBacks: TFunc<TAsynDeletion>);
-    /// <summary>
-    /// Synchronously creates a new vector store.
-    /// </summary>
-    /// <param name="ParamProc">
-    /// A procedure for configuring the parameters of the new vector store.
-    /// </param>
-    /// <returns>
-    /// A <c>TVectorStore</c> object representing the created vector store.
-    /// </returns>
-    function Create(const ParamProc: TProc<TVectorStoreCreateParams>): TVectorStore;
-    /// <summary>
-    /// Synchronously retrieves a list of vector stores.
-    /// </summary>
-    /// <returns>
-    /// A list of <c>TVectorStore</c> objects representing the vector stores.
-    /// </returns>
-    function List: TVectorStores; overload;
-    /// <summary>
-    /// Synchronously retrieves a filtered list of vector stores.
-    /// </summary>
-    /// <param name="ParamProc">
-    /// A procedure for setting the filtering parameters for the list request.
-    /// </param>
-    /// <returns>
-    /// A list of <c>TVectorStore</c> objects that match the specified criteria.
-    /// </returns>
-    function List(const ParamProc: TProc<TVectorStoreUrlParam>): TVectorStores; overload;
-    /// <summary>
-    /// Synchronously retrieves details of a specific vector store.
-    /// </summary>
-    /// <param name="VectorStoreId">
-    /// The unique identifier of the vector store to retrieve.
-    /// </param>
-    /// <returns>
-    /// A <c>TVectorStore</c> object containing the details of the specified vector store.
-    /// </returns>
-    function Retrieve(const VectorStoreId: string): TVectorStore;
-    /// <summary>
-    /// Synchronously updates an existing vector store.
-    /// </summary>
-    /// <param name="VectorStoreId">
-    /// The unique identifier of the vector store to update.
-    /// </param>
-    /// <param name="ParamProc">
-    /// A procedure for configuring the update parameters, such as name and expiration settings.
-    /// </param>
-    /// <returns>
-    /// A <c>TVectorStore</c> object representing the updated vector store.
-    /// </returns>
-    function Update(const VectorStoreId: string; const ParamProc: TProc<TVectorStoreUpdateParams>): TVectorStore;
-    /// <summary>
-    /// Synchronously deletes a vector store.
-    /// </summary>
-    /// <param name="VectorStoreId">
-    /// The unique identifier of the vector store to delete.
-    /// </param>
-    /// <returns>
-    /// A <c>TDeletion</c> object indicating the status of the deletion.
-    /// </returns>
-    function Delete(const VectorStoreId: string): TDeletion;
   end;
 
 implementation
@@ -605,6 +772,75 @@ begin
 end;
 
 { TVectorStoreRoute }
+
+function TVectorStoreRoute.AsyncAwaitCreate(
+  const ParamProc: TProc<TVectorStoreCreateParams>;
+  const CallBacks: TFunc<TPromiseVectorStore>): TPromise<TVectorStore>;
+begin
+  Result := TAsyncAwaitHelper.WrapAsyncAwait<TVectorStore>(
+    procedure(const CallBackParams: TFunc<TAsynVectorStore>)
+    begin
+      AsynCreate(ParamProc, CallBackParams);
+    end,
+    CallBacks);
+end;
+
+function TVectorStoreRoute.AsyncAwaitDelete(const VectorStoreId: string;
+  const CallBacks: TFunc<TPromiseDeletion>): TPromise<TDeletion>;
+begin
+  Result := TAsyncAwaitHelper.WrapAsyncAwait<TDeletion>(
+    procedure(const CallBackParams: TFunc<TAsynDeletion>)
+    begin
+      AsynDelete(VectorStoreId, CallBackParams);
+    end,
+    CallBacks);
+end;
+
+function TVectorStoreRoute.AsyncAwaitList(
+  const ParamProc: TProc<TVectorStoreUrlParam>;
+  const CallBacks: TFunc<TPromiseVectorStores>): TPromise<TVectorStores>;
+begin
+  Result := TAsyncAwaitHelper.WrapAsyncAwait<TVectorStores>(
+    procedure(const CallBackParams: TFunc<TAsynVectorStores>)
+    begin
+      ASynList(ParamProc, CallBackParams);
+    end,
+    CallBacks);
+end;
+
+function TVectorStoreRoute.AsyncAwaitList(
+  const CallBacks: TFunc<TPromiseVectorStores>): TPromise<TVectorStores>;
+begin
+  Result := TAsyncAwaitHelper.WrapAsyncAwait<TVectorStores>(
+    procedure(const CallBackParams: TFunc<TAsynVectorStores>)
+    begin
+      ASynList(CallBackParams);
+    end,
+    CallBacks);
+end;
+
+function TVectorStoreRoute.AsyncAwaitRetrieve(const VectorStoreId: string;
+  const CallBacks: TFunc<TPromiseVectorStore>): TPromise<TVectorStore>;
+begin
+  Result := TAsyncAwaitHelper.WrapAsyncAwait<TVectorStore>(
+    procedure(const CallBackParams: TFunc<TAsynVectorStore>)
+    begin
+      AsynRetrieve(VectorStoreId, CallBackParams);
+    end,
+    CallBacks);
+end;
+
+function TVectorStoreRoute.AsyncAwaitUpdate(const VectorStoreId: string;
+  const ParamProc: TProc<TVectorStoreUpdateParams>;
+  const CallBacks: TFunc<TPromiseVectorStore>): TPromise<TVectorStore>;
+begin
+  Result := TAsyncAwaitHelper.WrapAsyncAwait<TVectorStore>(
+    procedure(const CallBackParams: TFunc<TAsynVectorStore>)
+    begin
+      AsynUpdate(VectorStoreId, ParamProc, CallBackParams);
+    end,
+    CallBacks);
+end;
 
 procedure TVectorStoreRoute.AsynCreate(
   const ParamProc: TProc<TVectorStoreCreateParams>;

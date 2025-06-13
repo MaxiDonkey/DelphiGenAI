@@ -7,6 +7,10 @@ unit GenAI;
 
  ------------------------------------------------------------------------------}
 
+interface
+
+{$REGION  'Dev notes : GenAI'}
+
 (*
 
    This Delphi project relies on several key dependencies that cover network functionality,
@@ -50,7 +54,7 @@ unit GenAI;
 
 *)
 
-interface
+{$ENDREGION}
 
 uses
   System.SysUtils, System.Classes, System.JSON,
@@ -62,6 +66,9 @@ uses
   GenAI.Vector, GenAI.VectorFiles, GenAI.VectorBatch, GenAI.Monitoring, GenAI.Chat.Parallel,
   GenAI.Responses, GenAI.Responses.InputParams, GenAI.Responses.InputItemList,
   GenAI.Responses.OutputParams, GenAI.Async.Promise, GenAI.Responses.Internal;
+
+const
+  VERSION = 'GenAIv1.1.0';
 
 type
   /// <summary>
@@ -81,6 +88,7 @@ type
     procedure SetAPIKey(const Value: string);
     function GetBaseUrl: string;
     procedure SetBaseUrl(const Value: string);
+    function GetVersion: string;
 
     function GetAssistantsRoute: TAssistantsRoute;
     function GetAudioRoute: TAudioRoute;
@@ -104,6 +112,18 @@ type
     function GetResponses: TResponsesRoute;
 
     /// <summary>
+    /// Gets the current version of the GenAI library.
+    /// </summary>
+    /// <remarks>
+    /// The <c>Version</c> property provides the semantic version number of the library as a string.
+    /// This can be used for compatibility checks or displaying version information in your application.
+    /// </remarks>
+    /// <returns>
+    /// A string representing the library version.
+    /// </returns>
+    property Version: string read GetVersion;
+
+    /// <summary>
     /// Represents the API route handler for managing assistants.
     /// </summary>
     /// <remarks>
@@ -112,6 +132,7 @@ type
     /// custom headers.
     /// </remarks>
     property Assistants: TAssistantsRoute read GetAssistantsRoute;
+
     /// <summary>
     /// Provides routes to handle audio-related requests including speech generation, transcription, and translation.
     /// </summary>
@@ -121,6 +142,7 @@ type
     /// operations to accommodate different application needs.
     /// </remarks>
     property Audio: TAudioRoute read GetAudioRoute;
+
     /// <summary>
     /// Provides routes for managing batches within the OpenAI API.
     /// This class offers methods to create, retrieve, cancel, and list batches, facilitating the orchestration of batch operations.
@@ -128,6 +150,7 @@ type
     /// in application workflows.
     /// </summary>
     property Batch: TBatchRoute read GetBatchRoute;
+
     /// <summary>
     /// Handles the routing and execution of chat-related API requests within the application,
     /// facilitating interaction with AI models for generating chat completions.
@@ -139,12 +162,14 @@ type
     /// software architectures.
     /// </remarks>
     property Chat: TChatRoute read GetChatRoute;
+
     /// <summary>
     /// Manages the routes for creating and streaming completions using the OpenAI API.
     /// This class handles both synchronous and asynchronous operations to interact with the API
     /// for generating text completions.
     /// </summary>
     property Completion: TCompletionRoute read GetCompletionRoute;
+
     /// <summary>
     /// Provides routes for creating embeddings via the OpenAI API.
     /// </summary>
@@ -153,6 +178,7 @@ type
     /// provided by the caller. It utilizes TGenAIRoute as a base to inherit API communication capabilities.
     /// </remarks>
     property Embeddings: TEmbeddingsRoute read GetEmbeddingsRoute;
+
     /// <summary>
     /// Represents a route for managing file operations in the API.
     /// </summary>
@@ -162,6 +188,7 @@ type
     /// It supports both synchronous and asynchronous operations for efficient file management.
     /// </remarks>
     property Files: TFilesRoute read GetFilesRoute;
+
     /// <summary>
     /// Provides methods to interact with the OpenAI fine-tuning API routes.
     /// </summary>
@@ -170,6 +197,7 @@ type
     /// as well as accessing associated events and checkpoints.
     /// </remarks>
     property FineTuning: TFineTuningRoute read GetFineTuningRoute;
+
     /// <summary>
     /// Represents the route handler for image-related operations using the OpenAI API.
     /// </summary>
@@ -179,6 +207,7 @@ type
     /// diverse use cases involving image generation and manipulation.
     /// </remarks>
     property Images: TImagesRoute read GetImagesRoute;
+
     /// <summary>
     /// Manages the API routes for handling messages within a thread in the OpenAI API.
     /// </summary>
@@ -187,6 +216,7 @@ type
     /// within a thread. It also supports asynchronous operations for non-blocking message handling.
     /// </remarks>
     property Messages : TMessagesRoute read GetMesssagesRoute;
+
     /// <summary>
     /// Provides routes for managing model data via API calls, including listing, retrieving, and deleting models.
     /// </summary>
@@ -196,6 +226,7 @@ type
     /// interaction with the OpenAI model endpoints.
     /// </remarks>
     property Models: TModelsRoute read GetModelsRoute;
+
     /// <summary>
     /// Represents a route for handling moderation requests in the GenAI framework.
     /// This class provides methods for evaluating moderation parameters both
@@ -207,6 +238,7 @@ type
     /// for evaluating content against moderation models.
     /// </remarks>
     property Moderation: TModerationRoute read GetModerationRoute;
+
     /// <summary>
     /// Represents the route for managing execution runs in the OpenAI API.
     /// </summary>
@@ -215,6 +247,7 @@ type
     /// It handles both synchronous and asynchronous requests, allowing efficient interaction with the OpenAI API for execution management.
     /// </remarks>
     property Runs: TRunsRoute read GetRunsRoute;
+
     /// <summary>
     /// Represents the route for managing run steps within execution runs in the OpenAI API.
     /// </summary>
@@ -223,6 +256,7 @@ type
     /// and asynchronous requests, enabling efficient interaction with the OpenAI API for managing run steps.
     /// </remarks>
     property RunStep: TRunStepRoute read GetRunStepRoute;
+
     /// <summary>
     /// Provides an interface for interacting with OpenAI threads via API routes.
     /// This class supports both synchronous and asynchronous operations, including creating, retrieving, modifying, and deleting threads.
@@ -240,6 +274,7 @@ type
     /// </para>
     /// </remarks>
     property Threads: TThreadsRoute read GetThreadsRoute;
+
     /// <summary>
     /// Manages routes for handling file uploads, including creating uploads, adding parts, completing uploads, and canceling uploads.
     /// </summary>
@@ -248,6 +283,7 @@ type
     /// operations for creating an upload, adding parts to it, completing the upload, and canceling an upload.
     /// </remarks>
     property Uploads: TUploadsRoute read GetUploadsRoute;
+
     /// <summary>
     /// Provides methods to manage vector stores in the OpenAI API.
     /// </summary>
@@ -257,6 +293,7 @@ type
     /// operations, making it flexible for different application needs.
     /// </remarks>
     property VectorStore: TVectorStoreRoute read GetVectorStoreRoute;
+
     /// <summary>
     /// Provides methods to manage file batches within a vector store using the OpenAI API.
     /// </summary>
@@ -266,6 +303,7 @@ type
     /// enabling flexible interaction with the API for managing batch processing.
     /// </remarks>
     property VectorStoreBatch: TVectorStoreBatchRoute read GetVectorStoreBatchRoute;
+
     /// <summary>
     /// Provides methods to manage files within a vector store using the OpenAI API.
     /// </summary>
@@ -276,6 +314,17 @@ type
     /// </remarks>
     property VectorStoreFiles: TVectorStoreFilesRoute read GetVectorStoreFilesRoute;
 
+    /// <summary>
+    /// Provides access to the <c>v1/responses</c> API endpoint for managing and retrieving response objects.
+    /// </summary>
+    /// <remarks>
+    /// The <c>Responses</c> property exposes methods for interacting with the OpenAI <c>v1/responses</c> endpoint.
+    /// This includes retrieving, listing, or managing response objects returned by various API operations.
+    /// Use this route to access or query response records generated during API interactions.
+    /// </remarks>
+    /// <returns>
+    /// An instance of <c>TResponsesRoute</c> for handling response-related API operations.
+    /// </returns>
     property Responses: TResponsesRoute read GetResponses;
 
     /// <summary>
@@ -285,6 +334,7 @@ type
     /// An instance of TGenAIAPI for making API calls.
     /// </returns>
     property API: TGenAIAPI read GetAPI;
+
     /// Sets or retrieves the API API key for authentication.
     /// </summary>
     /// <param name="Value">
@@ -294,6 +344,7 @@ type
     /// The current API key.
     /// </returns>
     property APIKey: string read GetAPIKey write SetAPIKey;
+
     /// <summary>
     /// Sets or retrieves the base URL for API requests.
     /// Default is https://api.openai.com/v1.
@@ -305,6 +356,7 @@ type
     /// The current base URL.
     /// </returns>
     property BaseURL: string read GetBaseUrl write SetBaseUrl;
+
     /// <summary>
     /// Provides access to agent completion API.
     /// An AI agent is an autonomous system using large language models (LLM) to perform tasks based on high-level instructions.
@@ -353,6 +405,7 @@ type
     FVectorStoreFilesRoute: TVectorStoreFilesRoute;
     FResponsesRoute: TResponsesRoute;
 
+    function GetVersion: string;
     function GetAPI: TGenAIAPI;
     function GetAPIKey: string;
     procedure SetAPIKey(const Value: string);
@@ -388,6 +441,7 @@ type
     /// An instance of TGenAIAPI for making API calls.
     /// </returns>
     property API: TGenAIAPI read GetAPI;
+
     /// <summary>
     /// Sets or retrieves the API key for authentication.
     /// </summary>
@@ -398,6 +452,7 @@ type
     /// The current API key.
     /// </returns>
     property APIKey: string read GetAPIKey write SetAPIKey;
+
     /// <summary>
     /// Sets or retrieves the base URL for API requests.
     /// Default is https://api.openai.com/v1.
@@ -409,17 +464,12 @@ type
     /// The current base URL.
     /// </returns>
     property BaseURL: string read GetBaseUrl write SetBaseUrl;
+
   public
     constructor Create; overload;
     constructor Create(const AAPIKey: string); overload;
     destructor Destroy; override;
   end;
-
-  {$REGION 'GenAI.Async.Promise'}
-
-  TStringPromise = GenAI.Async.Promise.TStringPromise;
-
-  {$ENDREGION}
 
   {$REGION 'GenAI.API'}
 
@@ -537,6 +587,22 @@ type
   /// This structure facilitates non-blocking operations.
   /// </remarks>
   TAsynDeletion = GenAI.API.Deletion.TAsynDeletion;
+
+  /// <summary>
+  /// Represents a promise-based callback for handling asynchronous deletion operations.
+  /// </summary>
+  /// <remarks>
+  /// <para>
+  /// This type alias specializes <c>TPromiseCallBack</c> with <c>TDeletion</c>,
+  /// providing a promise-style mechanism to process the result of a deletion request.
+  /// It encapsulates both success and error handling for operations that return a <c>TDeletion</c> response.
+  /// </para>
+  /// <para>
+  /// Use <c>TPromiseDeletion</c> whenever you need to initiate a deletion request
+  /// and react to its completion (successful or failed) in a non-blocking, promise-like fashion.
+  /// </para>
+  /// </remarks>
+  TPromiseDeletion = GenAI.API.Deletion.TPromiseDeletion;
 
   {$ENDREGION}
 
@@ -664,6 +730,18 @@ type
   TAsynSpeechResult = GenAI.Audio.TAsynSpeechResult;
 
   /// <summary>
+  /// Defines a promise-based callback for asynchronous speech synthesis operations,
+  /// resolving with a <see cref="TSpeechResult"/>.
+  /// </summary>
+  /// <remarks>
+  /// Specializes <see cref="TPromiseCallBack{TSpeechResult}"/> to streamline
+  /// handling of OpenAI audio speech results. Use this type when you need a
+  /// <c>TPromise</c> that completes with a <see cref="TSpeechResult"/>,
+  /// or reports an error if the request fails.
+  /// </remarks>
+  TPromiseSpeechResult = GenAI.Audio.TPromiseSpeechResult;
+
+  /// <summary>
   /// Manages asynchronous callBacks for a request using <c>TTranscription</c> as the response type.
   /// </summary>
   /// <remarks>
@@ -674,6 +752,18 @@ type
   TAsynTranscription = GenAI.Audio.TAsynTranscription;
 
   /// <summary>
+  /// Defines a promise-based callback for asynchronous audio transcription operations,
+  /// resolving with a <see cref="TTranscription"/>.
+  /// </summary>
+  /// <remarks>
+  /// Specializes <see cref="TPromiseCallBack{TTranscription}"/> to streamline
+  /// handling of OpenAI audio transcription results. Use this type when you need a
+  /// <c>TPromise</c> that completes with a <see cref="TTranscription"/>,
+  /// or reports an error if the request fails.
+  /// </remarks>
+  TPromiseTranscription = GenAI.Audio.TPromiseTranscription;
+
+  /// <summary>
   /// Manages asynchronous callBacks for a request using <c>TTranslation</c> as the response type.
   /// </summary>
   /// <remarks>
@@ -682,6 +772,18 @@ type
   /// This structure facilitates non-blocking operations.
   /// </remarks>
   TAsynTranslation = GenAI.Audio.TAsynTranslation;
+
+  /// <summary>
+  /// Defines a promise-based callback for asynchronous audio translation operations,
+  /// resolving with a <see cref="TTranslation"/>.
+  /// </summary>
+  /// <remarks>
+  /// Specializes <see cref="TPromiseCallBack{TTranslation}"/> to streamline
+  /// handling of OpenAI audio translation results. Use this type when you need a
+  /// <c>TPromise</c> that completes with a <see cref="TTranslation"/>,
+  /// or reports an error if the request fails.
+  /// </remarks>
+  TPromiseTranslation = GenAI.Audio.TPromiseTranslation;
 
   {$ENDREGION}
 
@@ -729,6 +831,15 @@ type
   /// </remarks>
   TAsynEmbeddings = GenAI.Embeddings.TAsynEmbeddings;
 
+  /// <summary>
+  /// Represents a promise-based callback for asynchronous operations returning a <see cref="TEmbeddings"/> instance.
+  /// </summary>
+  /// <remarks>
+  /// Specializes <see cref="TPromiseCallBack{TEmbeddings}"/> to streamline handling of embeddings API responses.
+  /// Use this type when you need a <c>TPromise</c> that resolves with a <c>TEmbeddings</c> result.
+  /// </remarks>
+  TPromiseEmbeddings = GenAI.Embeddings.TPromiseEmbeddings;
+
   {$ENDREGION}
 
   {$REGION 'GenAI.Models'}
@@ -764,6 +875,15 @@ type
   TAsynModel = GenAI.Models.TAsynModel;
 
   /// <summary>
+  /// Represents a promise-based callback for asynchronous operations returning a <see cref="TModel"/> instance.
+  /// </summary>
+  /// <remarks>
+  /// Specializes <see cref="TPromiseCallBack{TModel}"/> to streamline handling of model API responses.
+  /// Use this type when you need a <c>TPromise</c> that resolves with a <c>TModel</c>.
+  /// </remarks>
+  TPromiseModel = GenAI.Models.TPromiseModel;
+
+  /// <summary>
   /// Manages asynchronous callBacks for a request using <c>TModels</c> as the response type.
   /// </summary>
   /// <remarks>
@@ -772,6 +892,15 @@ type
   /// This structure facilitates non-blocking operations.
   /// </remarks>
   TAsynModels = GenAI.Models.TAsynModels;
+
+  /// <summary>
+  /// Represents a promise-based callback for asynchronous operations returning a <see cref="TModels"/> collection.
+  /// </summary>
+  /// <remarks>
+  /// Specializes <see cref="TPromiseCallBack{TModels}"/> to streamline handling of model list API responses.
+  /// Use this type when you need a <c>TPromise</c> that resolves with a <c>TModels</c> instance.
+  /// </remarks>
+  TPromiseModels = GenAI.Models.TPromiseModels;
 
   {$ENDREGION}
 
@@ -1119,6 +1248,9 @@ type
   /// </remarks>
   TAsynChat = GenAI.Chat.TAsynChat;
 
+  //
+  TPromiseChat = GenAI.Chat.TPromiseChat;
+
   /// <summary>
   /// Manages asynchronous streaming callBacks for a request using <c>TChat</c> as the response type.
   /// </summary>
@@ -1128,6 +1260,9 @@ type
   /// This structure is ideal for handling scenarios where the chat response is streamed incrementally, providing real-time updates to the user interface.
   /// </remarks>
   TAsynChatStream = GenAI.Chat.TAsynChatStream;
+
+  //
+  TPromiseChatStream = GenAI.Chat.TPromiseChatStream;
 
   /// <summary>
   /// Provides URL parameter helpers for retrieving chat messages by completion ID,
@@ -1182,6 +1317,9 @@ type
   /// </remarks>
   TAsynChatMessages = GenAI.Chat.TAsynChatMessages;
 
+  //
+  TPromiseChatMessages = GenAI.Chat.TPromiseChatMessages;
+
   /// <summary>
   /// Represents an asynchronous callback structure for retrieving chat completion results.
   /// </summary>
@@ -1191,6 +1329,9 @@ type
   /// </remarks>
   TAsynChatCompletion = GenAI.Chat.TAsynChatCompletion;
 
+  //
+  TPromiseChatCompletion = GenAI.Chat.TPromiseChatCompletion;
+
   /// <summary>
   /// Represents an asynchronous callback structure for deleting a chat completion.
   /// </summary>
@@ -1199,6 +1340,9 @@ type
   /// when performing an asynchronous delete operation for a <see cref="TChatDelete"/> instance.
   /// </remarks>
   TAsynChatDelete = GenAI.Chat.TAsynChatDelete;
+
+  //
+  TPromiseChatDelete = GenAI.Chat.TPromiseChatDelete;
 
   {$ENDREGION}
 
@@ -1384,6 +1528,15 @@ type
   /// </remarks>
   TAsynModeration = GenAI.Moderation.TAsynModeration;
 
+  /// <summary>
+  /// Represents a promise-based callback for asynchronous moderation requests.
+  /// </summary>
+  /// <remarks>
+  /// Specializes <see cref="TPromiseCallBack{TModeration}"/> to simplify handling of moderation API responses.
+  /// Use this type when you need a <c>TPromise</c> that resolves with a <see cref="TModeration"/> instance.
+  /// </remarks>
+  TPromiseModeration = GenAI.Moderation.TPromiseModeration;
+
   {$ENDREGION}
 
   {$REGION 'GenAI.Images'}
@@ -1453,6 +1606,15 @@ type
   TGeneratedImages = GenAI.Images.TGeneratedImages;
 
   /// <summary>
+  /// Represents a promise-based callback for asynchronous operations that return a <see cref="TGeneratedImages"/> instance.
+  /// </summary>
+  /// <remarks>
+  /// Specializes <see cref="TPromiseCallBack{TGeneratedImages}"/> to streamline handling of image generation responses.
+  /// Use this type when you need a <c>TPromise</c> that resolves with a <c>TGeneratedImages</c> object.
+  /// </remarks>
+  TPromiseGeneratedImages = GenAI.Images.TPromiseGeneratedImages;
+
+  /// <summary>
   /// Manages asynchronous callBacks for a request using <c>TGeneratedImages</c> as the response type.
   /// </summary>
   /// <remarks>
@@ -1495,6 +1657,16 @@ type
   TFile = GenAI.Files.TFile;
 
   /// <summary>
+  /// Represents a promise-based callback for handling asynchronous file operations.
+  /// </summary>
+  /// <remarks>
+  /// This type alias specializes <c>TPromiseCallBack</c> with <c>TFile</c>,
+  /// providing a promise-style mechanism to process the result of file-related API requests.
+  /// It encapsulates both success and error handling for operations that return a <c>TFile</c> response.
+  /// </remarks>
+  TPromiseFile = GenAI.Files.TPromiseFile;
+
+  /// <summary>
   /// Represents a collection of file objects retrieved from the API.
   /// </summary>
   /// <remarks>
@@ -1503,6 +1675,16 @@ type
   /// It is used for operations that involve listing or retrieving multiple files.
   /// </remarks>
   TFiles = GenAI.Files.TFiles;
+
+  /// <summary>
+  /// Manages asynchronous callBacks for a request using <c>TFiles</c> as the response type.
+  /// </summary>
+  /// <remarks>
+  /// The <c>TAsynFiles</c> type extends the <c>TAsynParams&lt;TFiles&gt;</c> record to handle the lifecycle of an asynchronous chat operation.
+  /// It provides event handlers that trigger at various stages, such as when the operation starts, completes successfully, or encounters an error.
+  /// This structure facilitates non-blocking operations.
+  /// </remarks>
+  TPromiseFiles = GenAI.Files.TPromiseFiles;
 
   /// <summary>
   /// Represents the content of a file retrieved from the API.
@@ -1607,6 +1789,16 @@ type
   TAsynUpload = GenAI.Uploads.TAsynUpload;
 
   /// <summary>
+  /// Represents a promise-based callback for asynchronous upload operations.
+  /// </summary>
+  /// <remarks>
+  /// Specializes <see cref="TPromiseCallBack{TUpload}"/> to streamline handling of the
+  /// OpenAI upload API. Use this type when you need a <c>TPromise</c> that resolves with
+  /// a <see cref="TUpload"/> instance.
+  /// </remarks>
+  TPromiseUpload = GenAI.Uploads.TPromiseUpload;
+
+  /// <summary>
   /// Manages asynchronous callBacks for a request using <c>TUploadPart</c> as the response type.
   /// </summary>
   /// <remarks>
@@ -1615,6 +1807,16 @@ type
   /// This structure facilitates non-blocking operations.
   /// </remarks>
   TAsynUploadPart = GenAI.Uploads.TAsynUploadPart;
+
+  /// <summary>
+  /// Represents a promise-based callback for asynchronous upload part operations.
+  /// </summary>
+  /// <remarks>
+  /// Specializes <see cref="TPromiseCallBack{TUploadPart}"/> to streamline handling of the
+  /// OpenAI upload-part API. Use this type when you need a <c>TPromise</c> that resolves with
+  /// a <see cref="TUploadPart"/> instance.
+  /// </remarks>
+  TPromiseUploadPart = GenAI.Uploads.TPromiseUploadPart;
 
   {$ENDREGION}
 
@@ -2754,6 +2956,15 @@ type
   TAsynVectorStore = GenAI.Vector.TAsynVectorStore;
 
   /// <summary>
+  /// Represents a promise-based callback for asynchronous operations returning a <see cref="TVectorStore"/> instance.
+  /// </summary>
+  /// <remarks>
+  /// Specializes <see cref="TPromiseCallBack{TVectorStore}"/> to streamline handling of vector store API responses.
+  /// Use this type when you need a <c>TPromise</c> that resolves with a <c>TVectorStore</c>.
+  /// </remarks>
+  TPromiseVectorStore = GenAI.Vector.TPromiseVectorStore;
+
+  /// <summary>
   /// Manages asynchronous callBacks for a request using <c>TVectorStores</c> as the response type.
   /// </summary>
   /// <remarks>
@@ -2762,6 +2973,15 @@ type
   /// This structure facilitates non-blocking operations.
   /// </remarks>
   TAsynVectorStores = GenAI.Vector.TAsynVectorStores;
+
+  /// <summary>
+  /// Represents a promise-based callback for asynchronous operations returning a <see cref="TVectorStores"/> collection.
+  /// </summary>
+  /// <remarks>
+  /// Specializes <see cref="TPromiseCallBack{TVectorStores}"/> to streamline handling of vector store list API responses.
+  /// Use this type when you need a <c>TPromise</c> that resolves with a <c>TVectorStores</c> instance.
+  /// </remarks>
+  TPromiseVectorStores = GenAI.Vector.TPromiseVectorStores;
 
   {$ENDREGION}
 
@@ -2837,6 +3057,21 @@ type
   /// </remarks>
   TAsynVectorStoreFile = GenAI.VectorFiles.TAsynVectorStoreFile;
 
+ /// <summary>
+  /// Defines a promise-based callback type for operations returning a single vector store file.
+  /// </summary>
+  /// <remarks>
+  /// <para>
+  /// <c>TPromiseVectorStoreFile</c> is an alias for <c>TPromiseCallBack&lt;TVectorStoreFile&gt;</c>,
+  /// representing an asynchronous operation that resolves with a <see cref="TVectorStoreFile"/> instance.
+  /// </para>
+  /// <para>
+  /// Use this type when you need a promise-style API for creating, retrieving,
+  /// or deleting a file in a vector store.
+  /// </para>
+  /// </remarks>
+  TPromiseVectorStoreFile = GenAI.VectorFiles.TPromiseVectorStoreFile;
+
   /// <summary>
   /// Manages asynchronous callBacks for a request using <c>TVectorStoreFiles</c> as the response type.
   /// </summary>
@@ -2846,6 +3081,21 @@ type
   /// This structure facilitates non-blocking operations.
   /// </remarks>
   TAsynVectorStoreFiles = GenAI.VectorFiles.TAsynVectorStoreFiles;
+
+  /// <summary>
+  /// Defines a promise-based callback type for operations returning a collection of vector store files.
+  /// </summary>
+  /// <remarks>
+  /// <para>
+  /// <c>TPromiseVectorStoreFiles</c> is an alias for <c>TPromiseCallBack&lt;TVectorStoreFiles&gt;</c>,
+  /// representing an asynchronous operation that resolves with a <see cref="TVectorStoreFiles"/> list.
+  /// </para>
+  /// <para>
+  /// Use this type when you need a promise-style API for listing, filtering,
+  /// or retrieving multiple files from a vector store.
+  /// </para>
+  /// </remarks>
+  TPromiseVectorStoreFiles = GenAI.VectorFiles.TPromiseVectorStoreFiles;
 
   {$ENDREGION}
 
@@ -2902,6 +3152,21 @@ type
   TAsynVectorStoreBatch = GenAI.VectorBatch.TAsynVectorStoreBatch;
 
   /// <summary>
+  /// Defines a promise-style callback type for operations that return a single vector store batch.
+  /// </summary>
+  /// <remarks>
+  /// <para>
+  /// <c>TPromiseVectorStoreBatch</c> is an alias for <c>TPromiseCallBack&lt;TVectorStoreBatch&gt;</c>.
+  /// It represents an asynchronous operation that resolves with a <see cref="TVectorStoreBatch"/> instance.
+  /// </para>
+  /// <para>
+  /// Use this type when you need a promise-based API for creating, retrieving, canceling,
+  /// or otherwise managing file batches in a vector store.
+  /// </para>
+  /// </remarks>
+  TPromiseVectorStoreBatch = GenAI.VectorBatch.TPromiseVectorStoreBatch;
+
+  /// <summary>
   /// Manages asynchronous callBacks for a request using <c>TVectorStoreBatches</c> as the response type.
   /// </summary>
   /// <remarks>
@@ -2910,6 +3175,21 @@ type
   /// This structure facilitates non-blocking operations.
   /// </remarks>
   TAsynVectorStoreBatches = GenAI.VectorBatch.TAsynVectorStoreBatches;
+
+  /// <summary>
+  /// Defines a promise-style callback type for operations that return a collection of vector store batches.
+  /// </summary>
+  /// <remarks>
+  /// <para>
+  /// <c>TPromiseVectorStoreBatches</c> is an alias for <c>TPromiseCallBack&lt;TVectorStoreBatches&gt;</c>.
+  /// It represents an asynchronous operation that resolves with a <see cref="TVectorStoreBatches"/> list.
+  /// </para>
+  /// <para>
+  /// Use this type when you need a promise-based API for listing, filtering, or retrieving
+  /// multiple file batches in a vector store.
+  /// </para>
+  /// </remarks>
+  TPromiseVectorStoreBatches = GenAI.VectorBatch.TPromiseVectorStoreBatches;
 
   {$ENDREGION}
 
@@ -3426,7 +3706,6 @@ function web_search_preview(const SearchWebOption: string = ''): TResponseWebSea
 function Locate: TResponseUserLocationParams;
 function file_search(const vector_store_ids: TArray<string> = []): TResponseFileSearchParams;
 
-
 function HttpMonitoring: IRequestMonitor;
 
 var
@@ -3724,6 +4003,11 @@ begin
   if not Assigned(FVectorStoreRoute) then
     FVectorStoreRoute := TVectorStoreRoute.CreateRoute(API);
   Result := FVectorStoreRoute;
+end;
+
+function TGenAI.GetVersion: string;
+begin
+  Result := VERSION;
 end;
 
 function TGenAI.GetChatRoute: TChatRoute;

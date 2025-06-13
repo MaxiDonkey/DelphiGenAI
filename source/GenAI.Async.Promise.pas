@@ -1,7 +1,17 @@
 unit GenAI.Async.Promise;
 
-(*******************************************************************************
+{-------------------------------------------------------------------------------
 
+      Github repository :  https://github.com/MaxiDonkey/DelphiGenAI
+      Visit the Github repository for the documentation and use examples
+
+ ------------------------------------------------------------------------------}
+
+interface
+
+{$REGION  'Dev notes : GenAI.Async.Promise'}
+
+(*
       Unit providing a generic implementation of Promises for handling
       asynchronous operations in Delphi.
 
@@ -65,10 +75,9 @@ unit GenAI.Async.Promise;
       The unit is designed to work seamlessly with other asynchronous
       programming modules, making it a powerful addition to any Delphi
       application requiring structured async execution.
+*)
 
-*******************************************************************************)
-
-interface
+{$ENDREGION}
 
 uses
   System.SysUtils, System.Generics.Collections, System.Classes, System.Threading;
@@ -82,10 +91,12 @@ type
     /// The promise is pending and has not yet been resolved or rejected.
     /// </summary>
     psPending,
+
     /// <summary>
     /// The promise has been fulfilled with a value.
     /// </summary>
     psFulfilled,
+
     /// <summary>
     /// The promise has been rejected due to an error.
     /// </summary>
@@ -237,8 +248,43 @@ type
     /// <returns>A new promise to allow method chaining.</returns>
     function &Catch(AOnReject: TProc<Exception>): TPromise<T>;
 
+    /// <summary>
+    /// Creates a promise that is immediately resolved with the specified value.
+    /// </summary>
+    /// <remarks>
+    /// Use this method when you already have the result and want to wrap it in a promise.
+    /// You can optionally provide a <paramref name="Proc"/> callback, which will be executed
+    /// just before the promise is resolved, allowing you to perform any side effects.
+    /// </remarks>
+    /// <param name="AValue">
+    /// The value with which the new promise will be fulfilled.
+    /// </param>
+    /// <param name="Proc">
+    /// An optional procedure to run before resolving the promise. If not needed, pass <c>nil</c>.
+    /// </param>
+    /// <returns>
+    /// A new <see cref="TPromise{T}"/> instance that is already in the fulfilled state with <paramref name="AValue"/>.
+    /// </returns>
     class function Resolved(const AValue: T; Proc: TProc = nil): TPromise<T>;
 
+    /// <summary>
+    /// Creates a promise that is immediately rejected with the specified error.
+    /// </summary>
+    /// <remarks>
+    /// Use this method when you need to represent an error state in a promise without performing
+    /// any asynchronous work. You can optionally provide a <paramref name="Proc"/> callback,
+    /// which will be executed just before the promise is rejected, allowing for any necessary
+    /// side effects or cleanup.
+    /// </remarks>
+    /// <param name="AError">
+    /// The exception with which the new promise will be rejected.
+    /// </param>
+    /// <param name="Proc">
+    /// An optional procedure to run before rejecting the promise. If not needed, pass <c>nil</c>.
+    /// </param>
+    /// <returns>
+    /// A new <see cref="TPromise{T}"/> instance that is already in the rejected state with <paramref name="AError"/>.
+    /// </returns>
     class function Rejected(AError: Exception; Proc: TProc = nil): TPromise<T>;
 
   end;
@@ -319,8 +365,6 @@ type
     class procedure Clear;
   end;
 
-  TStringPromise = TPromise<string>;
-
 implementation
 
 { TPromise<T> }
@@ -397,7 +441,6 @@ begin
               if Assigned(Proc) then
                 Proc();
               Reject(CloneException(AError));
-//              Reject(AError);
             end)
         end)
     end);

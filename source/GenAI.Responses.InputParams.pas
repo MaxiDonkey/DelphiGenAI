@@ -21,34 +21,42 @@ type
     /// The type of the input item.
     /// </summary>
     function &Type(const Value: TInputItemType): TItemContent; overload;
+
     /// <summary>
     /// The type of the input item.
     /// </summary>
     function &Type(const Value: string): TItemContent; overload;
+
     /// <summary>
     /// The text input to the model.
     /// </summary>
     function Text(const Value: string): TItemContent;
+
     /// <summary>
     /// The detail level of the image to be sent to the model. One of high, low, or auto. Defaults to auto.
     /// </summary>
     function Detail(const Value: TImageDetail): TItemContent; overload;
+
     /// <summary>
     /// The detail level of the image to be sent to the model. One of high, low, or auto. Defaults to auto.
     /// </summary>
     function Detail(const Value: string): TItemContent; overload;
+
     /// <summary>
     /// The ID of the file to be sent to the model.
     /// </summary>
     function FileId(const Value: string): TItemContent;
+
     /// <summary>
     /// The URL of the image to be sent to the model. A fully qualified URL or base64 encoded image in a data URL.
     /// </summary>
     function ImageUrl(const Value: string): TItemContent;
+
     /// <summary>
     /// The content of the file to be sent to the model.
     /// </summary>
     function FileData(const Value: string): TItemContent;
+
     /// <summary>
     /// The name of the file to be sent to the model.
     /// </summary>
@@ -72,24 +80,29 @@ type
     /// The role of the message input. One of user, assistant, system, or developer.
     /// </summary>
     function Role(const Value: TRole): TInputMessage; overload;
+
     /// <summary>
     /// The role of the message input. One of user, assistant, system, or developer.
     /// </summary>
     function Role(const Value: string): TInputMessage; overload;
+
     /// <summary>
     /// The type of the message input.
     /// </summary>
     function &Type(const Value: string = 'message'): TInputMessage;
+
     /// <summary>
     /// Text, image, or audio input to the model, used to generate a response. Can also contain previous
     /// assistant responses.
     /// </summary>
     function Content(const Value: string): TInputMessage; overload;
+
     /// <summary>
     /// Text, image, or audio input to the model, used to generate a response. Can also contain previous
     /// assistant responses.
     /// </summary>
     function Content(const Value: TJSONArray): TInputMessage; overload;
+
     /// <summary>
     /// Text, image, or audio input to the model, used to generate a response. Can also contain previous
     /// assistant responses.
@@ -104,26 +117,32 @@ type
     /// The role of the message input. One of user, system, or developer.
     /// </summary>
     function Role(const Value: TRole): TItemInputMessage; overload;
+
     /// <summary>
     /// The role of the message input. One of user, system, or developer.
     /// </summary>
     function Role(const Value: string): TItemInputMessage; overload;
+
     /// <summary>
     /// The type of the message input
     /// </summary>
     function &Type(const Value: string = 'message'): TItemInputMessage;
+
     /// <summary>
     /// A list of one or many input items to the model, containing different content
     /// </summary>
     function Content(const Value: string): TItemInputMessage; overload;
+
     /// <summary>
     /// A list of one or many input items to the model, containing different content
     /// </summary>
     function Content(const Value: TArray<TItemContent>): TItemInputMessage; overload;
+
     /// <summary>
     /// The status of item. One of in_progress, completed, or incomplete. Populated when items are returned via API.
     /// </summary>
     function Status(const Value: TMessageStatus): TItemInputMessage; overload;
+
     /// <summary>
     /// The status of item. One of in_progress, completed, or incomplete. Populated when items are returned via API.
     /// </summary>
@@ -137,6 +156,7 @@ type
     /// The ID of the item to reference.
     /// </summary>
     function Id(const Value: string): TInputItemReference;
+
     /// <summary>
     /// The type of item to reference. Always item_reference.
     /// </summary>
@@ -151,38 +171,47 @@ type
     /// The ID of the file.
     /// </summary>
     function FileId(const Value: string): TOutputNotation;
+
     /// <summary>
     /// The index of the file in the list of files.
     /// </summary>
     function Index(const Value: Integer): TOutputNotation;
+
     /// <summary>
     /// The type of the file citation. file_citation, url_citation or file_path
     /// </summary>
     function &Type(const Value: string): TOutputNotation;
+
     /// <summary>
     /// The index of the last character of the URL citation in the message.
     /// </summary>
     function EndIndex(const Value: Integer): TOutputNotation;
+
     /// <summary>
     /// The index of the first character of the URL citation in the message.
     /// </summary>
     function StartIndex(const Value: Integer): TOutputNotation;
+
     /// <summary>
     /// The title of the web resource.
     /// </summary>
     function Title(const Value: string): TOutputNotation;
+
     /// <summary>
     /// The URL of the web resource.
     /// </summary>
     function Url(const Value: string): TOutputNotation;
+
     /// <summary>
     /// File citation
     /// </summary>
     class function NewFileCitation: TOutputNotation;
+
     /// <summary>
     /// A path to a file.
     /// </summary>
     class function NewFilePath: TOutputNotation;
+
     /// <summary>
     /// URL citation
     /// </summary>
@@ -208,26 +237,32 @@ type
     /// The type of the output text. Always output_text.
     /// </summary>
     function &Type(const Value: string): TOutputMessageContent;
+
     /// <summary>
     /// The text output from the model.
     /// </summary>
     function Text(const Value: string): TOutputMessageContent;
+
     /// <summary>
     /// The annotations of the text output.
     /// </summary>
     function Annotations(const Value: TArray<TOutputNotation>): TOutputMessageContent;
+
     /// <summary>
     /// The refusal explanationfrom the model.
     /// </summary>
     function Refusal(const Value: string): TOutputMessageContent;
+
     /// <summary>
     /// Sets the log probabilities for the generated tokens.
     /// </summary>
     function Logprobs(const Value: TArray<TOutputLogprobs>): TOutputMessageContent;
+
     /// <summary>
     /// A text output from the model.
     /// </summary>
     class function NewOutputText: TOutputMessageContent;
+
     /// <summary>
     /// A refusal from the model.
     /// </summary>
@@ -239,28 +274,34 @@ type
     /// The unique ID of the output message.
     /// </summary>
     function Id(const Value: string): TItemOutputMessage;
+
     /// <summary>
     /// The role of the output message. Always assistant.
     /// </summary>
     function Role(const Value: TRole): TItemOutputMessage; overload;
+
     /// <summary>
     /// The role of the output message. Always assistant.
     /// </summary>
     function Role(const Value: string): TItemOutputMessage; overload;
+
     /// <summary>
     /// The status of the message input. One of in_progress, completed, or incomplete. Populated when input items
     /// are returned via API.
     /// </summary>
     function Status(const Value: TMessageStatus): TItemOutputMessage; overload;
+
     /// <summary>
     /// The status of the message input. One of in_progress, completed, or incomplete. Populated when input items
     /// are returned via API.
     /// </summary>
     function Status(const Value: string): TItemOutputMessage; overload;
+
     /// <summary>
     /// The type of the output message. Always message.
     /// </summary>
     function &Type(const Value: string = 'message'): TItemOutputMessage; overload;
+
     /// <summary>
     /// The content of the output message.
     /// </summary>
@@ -277,18 +318,22 @@ type
     /// 512 characters, booleans, or numbers.
     /// </summary>
     function Attributes(const Value: TJSONObject): TFileSearchToolCallResult;
+
     /// <summary>
     /// The unique ID of the file.
     /// </summary>
     function FileId(const Value: string): TFileSearchToolCallResult;
+
     /// <summary>
     /// The name of the file.
     /// </summary>
     function Filename(const Value: string): TFileSearchToolCallResult;
+
     /// <summary>
     /// The relevance score of the file - a value between 0 and 1.
     /// </summary>
     function Score(const Value: Double): TFileSearchToolCallResult;
+
     /// <summary>
     /// The text that was retrieved from the file.
     /// </summary>
@@ -302,22 +347,27 @@ type
     /// The unique ID of the file search tool call.
     /// </summary>
     function Id(const Value: string): TFileSearchToolCall;
+
     /// <summary>
     /// The queries used to search for files.
     /// </summary>
     function Queries(const Value: TArray<string>): TFileSearchToolCall;
+
     /// <summary>
     /// The status of the file search tool call. One of in_progress, searching, incomplete or failed,
     /// </summary>
     function Status(const Value: TFileSearchToolCallType): TFileSearchToolCall; overload;
+
     /// <summary>
     /// The status of the file search tool call. One of in_progress, searching, incomplete or failed,
     /// </summary>
     function Status(const Value: string): TFileSearchToolCall; overload;
+
     /// <summary>
     /// The type of the file search tool call. Always file_search_call.
     /// </summary>
     function &Type(const Value: string = 'file_search_call'): TFileSearchToolCall;
+
     /// <summary>
     /// The results of the file search tool call.
     /// </summary>
@@ -331,10 +381,12 @@ type
     /// The type of the pending safety check.
     /// </summary>
     function Code(const Value: string): TPendingSafetyCheck;
+
     /// <summary>
     /// The ID of the pending safety check.
     /// </summary>
     function Id(const Value: string): TPendingSafetyCheck;
+
     /// <summary>
     /// Details about the pending safety check.
     /// </summary>
@@ -346,10 +398,12 @@ type
     /// The type of the pending safety check.
     /// </summary>
     function Code(const Value: string): TAcknowledgedSafetyCheckParams;
+
     /// <summary>
     /// The ID of the pending safety check.
     /// </summary>
     function Id(const Value: string): TAcknowledgedSafetyCheckParams;
+
     /// <summary>
     /// Details about the pending safety check.
     /// </summary>
@@ -363,10 +417,12 @@ type
     /// The identifier of an uploaded file that contains the screenshot.
     /// </summary>
     function FileId(const Value: string): TComputerToolCallOutputObject;
+
     /// <summary>
     /// The URL of the screenshot image.
     /// </summary>
     function ImageUrl(const Value: string): TComputerToolCallOutputObject;
+
     /// <summary>
     /// The type of the computer tool call output. Always computer_screenshot.
     /// </summary>
@@ -382,18 +438,22 @@ type
     /// Indicates which mouse button was pressed during the click. One of left, right, wheel, back, or forward.
     /// </summary>
     function Button(const Value: TMouseButton): TComputerClick; overload;
+
     /// <summary>
     /// Indicates which mouse button was pressed during the click. One of left, right, wheel, back, or forward.
     /// </summary>
     function Button(const Value: string): TComputerClick; overload;
+
     /// <summary>
     /// Specifies the event type. For a click action, this property is always set to click.
     /// </summary>
     function &Type(const Value: string = 'click'): TComputerClick;
+
     /// <summary>
     /// The x-coordinate where the click occurred.
     /// </summary>
     function X(const Value: Integer): TComputerClick;
+
     /// <summary>
     /// The y-coordinate where the click occurred.
     /// </summary>
@@ -407,10 +467,12 @@ type
     /// Specifies the event type. For a double click action, this property is always set to double_click.
     /// </summary>
     function &Type(const Value: string = 'double_click'): TComputerDoubleClick;
+
     /// <summary>
     /// The x-coordinate where the double click occurred.
     /// </summary>
     function X(const Value: Integer): TComputerDoubleClick;
+
     /// <summary>
     /// The y-coordinate where the double click occurred.
     /// </summary>
@@ -424,6 +486,7 @@ type
     /// The x-coordinate
     /// </summary>
     function X(const Value: Integer): TComputerDragPoint;
+
     /// <summary>
     /// The y-coordinate
     /// </summary>
@@ -437,6 +500,7 @@ type
     /// Specifies the event type. For a drag action, this property is always set to drag.
     /// </summary>
     function &Type(const Value: string = 'drag'): TComputerDrag;
+
     /// <summary>
     /// An array of coordinates representing the path of the drag action. Coordinates will appear
     /// as an array of point objects.
@@ -451,6 +515,7 @@ type
     /// Specifies the event type. For a keypress action, this property is always set to keypress.
     /// </summary>
     function &Type(const Value: string = 'keypress'): TComputerKeyPressed;
+
     /// <summary>
     /// The combination of keys the model is requesting to be pressed. This is an array of strings,
     /// each representing a key.
@@ -465,10 +530,12 @@ type
     /// Specifies the event type. For a move action, this property is always set to move.
     /// </summary>
     function &Type(const Value: string = 'move'): TComputerMove;
+
     /// <summary>
     /// The x-coordinate to move to.
     /// </summary>
     function X(const Value: Integer): TComputerMove;
+
     /// <summary>
     /// The y-coordinate to move to.
     /// </summary>
@@ -491,18 +558,22 @@ type
     /// Specifies the event type. For a scroll action, this property is always set to scroll.
     /// </summary>
     function &Type(const Value: string = 'scroll'): TComputerScroll;
+
     /// <summary>
     /// The horizontal scroll distance.
     /// </summary>
     function ScrollX(const Value: Integer): TComputerScroll;
+
     /// <summary>
     /// The vertical scroll distance.
     /// </summary>
     function ScrollY(const Value: Integer): TComputerScroll;
+
     /// <summary>
     /// The x-coordinate where the scroll occurred.
     /// </summary>
     function X(const Value: Integer): TComputerScroll;
+
     /// <summary>
     /// The y-coordinate where the scroll occurred.
     /// </summary>
@@ -516,6 +587,7 @@ type
     /// Specifies the event type. For a type action, this property is always set to type.
     /// </summary>
     function &Type(const Value: string = 'type'): TComputerType;
+
     /// <summary>
     /// The text to type.
     /// </summary>
@@ -538,26 +610,32 @@ type
     /// acknowledged safety checks for computer tool call outpu
     /// </summary>
     function AcknowledgedSafetyChecks(const Value: TArray<TAcknowledgedSafetyCheckParams>): TComputerToolCallOutput;
+
     /// <summary>
     /// The ID of the computer tool call that produced the output.
     /// </summary>
     function CallId(const Value: string): TComputerToolCallOutput;
+
     /// <summary>
     /// The unique ID of the computer tool call.
     /// </summary>
     function Id(const Value: string): TComputerToolCallOutput;
+
     /// <summary>
     /// The output of a computer tool call.
     /// </summary>
     function Output(const Value: TComputerToolCallOutputObject): TComputerToolCallOutput;
+
     /// <summary>
     /// The status of the file search tool call. One of in_progress, searching, incomplete or failed
     /// </summary>
     function Status(const Value: TMessageStatus): TComputerToolCallOutput; overload;
+
     /// <summary>
     /// The status of the file search tool call. One of in_progress, searching, incomplete or failed
     /// </summary>
     function Status(const Value: string): TComputerToolCallOutput; overload;
+
     /// <summary>
     /// The type of the computer tool call output. Always computer_call_output.
     /// </summary>
@@ -577,26 +655,32 @@ type
     /// </para>
     /// </remarks>
     function Action(const Value: TComputerToolCallAction): TComputerToolCall;
+
     /// <summary>
     /// An identifier used when responding to the tool call with output.
     /// </summary>
     function CallId(const Value: string): TComputerToolCall;
+
     /// <summary>
     /// The unique ID of the computer call.
     /// </summary>
     function Id(const Value: string): TComputerToolCall;
+
     /// <summary>
     /// The pending safety checks for the computer call.
     /// </summary>
     function PendingSafetyChecks(const Value: TArray<TPendingSafetyCheck>): TComputerToolCall;
+
     /// <summary>
     /// The status of the item. One of in_progress, completed, or incomplete. Populated when items are returned via API.
     /// </summary>
     function Status(const Value: TMessageStatus): TComputerToolCall; overload;
+
     /// <summary>
     /// The status of the item. One of in_progress, completed, or incomplete. Populated when items are returned via API.
     /// </summary>
     function Status(const Value: string): TComputerToolCall; overload;
+
     /// <summary>
     /// The type of the computer call. Always computer_call.
     /// </summary>
@@ -610,14 +694,17 @@ type
     /// The unique ID of the web search tool call.
     /// </summary>
     function Id(const Value: string): TWebSearchToolCall;
+
     /// <summary>
     /// The status of the web search tool call. One of in_progress, searching, incomplete or failed
     /// </summary>
     function Status(const Value: TMessageStatus): TWebSearchToolCall; overload;
+
     /// <summary>
     /// The status of the web search tool call. One of in_progress, searching, incomplete or failed
     /// </summary>
     function Status(const Value: string): TWebSearchToolCall; overload;
+
     /// <summary>
     /// The type of the web search tool call. Always web_search_call.
     /// </summary>
@@ -631,26 +718,32 @@ type
     /// A JSON string of the arguments to pass to the function.
     /// </summary>
     function Arguments(const Value: string): TFunctionToolCall;
+
     /// <summary>
     /// The unique ID of the function tool call generated by the model.
     /// </summary>
     function CallId(const Value: string): TFunctionToolCall;
+
     /// <summary>
     /// The unique ID of the function tool call.
     /// </summary>
     function Id(const Value: string): TFunctionToolCall;
+
     /// <summary>
     /// The name of the function to run.
     /// </summary>
     function Name(const Value: string): TFunctionToolCall;
+
     /// <summary>
     /// The status of the item. One of in_progress, completed, or incomplete. Populated when items are returned via API.
     /// </summary>
     function Status(const Value: TMessageStatus): TFunctionToolCall; overload;
+
     /// <summary>
     /// The status of the item. One of in_progress, completed, or incomplete. Populated when items are returned via API.
     /// </summary>
     function Status(const Value: string): TFunctionToolCall; overload;
+
     /// <summary>
     /// The type of the function tool call. Always function_call.
     /// </summary>
@@ -664,22 +757,27 @@ type
     /// The unique ID of the function tool call generated by the model.
     /// </summary>
     function CallId(const Value: string): TFunctionToolCalloutput;
+
     /// <summary>
     /// The name of the function tool call
     /// </summary>
     function Id(const Value: string): TFunctionToolCalloutput;
+
     /// <summary>
     /// A JSON string of the output of the function tool call.
     /// </summary>
     function Output(const Value: string): TFunctionToolCalloutput;
+
     /// <summary>
     /// The status of the item. One of in_progress, completed, or incomplete. Populated when items are returned via API.
     /// </summary>
     function Status(const Value: TMessageStatus): TFunctionToolCalloutput; overload;
+
     /// <summary>
     /// The status of the item. One of in_progress, completed, or incomplete. Populated when items are returned via API.
     /// </summary>
     function Status(const Value: string): TFunctionToolCalloutput; overload;
+
     /// <summary>
     /// The type of the function tool call output. Always function_call_output.
     /// </summary>
@@ -693,6 +791,7 @@ type
     /// A short summary of the reasoning used by the model when generating the response.
     /// </summary>
     function Text(const Value: string): TReasoningTextContent;
+
     /// <summary>
     /// The type of the object. Always summary_text.
     /// </summary>
@@ -706,23 +805,28 @@ type
     /// The unique identifier of the reasoning content.
     /// </summary>
     function Id(const Value: string): TReasoningObject;
+
     /// <summary>
     /// The status of the item. One of in_progress, completed, or incomplete. Populated when items are returned via API.
     /// </summary>
     function Status(const Value: TMessageStatus): TReasoningObject; overload;
+
     /// <summary>
     /// The status of the item. One of in_progress, completed, or incomplete. Populated when items are returned via API.
     /// </summary>
     function Status(const Value: string): TReasoningObject; overload;
+
     /// <summary>
     /// Reasoning text contents.
     /// </summary>
     function Summary(const Value: TArray<TReasoningTextContent>): TReasoningObject;
+
     /// <summary>
     /// The encrypted content of the reasoning item - populated when a response is generated with
     /// reasoning.encrypted_content in the include parameter.
     /// </summary>
     function EncryptedContent(const Value: string): TReasoningObject;
+
     /// <summary>
     /// The type of the object. Always reasoning.
     /// </summary>
@@ -736,18 +840,22 @@ type
     /// The unique ID of the image generation call.
     /// </summary>
     function Id(const Value: string): TImageGeneration;
+
     /// <summary>
     /// The generated image encoded in base64.
     /// </summary>
     function Result(const Value: string): TImageGeneration;
+
     /// <summary>
     /// The status of the item. One of in_progress, completed, or incomplete. Populated when items are returned via API.
     /// </summary>
     function Status(const Value: TMessageStatus): TImageGeneration; overload;
+
     /// <summary>
     /// The status of the item. One of in_progress, completed, or incomplete. Populated when items are returned via API.
     /// </summary>
     function Status(const Value: string): TImageGeneration; overload;
+
     /// <summary>
     /// The type of the image generation call. Always image_generation_call.
     /// </summary>
@@ -763,6 +871,7 @@ type
     /// The type of the code interpreter text output. Always logs.
     /// </summary>
     function &Type(const Value: string = 'logs'): TCodeInterpreterTextOutput;
+
     /// <summary>
     /// The logs of the code interpreter tool call.
     /// </summary>
@@ -776,6 +885,7 @@ type
     /// The ID of the file.
     /// </summary>
     function FileId(const Value: string): TCodeInterpreterFile;
+
     /// <summary>
     /// The MIME type of the file.
     /// </summary>
@@ -789,6 +899,7 @@ type
     /// The type of the code interpreter file output. Always files.
     /// </summary>
     function &Type(const Value: string = 'files'): TCodeInterpreterFileOutput;
+
     /// <summary>
     /// Files of the output of a code interpreter tool call
     /// </summary>
@@ -802,26 +913,32 @@ type
     /// The code to run.
     /// </summary>
     function Code(const Value: string): TCodeInterpreterToolCall;
+
     /// <summary>
     /// The unique ID of the code interpreter tool call.
     /// </summary>
     function Id(const Value: string): TCodeInterpreterToolCall;
+
     /// <summary>
     /// The results of the code interpreter tool call.
     /// </summary>
     function Results(const Value: TArray<TCodeInterpreterToolCallResult>): TCodeInterpreterToolCall;
+
     /// <summary>
     /// The status of the item. One of in_progress, completed, or incomplete. Populated when items are returned via API.
     /// </summary>
     function Status(const Value: TMessageStatus): TCodeInterpreterToolCall; overload;
+
     /// <summary>
     /// The status of the item. One of in_progress, completed, or incomplete. Populated when items are returned via API.
     /// </summary>
     function Status(const Value: string): TCodeInterpreterToolCall; overload;
+
     /// <summary>
     /// The type of the code interpreter tool call. Always code_interpreter_call.
     /// </summary>
     function &Type(const Value: string = 'code_interpreter_call'): TCodeInterpreterToolCall;
+
     /// <summary>
     /// The ID of the container used to run the code.
     /// </summary>
@@ -835,22 +952,27 @@ type
     /// The command to run.
     /// </summary>
     function Command(const Value: string): TLocalShellCallAction;
+
     /// <summary>
     /// Environment variables to set for the command.
     /// </summary>
     function Env(const Value: TJsonObject): TLocalShellCallAction;
+
     /// <summary>
     /// The type of the local shell action. Always exec.
     /// </summary>
     function &Type(const Value: string = 'exec'): TLocalShellCallAction;
+
     /// <summary>
     /// Optional timeout in milliseconds for the command.
     /// </summary>
     function TimeoutMs(const Value: Integer): TLocalShellCallAction;
+
     /// <summary>
     /// Optional user to run the command as.
     /// </summary>
     function User(const Value: string): TLocalShellCallAction;
+
     /// <summary>
     /// Optional working directory to run the command in.
     /// </summary>
@@ -864,22 +986,27 @@ type
     /// Execute a shell command on the server.
     /// </summary>
     function Action(const Value: TLocalShellCallAction): TLocalShellCall;
+
     /// <summary>
     /// The unique ID of the local shell tool call generated by the model.
     /// </summary>
     function CallId(const Value: string): TLocalShellCall;
+
     /// <summary>
     /// The unique ID of the local shell call.
     /// </summary>
     function Id(const Value: string): TLocalShellCall;
+
     /// <summary>
     /// The status of the item. One of in_progress, completed, or incomplete. Populated when items are returned via API.
     /// </summary>
     function Status(const Value: TMessageStatus): TLocalShellCall; overload;
+
     /// <summary>
     /// The status of the item. One of in_progress, completed, or incomplete. Populated when items are returned via API.
     /// </summary>
     function Status(const Value: string): TLocalShellCall; overload;
+
     /// <summary>
     /// The type of the local shell call. Always local_shell_call.
     /// </summary>
@@ -893,18 +1020,22 @@ type
     /// The unique ID of the local shell tool call generated by the model.
     /// </summary>
     function Id(const Value: string): TLocalShellCallOutput;
+
     /// <summary>
     /// A JSON string of the output of the local shell tool call.
     /// </summary>
     function Output(const Value: string): TLocalShellCallOutput;
+
     /// <summary>
     /// The status of the item. One of in_progress, completed, or incomplete. Populated when items are returned via API.
     /// </summary>
     function Status(const Value: TMessageStatus): TLocalShellCallOutput; overload;
+
     /// <summary>
     /// The status of the item. One of in_progress, completed, or incomplete. Populated when items are returned via API.
     /// </summary>
     function Status(const Value: string): TLocalShellCallOutput; overload;
+
     /// <summary>
     /// The type of the local shell tool call output. Always local_shell_call_output.
     /// </summary>
@@ -918,22 +1049,27 @@ type
     /// The JSON schema as TSchemaParams describing the tool's input.
     /// </summary>
     function InputSchema(const Value: TSchemaParams): TMCPTools; overload;
+
     /// <summary>
     /// The JSON schema as TJSONObject describing the tool's input.
     /// </summary>
     function InputSchema(const Value: TJSONObject): TMCPTools; overload;
+
     /// <summary>
     /// The JSON schema as string describing the tool's input.
     /// </summary>
     function InputSchema(const Value: string): TMCPTools; overload;
+
     /// <summary>
     /// The name of the tool.
     /// </summary>
     function Name(const Value: string): TMCPTools;
+
     /// <summary>
     /// Additional annotations about the tool.
     /// </summary>
     function Annotations(const Value: TJSONObject): TMCPTools;
+
     /// <summary>
     /// The description of the tool.
     /// </summary>
@@ -947,18 +1083,22 @@ type
     /// The unique ID of the list.
     /// </summary>
     function Id(const Value: string): TMCPListTools;
+
     /// <summary>
     /// The label of the MCP server.
     /// </summary>
     function ServerLabel(const Value: string): TMCPListTools;
+
     /// <summary>
     /// The tools available on the server.
     /// </summary>
     function Tools(const Value: TArray<TMCPTools>): TMCPListTools;
+
     /// <summary>
     /// The type of the item. Always mcp_list_tools.
     /// </summary>
     function &Type(const Value: string = 'mcp_list_tools'): TMCPListTools;
+
     /// <summary>
     /// Error message if the server could not list tools.
     /// </summary>
@@ -972,18 +1112,22 @@ type
     /// A JSON string of arguments for the tool.
     /// </summary>
     function Arguments(const Value: string): TMCPApprovalRequest;
+
     /// <summary>
     /// The unique ID of the approval request.
     /// </summary>
     function Id(const Value: string): TMCPApprovalRequest;
+
     /// <summary>
     /// The name of the tool to run.
     /// </summary>
     function Name(const Value: string): TMCPApprovalRequest;
+
     /// <summary>
     /// The label of the MCP server making the request.
     /// </summary>
     function ServerLabel(const Value: string): TMCPApprovalRequest;
+
     /// <summary>
     /// The type of the item. Always mcp_approval_request.
     /// </summary>
@@ -997,18 +1141,22 @@ type
     /// The ID of the approval request being answered.
     /// </summary>
     function ApprovalRequestId(const Value: string): TMCPApprovalResponse;
+
     /// <summary>
     /// Whether the request was approved.
     /// </summary>
     function Approve(const Value: Boolean): TMCPApprovalResponse;
+
     /// <summary>
     /// The type of the item. Always mcp_approval_response.
     /// </summary>
     function &Type(const Value: string = 'mcp_approval_response'): TMCPApprovalResponse;
+
     /// <summary>
     /// The unique ID of the approval response
     /// </summary>
     function Id(const Value: string): TMCPApprovalResponse;
+
     /// <summary>
     /// Optional reason for the decision.
     /// </summary>
@@ -1022,26 +1170,32 @@ type
     /// A JSON string of the arguments passed to the tool.
     /// </summary>
     function Arguments(const Value: string): TMCPToolCall;
+
     /// <summary>
     /// The unique ID of the tool call.
     /// </summary>
     function Id(const Value: string): TMCPToolCall;
+
     /// <summary>
     /// The name of the tool that was run.
     /// </summary>
     function Name(const Value: string): TMCPToolCall;
+
     /// <summary>
     /// The label of the MCP server running the tool.
     /// </summary>
     function ServerLabel(const Value: string): TMCPToolCall;
+
     /// <summary>
     /// The type of the item. Always mcp_call.
     /// </summary>
     function &Type(const Value: string = 'mcp_call'): TMCPToolCall;
+
     /// <summary>
     /// The error from the tool call, if any.
     /// </summary>
     function Error(const Value: string): TMCPToolCall;
+
     /// <summary>
     /// The output from the tool call.
     /// </summary>
@@ -1059,6 +1213,7 @@ type
     /// o-series models only
     /// </remarks>
     function Effort(const Value: TReasoningEffort): TReasoningParams; overload;
+
     /// <summary>
     /// Constrains effort on reasoning for reasoning models. Currently supported values are low, medium, and high.
     /// Reducing reasoning effort can result in faster responses and fewer tokens used on reasoning in a response.
@@ -1067,11 +1222,13 @@ type
     /// o-series models only
     /// </remarks>
     function Effort(const Value: string): TReasoningParams; overload;
+
     /// <summary>
     /// A summary of the reasoning performed by the model. This can be useful for debugging and understanding the
     /// model's reasoning process. One of concise or detailed.
     /// </summary>
     function Summary(const Value: TReasoningGenerateSummary): TReasoningParams; overload;
+
     /// <summary>
     /// A summary of the reasoning performed by the model. This can be useful for debugging and understanding the
     /// model's reasoning process. One of concise or detailed.
@@ -1101,24 +1258,29 @@ type
     /// A description of what the response format is for, used by the model to determine how to respond in the format.
     /// </summary>
     function Description(const Value: string): TTextJSONSchemaParams;
+
     /// <summary>
     /// The name of the response format. Must be a-z, A-Z, 0-9, or contain underscores and dashes, with a maximum length of 64.
     /// </summary>
     function Name(const Value: string): TTextJSONSchemaParams;
+
     /// <summary>
     /// The schema for the response format, described as a JSON Schema object. Learn how to build JSON schemas here.
     /// </summary>
     function Schema(const Value: TSchemaParams): TTextJSONSchemaParams; overload;
+
     /// <summary>
     /// The schema for the response format, described as a JSON Schema object. Learn how to build JSON schemas here.
     /// </summary>
     function Schema(const Value: string): TTextJSONSchemaParams; overload;
+
     /// <summary>
     /// Whether to enable strict schema adherence when generating the output. If set to true, the model will always
     /// follow the exact schema defined in the schema field. Only a subset of JSON Schema is supported when strict
     /// is true.
     /// </summary>
     function Strict(const Value: Boolean): TTextJSONSchemaParams;
+
     /// <summary>
     /// The type of response format being defined. Always json_schema.
     /// </summary>
@@ -1177,6 +1339,7 @@ type
     /// </para>
     /// </summary>
     function &Type(const Value: THostedTooltype): THostedToolParams; overload;
+
     /// <summary>
     /// The type of hosted tool the model should to use. Learn more about built-in tools.
     /// <para>
@@ -1202,6 +1365,7 @@ type
     /// The name of the function to call.
     /// </summary>
     function Name(const Value: string): TFunctionToolParams;
+
     /// <summary>
     /// For function calling, the type is always function.
     /// </summary>
@@ -1220,6 +1384,7 @@ type
     /// The key to compare against the value.
     /// </summary>
     function Key(const Value: string): TComparisonFilter;
+
     /// <summary>
     /// Specifies the comparison operator: eq, ne, gt, gte, lt, lte.
     /// </summary>
@@ -1244,6 +1409,7 @@ type
     /// </para>
     /// </remarks>
     function &Type(const Value: TComparisonFilterType): TComparisonFilter; overload;
+
     /// <summary>
     /// Specifies the comparison operator: eq, ne, gt, gte, lt, lte.
     /// </summary>
@@ -1268,6 +1434,7 @@ type
     /// </para>
     /// </remarks>
     function &Type(const Value: string): TComparisonFilter; overload;
+
     /// <summary>
     /// Uses text for comparison
     /// <para>
@@ -1275,18 +1442,22 @@ type
     /// </para>
     /// </summary>
     function Comparison(const Value: string): TComparisonFilter;
+
     /// <summary>
     /// The value to compare against the attribute key; supports string, number, or boolean types.
     /// </summary>
     function Value(const Value: string): TComparisonFilter; overload;
+
     /// <summary>
     /// The value to compare against the attribute key; supports string, number, or boolean types.
     /// </summary>
     function Value(const Value: Integer): TComparisonFilter; overload;
+
     /// <summary>
     /// The value to compare against the attribute key; supports string, number, or boolean types.
     /// </summary>
     function Value(const Value: Double): TComparisonFilter; overload;
+
     /// <summary>
     /// The value to compare against the attribute key; supports string, number, or boolean types.
     /// </summary>
@@ -1306,6 +1477,7 @@ type
     function &Type(const Value: TCompoundFilterType): TCompoundFilter;
     function &And: TCompoundFilter; overload;
     function &Or: TCompoundFilter; overload;
+
     /// <summary>
     /// Array of filters to combine. Items can be ComparisonFilter or CompoundFilter.
     /// </summary>
@@ -1327,6 +1499,7 @@ type
     /// The IDs of the vector stores to search.
     /// </summary>
     function VectorStoreIds(const Value: TArray<string>): TResponseFileSearchParams;
+
     /// <summary>
     /// A filter to apply based on file attributes.
     /// </summary>
@@ -1334,14 +1507,17 @@ type
     /// Value is TFileSearchFilters or his descendant e.g. TComparisonFilter, TCompoundFilter
     /// </remarks>
     function Filters(const Value: TFileSearchFilters): TResponseFileSearchParams;
+
     /// <summary>
     /// The maximum number of results to return. This number should be between 1 and 50 inclusive
     /// </summary>
     function MaxNumResults(const Value: Integer): TResponseFileSearchParams;
+
     /// <summary>
     /// Ranking options for search.
     /// </summary>
     function RankingOptions(const Value: TRankingOptionsParams): TResponseFileSearchParams;
+
     /// <summary>
     /// The type of the file search tool. Always file_search.
     /// </summary>
@@ -1355,22 +1531,27 @@ type
     /// A description of the function. Used by the model to determine whether or not to call the function.
     /// </summary>
     function Description(const Value: string): TResponseFunctionParams;
+
     /// <summary>
     /// The name of the function to call.
     /// </summary>
     function Name(const Value: string): TResponseFunctionParams;
+
     /// <summary>
     /// A JSON schema object describing the parameters of the function.
     /// </summary>
     function Parameters(const Value: TSchemaParams): TResponseFunctionParams; overload;
+
     /// <summary>
     /// A JSON schema object describing the parameters of the function.
     /// </summary>
     function Parameters(const Value: string): TResponseFunctionParams; overload;
+
     /// <summary>
     /// Whether to enforce strict parameter validation. Default true.
     /// </summary>
     function Strict(const Value: Boolean): TResponseFunctionParams;
+
     /// <summary>
     /// The type of the function tool. Always function.
     /// </summary>
@@ -1385,14 +1566,17 @@ type
     /// The height of the computer display
     /// </summary>
     function DisplayHeight(const Value: Integer): TResponseComputerUseParams;
+
     /// <summary>
     /// The width of the computer display.
     /// </summary>
     function DisplayWidth(const Value: Integer): TResponseComputerUseParams;
+
     /// <summary>
     /// The type of computer environment to control.
     /// </summary>
     function Environment(const Value: string): TResponseComputerUseParams;
+
     /// <summary>
     /// The type of the computer use tool. Always computer_use_preview.
     /// </summary>
@@ -1406,18 +1590,22 @@ type
     /// Free text input for the city of the user, e.g. San Francisco.
     /// </summary>
     function City(const Value: string): TResponseUserLocationParams;
+
     /// <summary>
     /// The two-letter ISO country code of the user, e.g. US.
     /// </summary>
     function Country(const Value: string): TResponseUserLocationParams;
+
     /// <summary>
     /// Free text input for the region of the user, e.g. California.
     /// </summary>
     function Region(const Value: string): TResponseUserLocationParams;
+
     /// <summary>
     /// The IANA timezone of the user, e.g. America/Los_Angeles.
     /// </summary>
     function Timezone(const Value: string): TResponseUserLocationParams;
+
     /// <summary>
     /// The type of location approximation. Always approximate.
     /// </summary>
@@ -1432,15 +1620,18 @@ type
     /// One of low, medium, or high. medium is the default.
     /// </summary>
     function SearchContextSize(const Value: TSearchWebOptions): TResponseWebSearchParams; overload;
+
     /// <summary>
     /// High level guidance for the amount of context window space to use for the search.
     /// One of low, medium, or high. medium is the default.
     /// </summary>
     function SearchContextSize(const Value: string = 'medium'): TResponseWebSearchParams; overload;
+
     /// <summary>
     /// Approximate location parameters for the search.
     /// </summary>
     function UserLocation(const Value: TResponseUserLocationParams): TResponseWebSearchParams;
+
     /// <summary>
     /// The type of the web search tool. One of:
     /// <para>
@@ -1451,6 +1642,7 @@ type
     /// </para>
     /// </summary>
     function &Type(const Value: TWebSearchType): TResponseWebSearchParams; overload;
+
     /// <summary>
     /// The type of the web search tool. One of:
     /// <para>
@@ -1484,6 +1676,7 @@ type
     /// A list of tools that always require approval.
     /// </summary>
     function Always(const Value: TArray<string>): TMCPRequireApprovalParams;
+
     /// <summary>
     /// A list of tools that never require approval.
     /// </summary>
@@ -1497,30 +1690,37 @@ type
     /// A label for this MCP server, used to identify it in tool calls.
     /// </summary>
     function ServerLabel(const Value: string): TResponseMCPToolParams;
+
     /// <summary>
     /// The URL for the MCP server.
     /// </summary>
     function ServerUrl(const Value: string): TResponseMCPToolParams;
+
     /// <summary>
     /// The type of the MCP tool. Always mcp.
     /// </summary>
     function &Type(const Value: string = 'mcp'): TResponseMCPToolParams;
+
     /// <summary>
     /// Allowed tool names or a filter object.
     /// </summary>
     function AllowedTools(const Value: TArray<string>): TResponseMCPToolParams; overload;
+
     /// <summary>
     /// Allowed tool names or a filter object.
     /// </summary>
     function AllowedTools(const Value: TMCPAllowedToolsParams): TResponseMCPToolParams; overload;
+
     /// <summary>
     /// List of allowed tool names or a filter object.
     /// </summary>
     function AllowedTools(const Value: TArray<TMCPAllowedToolsParams>): TResponseMCPToolParams; overload;
+
     /// <summary>
     /// Optional HTTP headers to send to the MCP server. Use for authentication or other purposes.
     /// </summary>
     function Headers(const Value: TJSONObject): TResponseMCPToolParams;
+
     /// <summary>
     /// Specify which of the MCP server's tools require approval.
     /// </summary>
@@ -1529,6 +1729,7 @@ type
     /// all tools will require approval. When set to never, all tools will not require approval.
     /// </remarks>
     function RequireApproval(const Value: string = 'always'): TResponseMCPToolParams; overload;
+
     /// <summary>
     /// Specify which of the MCP server's tools require approval.
     /// </summary>
@@ -1542,6 +1743,7 @@ type
     /// Always auto
     /// </summary>
     function &Type(const Value: string = 'auto'): TCodeInterpreterContainerAutoParams;
+
     /// <summary>
     /// An optional list of uploaded files to make available to your code.
     /// </summary>
@@ -1556,11 +1758,13 @@ type
     /// to make available to your code.
     /// </summary>
     function Container(const Value: string): TResponseCodeInterpreterParams; overload;
+
     /// <summary>
     /// The code interpreter container. Can be a container ID or an object that specifies uploaded file IDs
     /// to make available to your code.
     /// </summary>
     function Container(const Value: TCodeInterpreterContainerAutoParams): TResponseCodeInterpreterParams; overload;
+
     /// <summary>
     /// The type of the code interpreter tool. Always code_interpreter.
     /// </summary>
@@ -1574,6 +1778,7 @@ type
     /// File ID for the mask image.
     /// </summary>
     function FileId(const Value: string): TInputImageMaskParams;
+
     /// <summary>
     /// Base64-encoded mask image.
     /// </summary>
@@ -1587,54 +1792,67 @@ type
     /// The type of the image generation tool. Always image_generation.
     /// </summary>
     function &Type(const Value: string = 'image_generation'): TResponseImageGenerationParams;
+
     /// <summary>
     /// Background type for the generated image. One of transparent, opaque, or auto. Default: auto.
     /// </summary>
     function Background(const Value: string): TResponseImageGenerationParams; overload;
+
     /// <summary>
     /// Background type for the generated image. One of transparent, opaque, or auto. Default: auto.
     /// </summary>
     function Background(const Value: TBackGroundType): TResponseImageGenerationParams; overload;
+
     /// <summary>
     /// Optional mask for inpainting. Contains image_url (string, optional) and file_id (string, optional).
     /// </summary>
     function InputImageMask(const Value: TInputImageMaskParams): TResponseImageGenerationParams;
+
     /// <summary>
     /// The image generation model to use. Default: gpt-image-1.
     /// </summary>
     function Model(const Value: string): TResponseImageGenerationParams;
+
     /// <summary>
     /// Moderation level for the generated image. Default: auto.
     /// </summary>
     function Moderation(const Value: string): TResponseImageGenerationParams;
+
     /// <summary>
     /// Compression level for the output image. Default: 100.
     /// </summary>
     function OutputCompression(const Value: Integer): TResponseImageGenerationParams;
+
     /// <summary>
     /// The output format of the generated image. One of png, webp, or jpeg. Default: png.
     /// </summary>
     function OutputFormat(const Value: string): TResponseImageGenerationParams; overload;
+
     /// <summary>
     /// The output format of the generated image. One of png, webp, or jpeg. Default: png.
     /// </summary>
     function OutputFormat(const Value: TOutputFormatType): TResponseImageGenerationParams; overload;
+
     /// <summary>
     /// Number of partial images to generate in streaming mode, from 0 (default value) to 3.
     /// </summary>
     function PartialImages(const Value: Integer): TResponseImageGenerationParams;
+
     /// <summary>
     /// The quality of the generated image. One of low, medium, high, or auto. Default: auto.
     /// </summary>
     function Quality(const Value: string): TResponseImageGenerationParams; overload;
+
     /// <summary>
     /// The quality of the generated image. One of low, medium, high, or auto. Default: auto.
     /// </summary>
     function Quality(const Value: TImageQualityType): TResponseImageGenerationParams; overload;
+
     /// <summary>
     /// The size of the generated image. One of 1024x1024, 1024x1536, 1536x1024, or auto. Default: auto.
     /// </summary>
     function Size(const Value: string): TResponseImageGenerationParams; overload;
+
     /// <summary>
     /// The size of the generated image. One of 1024x1024, 1024x1536, 1536x1024, or auto. Default: auto.
     /// </summary>
@@ -1657,6 +1875,7 @@ type
     /// Text, image, or file inputs to the model, used to generate a response.
     /// </summary>
     function Input(const Value: string): TResponsesParams; overload;
+
     /// <summary>
     /// Text, image, or file inputs to the model, used to generate a response.
     /// </summary>
@@ -1665,6 +1884,7 @@ type
     /// TItemOutputMessage, TFileSearchToolCall, TComputerToolCall
     /// </param>
     function Input(const Value: TArray<TInputListItem>): TResponsesParams; overload;
+
     /// <summary>
     /// Text, image, or file inputs to the model, used to generate a response.
     /// </summary>
@@ -1672,6 +1892,7 @@ type
     /// Value is TJSONArray
     /// </param>
     function Input(const Value: TJSONArray): TResponsesParams; overload;
+
     /// <summary>
     /// Method to create a user default role message payload with multiple document references
     /// (images and/or PDF)-local or distant documents.
@@ -1683,16 +1904,19 @@ type
     /// An array of document paths to include. Only for images.
     /// </param>
     function Input(const Content: string; const Docs: TArray<string>; const Role: string = 'user'): TResponsesParams; overload;
+
     /// <summary>
     /// Model ID used to generate the response, like gpt-4o or o1. OpenAI offers a wide range of models
     /// with different capabilities, performance characteristics, and price points. Refer to the model
     /// guide to browse and compare available models.
     /// </summary>
     function Model(const Value: string): TResponsesParams;
+
     /// <summary>
     /// Whether to run the model response in the background.
     /// </summary>
     function Background(const Value: Boolean): TResponsesParams;
+
     /// <summary>
     /// Specify additional output data to include in the model response. Currently supported values are:
     /// <para>
@@ -1706,6 +1930,7 @@ type
     /// </para>
     /// </summary>
     function Include(const Value: TArray<TOutputIncluding>): TResponsesParams; overload;
+
     /// <summary>
     /// Specify additional output data to include in the model response. Currently supported values are:
     /// <para>
@@ -1719,6 +1944,7 @@ type
     /// </para>
     /// </summary>
     function Include(const Value: TArray<string>): TResponsesParams; overload;
+
     /// <summary>
     /// Inserts a system (or developer) message as the first item in the model's context.
     /// </summary>
@@ -1727,11 +1953,13 @@ type
     /// over to the next response. This makes it simple to swap out system (or developer) messages in new responses.
     /// </remarks>
     function Instructions(const Value: string): TResponsesParams;
+
     /// <summary>
     /// An upper bound for the number of tokens that can be generated for a response, including visible output tokens
     /// and reasoning tokens.
     /// </summary>
     function MaxOutputTokens(const Value: Integer): TResponsesParams;
+
     /// <summary>
     /// Set of 16 key-value pairs that can be attached to an object. This can be useful for storing additional information
     /// about the object in a structured format, and querying for objects via API or the dashboard.
@@ -1740,23 +1968,28 @@ type
     /// Keys are strings with a maximum length of 64 characters. Values are strings with a maximum length of 512 characters.
     /// </remarks>
     function Metadata(const Value: TJSONObject): TResponsesParams;
+
     /// <summary>
     /// Whether to allow the model to run tool calls in parallel.
     /// </summary>
     function ParallelToolCalls(const Value: Boolean): TResponsesParams;
+
     /// <summary>
     /// The unique ID of the previous response to the model. Use this to create multi-turn conversations. Learn more about
     /// conversation state.
     /// </summary>
     function PreviousResponseId(const Value: string): TResponsesParams;
+
     /// <summary>
     /// o-series models only. Configuration options for reasoning models.
     /// </summary>
     function Reasoning(const Value: TReasoningParams): TResponsesParams; overload;
+
     /// <summary>
     /// o-series models only. Configuration options for reasoning models.
     /// </summary>
     function Reasoning(const Value: string): TResponsesParams; overload;
+
     /// <summary>
     /// Specifies the latency tier to use for processing the request. This parameter is relevant for
     /// customers subscribed to the scale tier service:
@@ -1781,20 +2014,24 @@ type
     /// When this parameter is set, the response body will include the service_tier utilized.
     /// </summary>
     function ServiceTier(const Value: string): TResponsesParams;
+
     /// <summary>
     /// Whether to store the generated model response for later retrieval via API.
     /// </summary>
     function Store(const Value: Boolean = True): TResponsesParams;
+
     /// <summary>
     /// if set to true, the model response data will be streamed to the client as it is generated using server-sent events.
     /// </summary>
     function Stream(const Value: Boolean = True): TResponsesParams;
+
     /// <summary>
     /// What sampling temperature to use, between 0 and 2. Higher values like 0.8 will make the output more random, while
     /// lower values like 0.2 will make it more focused and deterministic. We generally recommend altering this or top_p
     /// but not both.
     /// </summary>
     function Temperature(const Value: Double): TResponsesParams;
+
     /// <summary>
     /// Configuration options for a text response from the model. Can be plain text or structured JSON data. Learn more:
     /// <para>
@@ -1805,6 +2042,7 @@ type
     /// </para>
     /// </summary>
     function Text(const Value: TTextParams): TResponsesParams; overload;
+
     /// <summary>
     /// Configuration options for a text response from the model. Can be plain text or structured JSON data. Learn more:
     /// <para>
@@ -1819,6 +2057,7 @@ type
     /// TTextParams
     /// </remarks>
     function Text(const Value: TTextFormatParams): TResponsesParams; overload;
+
     /// <summary>
     /// Configuration options for a text response from the model. Can be plain text or structured JSON data. Learn more:
     /// <para>
@@ -1829,6 +2068,7 @@ type
     /// </para>
     /// </summary>
     function Text(const Value: string; const SchemaParams: TTextJSONSchemaParams = nil): TResponsesParams; overload;
+
     /// <summary>
     /// Configuration options for a text response from the model. Can be plain text or structured JSON data. Learn more:
     /// <para>
@@ -1839,11 +2079,13 @@ type
     /// </para>
     /// </summary>
     function Text(const Value: TResponseOption; const SchemaParams: TTextJSONSchemaParams = nil): TResponsesParams; overload;
+
     /// <summary>
     /// How the model should select which tool (or tools) to use when generating a response. See the tools parameter
     /// to see how to specify which tools the model can call.
     /// </summary>
     function ToolChoice(const Value: TToolChoice): TResponsesParams; overload;
+
     /// <summary>
     /// How the model should select which tool (or tools) to use when generating a response. See the tools parameter
     /// to see how to specify which tools the model can call.
@@ -1861,6 +2103,7 @@ type
     /// </para>
     /// </remarks>
     function ToolChoice(const Value: string): TResponsesParams; overload;
+
     /// <summary>
     /// How the model should select which tool (or tools) to use when generating a response. See the tools parameter
     /// to see how to specify which tools the model can call.
@@ -1869,6 +2112,7 @@ type
     /// Value is TResponseToolChoiceParams or his descendant e.g. THostedToolParams, TFunctionToolParams
     /// </remarks>
     function ToolChoice(const Value: TResponseToolChoiceParams): TResponsesParams; overload;
+
     /// <summary>
     /// An array of tools the model may call while generating a response. You can specify which tool to use by setting
     /// the tool_choice parameter.
@@ -1891,6 +2135,7 @@ type
     /// </para>
     /// </remarks>
     function Tools(const Value: TArray<TResponseToolParams>): TResponsesParams; overload;
+
     /// <summary>
     /// An alternative to sampling with temperature, called nucleus sampling, where the model considers the results of
     /// the tokens with top_p probability mass. So 0.1 means only the tokens comprising the top 10% probability mass
@@ -1900,6 +2145,7 @@ type
     /// We generally recommend altering this or temperature but not both.
     /// </remarks>
     function TopP(const Value: Double): TResponsesParams;
+
     /// <summary>
     /// The truncation strategy to use for the model response.
     /// </summary>
@@ -1914,6 +2160,7 @@ type
     /// </para>
     /// </remarks>
     function Truncation(const Value: TResponseTruncationType): TResponsesParams; overload;
+
     /// <summary>
     /// The truncation strategy to use for the model response.
     /// </summary>
@@ -1928,6 +2175,7 @@ type
     /// </para>
     /// </remarks>
     function Truncation(const Value: string): TResponsesParams; overload;
+
     /// <summary>
     /// A unique identifier representing your end-user, which can help OpenAI to monitor and detect abuse. Learn more.
     /// </summary>
@@ -4051,7 +4299,7 @@ begin
     begin
       MimeType := TFormatHelper.GetMimeType(Item);
       if TFormatHelper.IsPDFDocument(MimeType) then
-        JSONArray.Add(TItemContent.NewFileData(Item).Detach)
+          JSONArray.Add(TItemContent.NewFileData(Item).Detach)
       else
       if TFormatHelper.IsImageDocument(MimeType) then
         JSONArray.Add(TItemContent.NewImage(Item).Detach)

@@ -11,7 +11,7 @@ interface
 
 uses
   System.SysUtils, System.Classes, System.Threading, REST.Json.Types, System.Net.Mime,
-  GenAI.API.Params, GenAI.API, GenAI.Types, GenAI.Async.Support;
+  GenAI.API.Params, GenAI.API, GenAI.Types, GenAI.Async.Support, GenAI.Async.Promise;
 
 type
   /// <summary>
@@ -29,36 +29,42 @@ type
     /// <param name="Value">The model identifier, such as 'tts-1' or 'tts-1-hd'.</param>
     /// <returns>Returns an instance of <see cref="TSpeechParams"/> configured with the specified model.</returns>
     function Model(const Value: string): TSpeechParams;
+
     /// <summary>
     /// Sets the text to be converted into speech.
     /// </summary>
     /// <param name="Value">The text string, maximum length of 4096 characters.</param>
     /// <returns>Returns an instance of <see cref="TSpeechParams"/> configured with the specified input text.</returns>
     function Input(const Value: string): TSpeechParams;
+
     /// <summary>
     /// Sets the voice to be used for speech synthesis.
     /// </summary>
     /// <param name="Value">The name of the voice to use, e.g., 'alloy', 'ash', etc.</param>
     /// <returns>Returns an instance of <see cref="TSpeechParams"/> configured with the specified voice.</returns>
     function Voice(const Value: TAudioVoice): TSpeechParams; overload;
+
     /// <summary>
     /// Sets the voice to be used for speech synthesis.
     /// </summary>
     /// <param name="Value">A value of <see cref="TAudioVoice"/> representing the voice to use.</param>
     /// <returns>Returns an instance of <see cref="TSpeechParams"/> configured with the specified voice.</returns>
     function Voice(const Value: string): TSpeechParams; overload;
+
     /// <summary>
     /// Sets the response format of the audio output.
     /// </summary>
     /// <param name="Value">The desired audio format, such as 'mp3', 'wav', etc.</param>
     /// <returns>Returns an instance of <see cref="TSpeechParams"/> configured with the specified response format.</returns>
     function ResponseFormat(const Value: TSpeechFormat): TSpeechParams; overload;
+
     /// <summary>
     /// Sets the response format of the audio output.
     /// </summary>
     /// <param name="Value">A value of <see cref="TSpeechFormat"/> specifying the desired audio format.</param>
     /// <returns>Returns an instance of <see cref="TSpeechParams"/> configured with the specified response format.</returns>
     function ResponseFormat(const Value: string): TSpeechParams; overload;
+
     /// <summary>
     /// Sets the speed of the generated speech.
     /// </summary>
@@ -85,6 +91,7 @@ type
     /// <returns>A <see cref="TStream"/> that contains the generated audio data.</returns>
     /// <exception cref="Exception">Raises an exception if the data conversion fails.</exception>
     function GetStream: TStream;
+
     /// <summary>
     /// Saves the generated image to the specified file path.
     /// </summary>
@@ -107,6 +114,7 @@ type
     /// will terminate without performing any operation.
     /// </remarks>
     procedure SaveToFile(const FileName: string; const RaiseError: Boolean = True);
+
     /// <summary>
     /// Contains the base64-encoded string of the audio data.
     /// </summary>
@@ -114,6 +122,7 @@ type
     /// Direct access to the raw audio data in base64 format, allowing further manipulation or processing if required.
     /// </remarks>
     property Data: string read FData write FData;
+
     /// <summary>
     /// The name of the file where the audio is saved if the SaveToFile method is used.
     /// </summary>
@@ -133,12 +142,14 @@ type
   TTranscriptionParams = class(TMultipartFormData)
   public
     constructor Create; reintroduce;
+
     /// <summary>
     /// Adds an audio file from the specified file path to the transcription request.
     /// </summary>
     /// <param name="FileName">The path to the audio file to be transcribed.</param>
     /// <returns>Returns an instance of <see cref="TTranscriptionParams"/> with the specified file included.</returns>
     function &File(const FileName: string): TTranscriptionParams; overload;
+
     /// <summary>
     /// Adds an audio file from a stream to the transcription request.
     /// </summary>
@@ -146,36 +157,42 @@ type
     /// <param name="FileName">The name of the file represented by the stream.</param>
     /// <returns>Returns an instance of <see cref="TTranscriptionParams"/> with the specified file stream included.</returns>
     function &File(const Stream: TStream; const FileName: string): TTranscriptionParams; overload;
+
     /// <summary>
     /// Sets the model to be used for transcription.
     /// </summary>
     /// <param name="Value">The model identifier, such as 'whisper-1'.</param>
     /// <returns>Returns an instance of <see cref="TTranscriptionParams"/> configured with the specified model.</returns>
     function Model(const Value: string): TTranscriptionParams;
+
     /// <summary>
     /// Optionally sets the language of the input audio.
     /// </summary>
     /// <param name="Value">The ISO-639-1 language code, such as 'en' for English.</param>
     /// <returns>Returns an instance of <see cref="TTranscriptionParams"/> configured with the specified language.</returns>
     function Language(const Value: string): TTranscriptionParams;
+
     /// <summary>
     /// Optionally sets a guiding prompt for the transcription.
     /// </summary>
     /// <param name="Value">The text to guide the model's style or to continue a previous audio segment.</param>
     /// <returns>Returns an instance of <see cref="TTranscriptionParams"/> configured with the specified prompt.</returns>
     function Prompt(const Value: string): TTranscriptionParams;
+
     /// <summary>
     /// Sets the format of the transcription output.
     /// </summary>
     /// <param name="Value">The desired output format, such as 'json', 'text', or 'srt'.</param>
     /// <returns>Returns an instance of <see cref="TTranscriptionParams"/> configured with the specified response format.</returns>
     function ResponseFormat(const Value: TTranscriptionResponseFormat): TTranscriptionParams; overload;
+
     /// <summary>
     /// Sets the format of the transcription output.
     /// </summary>
     /// <param name="Value">A value of <see cref="TTranscriptionResponseFormat"/> specifying the desired output format.</param>
     /// <returns>Returns an instance of <see cref="TTranscriptionParams"/> configured with the specified response format.</returns>
     function ResponseFormat(const Value: string): TTranscriptionParams; overload;
+
     /// <summary>
     /// Optionally sets the transcription temperature to control the randomness of the output.
     /// </summary>
@@ -205,6 +222,7 @@ type
     /// This property holds the text of the word as it was recognized in the audio.
     /// </remarks>
     property Word: string read FWord write FWord;
+
     /// <summary>
     /// The start time of the word in the audio stream, measured in seconds.
     /// </summary>
@@ -212,6 +230,7 @@ type
     /// This property indicates when the word starts in the audio.
     /// </remarks>
     property Start: Double read FStart write FStart;
+
     /// <summary>
     /// The end time of the word in the audio stream, measured in seconds.
     /// </summary>
@@ -248,6 +267,7 @@ type
     /// Unique identifier for the segment.
     /// </summary>
     property Id: Int64 read FId write FId;
+
     /// <summary>
     /// Seek position in the original audio data.
     /// </summary>
@@ -255,34 +275,42 @@ type
     /// This property could be used to directly access the specific part of the audio corresponding to this segment.
     /// </remarks>
     property Seek: Int64 read FSeek write FSeek;
+
     /// <summary>
     /// The start time of the segment in the audio stream, measured in seconds.
     /// </summary>
     property Start: Double read FStart write FStart;
+
     /// <summary>
     /// The end time of the segment in the audio stream, measured in seconds.
     /// </summary>
     property &End: Double read FEnd write FEnd;
+
     /// <summary>
     /// The text of the transcribed segment.
     /// </summary>
     property Text: string read FText write FText;
+
     /// <summary>
     /// An array of token identifiers associated with the segment.
     /// </summary>
     property Tokens: TArray<Int64> read FTokens write FTokens;
+
     /// <summary>
     /// The transcription model's confidence measure for this segment.
     /// </summary>
     property Temperature: Double read FTemperature write FTemperature;
+
     /// <summary>
     /// The average log probability of the segment, indicating model confidence.
     /// </summary>
     property AvgLogprob: Double read FAvgLogprob write FAvgLogprob;
+
     /// <summary>
     /// The ratio indicating how much the segment has been compressed from the original audio.
     /// </summary>
     property CompressionRatio: Double read FCompressionRatio write FCompressionRatio;
+
     /// <summary>
     /// Probability that the segment does not contain speech.
     /// </summary>
@@ -314,6 +342,7 @@ type
     /// such as 'en' for English.
     /// </remarks>
     property Language: string read FLanguage write FLanguage;
+
     /// <summary>
     /// The duration of the audio that was transcribed, typically expressed in seconds or a time format.
     /// </summary>
@@ -322,6 +351,7 @@ type
     /// which is useful for synchronizing the transcription with the audio playback.
     /// </remarks>
     property Duration: string read FDuration write FDuration;
+
     /// <summary>
     /// The complete transcribed text of the audio file.
     /// </summary>
@@ -330,6 +360,7 @@ type
     /// providing a comprehensive view of the spoken content.
     /// </remarks>
     property Text: string read FText write FText;
+
     /// <summary>
     /// A collection of words extracted from the transcription, each associated with specific timestamps.
     /// </summary>
@@ -338,6 +369,7 @@ type
     /// allowing for fine-grained analysis and synchronization with the audio.
     /// </remarks>
     property Words: TArray<TTranscriptionWord> read FWords write FWords;
+
     /// <summary>
     /// A collection of segments from the transcription, each providing detailed information about a portion of the text.
     /// </summary>
@@ -347,6 +379,7 @@ type
     /// into logical units for easier processing and analysis.
     /// </remarks>
     property Segments: TArray<TTranscriptionSegment> read FSegments write FSegments;
+
     /// <summary>
     /// Destructor for TTranscription, ensures proper cleanup of resources.
     /// </summary>
@@ -367,12 +400,14 @@ type
   TTranslationParams = class(TMultipartFormData)
   public
     constructor Create; reintroduce;
+
     /// <summary>
     /// Adds an audio file from the specified file path to the translation request.
     /// </summary>
     /// <param name="FileName">The path to the audio file to be translated.</param>
     /// <returns>Returns an instance of <see cref="TTranslationParams"/> with the specified file included.</returns>
     function &File(const FileName: string): TTranslationParams; overload;
+
     /// <summary>
     /// Adds an audio file from a stream to the translation request.
     /// </summary>
@@ -380,24 +415,28 @@ type
     /// <param name="FileName">The name of the file represented by the stream.</param>
     /// <returns>Returns an instance of <see cref="TTranslationParams"/> with the specified file stream included.</returns>
     function &File(const Stream: TStream; const FileName: string): TTranslationParams; overload;
+
     /// <summary>
     /// Sets the model to be used for translation.
     /// </summary>
     /// <param name="Value">The model identifier, such as 'whisper-1'.</param>
     /// <returns>Returns an instance of <see cref="TTranslationParams"/> configured with the specified model.</returns>
     function Model(const Value: string): TTranslationParams;
+
     /// <summary>
     /// Optionally sets a guiding prompt for the translation.
     /// </summary>
     /// <param name="Value">The text to guide the model's style or to continue a previous audio segment in English.</param>
     /// <returns>Returns an instance of <see cref="TTranslationParams"/> configured with the specified prompt.</returns>
     function Prompt(const Value: string): TTranslationParams;
+
     /// <summary>
     /// Sets the format of the translation output.
     /// </summary>
     /// <param name="Value">The desired output format, such as 'json', 'text', or 'srt'.</param>
     /// <returns>Returns an instance of <see cref="TTranslationParams"/> configured with the specified response format.</returns>
     function ResponseFormat(const Value: TTranscriptionResponseFormat): TTranslationParams;
+
     /// <summary>
     /// Optionally sets the translation temperature to control the randomness of the output.
     /// </summary>
@@ -438,6 +477,18 @@ type
   TAsynSpeechResult = TAsynCallBack<TSpeechResult>;
 
   /// <summary>
+  /// Defines a promise-based callback for asynchronous speech synthesis operations,
+  /// resolving with a <see cref="TSpeechResult"/>.
+  /// </summary>
+  /// <remarks>
+  /// Specializes <see cref="TPromiseCallBack{TSpeechResult}"/> to streamline
+  /// handling of OpenAI audio speech results. Use this type when you need a
+  /// <c>TPromise</c> that completes with a <see cref="TSpeechResult"/>,
+  /// or reports an error if the request fails.
+  /// </remarks>
+  TPromiseSpeechResult = TPromiseCallBack<TSpeechResult>;
+
+  /// <summary>
   /// Manages asynchronous callBacks for a request using <c>TTranscription</c> as the response type.
   /// </summary>
   /// <remarks>
@@ -446,6 +497,18 @@ type
   /// This structure facilitates non-blocking operations.
   /// </remarks>
   TAsynTranscription = TAsynCallBack<TTranscription>;
+
+  /// <summary>
+  /// Defines a promise-based callback for asynchronous audio transcription operations,
+  /// resolving with a <see cref="TTranscription"/>.
+  /// </summary>
+  /// <remarks>
+  /// Specializes <see cref="TPromiseCallBack{TTranscription}"/> to streamline
+  /// handling of OpenAI audio transcription results. Use this type when you need a
+  /// <c>TPromise</c> that completes with a <see cref="TTranscription"/>,
+  /// or reports an error if the request fails.
+  /// </remarks>
+  TPromiseTranscription = TPromiseCallBack<TTranscription>;
 
   /// <summary>
   /// Manages asynchronous callBacks for a request using <c>TTranslation</c> as the response type.
@@ -458,6 +521,18 @@ type
   TAsynTranslation = TAsynCallBack<TTranslation>;
 
   /// <summary>
+  /// Defines a promise-based callback for asynchronous audio translation operations,
+  /// resolving with a <see cref="TTranslation"/>.
+  /// </summary>
+  /// <remarks>
+  /// Specializes <see cref="TPromiseCallBack{TTranslation}"/> to streamline
+  /// handling of OpenAI audio translation results. Use this type when you need a
+  /// <c>TPromise</c> that completes with a <see cref="TTranslation"/>,
+  /// or reports an error if the request fails.
+  /// </remarks>
+  TPromiseTranslation = TPromiseCallBack<TTranslation>;
+
+  /// <summary>
   /// Provides routes to handle audio-related requests including speech generation, transcription, and translation.
   /// </summary>
   /// <remarks>
@@ -467,6 +542,93 @@ type
   /// </remarks>
   TAudioRoute = class(TGenAIRoute)
     /// <summary>
+    /// Initiates an asynchronous speech synthesis request and returns a promise that resolves with the generated speech result.
+    /// </summary>
+    /// <param name="ParamProc">
+    /// A procedure to configure the speech synthesis parameters via a <see cref="TSpeechParams"/> instance.
+    /// </param>
+    /// <param name="CallBacks">
+    /// An optional function providing <see cref="TPromiseSpeechResult"/> callbacks for start, success, and error handling.
+    /// </param>
+    /// <returns>
+    /// A <c>TPromise&lt;TSpeechResult&gt;</c> that completes when the speech request succeeds or fails.
+    /// </returns>
+    /// <remarks>
+    /// Internally wraps <see cref="AsynSpeech"/> using <see cref="TAsyncAwaitHelper.WrapAsyncAwait{TSpeechResult}"/>,
+    /// enabling seamless promise-based workflows for audio speech operations.
+    /// </remarks>
+    function AsyncAwaitSpeech(const ParamProc: TProc<TSpeechParams>;
+      const CallBacks: TFunc<TPromiseSpeechResult> = nil): TPromise<TSpeechResult>;
+
+    /// <summary>
+    /// Initiates an asynchronous audio transcription request and returns a promise that resolves with the transcription result.
+    /// </summary>
+    /// <param name="ParamProc">
+    /// A procedure to configure the transcription parameters via a <see cref="TTranscriptionParams"/> instance.
+    /// </param>
+    /// <param name="CallBacks">
+    /// An optional function providing <see cref="TPromiseTranscription"/> callbacks for start, success, and error handling.
+    /// </param>
+    /// <returns>
+    /// A <c>TPromise&lt;TTranscription&gt;</c> that completes when the transcription request succeeds or fails.
+    /// </returns>
+    /// <remarks>
+    /// Internally wraps <see cref="AsynTranscription"/> using <see cref="TAsyncAwaitHelper.WrapAsyncAwait{TTranscription}"/>,
+    /// enabling seamless promise-based workflows for audio transcription operations.
+    /// </remarks>
+    function AsyncAwaitTranscription(const ParamProc: TProc<TTranscriptionParams>;
+      const CallBacks: TFunc<TPromiseTranscription> = nil): TPromise<TTranscription>;
+
+    /// <summary>
+    /// Initiates an asynchronous audio translation into English request and returns a promise that resolves with the translation result.
+    /// </summary>
+    /// <param name="ParamProc">
+    /// A procedure to configure the translation parameters via a <see cref="TTranslationParams"/> instance.
+    /// </param>
+    /// <param name="CallBacks">
+    /// A function providing <see cref="TPromiseTranslation"/> callbacks for start, success, and error handling.
+    /// </param>
+    /// <returns>
+    /// A <c>TPromise&lt;TTranslation&gt;</c> that completes when the translation request succeeds or fails.
+    /// </returns>
+    /// <remarks>
+    /// Internally wraps <see cref="AsynTranslatingIntoEnglish"/> using <see cref="TAsyncAwaitHelper.WrapAsyncAwait{TTranslation}"/>,
+    /// enabling seamless promise-based workflows for audio translation operations.
+    /// </remarks>
+    function AsyncAwaitTranslatingIntoEnglish(const ParamProc: TProc<TTranslationParams>;
+      const CallBacks: TFunc<TPromiseTranslation>): TPromise<TTranslation>;
+
+    /// <summary>
+    /// Synchronously generates speech from text using the specified parameters.
+    /// </summary>
+    /// <param name="ParamProc">A procedure that accepts a TSpeechParams instance to set the parameters for the speech request.</param>
+    /// <returns>Returns an instance of TSpeechResult containing the generated speech.</returns>
+    /// <remarks>
+    /// This method allows for synchronous speech synthesis, suitable for situations where immediate response from the API is required.
+    /// </remarks>
+    function Speech(const ParamProc: TProc<TSpeechParams>): TSpeechResult;
+
+    /// <summary>
+    /// Synchronously transcribes audio into text using the specified parameters.
+    /// </summary>
+    /// <param name="ParamProc">A procedure that accepts a TTranscriptionParams instance to set the parameters for the transcription request.</param>
+    /// <returns>Returns an instance of TTranscription containing the transcription details.</returns>
+    /// <remarks>
+    /// This method allows for synchronous audio transcription, appropriate for applications requiring immediate text output from audio.
+    /// </remarks>
+    function Transcription(const ParamProc: TProc<TTranscriptionParams>): TTranscription;
+
+    /// <summary>
+    /// Synchronously translates audio into English using the specified parameters.
+    /// </summary>
+    /// <param name="ParamProc">A procedure that accepts a TTranslationParams instance to set the parameters for the translation request.</param>
+    /// <returns>Returns an instance of TTranslation containing the translated text.</returns>
+    /// <remarks>
+    /// This method allows for synchronous audio translation, ideal for scenarios where an immediate textual translation is needed.
+    /// </remarks>
+    function TranslatingIntoEnglish(const ParamProc: TProc<TTranslationParams>): TTranslation;
+
+     /// <summary>
     /// Asynchronously generates speech from text using the specified parameters.
     /// </summary>
     /// <param name="ParamProc">A procedure that accepts a TSpeechParams instance to set the parameters for the speech request.</param>
@@ -476,6 +638,7 @@ type
     /// while processing large or multiple speech synthesis requests.
     /// </remarks>
     procedure AsynSpeech(const ParamProc: TProc<TSpeechParams>; const CallBacks: TFunc<TAsynSpeechResult>);
+
     /// <summary>
     /// Asynchronously transcribes audio into text using the specified parameters.
     /// </summary>
@@ -486,6 +649,7 @@ type
     /// to process audio files or streams without blocking the main application thread.
     /// </remarks>
     procedure AsynTranscription(const ParamProc: TProc<TTranscriptionParams>; const CallBacks: TFunc<TAsynTranscription>);
+
     /// <summary>
     /// Asynchronously translates audio into English using the specified parameters.
     /// </summary>
@@ -496,33 +660,6 @@ type
     /// into English text without interrupting the user interface.
     /// </remarks>
     procedure AsynTranslatingIntoEnglish(const ParamProc: TProc<TTranslationParams>; const CallBacks: TFunc<TAsynTranslation>);
-    /// <summary>
-    /// Synchronously generates speech from text using the specified parameters.
-    /// </summary>
-    /// <param name="ParamProc">A procedure that accepts a TSpeechParams instance to set the parameters for the speech request.</param>
-    /// <returns>Returns an instance of TSpeechResult containing the generated speech.</returns>
-    /// <remarks>
-    /// This method allows for synchronous speech synthesis, suitable for situations where immediate response from the API is required.
-    /// </remarks>
-    function Speech(const ParamProc: TProc<TSpeechParams>): TSpeechResult;
-    /// <summary>
-    /// Synchronously transcribes audio into text using the specified parameters.
-    /// </summary>
-    /// <param name="ParamProc">A procedure that accepts a TTranscriptionParams instance to set the parameters for the transcription request.</param>
-    /// <returns>Returns an instance of TTranscription containing the transcription details.</returns>
-    /// <remarks>
-    /// This method allows for synchronous audio transcription, appropriate for applications requiring immediate text output from audio.
-    /// </remarks>
-    function Transcription(const ParamProc: TProc<TTranscriptionParams>): TTranscription;
-    /// <summary>
-    /// Synchronously translates audio into English using the specified parameters.
-    /// </summary>
-    /// <param name="ParamProc">A procedure that accepts a TTranslationParams instance to set the parameters for the translation request.</param>
-    /// <returns>Returns an instance of TTranslation containing the translated text.</returns>
-    /// <remarks>
-    /// This method allows for synchronous audio translation, ideal for scenarios where an immediate textual translation is needed.
-    /// </remarks>
-    function TranslatingIntoEnglish(const ParamProc: TProc<TTranslationParams>): TTranslation;
   end;
 
 implementation
@@ -569,6 +706,41 @@ begin
 end;
 
 { TAudioRoute }
+
+function TAudioRoute.AsyncAwaitSpeech(const ParamProc: TProc<TSpeechParams>;
+  const CallBacks: TFunc<TPromiseSpeechResult>): TPromise<TSpeechResult>;
+begin
+  Result := TAsyncAwaitHelper.WrapAsyncAwait<TSpeechResult>(
+    procedure(const CallBackParams: TFunc<TAsynSpeechResult>)
+    begin
+      AsynSpeech(ParamProc, CallBackParams);
+    end,
+    CallBacks);
+end;
+
+function TAudioRoute.AsyncAwaitTranscription(
+  const ParamProc: TProc<TTranscriptionParams>;
+  const CallBacks: TFunc<TPromiseTranscription>): TPromise<TTranscription>;
+begin
+  Result := TAsyncAwaitHelper.WrapAsyncAwait<TTranscription>(
+    procedure(const CallBackParams: TFunc<TAsynTranscription>)
+    begin
+      AsynTranscription(ParamProc, CallBackParams);
+    end,
+    CallBacks);
+end;
+
+function TAudioRoute.AsyncAwaitTranslatingIntoEnglish(
+  const ParamProc: TProc<TTranslationParams>;
+  const CallBacks: TFunc<TPromiseTranslation>): TPromise<TTranslation>;
+begin
+  Result := TAsyncAwaitHelper.WrapAsyncAwait<TTranslation>(
+    procedure(const CallBackParams: TFunc<TAsynTranslation>)
+    begin
+      AsynTranslatingIntoEnglish(ParamProc, CallBackParams);
+    end,
+    CallBacks);
+end;
 
 procedure TAudioRoute.AsynSpeech(const ParamProc: TProc<TSpeechParams>;
   const CallBacks: TFunc<TAsynSpeechResult>);

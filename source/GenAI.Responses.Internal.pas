@@ -120,6 +120,7 @@ type
 
   TInternalStreaming = class(TGenAIRoute)
   const
+    {--- at worst, I'm missing 4 bytes to complete a UTF-8 character. }
     MaxTrail = 4;
   private
     {--- Persistent state for an SSE stream }
@@ -130,16 +131,22 @@ type
     FCurrentData: string;
   protected
     function ProcessLines(Event: TResponseEvent): Boolean;
+
     function DecodeChunk(const ABytes: TBytes; Event: TResponseEvent): Boolean;
+
     function InternalCreateStream(ParamProc: TProc<TResponsesParams>; Event: TResponseEvent): Boolean;
   end;
 
   TInternalResponseRoute = class(TInternalStreaming)
   protected
     procedure InternalAsynCreate(ParamProc: TProc<TResponsesParams>; CallBacks: TFunc<TAsynResponse>);
+
     procedure InternalAsynCreateStream(ParamProc: TProc<TResponsesParams>; CallBacks: TFunc<TAsynResponseStream>);
+
     procedure InternalCreateParallel(ParamProc: TProc<TBundleParams>; const CallBacks: TFunc<TAsynBundleList>);
+
     function Create(ParamProc: TProc<TResponsesParams>): TResponse; virtual; abstract;
+
     function CreateStream(ParamProc: TProc<TResponsesParams>; Event: TResponseEvent): Boolean; virtual; abstract;
   end;
 
@@ -202,18 +209,16 @@ begin
                 procedure (var Response: TResponseStream; IsDone: Boolean; var Cancel: Boolean)
                 begin
                   {--- Check that the process has not been canceled }
-                  if Assigned(OnDoCancel) and (CancelTag = 0) then
+                  if not Stop and Assigned(OnDoCancel) then
                     TThread.Queue(nil,
                         procedure
                         begin
                           Stop := OnDoCancel();
-                          if Stop then
-                            Inc(CancelTag);
                         end);
                   if Stop then
                     begin
                       {--- Trigger when processus was stopped }
-                      if (CancelTag = 1) and Assigned(OnCancellation) then
+                      if (CancelTag = 0) and Assigned(OnCancellation) then
                         TThread.Queue(nil,
                         procedure
                         begin
@@ -223,7 +228,7 @@ begin
                       Cancel := True;
                       Exit;
                     end;
-                  if not IsDone and Assigned(Response) then
+                  if Assigned(Response) then
                     begin
                       var LocalResponse := Response;
                       Response := nil;
@@ -237,7 +242,7 @@ begin
                             OnProgress(Sender, LocalResponse);
                           finally
                             {--- Makes sure to release the instance containing the data obtained
-                                 following processing}
+                                 following processing }
                             LocalResponse.Free;
                           end;
                         end)
@@ -252,6 +257,9 @@ begin
                         TThread.Queue(nil,
                         procedure
                         begin
+                          {--- to be delayed cause the event generating IsDone
+                               is also an event fired in onProgress }
+                          Sleep(100);
                           OnSuccess(Sender);
                         end);
                     end;
@@ -400,8 +408,13 @@ begin
         if ErrorExists then
           Continue;
 
-        {--- TTask.WaitForAll is not used due to a memory leak in TLightweightEvent/TCompleteEventsWrapper.
-             See report RSP-12462 and RSP-25999. }
+        {$REGION  'Dev notes'}
+         (*
+            TTask.WaitForAll is not used due to a memory leak in TLightweightEvent/TCompleteEventsWrapper.
+            See report RSP-12462 and RSP-25999.
+         *)
+        {$ENDREGION}
+
         TTaskHelper.ContinueWith(Tasks[Index],
           procedure
           begin
@@ -426,6 +439,42 @@ end;
 
 { TInternalStreaming }
 
+{$REGION  'Dev notes'}
+
+(*
+  # Streaming Processing Flow Diagram
+
+      [Network] --(incoming bytes)--> [Binary buffer]
+      Bytes are received from the network and stored in a binary buffer.
+            |
+            v
+      [Find the last safe UTF-8 boundary]
+      We search for the last “safe” UTF-8 boundary so we never cut a multi-byte
+      character in half.
+            |
+            v
+      [Decode valid part to string, add to StringBuilder]
+      The valid part of the buffer is decoded into a string and appended to a
+      StringBuilder.
+            |
+            v
+      [Split string at LF (\n) to find complete lines]
+      We split the string into complete lines whenever a Line Feed (\n) character
+      is found.
+            |
+            v
+      [For each complete line: analyze (event: ... / data: ...)]
+      For each complete line, we check if it starts with "event: " or "data: "
+      and parse accordingly.
+            |
+            v
+      [Call user callback with parsed data]
+      Whenever a logical event is completed, the callback function is called with
+      the parsed data.
+*)
+
+{$ENDREGION}
+
 function TInternalStreaming.DecodeChunk(const ABytes: TBytes;
   Event: TResponseEvent): Boolean;
 var
@@ -447,8 +496,11 @@ begin
 
       while (i < MaxTrail) and (SafeLen - i > 0) do
         begin
+          {--- is it a full UTF-8 }
           if Utf8Enc.IsBufferValid(@FByteBuffer[0], SafeLen - i) then
             begin
+              {--- If this is not the case, we remove a byte at each iteration (we move back the border)
+                   until it passes or until the MaxTrail limit. }
               SafeLen := SafeLen - i;
               Break;
             end;
@@ -464,9 +516,13 @@ begin
     begin
       SetLength(ChunkStr, 0);
       SetString(ChunkStr, PChar(nil), 0);
+      {--- Decode the valid part into a string (ChunkStr) }
       ChunkStr := TEncoding.UTF8.GetString(FByteBuffer, 0, SafeLen);
+
+      {--- Add the result to a character buffer (FCharBuffer), probably to manage line splits later. }
       FCharBuffer.Append(ChunkStr);
 
+      {--- Keep only the incomplete part (if any) in FByteBuffer for next time. }
       if SafeLen < Length(FByteBuffer) then
         FByteBuffer := Copy(FByteBuffer, SafeLen, MaxInt)
       else
@@ -480,6 +536,9 @@ end;
 
 function TInternalStreaming.InternalCreateStream(
   ParamProc: TProc<TResponsesParams>; Event: TResponseEvent): Boolean;
+
+{$REGION  'Dev notes event samples'}
+
 (*
     {"type":"response.created","response":{"id":"resp_67ffeb4f88f4819183b0c7bfd76270970c4424583b6f214d","object":"response","created_at":1744825167,"status":"in_progress","error":null,"incomplete_details":null,"instructions":null,"max_output_tokens":null,"model":"gpt-4.1-nano-2025-04-14","output":[],"parallel_tool_calls":true,"previous_response_id":null,"reasoning":{"effort":null,"summary":null},"store":false,"temperature":1.0,"text":{"format":{"type":"text"}},"tool_choice":"auto","tools":[],"top_p":1.0,"truncation":"disabled","usage":null,"user":null,"metadata":{}}}
     {"type":"response.in_progress","response":{"id":"resp_67ffeb4f88f4819183b0c7bfd76270970c4424583b6f214d","object":"response","created_at":1744825167,"status":"in_progress","error":null,"incomplete_details":null,"instructions":null,"max_output_tokens":null,"model":"gpt-4.1-nano-2025-04-14","output":[],"parallel_tool_calls":true,"previous_response_id":null,"reasoning":{"effort":null,"summary":null},"store":false,"temperature":1.0,"text":{"format":{"type":"text"}},"tool_choice":"auto","tools":[],"top_p":1.0,"truncation":"disabled","usage":null,"user":null,"metadata":{}}}
@@ -492,6 +551,8 @@ function TInternalStreaming.InternalCreateStream(
     {"type":"response.output_item.done","output_index":0,"item":{"id":"msg_67ffeb4fbe28819193360cdfa54b544e0c4424583b6f214d","type":"message","status":"completed","content":[{"type":"output_text","annotations":[],"text":"messagele":"assistant"}}
 *)
 
+{$ENDREGION}
+
 var
   Response: TMemoryStream;
   Consumed: Int64;
@@ -503,7 +564,11 @@ begin
   FCurrentEvent := '';
   FCurrentData := '';
 
+  {--- To accumulate the bytes received at each network callback }
   Response := TMemoryStream.Create;
+
+  {--- To allow only new bytes to be processed on each pass (you process “in delta” so as not to reprocess
+       the entire stream on each callback). }
   Consumed := 0;
 
   try
@@ -515,20 +580,37 @@ begin
         Delta : Int64;
         Chunk : TBytes;
       begin
+        {--- Calculation of the delta of new data to be processed }
         Delta := Response.Size - Consumed;
         if Delta <= 0 then Exit;
 
+        {--- Extracting these bytes (chunk) from the memory buffer }
         SetLength(Chunk, Delta);
         Response.Position := Consumed;
         Response.ReadBuffer(Chunk[0], Delta);
         Consumed := Consumed + Delta;
 
+        {--- Passing the chunk to your DecodeChunk method for:
+              1. Manages binary accumulation
+              2. Cuts cleanly at UTF-8 borders
+              3. Pushes the decoded strings into the character buffer }
         DecodeChunk(Chunk, Event);
+
+        {$REGION  'Dev notes'}
+
+        (*
+           - The "consumed/delta" pattern avoids parsing the same data multiple times, it’s clean.
+           - The Event callback will eventually be called in the ProcessLines stack
+        *)
+
+        {$ENDREGION}
+
       end);
   finally
     {--- Process any remaining balance }
     if FCharBuffer.Length > 0 then
       begin
+        {--- if there are unprocessed characters in the character buffer then flush them }
         Result := ProcessLines(Event);
       end;
 
@@ -547,48 +629,60 @@ begin
   var StartPos := 0;
   while True do
     begin
+      {--- Search for line break (#10, so LF) }
       var LFPos := FCharBuffer.ToString.IndexOf(#10, StartPos);
       if LFPos = -1 then Break;
 
-      var Line := FCharBuffer.ToString.Substring(StartPos, LFPos - StartPos)
-                         .Trim([' ', #13, #10]);
+      {--- 1. Extract the current line (from the last starting point to the next LF)
+           2. Clean the line (spaces, CR and LF) }
+      var Line := FCharBuffer.ToString.Substring(StartPos, LFPos - StartPos).Trim([' ', #13, #10]);
+
+      {--- We position the start for the next loop }
       StartPos := LFPos + 1;
 
-      if Line = '' then
+      if Line.IsEmpty then
         begin
+          {--- If the line is empty AND there was “data” stored, the event is considered complete }
           if not FCurrentData.Trim.IsEmpty then
             begin
               IsDone := SameText(FCurrentEvent, 'response.completed');
               RespObj := nil;
-              if not IsDone and
-                 ((FCurrentData[1] = '{') or (FCurrentData[1] = '[')) then
+
+              {--- Parse the “data” into a response object }
               try
                 RespObj := TApiDeserializer.Parse<TResponseStream>(FCurrentData);
               except
                 RespObj := nil;
               end;
 
+              {--- Trigger the callback }
               Event(RespObj, IsDone, Result);
               RespObj.Free;
             end;
 
+          {--- Reset the event buffer }
           FCurrentEvent := EmptyStr;
           FCurrentData := EmptyStr;
         end
       else
         if Line.StartsWith('event: ') then
           begin
+            {--- Store the name of the current event }
             FCurrentEvent := Line.Substring(7).Trim;
           end
         else
           if Line.StartsWith('data: ') then
             begin
+              {--- If there is already data in the buffer, add a line break (to separate the data blocks:
+                   if multi-line) }
               if not FCurrentData.IsEmpty then
                 FCurrentData := FCurrentData + sLineBreak;
+              {--- Add the data to the current event. }
               FCurrentData := FCurrentData + Line.Substring(6).Trim;
             end;
     end;
 
+  {--- Removes all the lines already processed from the buffer, leaving only what remains to be parsed }
   if StartPos > 0 then
     FCharBuffer.Remove(0, StartPos);
 end;

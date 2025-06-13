@@ -13,7 +13,7 @@ uses
   System.SysUtils, System.Classes, System.Threading, System.JSON, REST.Json.Types,
   REST.JsonReflect, System.Net.URLClient,
   GenAI.API.Params, GenAI.API, GenAI.Consts, GenAI.Types, GenAI.Async.Support,
-  GenAI.API.Lists, GenAI.API.Deletion, GenAI.Assistants, GenAI.Runs;
+  GenAI.Async.Promise, GenAI.API.Lists, GenAI.API.Deletion, GenAI.Assistants, GenAI.Runs;
 
 type
   /// <summary>
@@ -253,6 +253,21 @@ type
   TAsynVectorStoreFile = TAsynCallBack<TVectorStoreFile>;
 
   /// <summary>
+  /// Defines a promise-based callback type for operations returning a single vector store file.
+  /// </summary>
+  /// <remarks>
+  /// <para>
+  /// <c>TPromiseVectorStoreFile</c> is an alias for <c>TPromiseCallBack&lt;TVectorStoreFile&gt;</c>,
+  /// representing an asynchronous operation that resolves with a <see cref="TVectorStoreFile"/> instance.
+  /// </para>
+  /// <para>
+  /// Use this type when you need a promise-style API for creating, retrieving,
+  /// or deleting a file in a vector store.
+  /// </para>
+  /// </remarks>
+  TPromiseVectorStoreFile = TPromiseCallBack<TVectorStoreFile>;
+
+  /// <summary>
   /// Manages asynchronous callBacks for a request using <c>TVectorStoreFiles</c> as the response type.
   /// </summary>
   /// <remarks>
@@ -261,6 +276,21 @@ type
   /// This structure facilitates non-blocking operations.
   /// </remarks>
   TAsynVectorStoreFiles = TAsynCallBack<TVectorStoreFiles>;
+
+  /// <summary>
+  /// Defines a promise-based callback type for operations returning a collection of vector store files.
+  /// </summary>
+  /// <remarks>
+  /// <para>
+  /// <c>TPromiseVectorStoreFiles</c> is an alias for <c>TPromiseCallBack&lt;TVectorStoreFiles&gt;</c>,
+  /// representing an asynchronous operation that resolves with a <see cref="TVectorStoreFiles"/> list.
+  /// </para>
+  /// <para>
+  /// Use this type when you need a promise-style API for listing, filtering,
+  /// or retrieving multiple files from a vector store.
+  /// </para>
+  /// </remarks>
+  TPromiseVectorStoreFiles = TPromiseCallBack<TVectorStoreFiles>;
 
   /// <summary>
   /// Provides methods to manage files within a vector store using the OpenAI API.
@@ -278,6 +308,169 @@ type
     procedure HeaderCustomize; override;
   public
     /// <summary>
+    /// Initiates an asynchronous request to add a file to the specified vector store and returns a promise.
+    /// </summary>
+    /// <param name="VectorStoreId">
+    /// The unique identifier of the vector store where the file will be created.
+    /// </param>
+    /// <param name="ParamProc">
+    /// A procedure that configures the creation parameters, such as file ID and chunking strategy,
+    /// via a <see cref="TVectorStoreFilesCreateParams"/> instance.
+    /// </param>
+    /// <param name="CallBacks">
+    /// Optional callbacks wrapped in a <see cref="TPromiseVectorStoreFile"/> for handling start,
+    /// success, or error events before the promise resolves.
+    /// </param>
+    /// <returns>
+    /// A <see cref="TPromise&lt;TVectorStoreFile&gt;"/> that resolves with the created <see cref="TVectorStoreFile"/>.
+    /// </returns>
+    function AsyncAwaitCreate(const VectorStoreId: string;
+      const ParamProc: TProc<TVectorStoreFilesCreateParams>;
+      const CallBacks: TFunc<TPromiseVectorStoreFile> = nil): TPromise<TVectorStoreFile>;
+
+    /// <summary>
+    /// Initiates an asynchronous request to retrieve all files from the specified vector store and returns a promise.
+    /// </summary>
+    /// <param name="VectorStoreId">
+    /// The unique identifier of the vector store whose files you want to list.
+    /// </param>
+    /// <param name="CallBacks">
+    /// Optional callbacks wrapped in a <see cref="TPromiseVectorStoreFiles"/> for handling start,
+    /// success, or error events before the promise resolves.
+    /// </param>
+    /// <returns>
+    /// A <see cref="TPromise&lt;TVectorStoreFiles&gt;"/> that resolves with a <see cref="TVectorStoreFiles"/> list.
+    /// </returns>
+    function AsyncAwaitList(const VectorStoreId: string;
+      const CallBacks: TFunc<TPromiseVectorStoreFiles> = nil): TPromise<TVectorStoreFiles>; overload;
+
+    /// <summary>
+    /// Initiates an asynchronous request to retrieve a filtered list of files from the specified vector store and returns a promise.
+    /// </summary>
+    /// <param name="VectorStoreId">
+    /// The unique identifier of the vector store whose files you want to list.
+    /// </param>
+    /// <param name="ParamProc">
+    /// A procedure that configures URL parameters—such as status filters—via a <see cref="TVectorStoreFilesUrlParams"/> instance.
+    /// </param>
+    /// <param name="CallBacks">
+    /// Optional callbacks wrapped in a <see cref="TPromiseVectorStoreFiles"/> for handling start,
+    /// success, or error events before the promise resolves.
+    /// </param>
+    /// <returns>
+    /// A <see cref="TPromise&lt;TVectorStoreFiles&gt;"/> that resolves with a filtered <see cref="TVectorStoreFiles"/> list.
+    /// </returns>
+    function AsyncAwaitList(const VectorStoreId: string;
+      const ParamProc: TProc<TVectorStoreFilesUrlParams>;
+      const CallBacks: TFunc<TPromiseVectorStoreFiles> = nil): TPromise<TVectorStoreFiles>; overload;
+
+    /// <summary>
+    /// Initiates an asynchronous request to retrieve a specific file from the specified vector store and returns a promise.
+    /// </summary>
+    /// <param name="VectorStoreId">
+    /// The unique identifier of the vector store containing the file.
+    /// </param>
+    /// <param name="FileId">
+    /// The unique identifier of the file to retrieve.
+    /// </param>
+    /// <param name="CallBacks">
+    /// Optional callbacks wrapped in a <see cref="TPromiseVectorStoreFile"/> for handling start,
+    /// success, or error events before the promise resolves.
+    /// </param>
+    /// <returns>
+    /// A <see cref="TPromise&lt;TVectorStoreFile&gt;"/> that resolves with the requested <see cref="TVectorStoreFile"/>.
+    /// </returns>
+    function AsyncAwaitRetrieve(const VectorStoreId: string; const FileId: string;
+      const CallBacks: TFunc<TPromiseVectorStoreFile> = nil): TPromise<TVectorStoreFile>;
+
+    /// <summary>
+    /// Initiates an asynchronous request to delete a specific file from the specified vector store and returns a promise.
+    /// </summary>
+    /// <param name="VectorStoreId">
+    /// The unique identifier of the vector store from which the file will be deleted.
+    /// </param>
+    /// <param name="FileId">
+    /// The unique identifier of the file to delete.
+    /// </param>
+    /// <param name="CallBacks">
+    /// Optional callbacks wrapped in a <see cref="TPromiseDeletion"/> for handling start,
+    /// success, or error events before the promise resolves.
+    /// </param>
+    /// <returns>
+    /// A <see cref="TPromise&lt;TDeletion&gt;"/> that resolves with a <see cref="TDeletion"/> object indicating the outcome.
+    /// </returns>
+    function AsyncAwaitDelete(const VectorStoreId: string; const FileId: string;
+      const CallBacks: TFunc<TPromiseDeletion> = nil): TPromise<TDeletion>;
+
+    /// <summary>
+    /// Synchronously creates a new file in the specified vector store.
+    /// </summary>
+    /// <param name="VectorStoreId">
+    /// The unique identifier of the vector store where the file will be added.
+    /// </param>
+    /// <param name="ParamProc">
+    /// A procedure that configures the parameters for creating the file, such as the file ID
+    /// and chunking strategy.
+    /// </param>
+    /// <returns>
+    /// A <c>TVectorStoreFile</c> object representing the created file.
+    /// </returns>
+    function Create(const VectorStoreId: string; const ParamProc: TProc<TVectorStoreFilesCreateParams>): TVectorStoreFile;
+
+    /// <summary>
+    /// Synchronously retrieves a list of files from a specified vector store.
+    /// </summary>
+    /// <param name="VectorStoreId">
+    /// The unique identifier of the vector store from which to retrieve the files.
+    /// </param>
+    /// <returns>
+    /// A <c>TVectorStoreFiles</c> list containing information about the files.
+    /// </returns>
+    function List(const VectorStoreId: string): TVectorStoreFiles; overload;
+
+    /// <summary>
+    /// Synchronously retrieves a filtered list of files from a specified vector store.
+    /// </summary>
+    /// <param name="VectorStoreId">
+    /// The unique identifier of the vector store from which to retrieve the files.
+    /// </param>
+    /// <param name="ParamProc">
+    /// A procedure to configure filtering parameters for the list request, such as file status.
+    /// </param>
+    /// <returns>
+    /// A <c>TVectorStoreFiles</c> list containing information about the filtered files.
+    /// </returns>
+    function List(const VectorStoreId: string; const ParamProc: TProc<TVectorStoreFilesUrlParams>): TVectorStoreFiles; overload;
+
+    /// <summary>
+    /// Synchronously retrieves details of a specific file within a vector store.
+    /// </summary>
+    /// <param name="VectorStoreId">
+    /// The unique identifier of the vector store containing the file.
+    /// </param>
+    /// <param name="FileId">
+    /// The unique identifier of the file to be retrieved.
+    /// </param>
+    /// <returns>
+    /// A <c>TVectorStoreFile</c> object containing the details of the specified file.
+    /// </returns>
+    function Retrieve(const VectorStoreId: string; const FileId: string): TVectorStoreFile;
+
+    /// <summary>
+    /// Synchronously deletes a file from the specified vector store.
+    /// </summary>
+    /// <param name="VectorStoreId">
+    /// The unique identifier of the vector store from which to delete the file.
+    /// </param>
+    /// <param name="FileId">
+    /// The unique identifier of the file to be deleted.
+    /// </param>
+    /// <returns>
+    /// A <c>TDeletion</c> object indicating the status of the deletion.
+    /// </returns>
+    function Delete(const VectorStoreId: string; const FileId: string): TDeletion;
+
+    /// <summary>
     /// Asynchronously creates a new file in the specified vector store.
     /// </summary>
     /// <param name="VectorStoreId">
@@ -292,6 +485,7 @@ type
     /// </param>
     procedure AsynCreate(const VectorStoreId: string; const ParamProc: TProc<TVectorStoreFilesCreateParams>;
       const CallBacks: TFunc<TAsynVectorStoreFile>);
+
     /// <summary>
     /// Asynchronously retrieves a list of files from a specified vector store.
     /// </summary>
@@ -303,6 +497,7 @@ type
     /// </param>
     procedure AsynList(const VectorStoreId: string;
       const CallBacks: TFunc<TAsynVectorStoreFiles>); overload;
+
     /// <summary>
     /// Asynchronously retrieves a filtered list of files from a specified vector store.
     /// </summary>
@@ -318,6 +513,7 @@ type
     procedure AsynList(const VectorStoreId: string;
       const ParamProc: TProc<TVectorStoreFilesUrlParams>;
       const CallBacks: TFunc<TAsynVectorStoreFiles>); overload;
+
     /// <summary>
     /// Asynchronously retrieves details of a specific file within a vector store.
     /// </summary>
@@ -332,6 +528,7 @@ type
     /// </param>
     procedure AsynRetrieve(const VectorStoreId: string; const FileId: string;
       const CallBacks: TFunc<TAsynVectorStoreFile>);
+
     /// <summary>
     /// Asynchronously deletes a file from the specified vector store.
     /// </summary>
@@ -346,69 +543,6 @@ type
     /// </param>
     procedure AsynDelete(const VectorStoreId: string; const FileId: string;
       const CallBacks: TFunc<TAsynDeletion>);
-    /// <summary>
-    /// Synchronously creates a new file in the specified vector store.
-    /// </summary>
-    /// <param name="VectorStoreId">
-    /// The unique identifier of the vector store where the file will be added.
-    /// </param>
-    /// <param name="ParamProc">
-    /// A procedure that configures the parameters for creating the file, such as the file ID
-    /// and chunking strategy.
-    /// </param>
-    /// <returns>
-    /// A <c>TVectorStoreFile</c> object representing the created file.
-    /// </returns>
-    function Create(const VectorStoreId: string; const ParamProc: TProc<TVectorStoreFilesCreateParams>): TVectorStoreFile;
-    /// <summary>
-    /// Synchronously retrieves a list of files from a specified vector store.
-    /// </summary>
-    /// <param name="VectorStoreId">
-    /// The unique identifier of the vector store from which to retrieve the files.
-    /// </param>
-    /// <returns>
-    /// A <c>TVectorStoreFiles</c> list containing information about the files.
-    /// </returns>
-    function List(const VectorStoreId: string): TVectorStoreFiles; overload;
-    /// <summary>
-    /// Synchronously retrieves a filtered list of files from a specified vector store.
-    /// </summary>
-    /// <param name="VectorStoreId">
-    /// The unique identifier of the vector store from which to retrieve the files.
-    /// </param>
-    /// <param name="ParamProc">
-    /// A procedure to configure filtering parameters for the list request, such as file status.
-    /// </param>
-    /// <returns>
-    /// A <c>TVectorStoreFiles</c> list containing information about the filtered files.
-    /// </returns>
-    function List(const VectorStoreId: string; const ParamProc: TProc<TVectorStoreFilesUrlParams>): TVectorStoreFiles; overload;
-    /// <summary>
-    /// Synchronously retrieves details of a specific file within a vector store.
-    /// </summary>
-    /// <param name="VectorStoreId">
-    /// The unique identifier of the vector store containing the file.
-    /// </param>
-    /// <param name="FileId">
-    /// The unique identifier of the file to be retrieved.
-    /// </param>
-    /// <returns>
-    /// A <c>TVectorStoreFile</c> object containing the details of the specified file.
-    /// </returns>
-    function Retrieve(const VectorStoreId: string; const FileId: string): TVectorStoreFile;
-    /// <summary>
-    /// Synchronously deletes a file from the specified vector store.
-    /// </summary>
-    /// <param name="VectorStoreId">
-    /// The unique identifier of the vector store from which to delete the file.
-    /// </param>
-    /// <param name="FileId">
-    /// The unique identifier of the file to be deleted.
-    /// </param>
-    /// <returns>
-    /// A <c>TDeletion</c> object indicating the status of the deletion.
-    /// </returns>
-    function Delete(const VectorStoreId: string; const FileId: string): TDeletion;
   end;
 
 implementation
@@ -458,6 +592,65 @@ begin
 end;
 
 { TVectorStoreFilesRoute }
+
+function TVectorStoreFilesRoute.AsyncAwaitCreate(const VectorStoreId: string;
+  const ParamProc: TProc<TVectorStoreFilesCreateParams>;
+  const CallBacks: TFunc<TPromiseVectorStoreFile>): TPromise<TVectorStoreFile>;
+begin
+  Result := TAsyncAwaitHelper.WrapAsyncAwait<TVectorStoreFile>(
+    procedure(const CallBackParams: TFunc<TAsynVectorStoreFile>)
+    begin
+      AsynCreate(VectorStoreId, ParamProc, CallBackParams);
+    end,
+    CallBacks);
+end;
+
+function TVectorStoreFilesRoute.AsyncAwaitDelete(const VectorStoreId,
+  FileId: string;
+  const CallBacks: TFunc<TPromiseDeletion>): TPromise<TDeletion>;
+begin
+  Result := TAsyncAwaitHelper.WrapAsyncAwait<TDeletion>(
+    procedure(const CallBackParams: TFunc<TAsynDeletion>)
+    begin
+      AsynDelete(VectorStoreId, FileId, CallBackParams);
+    end,
+    CallBacks);
+end;
+
+function TVectorStoreFilesRoute.AsyncAwaitList(const VectorStoreId: string;
+  const ParamProc: TProc<TVectorStoreFilesUrlParams>;
+  const CallBacks: TFunc<TPromiseVectorStoreFiles>): TPromise<TVectorStoreFiles>;
+begin
+  Result := TAsyncAwaitHelper.WrapAsyncAwait<TVectorStoreFiles>(
+    procedure(const CallBackParams: TFunc<TAsynVectorStoreFiles>)
+    begin
+      AsynList(VectorStoreId, ParamProc, CallBackParams);
+    end,
+    CallBacks);
+end;
+
+function TVectorStoreFilesRoute.AsyncAwaitList(const VectorStoreId: string;
+  const CallBacks: TFunc<TPromiseVectorStoreFiles>): TPromise<TVectorStoreFiles>;
+begin
+  Result := TAsyncAwaitHelper.WrapAsyncAwait<TVectorStoreFiles>(
+    procedure(const CallBackParams: TFunc<TAsynVectorStoreFiles>)
+    begin
+      AsynList(VectorStoreId, CallBackParams);
+    end,
+    CallBacks);
+end;
+
+function TVectorStoreFilesRoute.AsyncAwaitRetrieve(const VectorStoreId,
+  FileId: string;
+  const CallBacks: TFunc<TPromiseVectorStoreFile>): TPromise<TVectorStoreFile>;
+begin
+  Result := TAsyncAwaitHelper.WrapAsyncAwait<TVectorStoreFile>(
+    procedure(const CallBackParams: TFunc<TAsynVectorStoreFile>)
+    begin
+      AsynRetrieve(VectorStoreId, FileId, CallBackParams);
+    end,
+    CallBacks);
+end;
 
 procedure TVectorStoreFilesRoute.AsynCreate(const VectorStoreId: string;
   const ParamProc: TProc<TVectorStoreFilesCreateParams>;

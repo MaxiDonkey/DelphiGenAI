@@ -30,6 +30,7 @@ type
     /// The ID of the file.
     /// </summary>
     property FileId: string read FFileId write FFileId;
+
     /// <summary>
     /// The MIME type of the file.
     /// </summary>
@@ -46,14 +47,17 @@ type
     /// The logs of the code interpreter tool call.
     /// </summary>
     property Logs: string read FLogs write FLogs;
+
     /// <summary>
     /// The output of a code interpreter tool call that is a file.
     /// </summary>
     property &Type: string read FType write FType;
+
     /// <summary>
     /// The output of a code interpreter tool call that is a file.
     /// </summary>
     property Files: TArray<TCodeInterpreterResultFiles> read FFiles write FFiles;
+
     destructor Destroy; override;
   end;
 
@@ -79,18 +83,22 @@ type
     /// a maximum length of 64 characters. Values are strings with a maximum length of 512 characters, booleans, or numbers.
     /// </summary>
     property Attributes: string read FAttributes write FAttributes;
+
     /// <summary>
     /// The unique ID of the file.
     /// </summary>
     property FileId: string read FFileId write FFileId;
+
     /// <summary>
     /// The name of the file.
     /// </summary>
     property Filename: string read FFilename write FFilename;
+
     /// <summary>
     /// The relevance score of the file - a value between 0 and 1.
     /// </summary>
     property Score: Double read FScore write FScore;
+
     /// <summary>
     /// The text that was retrieved from the file.
     /// </summary>
@@ -102,17 +110,20 @@ type
     [JsonNameAttribute('input_schema')]
     FInputSchema: string;
     FDescription: string;
-    {---
+    {$REGION  'Dev notes'}
+    (*
          FAnnotations: string > Automatic deserialization not possible-
             Ambiguous object or name already used
 
          Access to field contents from JSONResponse string possible
-    }
+    *)
+    {$ENDREGION}
   public
     /// <summary>
     /// The JSON schemas string describing the tool's input.
     /// </summary>
     property InputSchema: string read FInputSchema write FInputSchema;
+
     /// <summary>
     /// The description of the tool.
     /// </summary>
@@ -128,6 +139,7 @@ type
     /// The x-coordinate.
     /// </summary>
     property X: Int64 read FX write FX;
+
     /// <summary>
     /// The y-coordinate.
     /// </summary>
@@ -144,10 +156,12 @@ type
     /// The type of the pending safety check.
     /// </summary>
     property Code: string read FCode write FCode;
+
     /// <summary>
     /// The ID of the pending safety check.
     /// </summary>
     property Id: string read FId write FId;
+
     /// <summary>
     /// Details about the pending safety check.
     /// </summary>
@@ -166,10 +180,12 @@ type
     /// The identifier of an uploaded file that contains the screenshot.
     /// </summary>
     property FileId: string read FFileId write FFileId;
+
     /// <summary>
     /// The URL of the screenshot image.
     /// </summary>
     property ImageUrl: string read FImageUrl write FImageUrl;
+
     /// <summary>
     /// Specifies the event type. For a computer screenshot, this property is always set to computer_screenshot.
     /// </summary>
@@ -186,10 +202,12 @@ type
     /// The type of the pending safety check.
     /// </summary>
     property Code: string read FCode write FCode;
+
     /// <summary>
     /// The ID of the pending safety check.
     /// </summary>
     property Id: string read FId write FId;
+
     /// <summary>
     /// Details about the pending safety check.
     /// </summary>
@@ -217,10 +235,12 @@ type
     /// Indicates which mouse button was pressed during the click. One of left, right, wheel, back, or forward.
     /// </summary>
     property Button: TMouseButton read FButton write FButton;
+
     /// <summary>
     /// The x-coordinate where the click occurred.
     /// </summary>
     property X: Int64 read FX write FX;
+
     /// <summary>
     /// The y-coordinate where the click occurred.
     /// </summary>
@@ -241,6 +261,7 @@ type
     /// of objects, eg [ { x: 100, y: 200 }, { x: 200, y: 300 }
     /// </summary>
     property Path: TArray<TDragPoint> read FPath write FPath;
+
     destructor Destroy; override;
   end;
 
@@ -276,6 +297,7 @@ type
     /// The horizontal scroll distance.
     /// </summary>
     property ScrollX: Int64 read FScrollX write FScrollX;
+
     /// <summary>
     /// The vertical scroll distance.
     /// </summary>
@@ -330,18 +352,22 @@ type
     /// The command to run.
     /// </summary>
     property Command: TArray<string> read FCommand write FCommand;
+
     /// <summary>
     /// Environment variables to set for the command.
     /// </summary>
     property Env: string read FEnv write FEnv;
+
     /// <summary>
     /// Optional timeout in milliseconds for the command.
     /// </summary>
     property Timeout: Int64 read FTimeout write FTimeout;
+
     /// <summary>
     /// Optional user to run the command as.
     /// </summary>
     property User: string read FUser write FUser;
+
     /// <summary>
     /// Optional working directory to run the command in.
     /// </summary>
@@ -372,10 +398,12 @@ type
     /// The ID of the file.
     /// </summary>
     property FileId: string read FFileId write FFileId;
+
     /// <summary>
     /// The index of the file in the list of files.
     /// </summary>
     property Index: Int64 read FIndex write FIndex;
+
     /// <summary>
     /// The name of the file.
     /// </summary>
@@ -395,14 +423,17 @@ type
     /// The index of the last character of the URL citation in the message.
     /// </summary>
     property EndIndex: Int64 read FEndIndex write FEndIndex;
+
     /// <summary>
     /// The index of the first character of the URL citation in the message.
     /// </summary>
     property StartIndex: Int64 read FStartIndex write FStartIndex;
+
     /// <summary>
     /// The title of the web resource.
     /// </summary>
     property Title: string read FTitle write FTitle;
+
     /// <summary>
     /// The URL of the web resource.
     /// </summary>
@@ -455,10 +486,12 @@ type
     /// The detail level of the image to be sent to the model. One of high, low, or auto. Defaults to auto.
     /// </summary>
     property Detail: TImageDetail read FDetail write FDetail;
+
     /// <summary>
     /// The ID of the file to be sent to the model.
     /// </summary>
     property FileId: string read FFileId write FFileId;
+
     /// <summary>
     /// The URL of the image to be sent to the model. A fully qualified URL or base64 encoded image in a data URL.
     /// </summary>
@@ -475,6 +508,7 @@ type
     /// The content of the file to be sent to the model.
     /// </summary>
     property FileData: string read FFileData write FFileData;
+
     /// <summary>
     /// The name of the file to be sent to the model.
     /// </summary>
@@ -489,6 +523,7 @@ type
     /// The annotations of the text output.
     /// </summary>
     property Annotations: TArray<TResponseMessageAnnotation> read FAnnotations write FAnnotations;
+
     destructor Destroy; override;
   end;
 
@@ -539,10 +574,12 @@ type
     /// The unique ID of the object.
     /// </summary>
     property Id: string read FId write FId;
+
     /// <summary>
     /// The status of item. One of in_progress, completed, or incomplete. Populated when items are returned via API.
     /// </summary>
     property Status: string read FStatus write FStatus;
+
     /// <summary>
     /// The type of the object input.
     /// </summary>
@@ -559,6 +596,7 @@ type
     /// The role of the message input. One of user, system, or developer.
     /// </summary>
     property Role: TRole read FRole write FRole;
+
     /// <summary>
     /// A list of one or many input items to the model, containing different content types.
     /// </summary>
@@ -580,10 +618,12 @@ type
     /// The queries used to search for files.
     /// </summary>
     property Queries: TArray<string> read FQueries write FQueries;
+
     /// <summary>
     /// The results of the file search tool call.
     /// </summary>
     property Results: TArray<TFileSearchResult> read FResults write FResults;
+
     destructor Destroy; override;
   end;
 
@@ -599,14 +639,17 @@ type
     /// Action to execute on computer
     /// </summary>
     property Action: TAction read FAction write FAction;
+
     /// <summary>
     /// An identifier used when responding to the tool call with output.
     /// </summary>
     property CallId: string read FCallId write FCallId;
+
     /// <summary>
     /// The pending safety checks for the computer call.
     /// </summary>
     property PendingSafetyChecks: TArray<TPendingSafetyChecks> read FPendingSafetyChecks write FPendingSafetyChecks;
+
     destructor Destroy; override;
   end;
 
@@ -620,10 +663,12 @@ type
     /// A computer screenshot image used with the computer use tool.
     /// </summary>
     property Output: TComputerOutput read FOutput write FOutput;
+
     /// <summary>
     /// The safety checks reported by the API that have been acknowledged by the developer.
     /// </summary>
     property AcknowledgedSafetyChecks: TArray<TAcknowledgedSafetyCheck> read FAcknowledgedSafetyChecks write FAcknowledgedSafetyChecks;
+
     destructor Destroy; override;
   end;
 
@@ -641,6 +686,7 @@ type
     /// A JSON string of the arguments to pass to the function.
     /// </summary>
     property Arguments: string read FArguments write FArguments;
+
     /// <summary>
     /// The name of the function to run.
     /// </summary>
@@ -680,6 +726,7 @@ type
     /// The code to run.
     /// </summary>
     property Code: string read FCode write FCode;
+
     /// <summary>
     /// The ID of the container used to run the code.
     /// </summary>
@@ -707,10 +754,12 @@ type
     /// The label of the MCP server running the tool.
     /// </summary>
     property ServerLabel: string read FServerLabel write FServerLabel;
+
     /// <summary>
     /// The error from the tool call, if any.
     /// </summary>
     property Error: string read FError write FError;
+
     /// <summary>
     /// The output from the tool call.
     /// </summary>
@@ -722,6 +771,7 @@ type
     FTools: TArray<TMCPListTool>;
   public
     property Tools: TArray<TMCPListTool> read FTools write FTools;
+
     destructor Destroy; override;
   end;
 
@@ -770,22 +820,27 @@ type
     /// A list of items used to generate this response.
     /// </summary>
     property Data: TArray<TResponseItem> read FData write FData;
+
     /// <summary>
     /// The ID of the first item in the list.
     /// </summary>
     property FirstId: string read FFirstId write FFirstId;
+
     /// <summary>
     /// Whether there are more items available.
     /// </summary>
     property HasMore: Boolean read FHasMore write FHasMore;
+
     /// <summary>
     /// The ID of the last item in the list.
     /// </summary>
     property LastId: string read FLastId write FLastId;
+
     /// <summary>
     /// The type of object returned, must be list.
     /// </summary>
     property &Object: string read FObject write FObject;
+
     destructor Destroy; override;
   end;
 

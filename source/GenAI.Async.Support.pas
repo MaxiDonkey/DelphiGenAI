@@ -2,6 +2,16 @@ unit GenAI.Async.Support;
 
 {-------------------------------------------------------------------------------
 
+      Github repository :  https://github.com/MaxiDonkey/DelphiGenAI
+      Visit the Github repository for the documentation and use examples
+
+ ------------------------------------------------------------------------------}
+
+interface
+
+{$REGION  'Dev notes : GenAI.Async.Support'}
+
+(*
       Unit containing  records for managing  asynchronous events related to
       chat requests.
 
@@ -16,16 +26,13 @@ unit GenAI.Async.Support;
       The IUseParams<T>  and  TUseParamsFactory<T>  interfaces  and  classes
       from  GenAI.Params.Core  are  utilized  to  create and manage the
       parameter  instances  for  asynchronous  operations.
+*)
 
-        Github repository :  https://github.com/MaxiDonkey/DelphiGenAI
-        Visit the Github repository for the documentation and use examples
-
--------------------------------------------------------------------------------}
-
-interface
+{$ENDREGION}
 
 uses
-  System.SysUtils, system.Classes, System.Threading, GenAI.Async.Params;
+  System.SysUtils, system.Classes, System.Threading, GenAI.Async.Params,
+  GenAI.Async.Promise;
 
 type
   /// <summary>
@@ -50,6 +57,7 @@ type
     /// This can be useful for providing context in the callback procedures.
     /// </remarks>
     property Sender: TObject read FSender write FSender;
+
     /// <summary>
     /// Event triggered at the start of the asynchronous request.
     /// </summary>
@@ -65,6 +73,7 @@ type
     /// </code>
     /// </remarks>
     property OnStart: TProc<TObject> read FOnStart write FOnStart;
+
     /// <summary>
     /// Event triggered at the end of the asynchronous request.
     /// </summary>
@@ -87,6 +96,7 @@ type
     /// </code>
     /// </remarks>
     property OnSuccess: TProc<TObject, T> read FOnSuccess write FOnSuccess;
+
     /// <summary>
     /// Event triggered when an error occurs during the asynchronous request.
     /// </summary>
@@ -110,6 +120,15 @@ type
     property OnError: TProc<TObject, string> read FOnError write FOnError;
   end;
 
+  /// <summary>
+  /// Record used to define promise-style callbacks for asynchronous operations.
+  /// </summary>
+  /// <typeparam name="T">The type of result returned by the asynchronous operation.</typeparam>
+  /// <remarks>
+  /// <c>TPromiseCallBack&lt;T&gt;</c> encapsulates the callbacks to handle the start, successful completion, or error of an asynchronous request
+  /// in a promise-based workflow. Callback events can be used for UI updates, chaining operations, logging, or error handling
+  /// according to the outcome of the asynchronous task.
+  /// </remarks>
   TPromiseCallBack<T> = record
   private
     FSender: TObject;
@@ -125,6 +144,7 @@ type
     /// This can be useful for providing context in the callback procedures.
     /// </remarks>
     property Sender: TObject read FSender write FSender;
+
     /// <summary>
     /// Event triggered at the start of the asynchronous request.
     /// </summary>
@@ -140,6 +160,7 @@ type
     /// </code>
     /// </remarks>
     property OnStart: TProc<TObject> read FOnStart write FOnStart;
+
     /// <summary>
     /// Event triggered at the end of the asynchronous request.
     /// </summary>
@@ -163,6 +184,7 @@ type
     /// </code>
     /// </remarks>
     property OnSuccess: TFunc<TObject, T, string> read FOnSuccess write FOnSuccess;
+
     /// <summary>
     /// Event triggered when an error occurs during the asynchronous request.
     /// </summary>
@@ -209,6 +231,7 @@ type
     /// An instance of <c>IUseParams&lt;T&gt;</c> that provides parameter management functionality.
     /// </value>
     property Use: IUseParams<T> read FUse;
+
     /// <summary>
     /// The object representing the sender of the asynchronous operation.
     /// </summary>
@@ -219,6 +242,7 @@ type
     /// This property can be set to identify the object that initiated the asynchronous operation, which is useful in callback methods.
     /// </remarks>
     property Sender: TObject read FSender write FSender;
+
     /// <summary>
     /// Event triggered when the asynchronous operation starts.
     /// </summary>
@@ -236,6 +260,7 @@ type
     /// </code>
     /// </remarks>
     property OnStart: TProc<TObject> read FOnStart write FOnStart;
+
     /// <summary>
     /// Event triggered when the asynchronous operation completes successfully.
     /// </summary>
@@ -253,6 +278,7 @@ type
     /// </code>
     /// </remarks>
     property OnSuccess: TProc<TObject, U> read FOnSuccess write FOnSuccess;
+
     /// <summary>
     /// Event triggered when an error occurs during the asynchronous operation.
     /// </summary>
@@ -270,6 +296,7 @@ type
     /// </code>
     /// </remarks>
     property OnError: TProc<TObject, string> read FOnError write FOnError;
+
     /// <summary>
     /// Executes the specified function asynchronously.
     /// </summary>
@@ -281,6 +308,7 @@ type
     /// It invokes the <c>OnStart</c> event before execution, the <c>OnSuccess</c> event upon successful completion, and the <c>OnError</c> event if an exception occurs during execution.
     /// </remarks>
     procedure Run(Value: TFunc<U>);
+
     /// <summary>
     /// Initializes a new instance of the <c>TAsynCallBackExec&lt;T, U&gt;</c> class with the specified parameter function.
     /// </summary>
@@ -318,6 +346,7 @@ type
     /// which can be useful for context within the callback procedures.
     /// </remarks>
     property Sender: TObject read FSender write FSender;
+
     /// <summary>
     /// Event triggered when the asynchronous chat request starts.
     /// </summary>
@@ -339,6 +368,7 @@ type
     /// </code>
     /// </remarks>
     property OnStart: TProc<TObject> read FOnStart write FOnStart;
+
     /// <summary>
     /// Event triggered when the asynchronous Data request completes successfully.
     /// </summary>
@@ -361,6 +391,7 @@ type
     /// </code>
     /// </remarks>
     property OnSuccess: TProc<TObject> read FOnSuccess write FOnSuccess;
+
     /// <summary>
     /// Event triggered to handle progress during the streaming Data request.
     /// </summary>
@@ -383,6 +414,7 @@ type
     /// </code>
     /// </remarks>
     property OnProgress: TProc<TObject, T> read FOnProgress write FOnProgress;
+
     /// <summary>
     /// Event triggered when an error occurs during the asynchronous request.
     /// </summary>
@@ -404,6 +436,7 @@ type
     /// </code>
     /// </remarks>
     property OnError: TProc<TObject, string> read FOnError write FOnError;
+
     /// <summary>
     /// Event triggered when the asynchronous request has been canceled.
     /// </summary>
@@ -419,6 +452,7 @@ type
     /// </code>
     /// </remarks>
     property OnCancellation: TProc<TObject> read FOnCancellation write FOnCancellation;
+
     /// <summary>
     /// Function called to determine if the asynchronous chat request should be canceled.
     /// </summary>
@@ -439,6 +473,14 @@ type
     property OnDoCancel: TFunc<Boolean> read FOnDoCancel write FOnDoCancel;
   end;
 
+  /// <summary>
+  /// Record used to handle asynchronous events for a streaming operation with promise-based callbacks.
+  /// </summary>
+  /// <remarks>
+  /// <c>TPromiseStreamCallBack&lt;T&gt;</c> manages the lifecycle of a streaming asynchronous request.
+  /// It provides promise-style function callbacks for key events including start, progress, success, error, cancellation, and cancellation check.
+  /// The event signatures allow you to compose and chain UI, logging, or application logic in response to streamed data, errors, or user cancellation.
+  /// </remarks>
   TPromiseStreamCallBack<T> = record
   private
     FSender: TObject;
@@ -457,6 +499,7 @@ type
     /// which can be useful for context within the callback procedures.
     /// </remarks>
     property Sender: TObject read FSender write FSender;
+
     /// <summary>
     /// Event triggered when the asynchronous chat request starts.
     /// </summary>
@@ -478,6 +521,7 @@ type
     /// </code>
     /// </remarks>
     property OnStart: TProc<TObject> read FOnStart write FOnStart;
+
     /// <summary>
     /// Event triggered when the asynchronous Data request completes successfully.
     /// </summary>
@@ -497,6 +541,7 @@ type
     /// </code>
     /// </remarks>
     property OnSuccess: TFunc<TObject, string> read FOnSuccess write FOnSuccess;
+
     /// <summary>
     /// Event triggered to handle progress during the streaming Data request.
     /// </summary>
@@ -519,6 +564,7 @@ type
     /// </code>
     /// </remarks>
     property OnProgress: TProc<TObject, T> read FOnProgress write FOnProgress;
+
     /// <summary>
     /// Event triggered when an error occurs during the asynchronous streamed request.
     /// </summary>
@@ -541,6 +587,7 @@ type
     /// </code>
     /// </remarks>
     property OnError: TFunc<TObject, string, string> read FOnError write FOnError;
+
     /// <summary>
     /// Event triggered when the asynchronous request has been canceled.
     /// </summary>
@@ -557,6 +604,7 @@ type
     /// </code>
     /// </remarks>
     property OnCancellation: TFunc<TObject, string> read FOnCancellation write FOnCancellation;
+
     /// <summary>
     /// Function called to determine if the asynchronous chat request should be canceled.
     /// </summary>
@@ -575,6 +623,48 @@ type
     /// </code>
     /// </remarks>
     property OnDoCancel: TFunc<Boolean> read FOnDoCancel write FOnDoCancel;
+  end;
+
+  /// <summary>
+  /// Reference to a procedure type used to invoke an asynchronous operation with callback parameters.
+  /// </summary>
+  /// <typeparam name="T">The type of the result expected from the asynchronous operation.</typeparam>
+  /// <param name="CallBackParams">
+  /// A function returning a <c>TAsynCallBack&lt;T&gt;</c> record that defines the callbacks to handle start, success, and error events of the asynchronous request.
+  /// </param>
+  /// <remarks>
+  /// <c>TInvokeAsyn&lt;T&gt;</c> abstracts the invocation of an asynchronous task.
+  /// It accepts a function providing the set of callbacks to be executed during the lifecycle of the async operation.
+  /// This enables flexible and type-safe management of event handlers for non-blocking code.
+  /// </remarks>
+  TInvokeAsyn<T> = reference to procedure(const CallBackParams: TFunc<TAsynCallBack<T>>);
+
+  /// <summary>
+  /// Helper record providing utilities for composing asynchronous operations using async/await-style patterns.
+  /// </summary>
+  /// <remarks>
+  /// <c>TAsyncAwaitHelper</c> offers static helper methods to simplify the integration of asynchronous workflows in a promise-like style.
+  /// Its main utility is to bridge traditional callback-based asynchronous invocation with a modern, promise-based API.
+  /// </remarks>
+  TAsyncAwaitHelper = record
+    /// <summary>
+    /// Wraps a callback-based asynchronous invocation into a promise-style asynchronous workflow.
+    /// </summary>
+    /// <typeparam name="T">The type of result returned by the asynchronous operation.</typeparam>
+    /// <param name="Invoke">
+    /// A procedure that starts the asynchronous operation, accepting a function returning a <c>TAsynCallBack&lt;T&gt;</c> to specify event handlers.
+    /// </param>
+    /// <param name="CallBacks">
+    /// A function returning a <c>TPromiseCallBack&lt;T&gt;</c> record defining the promise-style callback handlers.
+    /// </param>
+    /// <returns>
+    /// Returns a <c>TPromise&lt;T&gt;</c> representing the asynchronous operation.
+    /// </returns>
+    /// <remarks>
+    /// Use <c>WrapAsyncAwait</c> to convert legacy callback-driven async code to a more composable, promise-based approach.
+    /// </remarks>
+    class function WrapAsyncAwait<T>(const Invoke: TInvokeAsyn<T>;
+      const CallBacks: TFunc<TPromiseCallBack<T>>): TPromise<T>; static;
   end;
 
 implementation
@@ -651,6 +741,55 @@ begin
             end;
           end);
   Task.Start;
+end;
+
+{ TAsyncAwaitHelper }
+
+class function TAsyncAwaitHelper.WrapAsyncAwait<T>(const Invoke: TInvokeAsyn<T>;
+  const CallBacks: TFunc<TPromiseCallBack<T>>): TPromise<T>;
+begin
+  Result := TPromise<T>.Create(
+    procedure(Resolve: TProc<T>; Reject: TProc<Exception>)
+    begin
+      Invoke(
+        function: TAsynCallBack<T>
+        begin
+          if Assigned(CallBacks) then
+            begin
+              Result.Sender  := CallBacks.Sender;
+              Result.OnStart := CallBacks.OnStart;
+
+              Result.OnSuccess :=
+                procedure(Sender: TObject; Value: T)
+                begin
+                  if Assigned(CallBacks.OnSuccess) then
+                    CallBacks.OnSuccess(Sender, Value);
+                  Resolve(Value);
+                end;
+
+              Result.OnError :=
+                procedure(Sender: TObject; Error: string)
+                begin
+                  if Assigned(CallBacks.OnError) then
+                    Error := CallBacks.OnError(Sender, Error);
+                  Reject(Exception.Create(Error));
+                end;
+            end
+          else
+            begin
+              Result.OnSuccess :=
+                procedure(Sender: TObject; Value: T)
+                begin
+                  Resolve(Value);
+                end;
+
+              Result.OnError := procedure(Sender: TObject; Error: string)
+                begin
+                  Reject(Exception.Create(Error));
+                end;
+            end;
+        end);
+    end);
 end;
 
 end.

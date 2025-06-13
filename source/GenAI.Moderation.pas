@@ -12,7 +12,8 @@ interface
 uses
   System.SysUtils, System.Classes, System.Threading, System.JSON, REST.Json.Types,
   REST.JsonReflect,
-  GenAI.API.Params, GenAI.API, GenAI.Consts, GenAI.Types, GenAI.Async.Support;
+  GenAI.API.Params, GenAI.API, GenAI.Consts, GenAI.Types, GenAI.Async.Support,
+  GenAI.Async.Promise;
 
 type
   /// <summary>
@@ -37,6 +38,7 @@ type
     /// Returns an instance of TTextModerationParams.
     /// </returns>
     function &Type(const Value: string): TTextModerationParams;
+
     /// <summary>
     /// Sets the text content to be classified for moderation. This method allows
     /// the inclusion of a string of text that will be evaluated by the moderation API.
@@ -48,6 +50,7 @@ type
     /// Returns an instance of TTextModerationParams.
     /// </returns>
     function Text(const Value: string): TTextModerationParams;
+
     /// <summary>
     /// Creates a new instance of TTextModerationParams with the specified text input.
     /// This method combines the configuration of input type and text content for
@@ -84,6 +87,7 @@ type
     /// Returns an instance of TUrlModerationParams.
     /// </returns>
     function Url(const Value: string): TUrlModerationParams;
+
     /// <summary>
     /// Creates a new instance of TUrlModerationParams with the specified URL.
     /// This method initializes the URL parameter for moderation requests.
@@ -119,6 +123,7 @@ type
     /// Returns an instance of TImageModerationParams.
     /// </returns>
     function &Type(const Value: string): TImageModerationParams;
+
     /// <summary>
     /// Sets the image URL or base64-encoded data to be classified for moderation.
     /// This method allows the inclusion of an image URL or encoded image data
@@ -131,6 +136,7 @@ type
     /// Returns an instance of TImageModerationParams.
     /// </returns>
     function ImageUrl(const Value: string): TImageModerationParams;
+
     /// <summary>
     /// Creates a new instance of TImageModerationParams with the specified image URL or
     /// base64-encoded image data. This method combines the configuration of input type
@@ -167,6 +173,7 @@ type
     /// Returns an instance of TModerationParams.
     /// </returns>
     function Input(const Value: string): TModerationParams; overload;
+
     /// <summary>
     /// Sets multiple input data elements for the moderation request. This method
     /// accepts an array of strings, which can include text or image paths/URLs.
@@ -178,6 +185,7 @@ type
     /// Returns an instance of TModerationParams.
     /// </returns>
     function Input(const Value: TArray<string>): TModerationParams; overload;
+
     /// <summary>
     /// Specifies the moderation model to be used for the request. The default
     /// model is "omni-moderation-latest".
@@ -230,56 +238,68 @@ type
     /// ethnicity, religion, nationality, sexual orientation, disability status, or caste.
     /// </summary>
     property Hate: Boolean read FHate write FHate;
+
     /// <summary>
     /// Indicates whether the content includes hateful speech that also involves
     /// violence or serious harm towards the targeted group.
     /// </summary>
     property HateThreatening: Boolean read FHateThreatening write FHateThreatening;
+
     /// <summary>
     /// Indicates whether the content contains language that is harassing towards a target.
     /// </summary>
     property Harassment: Boolean read FHarassment write FHarassment;
+
     /// <summary>
     /// Indicates whether the harassing content also involves threats of violence
     /// or serious harm.
     /// </summary>
     property HarassmentThreatening: Boolean read FHarassmentThreatening write FHarassmentThreatening;
+
     /// <summary>
     /// Indicates whether the content includes instructions or advice that facilitate
     /// wrongdoing or illicit acts.
     /// </summary>
     property Illicit: Boolean read FIllicit write FIllicit;
+
     /// <summary>
     /// Indicates whether the illicit content also involves violence or weapon procurement.
     /// </summary>
     property IllicitViolent: Boolean read FIllicitViolent write FIllicitViolent;
+
     /// <summary>
     /// Indicates whether the content promotes or depicts acts of self-harm, such as
     /// suicide, cutting, or eating disorders.
     /// </summary>
     property SelfHarm: Boolean read FSelfHarm write FSelfHarm;
+
     /// <summary>
     /// Indicates whether the content explicitly states an intent to commit self-harm.
     /// </summary>
     property SelfHarmIntent: Boolean read FSelfHarmIntent write FSelfHarmIntent;
+
     /// <summary>
     /// Indicates whether the content provides instructions or encouragement for
     /// acts of self-harm.
     /// </summary>
     property SelfHarmInstructions: Boolean read FSelfHarmInstructions write FSelfHarmInstructions;
+
     /// <summary>
     /// Indicates whether the content contains sexually explicit material designed
     /// to arouse sexual excitement.
     /// </summary>
     property Sexual: Boolean read FSexual write FSexual;
+
     /// <summary>
     /// Indicates whether the content contains sexual material involving minors.
     /// </summary>
     property SexualMinors: Boolean read FSexualMinors write FSexualMinors;
+
     /// <summary>
     /// Indicates whether the content depicts acts of violence, death, or physical injury.
     /// </summary>
     property Violence: Boolean read FViolence write FViolence;
+
     /// <summary>
     /// Indicates whether the violent content is graphically detailed.
     /// </summary>
@@ -325,61 +345,73 @@ type
     /// The score for the 'hate' category, representing the likelihood of hateful content.
     /// </summary>
     property Hate: Double read FHate write FHate;
+
     /// <summary>
     /// The score for the 'hate/threatening' category, representing the likelihood
     /// of threatening hateful content.
     /// </summary>
     property HateThreatening: Double read FHateThreatening write FHateThreatening;
+
     /// <summary>
     /// The score for the 'harassment' category, representing the likelihood of
     /// harassing content.
     /// </summary>
     property Harassment: Double read FHarassment write FHarassment;
+
     /// <summary>
     /// The score for the 'harassment/threatening' category, representing the likelihood
     /// of threatening harassing content.
     /// </summary>
     property HarassmentThreatening: Double read FHarassmentThreatening write FHarassmentThreatening;
+
     /// <summary>
     /// The score for the 'illicit' category, representing the likelihood of content
     /// promoting illicit activities.
     /// </summary>
     property Illicit: Double read FIllicit write FIllicit;
+
     /// <summary>
     /// The score for the 'illicit/violent' category, representing the likelihood
     /// of content promoting illicit violence.
     /// </summary>
     property IllicitViolent: Double read FIllicitViolent write FIllicitViolent;
+
     /// <summary>
     /// The score for the 'self-harm' category, representing the likelihood of content
     /// promoting or encouraging self-harm.
     /// </summary>
     property SelfHarm: Double read FSelfHarm write FSelfHarm;
+
     /// <summary>
     /// The score for the 'self-harm/intent' category, representing the likelihood
     /// of content indicating self-harm intent.
     /// </summary>
     property SelfHarmIntent: Double read FSelfHarmIntent write FSelfHarmIntent;
+
     /// <summary>
     /// The score for the 'self-harm/instructions' category, representing the likelihood
     /// of content providing instructions on self-harm.
     /// </summary>
     property SelfHarmInstructions: Double read FSelfHarmInstructions write FSelfHarmInstructions;
+
     /// <summary>
     /// The score for the 'sexual' category, representing the likelihood of content
     /// with explicit sexual material.
     /// </summary>
     property Sexual: Double read FSexual write FSexual;
+
     /// <summary>
     /// The score for the 'sexual/minors' category, representing the likelihood
     /// of sexual content involving minors.
     /// </summary>
     property SexualMinors: Double read FSexualMinors write FSexualMinors;
+
     /// <summary>
     /// The score for the 'violence' category, representing the likelihood of content
     /// involving violence.
     /// </summary>
     property Violence: Double read FViolence write FViolence;
+
     /// <summary>
     /// The score for the 'violence/graphics' category, representing the likelihood
     /// of content with graphic depictions of violence.
@@ -424,50 +456,62 @@ type
     /// Categories applied to hateful content.
     /// </summary>
     property Hate: TArray<string> read FHate write FHate;
+
     /// <summary>
     /// Categories applied to hateful content that includes threats.
     /// </summary>
     property HateThreatening: TArray<string> read FHateThreatening write FHateThreatening;
+
     /// <summary>
     /// Categories applied to harassment content.
     /// </summary>
     property Harassment: TArray<string> read FHarassment write FHarassment;
+
     /// <summary>
     /// Categories applied to harassment content that includes threats.
     /// </summary>
     property HarassmentThreatening: TArray<string> read FHarassmentThreatening write FHarassmentThreatening;
+
     /// <summary>
     /// Categories applied to illicit content.
     /// </summary>
     property Illicit: TArray<string> read FIllicit write FIllicit;
+
     /// <summary>
     /// Categories applied to illicit content that involves violence.
     /// </summary>
     property IllicitViolent: TArray<string> read FIllicitViolent write FIllicitViolent;
+
     /// <summary>
     /// Categories applied to self-harm-related content.
     /// </summary>
     property SelfHarm: TArray<string> read FSelfHarm write FSelfHarm;
+
     /// <summary>
     /// Categories applied to self-harm content expressing intent.
     /// </summary>
     property SelfHarmIntent: TArray<string> read FSelfHarmIntent write FSelfHarmIntent;
+
     /// <summary>
     /// Categories applied to self-harm content providing instructions.
     /// </summary>
     property SelfHarmInstructions: TArray<string> read FSelfHarmInstructions write FSelfHarmInstructions;
+
     /// <summary>
     /// Categories applied to sexual content.
     /// </summary>
     property Sexual: TArray<string> read FSexual write FSexual;
+
     /// <summary>
     /// Categories applied to sexual content involving minors.
     /// </summary>
     property SexualMinors: TArray<string> read FSexualMinors write FSexualMinors;
+
     /// <summary>
     /// Categories applied to violent content.
     /// </summary>
     property Violence: TArray<string> read FViolence write FViolence;
+
     /// <summary>
     /// Categories applied to graphically violent content.
     /// </summary>
@@ -492,10 +536,12 @@ type
     /// Gets or sets the category of harm associated with the flagged item.
     /// </summary>
     property Category: THarmCategories read FCategory write FCategory;
+
     /// <summary>
     /// Gets or sets the confidence score for the flagged category.
     /// </summary>
     property Score: Double read FScore write FScore;
+
     /// <summary>
     /// Initializes a new instance of the TFlaggedItem record with the specified
     /// harm category and confidence score.
@@ -533,23 +579,28 @@ type
     /// Indicates whether any categories were flagged during moderation.
     /// </summary>
     property Flagged: Boolean read FFlagged write FFlagged;
+
     /// <summary>
     /// Provides the status of all moderation categories and whether they were flagged.
     /// </summary>
     property Categories: TModerationCategories read FCategories write FCategories;
+
     /// <summary>
     /// Provides the confidence scores for each moderation category as predicted by the model.
     /// </summary>
     property CategoryScores: TModerationCategoryScores read FCategoryScores write FCategoryScores;
+
     /// <summary>
     /// Specifies the input types (e.g., text, image) associated with flagged categories.
     /// </summary>
     property CategoryAppliedInputTypes: TModerationCategoryApplied read FCategoryAppliedInputTypes write FCategoryAppliedInputTypes;
+
     /// <summary>
     /// Retrieves detailed information about flagged items, including their categories
     /// and confidence scores.
     /// </summary>
     property FlaggedDetail: TArray<TFlaggedItem> read GetFlaggedDetail;
+
     destructor Destroy; override;
   end;
 
@@ -571,14 +622,17 @@ type
     /// Gets or sets the unique identifier for the moderation request.
     /// </summary>
     property Id: string read FId write FId;
+
     /// <summary>
     /// Gets or sets the name of the moderation model used for evaluation.
     /// </summary>
     property Model: string read FModel write FModel;
+
     /// <summary>
     /// Gets or sets the array of results from the moderation process.
     /// </summary>
     property Results: TArray<TModerationResult> read FResults write FResults;
+
     destructor Destroy; override;
   end;
 
@@ -593,6 +647,15 @@ type
   TAsynModeration = TAsynCallBack<TModeration>;
 
   /// <summary>
+  /// Represents a promise-based callback for asynchronous moderation requests.
+  /// </summary>
+  /// <remarks>
+  /// Specializes <see cref="TPromiseCallBack{TModeration}"/> to simplify handling of moderation API responses.
+  /// Use this type when you need a <c>TPromise</c> that resolves with a <see cref="TModeration"/> instance.
+  /// </remarks>
+  TPromiseModeration = TPromiseCallBack<TModeration>;
+
+  /// <summary>
   /// Represents a route for handling moderation requests in the GenAI framework.
   /// This class provides methods for evaluating moderation parameters both
   /// synchronously and asynchronously.
@@ -604,17 +667,24 @@ type
   /// </remarks>
   TModerationRoute = class(TGenAIRoute)
     /// <summary>
-    /// Asynchronously evaluates the given moderation parameters and triggers
-    /// the specified callback functions upon completion.
+    /// Asynchronously evaluates the given moderation parameters and returns a promise that resolves with the moderation result.
     /// </summary>
     /// <param name="ParamProc">
-    /// A procedure to configure the moderation parameters.
+    /// A procedure to configure the moderation parameters via a <see cref="TModerationParams"/> instance.
     /// </param>
     /// <param name="CallBacks">
-    /// A function that defines the asynchronous callbacks for success, error,
-    /// and other states during the operation.
+    /// An optional function providing <see cref="TPromiseModeration"/> callbacks for start, success, and error handling.
     /// </param>
-    procedure AsynEvaluate(const ParamProc: TProc<TModerationParams>; CallBacks: TFunc<TAsynModeration>);
+    /// <returns>
+    /// A <c>TPromise&lt;TModeration&gt;</c> that completes when the moderation evaluation succeeds or fails.
+    /// </returns>
+    /// <remarks>
+    /// Wraps <see cref="AsynEvaluate"/> to enable promise-based workflows with the moderation API.
+    /// If <c>CallBacks</c> is omitted, only resolution and rejection are handled.
+    /// </remarks>
+    function AsyncAwaitEvaluate(const ParamProc: TProc<TModerationParams>;
+      const CallBacks: TFunc<TPromiseModeration> = nil): TPromise<TModeration>;
+
     /// <summary>
     /// Synchronously evaluates the given moderation parameters and returns
     /// the moderation result.
@@ -626,6 +696,20 @@ type
     /// Returns a TModeration object containing the results of the moderation process.
     /// </returns>
     function Evaluate(const ParamProc: TProc<TModerationParams>): TModeration;
+
+    /// <summary>
+    /// Asynchronously evaluates the given moderation parameters and triggers
+    /// the specified callback functions upon completion.
+    /// </summary>
+    /// <param name="ParamProc">
+    /// A procedure to configure the moderation parameters.
+    /// </param>
+    /// <param name="CallBacks">
+    /// A function that defines the asynchronous callbacks for success, error,
+    /// and other states during the operation.
+    /// </param>
+    procedure AsynEvaluate(const ParamProc: TProc<TModerationParams>;
+      const CallBacks: TFunc<TAsynModeration>);
   end;
 
 implementation
@@ -767,8 +851,20 @@ end;
 
 { TModerationRoute }
 
+function TModerationRoute.AsyncAwaitEvaluate(
+  const ParamProc: TProc<TModerationParams>;
+  const CallBacks: TFunc<TPromiseModeration>): TPromise<TModeration>;
+begin
+  Result := TAsyncAwaitHelper.WrapAsyncAwait<TModeration>(
+    procedure(const CallBackParams: TFunc<TAsynModeration>)
+    begin
+      AsynEvaluate(ParamProc, CallBackParams);
+    end,
+    CallBacks);
+end;
+
 procedure TModerationRoute.AsynEvaluate(
-  const ParamProc: TProc<TModerationParams>; CallBacks: TFunc<TAsynModeration>);
+  const ParamProc: TProc<TModerationParams>; const CallBacks: TFunc<TAsynModeration>);
 begin
   with TAsynCallBackExec<TAsynModeration, TModeration>.Create(CallBacks) do
   try

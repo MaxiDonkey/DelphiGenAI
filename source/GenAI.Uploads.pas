@@ -13,7 +13,7 @@ uses
   System.SysUtils, System.Classes, System.Threading, System.JSON, REST.Json.Types,
   REST.JsonReflect, System.Net.Mime,
   GenAI.API.Params, GenAI.API, GenAI.Consts, GenAI.Types, GenAI.Async.Support,
-  GenAI.Files;
+  GenAI.Async.Promise, GenAI.Files;
 
 type
   /// <summary>
@@ -36,6 +36,7 @@ type
     /// Returns an instance of <c>TUploadCreateParams</c> with the filename set.
     /// </returns>
     function Filename(const Value: string): TUploadCreateParams;
+
     /// <summary>
     /// Sets the purpose of the uploaded file. This is a required field to define
     /// the intent or use of the file being uploaded.
@@ -47,6 +48,7 @@ type
     /// Returns an instance of <c>TUploadCreateParams</c> with the purpose set.
     /// </returns>
     function Purpose(const Value: string): TUploadCreateParams; overload;
+
     /// <summary>
     /// Sets the purpose of the uploaded file using an enumerated value. This method
     /// allows specifying the purpose from predefined purposes in the <c>TFilesPurpose</c> enumeration.
@@ -58,6 +60,7 @@ type
     /// Returns an instance of <c>TUploadCreateParams</c> with the purpose set.
     /// </returns>
     function Purpose(const Value: TFilesPurpose): TUploadCreateParams; overload;
+
     /// <summary>
     /// Sets the total size of the file in bytes. This value is required
     /// to ensure the uploaded parts match the intended file size.
@@ -69,6 +72,7 @@ type
     /// Returns an instance of <c>TUploadCreateParams</c> with the file size set.
     /// </returns>
     function Bytes(const Value: Int64): TUploadCreateParams;
+
     /// <summary>
     /// Sets the MIME type of the file to be uploaded. The MIME type must
     /// correspond to the supported types for the specified file purpose.
@@ -93,6 +97,7 @@ type
   TUploadPartParams = class(TMultipartFormData)
   public
     constructor Create; reintroduce;
+
     /// <summary>
     /// Adds a file to the form-data as a part of the upload.
     /// </summary>
@@ -103,6 +108,7 @@ type
     /// Returns the current instance of <c>TUploadPartParams</c> to allow method chaining.
     /// </returns>
     function Data(const Value: string): TUploadPartParams; overload;
+
     /// <summary>
     /// Adds a stream to the form-data as a part of the upload.
     /// </summary>
@@ -141,6 +147,7 @@ type
     /// Returns the current instance of <c>TUploadCompleteParams</c> to allow method chaining.
     /// </returns>
     function PartIds(const Value: TArray<string>): TUploadCompleteParams;
+
     /// <summary>
     /// Sets the MD5 checksum for the uploaded file to ensure data integrity.
     /// </summary>
@@ -186,46 +193,57 @@ type
     /// Gets or sets the unique identifier of the upload.
     /// </summary>
     property Id: string read FId write FId;
+
     /// <summary>
     /// Gets the Unix timestamp (in seconds) indicating when the upload was created.
     /// </summary>
     property CreatedAt: Int64 read GetCreatedAt;
+
     /// <summary>
     /// Gets the Unix timestamp a a string, indicating when the upload was created.
     /// </summary>
     property CreatedAtAsString: string read GetCreatedAtAsString;
+
     /// <summary>
     /// Gets or sets the name of the file being uploaded.
     /// </summary>
     property Filename: string read FFilename write FFilename;
+
     /// <summary>
     /// Gets or sets the intended size of the file being uploaded, in bytes.
     /// </summary>
     property Bytes: Int64 read FBytes write FBytes;
+
     /// <summary>
     /// Gets or sets the purpose of the upload. This indicates the intended usage of the uploaded file.
     /// </summary>
     property Purpose: TFilesPurpose read FPurpose write FPurpose;
+
     /// <summary>
     /// Gets or sets the current status of the upload (e.g., "pending", "completed", or "cancelled").
     /// </summary>
     property Status: string read FStatus write FStatus;
+
     /// <summary>
     /// Gets the Unix timestamp (in seconds) indicating when the upload will expire.
     /// </summary>
     property ExpiresAt: Int64 read GetExpiresAt;
+
     /// <summary>
     /// Gets the Unix timestamp as a string, indicating when the upload will expire.
     /// </summary>
     property ExpiresAtAsString: string read GetExpiresAtAsString;
+
     /// <summary>
     /// Gets or sets the object type, which is always "upload".
     /// </summary>
     property &Object: string read FObject write FObject;
+
     /// <summary>
     /// Gets or sets the associated file object created after the upload is completed.
     /// </summary>
     property &File: TFile read FFile write FFile;
+
     destructor Destroy; override;
   end;
 
@@ -252,22 +270,27 @@ type
     /// Gets or sets the unique identifier of the upload part.
     /// </summary>
     property Id: string read FId write FId;
+
     /// <summary>
     /// Gets the Unix timestamp (in seconds) indicating when the upload part was created.
     /// </summary>
     property CreatedAt: Int64 read GetCreatedAt;
+
     /// <summary>
     /// Gets the formatted creation time as a human-readable string.
     /// </summary>
     property CreatedAtAsString: string read GetCreatedAtAsString;
+
     /// <summary>
     /// Gets or sets the ID of the upload to which this part belongs.
     /// </summary>
     property UploadId: string read FUploadId write FUploadId;
+
     /// <summary>
     /// Gets or sets the object type, which is always "upload.part".
     /// </summary>
     property &Object: string read FObject write FObject;
+
   end;
 
   /// <summary>
@@ -281,6 +304,16 @@ type
   TAsynUpload = TAsynCallBack<TUpload>;
 
   /// <summary>
+  /// Represents a promise-based callback for asynchronous upload operations.
+  /// </summary>
+  /// <remarks>
+  /// Specializes <see cref="TPromiseCallBack{TUpload}"/> to streamline handling of the
+  /// OpenAI upload API. Use this type when you need a <c>TPromise</c> that resolves with
+  /// a <see cref="TUpload"/> instance.
+  /// </remarks>
+  TPromiseUpload = TPromiseCallBack<TUpload>;
+
+  /// <summary>
   /// Manages asynchronous callBacks for a request using <c>TUploadPart</c> as the response type.
   /// </summary>
   /// <remarks>
@@ -291,6 +324,16 @@ type
   TAsynUploadPart = TAsynCallBack<TUploadPart>;
 
   /// <summary>
+  /// Represents a promise-based callback for asynchronous upload part operations.
+  /// </summary>
+  /// <remarks>
+  /// Specializes <see cref="TPromiseCallBack{TUploadPart}"/> to streamline handling of the
+  /// OpenAI upload-part API. Use this type when you need a <c>TPromise</c> that resolves with
+  /// a <see cref="TUploadPart"/> instance.
+  /// </remarks>
+  TPromiseUploadPart = TPromiseCallBack<TUploadPart>;
+
+  /// <summary>
   /// Manages routes for handling file uploads, including creating uploads, adding parts, completing uploads, and canceling uploads.
   /// </summary>
   /// <remarks>
@@ -298,6 +341,134 @@ type
   /// operations for creating an upload, adding parts to it, completing the upload, and canceling an upload.
   /// </remarks>
   TUploadsRoute = class(TGenAIRoute)
+    /// <summary>
+    /// Initiates a promise-based asynchronous operation to create a new upload.
+    /// </summary>
+    /// <param name="ParamProc">
+    /// A procedure to configure the upload creation parameters, including filename, purpose, total size, and MIME type.
+    /// </param>
+    /// <param name="CallBacks">
+    /// An optional function supplying <see cref="TPromiseUpload"/> callbacks for start, success, and error handling.
+    /// </param>
+    /// <returns>
+    /// A <see cref="TPromise{TUpload}"/> that resolves with a <see cref="TUpload"/> instance upon successful creation.
+    /// </returns>
+    /// <remarks>
+    /// Wraps the <see cref="AsynCreate"/> method to enable promise chaining and streamlined handling of the OpenAI upload API.
+    /// </remarks>
+    function AsyncAwaitCreate(const ParamProc: TProc<TUploadCreateParams>;
+      const CallBacks: TFunc<TPromiseUpload> = nil): TPromise<TUpload>;
+
+    /// <summary>
+    /// Initiates a promise-based asynchronous operation to add a part to an existing upload.
+    /// </summary>
+    /// <param name="UploadId">
+    /// The identifier of the upload to which the part will be added.
+    /// </param>
+    /// <param name="ParamProc">
+    /// A procedure to configure the upload part parameters, such as the data stream or file path.
+    /// </param>
+    /// <param name="CallBacks">
+    /// An optional function supplying <see cref="TPromiseUploadPart"/> callbacks for start, success, and error handling.
+    /// </param>
+    /// <returns>
+    /// A <see cref="TPromise{TUploadPart}"/> that resolves with a <see cref="TUploadPart"/> instance upon successful upload of the part.
+    /// </returns>
+    /// <remarks>
+    /// Wraps the <see cref="AsynAddPart"/> method to enable promise chaining and simplified handling of the OpenAI upload-part API.
+    /// </remarks>
+    function AsyncAwaitAddPart(const UploadId: string; const ParamProc: TProc<TUploadPartParams>;
+      const CallBacks: TFunc<TPromiseUploadPart> = nil): TPromise<TUploadPart>;
+
+    /// <summary>
+    /// Initiates a promise-based asynchronous operation to complete an existing upload.
+    /// </summary>
+    /// <param name="UploadId">
+    /// The identifier of the upload to complete.
+    /// </param>
+    /// <param name="ParamProc">
+    /// A procedure to configure the completion parameters, such as the ordered list of part IDs and optional MD5 checksum.
+    /// </param>
+    /// <param name="CallBacks">
+    /// An optional function supplying <see cref="TPromiseUpload"/> callbacks for start, success, and error handling.
+    /// </param>
+    /// <returns>
+    /// A <see cref="TPromise{TUpload}"/> that resolves with a <see cref="TUpload"/> instance upon successful completion.
+    /// </returns>
+    /// <remarks>
+    /// Wraps the <see cref="AsynComplete"/> method to enable promise chaining and streamlined handling of the OpenAI complete-upload API.
+    /// </remarks>
+    function AsyncAwaitComplete(const UploadId: string; const ParamProc: TProc<TUploadCompleteParams>;
+      const CallBacks: TFunc<TPromiseUpload> = nil): TPromise<TUpload>;
+
+    /// <summary>
+    /// Initiates a promise-based asynchronous operation to cancel an existing upload.
+    /// </summary>
+    /// <param name="UploadId">
+    /// The identifier of the upload to cancel.
+    /// </param>
+    /// <param name="CallBacks">
+    /// An optional function supplying <see cref="TPromiseUpload"/> callbacks for start, success, and error handling.
+    /// </param>
+    /// <returns>
+    /// A <see cref="TPromise{TUpload}"/> that resolves with a <see cref="TUpload"/> instance representing the cancelled upload.
+    /// </returns>
+    /// <remarks>
+    /// Wraps the <see cref="AsynCancel"/> method to enable promise chaining and streamlined handling of the OpenAI cancel-upload API.
+    /// </remarks>
+    function AsyncAwaitCancel(const UploadId: string;
+      const CallBacks: TFunc<TPromiseUpload> = nil): TPromise<TUpload>;
+
+    /// <summary>
+    /// Creates a new upload synchronously.
+    /// </summary>
+    /// <param name="ParamProc">
+    /// A procedure to configure the upload creation parameters, such as filename, purpose, size, and MIME type.
+    /// </param>
+    /// <returns>
+    /// A <c>TUpload</c> object containing the metadata of the created upload.
+    /// </returns>
+    function Create(const ParamProc: TProc<TUploadCreateParams>): TUpload;
+
+    /// <summary>
+    /// Adds a part to an existing upload synchronously.
+    /// </summary>
+    /// <param name="UploadId">
+    /// The ID of the upload to which the part will be added.
+    /// </param>
+    /// <param name="ParamProc">
+    /// A procedure to configure the upload part parameters, such as the data chunk.
+    /// </param>
+    /// <returns>
+    /// A <c>TUploadPart</c> object containing the metadata of the added part.
+    /// </returns>
+    function AddPart(const UploadId: string; const ParamProc: TProc<TUploadPartParams>): TUploadPart;
+
+    /// <summary>
+    /// Completes an upload synchronously.
+    /// </summary>
+    /// <param name="UploadId">
+    /// The ID of the upload to complete.
+    /// </param>
+    /// <param name="ParamProc">
+    /// A procedure to configure the parameters for completing the upload, such as the part order and optional MD5 checksum.
+    /// </param>
+    /// <returns>
+    /// A <c>TUpload</c> object containing the metadata of the completed upload.
+    /// </returns>
+    function Complete(const UploadId: string; const ParamProc: TProc<TUploadCompleteParams>): TUpload;
+
+    /// <summary>
+    /// Cancels an upload synchronously.
+    /// </summary>
+    /// <param name="UploadId">
+    /// The ID of the upload to cancel.
+    /// </param>
+    /// <returns>
+    /// A <c>TUpload</c> object containing the metadata of the canceled upload.
+    /// </returns>
+    function Cancel(const UploadId: string): TUpload;
+
     /// <summary>
     /// Initiates an asynchronous operation to create a new upload.
     /// </summary>
@@ -308,6 +479,7 @@ type
     /// A function that specifies the callbacks for the asynchronous operation.
     /// </param>
     procedure AsynCreate(const ParamProc: TProc<TUploadCreateParams>; const CallBacks: TFunc<TAsynUpload>);
+
     /// <summary>
     /// Initiates an asynchronous operation to add a part to an existing upload.
     /// </summary>
@@ -322,6 +494,7 @@ type
     /// </param>
     procedure AsynAddPart(const UploadId: string; const ParamProc: TProc<TUploadPartParams>;
       const CallBacks: TFunc<TAsynUploadPart>);
+
     /// <summary>
     /// Initiates an asynchronous operation to complete an upload.
     /// </summary>
@@ -336,6 +509,7 @@ type
     /// </param>
     procedure AsynComplete(const UploadId: string; const ParamProc: TProc<TUploadCompleteParams>;
       const CallBacks: TFunc<TAsynUpload>);
+
     /// <summary>
     /// Initiates an asynchronous operation to cancel an upload.
     /// </summary>
@@ -346,52 +520,6 @@ type
     /// A function that specifies the callbacks for the asynchronous operation.
     /// </param>
     procedure AsynCancel(const UploadId: string; const CallBacks: TFunc<TAsynUpload>);
-    /// <summary>
-    /// Creates a new upload synchronously.
-    /// </summary>
-    /// <param name="ParamProc">
-    /// A procedure to configure the upload creation parameters, such as filename, purpose, size, and MIME type.
-    /// </param>
-    /// <returns>
-    /// A <c>TUpload</c> object containing the metadata of the created upload.
-    /// </returns>
-    function Create(const ParamProc: TProc<TUploadCreateParams>): TUpload;
-    /// <summary>
-    /// Adds a part to an existing upload synchronously.
-    /// </summary>
-    /// <param name="UploadId">
-    /// The ID of the upload to which the part will be added.
-    /// </param>
-    /// <param name="ParamProc">
-    /// A procedure to configure the upload part parameters, such as the data chunk.
-    /// </param>
-    /// <returns>
-    /// A <c>TUploadPart</c> object containing the metadata of the added part.
-    /// </returns>
-    function AddPart(const UploadId: string; const ParamProc: TProc<TUploadPartParams>): TUploadPart;
-    /// <summary>
-    /// Completes an upload synchronously.
-    /// </summary>
-    /// <param name="UploadId">
-    /// The ID of the upload to complete.
-    /// </param>
-    /// <param name="ParamProc">
-    /// A procedure to configure the parameters for completing the upload, such as the part order and optional MD5 checksum.
-    /// </param>
-    /// <returns>
-    /// A <c>TUpload</c> object containing the metadata of the completed upload.
-    /// </returns>
-    function Complete(const UploadId: string; const ParamProc: TProc<TUploadCompleteParams>): TUpload;
-    /// <summary>
-    /// Cancels an upload synchronously.
-    /// </summary>
-    /// <param name="UploadId">
-    /// The ID of the upload to cancel.
-    /// </param>
-    /// <returns>
-    /// A <c>TUpload</c> object containing the metadata of the canceled upload.
-    /// </returns>
-    function Cancel(const UploadId: string): TUpload;
   end;
 
 implementation
@@ -501,6 +629,53 @@ begin
   finally
     Free;
   end;
+end;
+
+function TUploadsRoute.AsyncAwaitAddPart(const UploadId: string;
+  const ParamProc: TProc<TUploadPartParams>;
+  const CallBacks: TFunc<TPromiseUploadPart>): TPromise<TUploadPart>;
+begin
+  Result := TAsyncAwaitHelper.WrapAsyncAwait<TUploadPart>(
+    procedure(const CallBackParams: TFunc<TAsynUploadPart>)
+    begin
+      AsynAddPart(UploadId, ParamProc, CallBackParams);
+    end,
+    CallBacks);
+end;
+
+function TUploadsRoute.AsyncAwaitCancel(const UploadId: string;
+  const CallBacks: TFunc<TPromiseUpload>): TPromise<TUpload>;
+begin
+  Result := TAsyncAwaitHelper.WrapAsyncAwait<TUpload>(
+    procedure(const CallBackParams: TFunc<TAsynUpload>)
+    begin
+      AsynCancel(UploadId, CallBackParams);
+    end,
+    CallBacks);
+end;
+
+function TUploadsRoute.AsyncAwaitComplete(const UploadId: string;
+  const ParamProc: TProc<TUploadCompleteParams>;
+  const CallBacks: TFunc<TPromiseUpload>): TPromise<TUpload>;
+begin
+  Result := TAsyncAwaitHelper.WrapAsyncAwait<TUpload>(
+    procedure(const CallBackParams: TFunc<TAsynUpload>)
+    begin
+      AsynComplete(UploadId, ParamProc, CallBackParams);
+    end,
+    CallBacks);
+end;
+
+function TUploadsRoute.AsyncAwaitCreate(
+  const ParamProc: TProc<TUploadCreateParams>;
+  const CallBacks: TFunc<TPromiseUpload>): TPromise<TUpload>;
+begin
+  Result := TAsyncAwaitHelper.WrapAsyncAwait<TUpload>(
+    procedure(const CallBackParams: TFunc<TAsynUpload>)
+    begin
+      AsynCreate(ParamProc, CallBackParams);
+    end,
+    CallBacks);
 end;
 
 procedure TUploadsRoute.AsynComplete(const UploadId: string;
