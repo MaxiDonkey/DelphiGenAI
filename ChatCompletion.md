@@ -34,6 +34,11 @@ You can send a structured list of input messages containing only text content, a
 
 The Chat API can be used for both single-turn requests and multi-turn, stateless conversations.
 
+>[!IMPORTANT]
+>The `async/await` methods were introduced on the ***v1/chat/completion*** endpoint. Below you’ll find two examples: one for non-streamed responses and one for streamed responses.
+>
+>OpenAI maintains this endpoint solely for backward compatibility and does not plan any major updates. Consequently, we’ve provided only these two examples for `async/await`. It’s up to you to integrate these methods into your own code—using the ***v1/responses*** examples, with a few minor adjustments, is a great place to start.
+
 ### Non streamed
 
 ```Delphi
@@ -78,6 +83,36 @@ The Chat API can be used for both single-turn requests and multi-turn, stateless
 //  finally
 //    Value.Free;
 //  end;
+
+  //Asynchronous promise example
+//  Display(TutorialHub, 'This may take a few seconds.');
+//  var Promise := Client.Chat.AsyncAwaitCreate(
+//    procedure (Params: TChatParams)
+//    begin
+//      Params.Model('gpt-4o');
+//      Params.Messages([
+//        FromSystem('You are a comedian looking for jokes for your new show.'),
+//        FromUser('What is the difference between a mathematician and a physicist?')
+//      ]);
+//      Params.MaxCompletionTokens(1024);
+//      Params.Store(False);
+//      TutorialHub.JSONRequest := Params.ToFormat();
+//    end);
+//
+//  promise
+//    .&Then<string>(
+//      function (Value: TChat): string
+//      begin
+//        for var Item in Value.Choices do
+//          Result := Result + Item.Message.Content;
+//        Display(TutorialHub, Value);
+//        ShowMessage(Result);
+//      end)
+//    .&Catch(
+//      procedure (E: Exception)
+//      begin
+//        Display(TutorialHub, E.Message);
+//      end
 ```
 <br>
 
@@ -141,6 +176,54 @@ By using the GenAI.Tutorial.VCL unit along with the initialization described [ab
 //          DisplayStream(TutorialHub, Chat);
 //        end;
 //    end);
+
+  //Asynchronous promise example
+//  var Promise := Client.Chat.AsyncAwaitCreateStream(
+//    procedure(Params: TChatParams)
+//    begin
+//      Params.Model('gpt-4.1-nano');
+//      Params.Messages([
+//          FromDeveloper('You are a funny domestic assistant.'),
+//          FromUser('Hello'),
+//          FromAssistant('Great to meet you. What would you like to know?'),
+//          FromUser('I have two dogs in my house. How many paws are in my house?')
+//      ]);
+//      Params.Stream;
+//      Params.Store(False);
+//      TutorialHub.JSONRequest := Params.ToFormat();
+//    end,
+//    function : TPromiseChatStream
+//    begin
+//      Result.Sender := TutorialHub;
+//      Result.OnStart := Start;
+//
+//      Result.OnProgress :=
+//        procedure (Sender: TObject; Chunk: TChat)
+//        begin
+//          DisplayStream(Sender, Chunk);
+//        end;
+//
+//      Result.OnDoCancel := DoCancellation;
+//
+//      Result.OnCancellation :=
+//        function (Sender: TObject): string
+//        begin
+//          Cancellation(Sender);
+//        end
+//    end);
+//
+//  Promise
+//    .&Then<string>(
+//      function (Value: string): string
+//      begin
+//        Result := Value;
+//        ShowMessage(Result);
+//      end)
+//    .&Catch(
+//      procedure (E: Exception)
+//      begin
+//        Display(TutorialHub, E.Message);
+//      end);
 ```
 
 ![Preview](https://github.com/MaxiDonkey/DelphiGenAI/blob/main/images/GenAIChatStreamedRequest.png?raw=true "Preview")
@@ -363,6 +446,22 @@ Get a stored chat completion. Only [Chat Completions](https://github.com/MaxiDon
 //  finally
 //    Value.Free;
 //  end;
+
+  //Asynchronous promise example
+//  var Promise := Client.Chat.AsyncAwaitGetCompletion('completion_id');   //e.g. 'chatcmpl-BO9ybVceB3aXFyMRKR3MKUEzWcFqE'
+//
+//  promise
+//    .&Then<TChat>(
+//      function (Value: TChat): TChat
+//      begin
+//        Result := Value;
+//        Display(TutorialHub, Value);
+//      end)
+//    .&Catch(
+//      procedure (E: Exception)
+//      begin
+//        Display(TutorialHub, E.Message);
+//      end);
 ```
 
 <br>
@@ -403,6 +502,28 @@ Get the messages in a stored chat completion. Only [Chat Completions](https://gi
 //  finally
 //    Value.Free;
 //  end;
+
+  //Asynchronous promise example
+//  var Promise := Client.Chat.AsyncAwaitGetMessages(
+//    'completion_id',   //e.g. 'chatcmpl-BO9ybVceB3aXFyMRKR3MKUEzWcFqE',
+//    procedure (Param: TUrlChatParams)
+//    begin
+//      Param.Limit(15);
+//      Param.Order('asc');
+//    end);
+//
+//  promise
+//    .&Then<TChatMessages>(
+//      function (Value: TChatMessages): TChatMessages
+//      begin
+//        Result := Value;
+//        Display(TutorialHub, Value);
+//      end)
+//    .&Catch(
+//      procedure (E: Exception)
+//      begin
+//        Display(TutorialHub, E.Message);
+//      end);
 ```
 
 <br>
@@ -442,6 +563,26 @@ List stored Chat Completions. Only [Chat Completions](https://github.com/MaxiDon
 //  finally
 //    Value.Free;
 //  end;
+
+  //Asynchronous promise example
+//  var Promise := Client.Chat.AsyncAwaitList(
+//    procedure (Params: TUrlChatListParams)
+//    begin
+//      Params.Limit(15);
+//    end);
+//
+//  promise
+//    .&Then<TChatCompletion>(
+//      function (Value: TChatCompletion): TChatCompletion
+//      begin
+//        Result := Value;
+//        Display(TutorialHub, Value);
+//      end)
+//    .&Catch(
+//      procedure (E: Exception)
+//      begin
+//        Display(TutorialHub, E.Message);
+//      end);
 ```
 
 <br>
@@ -460,6 +601,7 @@ Modify a stored chat completion. Only [Chat Completions](https://github.com/Maxi
     procedure (Params: TChatUpdateParams)
     begin
       Params.Metadata(TJSONObject.Create.AddPair('foo', 'bar'));
+      TutorialHub.JSONRequest := Params.ToFormat();
     end,
     function : TAsynChat
     begin
@@ -474,12 +616,36 @@ Modify a stored chat completion. Only [Chat Completions](https://github.com/Maxi
 //    procedure (Params: TChatUpdateParams)
 //    begin
 //      Params.Metadata(TJSONObject.Create.AddPair('foo', 'bar'));
+//      TutorialHub.JSONRequest := Params.ToFormat();
 //    end);
 //  try
 //    Display(TutorialHub, Value);
 //  finally
 //    Value.Free;
 //  end;
+
+  //Asynchronous promise example
+//  var Promise := Client.Chat.AsyncAwaitUpdate(
+//    'completion_id',   //e.g. 'chatcmpl-BO9ybVceB3aXFyMRKR3MKUEzWcFqE'
+//    procedure (Params: TChatUpdateParams)
+//    begin
+//      Params.Metadata(TJSONObject.Create.AddPair('foo1', 'bar1'));
+//      TutorialHub.JSONRequest := Params.ToFormat();
+//    end);
+//
+//  promise
+//    .&Then<TChat>(
+//      function (Value: TChat): TChat
+//      begin
+//        Result := Value;
+//        Display(TutorialHub, Value);
+//      end)
+//    .&Catch(
+//      procedure (E: Exception)
+//      begin
+//        Display(TutorialHub, E.Message);
+//      end);
+
 ```
 
 <br>
@@ -510,6 +676,22 @@ Delete a stored chat completion. Only [Chat Completions](https://github.com/Maxi
 //  finally
 //    Value.Free;
 //  end;
+
+  //Asynchronous promise example
+//  var Promise := Client.Chat.AsyncAwaitDelete('completion_id');   //e.g. 'chatcmpl-BO9ybVceB3aXFyMRKR3MKUEzWcFqE'
+//
+//  promise
+//    .&Then<TChatDelete>(
+//      function (Value: TChatDelete): TChatDelete
+//      begin
+//        Result := Value;
+//        Display(TutorialHub, Value);
+//      end)
+//    .&Catch(
+//      procedure (E: Exception)
+//      begin
+//        Display(TutorialHub, E.Message);
+//      end);
 ```
 
 <br>

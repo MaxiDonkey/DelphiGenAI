@@ -1,4 +1,19 @@
-#### 2025, June 4 version 1.0.7
+#### 2025, June 14 version 1.1.0
+- Given the project’s rapid progress, it’s now essential to embed versioning directly into the GenAI wrapper’s source code. For any client implementing the IGenAI interface, the version number can be retrieved via the Version property, for example:
+```Delphi
+var version = Client.Version;
+```
+- `Async/await` methods have been rolled out across all APIs with sensitive endpoints. Consequently, the tutorial’s code snippets have been enriched to provide readers with ready-to-use examples via ***TutorialHub***.
+
+- For endpoints dedicated to `fine-tuning` and `batch` processing, adding ***async/await*** isn’t relevant—those operations can incur significant response delays—so only the asynchronous approach has been adopted.
+
+- The endpoints responsible for configuring and running assistants haven’t been updated, as OpenAI plans to remove that functionality in the near future.
+
+- The demonstration project code for [file2knowledge](https://github.com/MaxiDonkey/file2knowledge), which leverages the `v1/responses` endpoint, has been updated to include advanced usage examples using asynchronous (async/await) methods. You can check out the units in the [`Providers`](https://github.com/MaxiDonkey/file2knowledge/tree/main/providers) folder to explore the various illustrations. Finally, the `GenAI` tutorial will automatically insert links to this project whenever they prove relevant.
+
+- `AsyncAwaitCreateStream` now handles the error event directly, immediately rejecting the promise on the `v1/responses` endpoint. 
+
+### 2025, June 4 version 1.0.7 (**Getit version**)
 - Added streaming events to the `v1/responses` endpoint.
     - response.image_generation_call.completed
     - response.image_generation_call.generating

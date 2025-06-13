@@ -4,6 +4,7 @@
     - [Non streamed](#non-streamed) 
     - [Streamed](#streamed)
     - [Multi-turn conversations](#multi-turn-conversations) 
+    - [Advanced Use Case](#advanced-use-case)
     - [Parallel method for generating text](#parallel-method-for-generating-text)
         - [Example 1 : Two prompts processed in parallel](#example-1--two-prompts-processed-in-parallel)
         - [Example 2 : Three web search processed in parallel.](#example-2--three-web-search-processed-in-parallel)
@@ -54,7 +55,7 @@ This interface represents OpenAI’s most advanced environment for driving model
     begin
       Params.Model('gpt-4.1-mini');
       Params.Input('What is the difference between a mathematician and a physicist?');
-      //Params.Store(False);  // Response not stored
+      Params.Store(False);  // Response not stored
       TutorialHub.JSONRequest := Params.ToFormat();
     end,
     function : TAsynResponse
@@ -76,7 +77,7 @@ This interface represents OpenAI’s most advanced environment for driving model
 //    begin
 //      Params.Model('gpt-4.1-mini');
 //      Params.Input('What is the difference between a mathematician and a physicist?');
-//      //Params.Store(False);  // Response not stored
+//      Params.Store(False);  // Response not stored
 //      TutorialHub.JSONRequest := Params.ToFormat();
 //    end);
 //  try
@@ -85,32 +86,22 @@ This interface represents OpenAI’s most advanced environment for driving model
 //    Value.Free;
 //  end;
 
-  //Asynchronous promise example
+    //Asynchronous promise example
+//  Display(TutorialHub, 'This may take a few seconds.');
 //  var Promise := Client.Responses.AsyncAwaitCreate(
 //    procedure (Params: TResponsesParams)
 //    begin
 //      Params.Model('gpt-4.1-mini');
 //      Params.Input('What is the difference between a mathematician and a physicist?');
-//      //Params.Store(False);  // Response not stored
+//      Params.Store(False);  // Response not stored
 //      TutorialHub.JSONRequest := Params.ToFormat();
-//    end,
-//    function : TPromiseResponse
-//    begin
-//      Result.Sender := TutorialHub;
-//      Result.OnStart := Start;
-//      Result.OnSuccess :=
-//        function (Sender: TObject; Response: TResponse): string
-//        begin
-//          Result := Response.Output[0].Content[0].Text;
-//          TutorialHub.JSONResponse := Response.JSONResponse; //Display the JSON response
-//        end;
 //    end);
 //
 //  promise
 //    .&Then<string>(
-//      function (Value: string): string
+//      function (Value: TResponse): string
 //      begin
-//        Result := Value;
+//        Result := Value.Output[0].Content[0].Text;
 //        Display(TutorialHub, Value);
 //      end)
 //    .&Catch(
@@ -149,7 +140,7 @@ When you create a Response with `stream` set to `true`, the server will emit ser
     begin
       Params.Model('gpt-4.1-nano');
       Params.Input('What is the difference between a mathematician and a physicist?');
-      //Params.Store(False);  // Response not stored
+      Params.Store(False);  // Response not stored
       Params.Stream;
       TutorialHub.JSONRequest := Params.ToFormat();
     end,
@@ -169,7 +160,7 @@ When you create a Response with `stream` set to `true`, the server will emit ser
 //    begin
 //      Params.Model('gpt-4.1-nano');
 //      Params.Input('What is the difference between a mathematician and a physicist?');
-//      //Params.Store(False);  // Response not stored
+//      Params.Store(False);  // Response not stored
 //      Params.Stream;
 //      TutorialHub.JSONRequest := Params.ToFormat();
 //    end,
@@ -182,13 +173,12 @@ When you create a Response with `stream` set to `true`, the server will emit ser
 //    end);
 
     //Asynchronous promise example
-//  var Buffer := EmptyStr;
 //  var Promise := Client.Responses.AsyncAwaitCreateStream(
 //    procedure(Params: TResponsesParams)
 //    begin
 //      Params.Model('gpt-4.1-nano');
 //      Params.Input('What is the difference between a mathematician and a physicist?');
-//      //Params.Store(False);  // Response not stored
+//      Params.Store(False);  // Response not stored
 //      Params.Stream;
 //      TutorialHub.JSONRequest := Params.ToFormat();
 //    end,
@@ -201,13 +191,6 @@ When you create a Response with `stream` set to `true`, the server will emit ser
 //        procedure (Sender: TObject; Chunk: TResponseStream)
 //        begin
 //          DisplayStream(Sender, Chunk);
-//          Buffer := Buffer + Chunk.Delta;
-//        end;
-//
-//      Result.OnSuccess :=
-//        function (Sender: TObject): string
-//        begin
-//          Result := Buffer;
 //        end;
 //
 //      Result.OnDoCancel := DoCancellation;
@@ -221,10 +204,10 @@ When you create a Response with `stream` set to `true`, the server will emit ser
 //
 //  Promise
 //    .&Then<string>(
-//      function (Value: string): string
+//      function (Value: TResponseStream): string
 //      begin
-//        Result := Value;
-//        ShowMessage(Value);
+//        Result := Value.Item.Content[0].Text;
+//        ShowMessage(Result);
 //      end)
 //    .&Catch(
 //      procedure (E: Exception)
@@ -232,6 +215,12 @@ When you create a Response with `stream` set to `true`, the server will emit ser
 //        Display(TutorialHub, E.Message);
 //      end);
 ```
+
+>[!WARNING]
+>**When using `promises with SSE`**
+>- In the context of SSE (streaming) reception, the promise is resolved as soon as the ***response.completed*** event is received, that is, within the `OnProgress` callback. Consequently, the `OnSuccess` callback is never invoked.
+>
+>- When an `error` or `response.failed` event is received, the promise is automatically rejected, just as it is when an SSE reception is `canceled` by the user. In such cases, it is not possible to guarantee the return of a valid `TResponseStream` object.
 
 ![Preview](/../main/images/GenAIResponseStreamedRequest.png?raw=true "Preview")
 
@@ -264,12 +253,18 @@ In the example below, we assume that one of the previous requests (streamed or n
       Params.Model('gpt-4.1-mini');
       Params.Input('question : second tour');
       Params.PreviousResponseId('resp_67ffb72044648191b4faddb8254c79cf002f1563a5487ec4');
-      Params.Store(False);
+      Params.Store(True);
     end 
   ...
 ```
 
 Simply include the previous response’s ID with each turn. Thanks to CRUD operations, retrieving, processing, and deleting saved responses is straightforward. For more details, see the [CRUD operations on saved Responses](#crud-operations-on-saved-responses).
+
+<br>
+
+### Advanced Use Case
+
+A more advanced use case can be found in the [file2knowledge](https://github.com/MaxiDonkey/file2knowledge/tree/main) project, which involves SSE and detailed streaming event management. For this, refer to the units [Provider.OpenAI.ExecutionEngine](https://github.com/MaxiDonkey/file2knowledge/blob/main/providers/Provider.OpenAI.ExecutionEngine.pas) for SSE management and [Provider.OpenAI.StreamEvents](https://github.com/MaxiDonkey/file2knowledge/blob/main/providers/Provider.OpenAI.StreamEvents.pas) for advanced streaming event handling.
 
 <br>
 
@@ -392,7 +387,7 @@ To perform a web search, use the `gpt-4.1` or `gpt-4.1-mini` models with the `re
 ```Delphi
 //uses GenAI, GenAI.Types, GenAI.Tutorial.VCL;
 
-  var Buffer := EmptyStr;
+  Display(TutorialHub, 'Start the parallel job' + sLineBreak);
   var Promise := Client.Responses.AsyncAwaitCreateParallel(
     procedure (Params: TBundleParams)
     begin
@@ -404,30 +399,21 @@ To perform a web search, use the `gpt-4.1` or `gpt-4.1-mini` models with the `re
       Params.Model('gpt-4.1-mini');
       Params.SearchSize('medium');
       Params.Country('US');
-    end,
-    function : TPromiseBundleList
-    begin
-      Result.Sender := TutorialHub;
-      Result.OnStart :=
-        procedure (Sender: TObject)
-        begin
-          Display(Sender, 'Start the parallel job' + sLineBreak);
-        end;
-      Result.OnSuccess :=
-        function (Sender: TObject; Bundle: TBundleList): string
-        begin
-          for var Item in Bundle.Items do
-            begin
-              Result := Result + 'Question : ' + Item.Prompt + sLineBreak + sLineBreak;
-              Result := Result + 'Response : ' + Item.Response + sLineBreak + sLineBreak;
-              Display(Sender, Result);
-            end;
-        end;
     end);
 
   Promise
-    .&Then(
-      function (Value: string): TStringPromise
+    .&Then<string>(
+      function (Value: TBundleList): string
+      begin
+        for var Item in Value.Items do
+          begin
+            Result := Result + 'Question : ' + Item.Prompt + sLineBreak + sLineBreak;
+            Result := Result + 'Response : ' + Item.Response + sLineBreak + sLineBreak;
+          end;
+        Display(TutorialHub, Result);
+      end)
+    .&Then<TResponseStream>(
+      function (Value: string): TPromise<TResponseStream>
       begin
         Result := Client.Responses.AsyncAwaitCreateStream(
           procedure (Params: TResponsesParams)
@@ -440,35 +426,25 @@ To perform a web search, use the `gpt-4.1` or `gpt-4.1-mini` models with the `re
           end,
           function : TPromiseResponseStream
           begin
-            Result.Sender := TutorialHub;
-            Result.OnStart := Start;
             Result.OnProgress :=
               procedure (Sender: TObject; Response: TResponseStream)
               begin
-                if Response.&Type = TResponseStreamType.output_text_delta then
-                  Buffer := Buffer + Response.Delta;
-                DisplayStream(Sender, Response);
-              end;
-            Result.OnSuccess :=
-              function (Sender: TObject): string
-              begin
-                Result := Buffer;
+                DisplayStream(TutorialHub, Response);
               end;
             Result.OnDoCancel := DoCancellation;
-            Result.OnCancellation := nil;
-          end);
+          end)
       end)
     .&Then<string>(
-      function (Value: string): string
+      function (Value: TResponseStream): string
       begin
-        Result := Value;
+        Result := Value.Item.Content[0].Text;
         ShowMessage(Result);
       end)
     .&Catch(
       procedure (E: Exception)
       begin
         Display(TutorialHub, E.Message);
-      end);  
+      end);
 ```
  
 
@@ -517,18 +493,7 @@ Retrieves a model response with the given ID. Refer to the [official documentati
 //  end;
 
     //Asynchronous promise example
-//  var Promise := Client.Responses.ASyncAwaitRetrieve('Response_ID',
-//    function : TPromiseResponse
-//    begin
-//      Result.Sender := TutorialHub;
-//      Result.OnStart := Start;
-//      Result.OnSuccess :=
-//        function (Sender: TObject; Response: TResponse): string
-//        begin
-//          Result := Response.Model;
-//          Display(Sender, Response.Id + ': ' + Result);
-//        end;
-//    end);
+//  var Promise := Client.Responses.ASyncAwaitRetrieve('Response_ID');
 //
 //  Promise
 //    .&Then<TResponse>(
@@ -541,8 +506,7 @@ Retrieves a model response with the given ID. Refer to the [official documentati
 //      procedure (E: Exception)
 //      begin
 //        Display(TutorialHub, E.Message);
-//      end
-//    );
+//      end);
 ```
 
 <br>
@@ -574,17 +538,7 @@ Deletes a model response with the given ID. Refer to the [official documentation
 //  end;
 
     //Asynchronous promise example
-//  var Promise := Client.Responses.AsyncAwaitDelete(Edit1.Text,
-//    function : TPromiseResponseDelete
-//    begin
-//      Result.Sender := TutorialHub;
-//      Result.OnStart := Start;
-//      Result.OnSuccess :=
-//        function (Sender: TObject; Deleted: TResponseDelete): string
-//        begin
-//          Display(Sender, Deleted.Id + ' [deleted]');
-//        end
-//    end);
+//  var Promise := Client.Responses.AsyncAwaitDelete('Response_ID');
 //
 //  Promise
 //    .&Then<TResponseDelete>(
@@ -641,16 +595,11 @@ Returns a list of input items for a given response. Refer to the [official docum
 
     //Asynchronous promise example
 //  var Promise := Client.Responses.AsyncAwaitList(
-//    Edit1.Text,
+//    'Response_ID',
 //    procedure (Params: TUrlResponseListParams)
 //    begin
 //      Params.Order('asc');
 //      Params.Limit(15);
-//    end,
-//    function : TPromiseResponses
-//    begin
-//      Result.Sender := TutorialHub;
-//      Result.OnStart := Start;
 //    end);
 //
 //  Promise
@@ -728,6 +677,42 @@ Refer to the [official documentation](https://platform.openai.com/docs/guides/vi
 //            DisplayStream(TutorialHub, Chat);
 //          end;
 //      end);
+
+  //Asynchronous promise example
+//  Display(TutorialHub, 'Start image analysis');
+//  var Promise := Client.Responses.AsyncAwaitCreateStream(
+//    procedure (Params: TResponsesParams)
+//    begin
+//      Params.Model('gpt-4.1-mini');
+//      Params.Input('What is in this image?', [Url]);
+//      Params.Store(False);
+//      Params.Stream;
+//      TutorialHub.JSONRequest := Params.ToFormat();
+//    end,
+//    function : TPromiseResponseStream
+//    begin
+//      Result.OnProgress :=
+//        procedure (Sender: TObject; Chunk: TResponseStream)
+//        begin
+//          DisplayStream(TutorialHub, Chunk);
+//        end;
+//      Result.OnDoCancel := DoCancellation;
+//    end);
+//
+//  Promise
+//    .&Then<string>(
+//      function (Value: TResponseStream): string
+//      begin
+//        for var Item in Value.Response.Output do
+//          for var SubItem in Item.Content do
+//            Result := Result + SubItem.Text;
+//        ShowMessage(Result);
+//      end)
+//    .&Catch(
+//      procedure (E: Exception)
+//      begin
+//        Display(TutorialHub, E.Message);
+//      end);
 ```
 This example uses streaming. The non-streamed version is straightforward to implement, so it is not covered here.
 
@@ -779,6 +764,42 @@ This example uses streaming. The non-streamed version is straightforward to impl
 //            DisplayStream(TutorialHub, Chat);
 //          end;
 //      end);
+
+  //Asynchronous promise example
+//  Display(TutorialHub, 'Start comparison');
+//  var Promise := Client.Responses.AsyncAwaitCreateStream(
+//    procedure (Params: TResponsesParams)
+//    begin
+//      Params.Model('gpt-4.1-mini');
+//      Params.Input('Compare images', [Ref1, Ref2]);
+//      Params.Store(False);
+//      Params.Stream;
+//      TutorialHub.JSONRequest := Params.ToFormat();
+//    end,
+//    function : TPromiseResponseStream
+//    begin
+//      Result.OnProgress :=
+//        procedure (Sender: TObject; Chunk: TResponseStream)
+//        begin
+//          DisplayStream(TutorialHub, Chunk);
+//        end;
+//      Result.OnDoCancel := DoCancellation;
+//    end);
+//
+//  Promise
+//    .&Then<string>(
+//      function (Value: TResponseStream): string
+//      begin
+//        for var Item in Value.Response.Output do
+//          for var SubItem in Item.Content do
+//            Result := Result + SubItem.Text;
+//        ShowMessage(Result);
+//      end)
+//    .&Catch(
+//      procedure (E: Exception)
+//      begin
+//        Display(TutorialHub, E.Message);
+//      end);
 ```
 
 <br>
@@ -818,8 +839,9 @@ However, with GenAI, it is possible to directly provide a local path or a URL po
 //uses GenAI, GenAI.Types, GenAI.Tutorial.VCL;
 
   TutorialHub.JSONRequestClear;
-  var Ref := 'http://www.mysite.com/my_file.pdf';
-//  var Ref := 'D:\my_folder\my_file.pdf';
+  var Ref := '..\..\sample\File_Search_file.pdf'
+//  var Ref := 'http://www.mysite.com/my_file.pdf';
+
 
   //Asynchronous example
   Client.Responses.AsynCreateStream(
@@ -858,6 +880,42 @@ However, with GenAI, it is possible to directly provide a local path or a URL po
 //            DisplayStream(TutorialHub, Response);
 //          end;
 //      end);
+
+  //Asynchronous promise example
+//  Display(TutorialHub, 'Start PDF analysis');
+//  var Promise := Client.Responses.AsyncAwaitCreateStream(
+//    procedure (Params: TResponsesParams)
+//    begin
+//      Params.Model('gpt-4.1-mini');
+//      Params.Input('Summarize the document', [Ref]);
+//      Params.Store(False);
+//      Params.Stream;
+//      TutorialHub.JSONRequest := Params.ToFormat();
+//    end,
+//    function : TPromiseResponseStream
+//    begin
+//      Result.OnProgress :=
+//        procedure (Sender: TObject; Chunk: TResponseStream)
+//        begin
+//          DisplayStream(TutorialHub, Chunk);
+//        end;
+//      Result.OnDoCancel := DoCancellation;
+//    end);
+//
+//  Promise
+//    .&Then<string>(
+//      function (Value: TResponseStream): string
+//      begin
+//        for var Item in Value.Response.Output do
+//          for var SubItem in Item.Content do
+//            Result := Result + SubItem.Text;
+//        ShowMessage(Result);
+//      end)
+//    .&Catch(
+//      procedure (E: Exception)
+//      begin
+//        Display(TutorialHub, E.Message);
+//      end);
 ```
 You can also submit multiple PDF files at once to perform analysis across a group of documents.
 
@@ -891,33 +949,86 @@ Since these models can require response times ranging from a few seconds to seve
 
   TutorialHub.JSONRequestClear;
 
- //Asynchronous example
-  Client.Responses.AsynCreateStream(
+  //Asynchronous promise example
+  Client.API.HttpClient.ResponseTimeout := 300000; //5 min
+
+  var Promise := Client.Responses.AsyncAwaitCreateStream(
     procedure (Params: TResponsesParams)
     begin
       Params.Model('o4-mini');
       Params.Instructions('You are an expert in bash script.');
       Params.Input('Write a bash script that takes a matrix represented as a string with format \"[1,2],[3,4],[5,6]\" and prints the transpose in the same format.');
       //Simplified
-      Params.Reasoning('high' );
-      //or deailled
-      //Params.Reasoning(
-      //  TReasoningParams.New.Effort('high').Summary('concise')
-      //);
+      //Params.Reasoning('high' );
+      //or detailed
+      Params.Reasoning(
+        TReasoningParams.New.Effort('high').Summary('detailed')
+      );
       Params.Stream;
+      Params.Store(False);
       TutorialHub.JSONRequest := Params.ToFormat();
     end,
-    function : TAsynResponseStream
+    function : TPromiseResponseStream
     begin
-      Result.Sender := TutorialHub;
-      Result.OnStart := Start;
-      Result.OnProgress := DisplayStream;
-      Result.OnError := Display;
+      Result.OnProgress :=
+        procedure (Sender: TObject; Chunk: TResponseStream)
+        begin
+          DisplayStream(TutorialHub, Chunk);
+        end;
       Result.OnDoCancel := DoCancellation;
-      Result.OnCancellation := Cancellation;
-    end);tion := Cancellation;
     end);
+
+  Promise
+    .&Then<string>(
+      function (Value: TResponseStream): string
+      begin
+        for var Item in Value.Response.Output do
+          for var SubItem in Item.Content do
+            Result := Result + SubItem.Text;
+        ShowMessage(Result);
+      end)
+    .&Catch(
+      procedure (E: Exception)
+      begin
+        Display(TutorialHub, E.Message);
+      end);
+
+  //Asynchronous example
+//  Client.API.HttpClient.ResponseTimeout := 300000; //5 min
+//
+//  Client.Responses.AsynCreateStream(
+//    procedure (Params: TResponsesParams)
+//    begin
+//      Params.Model('o4-mini');
+//      Params.Instructions('You are an expert in bash script.');
+//      Params.Input('Write a bash script that takes a matrix represented as a string with format \"[1,2],[3,4],[5,6]\" and prints the transpose in the same format.');
+//      //Simplified
+//      //Params.Reasoning('high' );
+//      //or detailed
+//      Params.Reasoning(
+//        TReasoningParams.New.Effort('high').Summary('detailed')
+//      );
+//      Params.Stream;
+//      Params.Store(False);
+//      TutorialHub.JSONRequest := Params.ToFormat();
+//    end,
+//    function : TAsynResponseStream
+//    begin
+//      Result.Sender := TutorialHub;
+//      Result.OnStart := Start;
+//      Result.OnProgress := DisplayStream;
+//      Result.OnError := Display;
+//      Result.OnDoCancel := DoCancellation;
+//      Result.OnCancellation := Cancellation;
+//    end);
+//end;
 ```
+
+### **Remarks**
+
+- Since we are using a reasoning-based model, it is not possible to predict the exact duration of the reasoning process in advance. As an experiment, we will therefore set the connection duration to 5 minutes for this test.
+
+- To access reasoning visualization with o-models, you must enable this feature in the Verification section of your [OpenAI account](https://platform.openai.com/settings/organization/general). The activation process takes only a few minutes.
 
 <br>
 
@@ -1020,8 +1131,7 @@ To fine‑tune search results by geography, you can supply an approximate locati
 //        end;
 //    end);
 
-    //Asynchronous promise example
-//  var Buffer := EmptyStr;
+  //Asynchronous promise example
 //  var promise := Client.Responses.AsyncAwaitCreateStream(
 //    procedure(Params: TResponsesParams)
 //    begin
@@ -1041,13 +1151,6 @@ To fine‑tune search results by geography, you can supply an approximate locati
 //        procedure (Sender: TObject; Chunk: TResponseStream)
 //        begin
 //          DisplayStream(Sender, Chunk);
-//          Buffer := Buffer + Chunk.Delta;
-//        end;
-//
-//      Result.OnSuccess :=
-//        function (Sender: TObject): string
-//        begin
-//          Result := Buffer;
 //        end;
 //
 //      Result.OnDoCancel := DoCancellation;
@@ -1061,10 +1164,12 @@ To fine‑tune search results by geography, you can supply an approximate locati
 //
 //  promise
 //    .&Then<string>(
-//      function (Value: string): string
+//      function (Value: TResponseStream): string
 //      begin
-//        Result := Value;
-//        ShowMessage(Value);
+//        for var Item in Value.Response.Output do
+//          for var SubItem in Item.Content do
+//            Result := Result + SubItem.Text;
+//        ShowMessage(Result);
 //      end)
 //    .&Catch(
 //      procedure (E: Exception)
@@ -1155,6 +1260,9 @@ The file is named `File_Search_file.pdf`.
   end;
 ```
 
+>[!IMPORTANT]
+> For practical information on using the ***upload API*** with the `v1/files` endpoint, please refer to the ["File Upload"](https://github.com/MaxiDonkey/DelphiGenAI?tab=readme-ov-file#file-upload) section of this tutorial.
+
 Result
 ```Json
 {
@@ -1193,6 +1301,10 @@ This step initializes a vector storage space, which will later be used to index 
     Value.Free;
   end;
 ```
+
+>[!IMPORTANT]
+> For practical information on using the ***create API*** with the `v1/vector_stores` endpoint, please refer to the ["Vector store create"](https://github.com/MaxiDonkey/DelphiGenAI/blob/main/BeyondBasics.md#vector-store-create) section of this tutorial.
+
 
 Result
 ```Json
@@ -1240,6 +1352,10 @@ To complete the vector store setup, we will now attach the uploaded file to the 
   end;
 ```
 
+>[!IMPORTANT]
+> For practical information on using the ***create API*** with the `v1/vector_stores` endpoint, please refer to the ["Vector store files create"](https://github.com/MaxiDonkey/DelphiGenAI/blob/main/BeyondBasics.md#vector-store-files) section of this tutorial.
+
+
 Result
 ```Json
 {
@@ -1261,6 +1377,13 @@ Result
     }
 }
 ```
+
+>[!IMPORTANT]
+>A comprehensive use case can be found in the [file2knowledge](https://github.com/MaxiDonkey/file2knowledge/tree/main) project by reviewing the units [Provider.OpenAI.FileStore](https://github.com/MaxiDonkey/file2knowledge/blob/main/providers/Provider.OpenAI.FileStore.pas) and [Provider.OpenAI.VectorStore](https://github.com/MaxiDonkey/file2knowledge/blob/main/providers/Provider.OpenAI.VectorStore.pas). 
+>These units provide all the necessary tools for implementing advanced scenarios.
+>
+>Similarly, within the [Provider.OpenAI](https://github.com/MaxiDonkey/file2knowledge/blob/main/providers/Provider.OpenAI.pas) unit of the same project, you will find the method `EnsureVectorStoreFileLinked`. This method automatically provides a vector store as soon as a file is supplied, handling checks for pre-existence, file upload, and association with an existing or newly created vector store. 
+>This approach will enable you to integrate the `file_search` tool into your applications more efficiently.
 
 <br>
 
@@ -1498,43 +1621,30 @@ We will demonstrate this concept in practice through several examples. Please no
   TutorialHub.JSONRequestClear;
 
   //Asynchronous promise example
+  Display(TutorialHub, 'This may take a few seconds.');
   var Promise := Client.Responses.AsyncAwaitCreate(
     procedure (Params: TResponsesParams)
     begin
       Params.Model('gpt-4.1-mini');
       Params.Input('Create a realistic image of a cup of coffee on a transparent background.');
-      
-      Params.Tools([   
-        TResponseImageGenerationParams.New //Use the image generation tool 
+      Params.Tools([
+        TResponseImageGenerationParams.New
           .Background('transparent')
           .model('gpt-image-1')
           .Size(TImageSize.r1024x1024)
       ]);
-      
       Params.Store(False);
       TutorialHub.JSONRequest := Params.ToFormat();
-    end,
-    function : TPromiseResponse
-    begin
-      Result.Sender := TutorialHub;
-
-      Result.OnStart := Start;
-
-      Result.OnSuccess :=
-        function (Sender: TObject; Response: TResponse): string
-        begin
-          Display(Sender, Response);
-          Result := Response.Output[0].Result;  //Retrieving the image in base64
-        end;
     end
   );
 
   promise
     .&Then<string>(
-      function (Value: string): string
+      function (Value: TResponse): string
       begin
-        Result := Value;
-        var Stream := TImageHelper.Create(Value).GetStream;
+        Display(TutorialHub, Value);
+        Result := Value.Output[0].Result; //image base-64
+        var Stream := TImageHelper.Create(Result).GetStream;
         try
           Image1.Picture.LoadFromStream(Stream);
         finally

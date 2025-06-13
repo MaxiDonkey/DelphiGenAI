@@ -1,18 +1,19 @@
 # **Delphi GenAI - Optimized OpenAI Integration**
 
 ___
-![Delphi Next Gen Ready](https://img.shields.io/badge/Delphi--Next--Gen-ready-brightgreen)
+![Delphi async/await supported](https://img.shields.io/badge/Delphi%20async%2Fawait-supported-blue)
 ![GitHub](https://img.shields.io/badge/IDE%20Version-Delphi%2010.4/11/12-ffffba)
 [![GetIt – Available](https://img.shields.io/badge/GetIt-Available-baffc9?logo=delphi&logoColor=white)](https://getitnow.embarcadero.com/genai-optimized-openai-integration-wrapper/)
 ![GitHub](https://img.shields.io/badge/platform-all%20platforms-baffc9)
-![GitHub](https://img.shields.io/badge/Updated%20on%20June%2003,%202025-blue)
+![GitHub](https://img.shields.io/badge/Updated%20on%20June%2013,%202025-blue)
 
 <br>
 
 NEW: 
-- [Changelog v1.0.7](https://github.com/MaxiDonkey/DelphiGenAI/blob/main/Changelog.md)
-- [Mini-lab to experiment with the v1/responses endpoint](https://github.com/MaxiDonkey/file2knowledge) `File2knowledge` 
-- [Responses](https://github.com/MaxiDonkey/DelphiGenAI/blob/main/Responses.md)
+- Getit current version: 1.0.7
+- [Changelog v1.1.0](https://github.com/MaxiDonkey/DelphiGenAI/blob/main/Changelog.md)
+- [Mini-lab to experiment with the v1/responses endpoint `File2knowledge`](https://github.com/MaxiDonkey/file2knowledge)  
+- [Responses endpoint](https://github.com/MaxiDonkey/DelphiGenAI/blob/main/Responses.md)
 ___
 
 <br>
@@ -67,11 +68,22 @@ ___
 
 # Introduction
 
-Welcome to `GenAI`, a powerful and flexible **Delphi library** integrating the latest innovations from `OpenAI` APIs. Designed for comprehensive support, it enables content generation, dialogue management, vision and speech processing, as well as audio interactions with precise control.
-Built on advanced models with reasoning capabilities, such as `o1`, `o3` and `o4`, it provides tools for data manipulation, batch processing, function calling, file management, and content moderation. It also supports the `GPT-4.1` models, the terminaison endpoints `v1/chat/completion`, `v1/responses` and offers seamless agent construction.
-Additionally, `GenAI` streamlines assistant orchestration, message management, threads, and execution (runs), meeting the demands of modern projects. <br> <br>
-Integrating OpenAI APIs into your Delphi apps has never been easier: enjoy streamlined network‑call management, built‑in unit testing, and a modular JSON‑configuration approach.
-Check out the full [GenAI project](https://github.com/MaxiDonkey/DelphiGenAI/blob/main/GenAI.md)
+**GenAI** is a powerful Delphi library that brings the latest OpenAI APIs to your desktop, mobile, and server apps.
+
+**Core capabilities**  
+- Unified access to text, vision, speech, and audio endpoints  
+- Agentic workflows via the `v1/responses` endpoint, with built-in tools `file_search`, `web_search`, `Code Interpreter`, and `remote MCP`  
+- Supports state-of-the-art models, including ***gpt-4o***, ***gpt-4.1***, ***gpt-4.5*** and the reasoning-centric *o1 · o3 · o4* series  
+
+**Developer tooling**  
+- Ready-made `Sync`, `Async`, and `Await` code snippets (TutorialHUB compatible)  
+- Batch processing, function calling, file management, and content moderation out of the box  
+- Built-in DUnit test helpers and a modular JSON configuration for streamlined setup  
+- Mock-friendly design: the HTTP layer is injected via dependency injection, so you can swap in stubs or fakes for testing  
+
+Integrate OpenAI into Delphi—no boilerplate, just results.
+
+_Check out the full [GenAI project](https://github.com/MaxiDonkey/DelphiGenAI/blob/main/GenAI.md) for details._
 
 <br>
 
@@ -281,6 +293,22 @@ The list of available models can be retrieved from the Models API response. The 
 //  finally
 //    Value.Free;
 //  end;
+
+  //Asynchronous promise example
+//  var Promise := Client.Models.AsyncAwaitList;
+//
+//  Promise
+//    .&Then<TModels>(
+//      function (Value: TModels): TModels
+//      begin
+//        Display(TutorialHub, Value);
+//        Result := Value;
+//      end)
+//    .&Catch(
+//      procedure (E: Exception)
+//      begin
+//        Display(TutorialHub, E.Message);
+//      end);
 ```
 
 <br/>
@@ -312,6 +340,22 @@ Retrieve a model using its ID.
 //  finally
 //    Value.Free;
 //  end;
+
+  //Asynchronous promise example
+//  var Promise := Client.Models.AsyncAwaitRetrieve(TutorialHub.ModelId);
+//
+//  Promise
+//    .&Then<string>(
+//      function (Value: TModel): string
+//      begin
+//        Result := Value.Id;
+//        Display(TutorialHub, Value);
+//      end)
+//    .&Catch(
+//      procedure (E: Exception)
+//      begin
+//        Display(TutorialHub, E.Message);
+//      end);
 ```
 
 <br/>
@@ -343,6 +387,22 @@ Deleting a model is only possible if the model is one of your fine-tuned models.
 //  finally
 //    Value.Free;
 //  end;
+
+  //Asynchronous promise example
+//  var Promise := Client.Models.AsyncAwaitDelete(TutorialHub.ModelId);
+//
+//  Promise
+//    .&Then<string>(
+//      function (Value: TDeletion): string
+//      begin
+//        Result := Value.Id;
+//        Display(TutorialHub, Value);
+//      end)
+//    .&Catch(
+//      procedure (E: Exception)
+//      begin
+//        Display(TutorialHub, E.Message);
+//      end);
 ```
 
 <br/>
@@ -398,6 +458,32 @@ Generation of an image using `dall-e-3`.
 //  finally
 //    Value.Free;
 //  end;
+
+  //Asynchronous promise example
+//  var Promise := Client.Images.AsyncAwaitCreate(
+//    procedure (Params: TImageCreateParams)
+//    begin
+//      Params.Model('dall-e-3');
+//      Params.Prompt('A quarter dollar on a wooden floor close up.');
+//      Params.N(1);
+//      Params.Size('1024x1024');
+//      Params.Style('vivid');
+//      Params.ResponseFormat(TResponseFormat.url);
+//    end
+//  );
+//
+//  Promise
+//    .&Then<TGeneratedImages>(
+//      function (Value: TGeneratedImages): TGeneratedImages
+//      begin
+//        Result := Value;
+//        Display(TutorialHub, Value);
+//      end)
+//    .&Catch(
+//      procedure (E: Exception)
+//      begin
+//        Display(TutorialHub, E.Message);
+//      end);
 ```
 
 <br>
@@ -497,6 +583,34 @@ An example of image creation with gpt-image-1 (Asynchronous because response tim
       Result.OnSuccess := Display;
       Result.OnError := Display;
     end);
+
+  //Asynchronous promise example
+//  var Promise := Client.Images.AsyncAwaitCreate(
+//    procedure (Params: TImageCreateParams)
+//    begin
+//      Params.Model('gpt-image-1');
+//      Params.Prompt('A realistic photo of a coffee cup with saucer on a transparent background');
+//      Params.N(1);
+//      Params.Size('1536x1024');
+//      Params.BackGround('transparent');
+//      Params.Moderation('low');
+//      Params.OutputFormat('png');
+//      Params.Quality('high');
+//    end
+//  );
+//
+//  Promise
+//    .&Then<TGeneratedImages>(
+//      function (Value: TGeneratedImages): TGeneratedImages
+//      begin
+//        Result := Value;
+//        Display(TutorialHub, Value);
+//      end)
+//    .&Catch(
+//      procedure (E: Exception)
+//      begin
+//        Display(TutorialHub, E.Message);
+//      end);
 ```
 
 <br>
@@ -549,6 +663,7 @@ Below, you’ll find an example of the code to send to gpt-image-1 to initiate t
       Params.Mask('Dalle05Mask.png');       //<--- Modified image with masked part
       Params.Prompt('Add a pink elephant'); //<--- Replace the mask by building this
       Params.Size('1024x1024');
+      TutorialHub.JSONRequest := Params.ToFormat();
     end,
     function : TAsynGeneratedImages
     begin
@@ -557,6 +672,30 @@ Below, you’ll find an example of the code to send to gpt-image-1 to initiate t
       Result.OnSuccess := Display;
       Result.OnError := Display;
     end);
+
+  //Asynchronous promise example
+//  var Promise := Client.Images.AsyncAwaitEdit(
+//    procedure (Params: TImageEditParams)
+//    begin
+//      Params.Model('gpt-image-1');
+//      Params.Image('Dalle05.png');          //<--- Unmodified image
+//      Params.Mask('Dalle05Mask.png');       //<--- Modified image with masked part
+//      Params.Prompt('Add a pink elephant'); //<--- Replace the mask by building this
+//      Params.Size('1024x1024');
+//    end);
+//
+//  Promise
+//    .&Then<TGeneratedImages>(
+//      function (Value: TGeneratedImages): TGeneratedImages
+//      begin
+//        Result := Value;
+//        Display(TutorialHub, Value);
+//      end)
+//    .&Catch(
+//      procedure (E: Exception)
+//      begin
+//        Display(TutorialHub, E.Message);
+//      end);
 ```
 
 <br>
@@ -585,7 +724,7 @@ Convert a text into an audio file. Refer to [official documentation](https://pla
   Client.Audio.AsynSpeech(
     procedure (Params: TSpeechParams)
     begin
-      Params.Model('tts-1');
+      Params.Model('gpt-4o-mini-tts');
       Params.Input('Hi! what are you doing ?');
       Params.Voice('fable');
       Params.ResponseFormat(TSpeechFormat.mp3);
@@ -602,7 +741,7 @@ Convert a text into an audio file. Refer to [official documentation](https://pla
 //  var Value := Client.Audio.Speech(
 //    procedure (Params: TSpeechParams)
 //    begin
-//      Params.Model('tts-1');
+//      Params.Model('gpt-4o-mini-tts');
 //      Params.Input('Hi! what are you doing ?');
 //      Params.Voice(alloy);
 //      Params.ResponseFormat(mp3);
@@ -613,6 +752,30 @@ Convert a text into an audio file. Refer to [official documentation](https://pla
 //  finally
 //    Value.Free;
 //  end;  
+
+  //Asynchronous promise example
+//  var Promise := Client.Audio.AsyncAwaitSpeech(
+//    procedure (Params: TSpeechParams)
+//    begin
+//      Params.Model('gpt-4o-mini-tts');
+//      Params.Input('Hi! what are you doing ?');
+//      Params.Voice('fable');
+//      Params.ResponseFormat(TSpeechFormat.mp3);
+//      TutorialHub.JSONRequest := Params.ToFormat();
+//    end);
+//
+//  Promise
+//    .&Then<TSpeechResult>(
+//      function (Value: TSpeechResult): TSpeechResult
+//      begin
+//        Result := Value;
+//        Display(TutorialHub, Value);
+//      end)
+//    .&Catch(
+//      procedure (E: Exception)
+//      begin
+//        Display(TutorialHub, E.Message);
+//      end);
 ```
 <br>
 
@@ -679,6 +842,27 @@ Convert data audio into a text. Refer to [official documentation](https://platfo
 //  finally
 //    Value.Free;
 //  end;
+
+  //Asynchronous promise example
+//  var Promise := Client.Audio.AsyncAwaitTranscription(
+//    procedure (Params: TTranscriptionParams)
+//    begin
+//      Params.&File('SpeechRecorded.wav');
+//      Params.Model('gpt-4o-transcribe');
+//    end);
+//
+//  Promise
+//    .&Then<TTranscription>(
+//      function (Value: TTranscription): TTranscription
+//      begin
+//        Result := Value;
+//        Display(TutorialHub, Value);
+//      end)
+//    .&Catch(
+//      procedure (E: Exception)
+//      begin
+//        Display(TutorialHub, E.Message);
+//      end);
 ```
 
 <br>
@@ -737,6 +921,33 @@ Refer to [official documentation](https://platform.openai.com/docs/guides/embedd
 //  finally
 //    Value.Free;
 //  end;
+
+  //Asynchronous promise example
+//  var Promise := Client.Embeddings.AsyncAwaitCreate(
+//    procedure (Params: TEmbeddingsParams)
+//    begin
+//      Params.Input(['Hello', 'how', 'are you?']);
+//      Params.Model('text-embedding-3-large');
+//      Params.Dimensions(5);
+//      Params.EncodingFormat(TEncodingFormat.float);
+//      TutorialHub.JSONRequest := Params.ToFormat();
+//    end
+//  );
+//
+//  Promise
+//    .&Then<TArray<TArray<Double>>>(
+//       function (Value: TEmbeddings): TArray<TArray<Double>>
+//       begin
+//         Display(TutorialHub, Value);
+//         for var Item in Value.Data do
+//           Result := Result + [Item.Embedding];
+//         ShowMessage(Result[2][3].ToString(ffNumber, 2, 3));
+//       end)
+//    .&Catch(
+//       procedure (E: Exception)
+//       begin
+//         Display(TutorialHub, E.Message);
+//       end);
 ```
 
 <br>
@@ -792,6 +1003,28 @@ Refer to the [official documentation](https://platform.openai.com/docs/guides/mo
 //  finally
 //    Value.Free;
 //  end;
+
+  //Asynchronous promise example
+//  var Promise := Client.Moderation.AsyncAwaitEvaluate(
+//    procedure (Params: TModerationParams)
+//    begin
+//      Params.Input('...text to classify goes here...');
+//      Params.Model('omni-moderation-latest');
+//      TutorialHub.JSONRequest := Params.ToFormat();
+//    end);
+//
+//  Promise
+//    .&Then<TModeration>(
+//       function (Value: TModeration): TModeration
+//       begin
+//         Display(TutorialHub, Value);
+//         Result := Value;
+//       end)
+//    .&Catch(
+//       procedure (E: Exception)
+//       begin
+//         Display(TutorialHub, E.Message);
+//       end);
 ```
 
 <br>
@@ -833,6 +1066,28 @@ Refer to the [official documentation](https://platform.openai.com/docs/guides/mo
 //  finally
 //    Value.Free;
 //  end;
+
+  //Asynchronous promise example
+//  var Promise := Client.Moderation.AsyncAwaitEvaluate(
+//    procedure (Params: TModerationParams)
+//    begin
+//      Params.Input(['...text to classify goes here...', Ref]);
+//      Params.Model('omni-moderation-latest');
+//      TutorialHub.JSONRequest := Params.ToFormat();
+//    end);
+//
+//  Promise
+//    .&Then<TModeration>(
+//       function (Value: TModeration): TModeration
+//       begin
+//         Display(TutorialHub, Value);
+//         Result := Value;
+//       end)
+//    .&Catch(
+//       procedure (E: Exception)
+//       begin
+//         Display(TutorialHub, E.Message);
+//       end);
 ```
 <br>
 
@@ -893,6 +1148,22 @@ Example without parameters
 //  finally
 //    Value.Free;
 //  end;
+
+    //Asynchronous promise example
+//  var Promise := Client.Files.AsyncAwaitList;
+//
+//  Promise
+//    .&Then<Integer>(
+//      function (List: TFiles): Integer
+//      begin
+//        Display(TutorialHub, List);
+//        Result := Length(List.Data);
+//      end)
+//    .&Catch(
+//      procedure (E: Exception)
+//      begin
+//        Display(TutorialHub, E.Message);
+//      end);
 ```
 
 Example using parameters
@@ -927,6 +1198,27 @@ Example using parameters
 //  finally
 //    Value.Free;
 //  end;
+
+  //Asynchronous promise example
+//  var Promise := Client.Files.AsyncAwaitList(
+//    procedure (Params: TFileUrlParams)
+//    begin
+//      Params.Purpose('user_data');
+//      Params.Limit(10);
+//    end);
+//
+//  Promise
+//    .&Then<Integer>(
+//      function (List: TFiles): Integer
+//      begin
+//        Display(TutorialHub, List);
+//        Result := Length(List.Data);
+//      end)
+//    .&Catch(
+//      procedure (E: Exception)
+//      begin
+//        Display(TutorialHub, E.Message);
+//      end);
 ```
 
 Refer to [parameters documentation](https://platform.openai.com/docs/api-reference/files/list).
@@ -969,6 +1261,32 @@ The Assistants API accommodates files containing up to 2 million tokens and acce
 //  finally
 //    Value.Free;
 //  end;
+
+    //Asynchronous promise example
+//  var Promise := Client.Files.AsyncAwaitUpload(
+//    procedure (Params: TFileUploadParams)
+//    begin
+//      Params.&File(Document);
+//      Params.Purpose(TFilesPurpose.user_data);
+//    end,
+//    function : TPromiseFile
+//    begin
+//      Result.Sender := TutorialHub;
+//      Result.OnStart := Start;
+//    end);
+//
+//  Promise
+//    .&Then<TFile>(
+//      function (Value: TFile): TFile
+//      begin
+//        Result := Value;
+//        Display(TutorialHub, Value);
+//      end)
+//    .&Catch(
+//      procedure (E: Exception)
+//      begin
+//        Display(TutorialHub, E.Message);
+//      end);
 ```
 Example with batch file.
 
@@ -1000,6 +1318,28 @@ Returns information about a specific file.
 //  finally
 //    Value.Free;
 //  end;
+
+    //Asynchronous promise example
+//  var Promise := Client.Files.AsyncAwaitRetrieve(
+//    TutorialHub.Id,
+//    function : TPromiseFile
+//    begin
+//      Result.Sender := TutorialHub;
+//      Result.OnStart := Start;
+//    end);
+//
+//  Promise
+//    .&Then<TFile>(
+//      function (Value: TFile): TFile
+//      begin
+//        Result := Value;
+//        Display(TutorialHub, Value);
+//      end)
+//    .&Catch(
+//      procedure (E: Exception)
+//      begin
+//        Display(TutorialHub, E.Message);
+//      end);
 ```
 
 <br/>
@@ -1050,6 +1390,23 @@ Delete a file.
   finally
     Value.Free;
   end;
+
+  //Asynchronous promise example
+//  var Promise := Client.Files.AsyncAwaitDelete(
+//    TutorialHub.Id);
+//
+//  promise
+//    .&Then<TDeletion>(
+//      function (Value: TDeletion): TDeletion
+//      begin
+//        Result := Value;
+//        Display(TutorialHub, F('Deleted', BoolToStr(Value.Deleted, True)));
+//      end)
+//    .&Catch(
+//      procedure (E: Exception)
+//      begin
+//        Display(TutorialHub, E.Message);
+//      end);
 ```
 
 <br/>

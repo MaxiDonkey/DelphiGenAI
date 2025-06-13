@@ -117,6 +117,29 @@ For details on selecting the appropriate file extensions for different scenarios
 //  finally
 //    Value.Free;
 //  end;
+
+  //Asynchronous promise example
+//  var Promise := Client.Uploads.AsyncAwaitCreate(
+//    procedure (Params: TUploadCreateParams)
+//    begin
+//      Params.Purpose('fine-tune');
+//      Params.Filename('BatchExample.jsonl');
+//      Params.bytes(FileSize('BatchExample.jsonl'));
+//      Params.MimeType('text/jsonl');
+//    end);
+//
+//  Promise
+//    .&Then<TUpload>(
+//      function (Value: TUpload): TUpload
+//      begin
+//        Display(TutorialHub, Value);
+//        Result := Value;
+//      end)
+//    .&Catch(
+//      procedure (E: Exception)
+//      begin
+//        Display(TutorialHub, E.Message);
+//      end);
 ```
 
 <br/>
@@ -147,6 +170,22 @@ Cancels the Upload. No Parts may be added after an Upload is cancelled.
 //  finally
 //    Value.Free;
 //  end;
+
+  //Asynchronous promise example
+//  var Promise := Client.Uploads.AsyncAwaitCancel(TutorialHub.Id);
+//
+//  Promise
+//    .&Then<TUpload>(
+//      function (Value: TUpload): TUpload
+//      begin
+//        Display(TutorialHub, Value);
+//        Result := Value;
+//      end)
+//    .&Catch(
+//      procedure (E: Exception)
+//      begin
+//        Display(TutorialHub, E.Message);
+//      end);
 ```
 
 <br/>
@@ -189,6 +228,27 @@ It is possible to add multiple Parts in parallel. You can decide the intended or
 //  finally
 //    Value.Free;
 //  end;
+
+  //Asynchronous promise example
+//  var Promise := Client.Uploads.AsyncAwaitAddPart(
+//    TutorialHub.Id,
+//    procedure (Params: TUploadPartParams)
+//    begin
+//      Params.Data('BatchExample.jsonl');
+//    end);
+//
+//  Promise
+//    .&Then<TUploadPart>(
+//      function (Value: TUploadPart): TUploadPart
+//      begin
+//        Display(TutorialHub, Value);
+//        Result := Value;
+//      end)
+//    .&Catch(
+//      procedure (E: Exception)
+//      begin
+//        Display(TutorialHub, E.Message);
+//      end);
 ```
 
 <br/>
@@ -233,6 +293,27 @@ The number of bytes uploaded upon completion must match the number of bytes init
 //  finally
 //    Value.Free;
 //  end;
+
+  //Asynchronous promise example
+//  var Promise := Client.Uploads.AsyncAwaitComplete(
+//    TutorialHub.Id,
+//    procedure (Params: TUploadCompleteParams)
+//    begin
+//      Params.PartIds(['BatchExample.jsonl'])
+//    end);
+//
+//  Promise
+//    .&Then<TUpload>(
+//      function (Value: TUpload): TUpload
+//      begin
+//        Display(TutorialHub, Value);
+//        Result := Value;
+//      end)
+//    .&Catch(
+//      procedure (E: Exception)
+//      begin
+//        Display(TutorialHub, E.Message);
+//      end);
 ```
 
 <br/>
@@ -886,6 +967,27 @@ Create a vector store. [Refer to documentation](https://platform.openai.com/docs
 //  finally
 //    Value.Free;
 //  end;
+
+  //Asynchronous promise example
+//  var Promise := Client.VectorStore.AsyncAwaitCreate(
+//    procedure (Params: TVectorStoreCreateParams)
+//    begin
+//      Params.Name('GenAI project Data');
+//      TutorialHub.JSONRequest := Params.ToFormat();
+//    end);
+//
+//  Promise
+//    .&Then<string>(
+//      function (Value: TVectorStore): string
+//      begin
+//        Result := Value.Id;
+//        Display(TutorialHub, Value);
+//      end)
+//    .&Catch(
+//      procedure (E: Exception)
+//      begin
+//        Display(TutorialHub, E.Message);
+//      end);
 ```
 
 The Json response.
@@ -905,7 +1007,6 @@ The Json response.
   }
 }
 ```
-
 
 <br/>
 
@@ -935,6 +1036,22 @@ Returns a list of vector stores.
 //  finally
 //    Value.Free;
 //  end;
+
+  //Asynchronous promise example
+//  var Promise := Client.VectorStore.AsyncAwaitList;
+//
+//  Promise
+//    .&Then<TVectorStores>(
+//      function (Value: TVectorStores): TVectorStores
+//      begin
+//        Result := Value;
+//        Display(TutorialHub, Value);
+//      end)
+//    .&Catch(
+//      procedure (E: Exception)
+//      begin
+//        Display(TutorialHub, E.Message);
+//      end);
 ```
 
 Example using [parameter](https://platform.openai.com/docs/api-reference/vector-stores/list).
@@ -969,6 +1086,26 @@ Example using [parameter](https://platform.openai.com/docs/api-reference/vector-
 //  finally
 //    Value.Free;
 //  end;
+
+  //Asynchronous promise example
+//  var Promise := Client.VectorStore.AsyncAwaitList(
+//    procedure (Params: TVectorStoreUrlParam)
+//    begin
+//      Params.Limit(30);
+//    end);
+//
+//  Promise
+//    .&Then<TVectorStores>(
+//      function (Value: TVectorStores): TVectorStores
+//      begin
+//        Result := Value;
+//        Display(TutorialHub, Value);
+//      end)
+//    .&Catch(
+//      procedure (E: Exception)
+//      begin
+//        Display(TutorialHub, E.Message);
+//      end);
 ```
 
 <br/>
@@ -999,6 +1136,22 @@ Retrieves a vector store by its ID.
 //  finally
 //    Value.Free;
 //  end;
+
+  //Asynchronous promise example
+//  var Promise := Client.VectorStore.AsyncAwaitRetrieve(TutorialHub.Id);
+//
+//  Promise
+//    .&Then<string>(
+//      function (Value: TVectorStore): string
+//      begin
+//        Result := Value.Id;
+//        Display(TutorialHub, Value);
+//      end)
+//    .&Catch(
+//      procedure (E: Exception)
+//      begin
+//        Display(TutorialHub, E.Message);
+//      end);
 ```
 
 <br/>
@@ -1045,6 +1198,29 @@ Modifies a vector store by its ID.
 //  finally
 //    Value.Free;
 //  end;
+
+  //Asynchronous promise example
+//  var Promise := Client.VectorStore.AsyncAwaitUpdate(
+//    TutorialHub.Id,
+//    procedure (Params: TVectorStoreUpdateParams)
+//    begin
+//      Params.Name('Support FAQ user');
+//      Params.Metadata(Metadata);
+//      TutorialHub.JSONRequest := Params.ToFormat();
+//    end);
+//
+//  Promise
+//    .&Then<string>(
+//      function (Value: TVectorStore): string
+//      begin
+//        Result := Value.Id;
+//        Display(TutorialHub, Value);
+//      end)
+//    .&Catch(
+//      procedure (E: Exception)
+//      begin
+//        Display(TutorialHub, E.Message);
+//      end);
 ```
 
 <br/>
@@ -1075,6 +1251,22 @@ Delete a vector store by its ID.
 //  finally
 //    Value.Free;
 //  end;
+
+  //Asynchronous promise example
+//  var Promise := Client.VectorStore.AsyncAwaitDelete(TutorialHub.Id);
+//
+//  Promise
+//    .&Then<string>(
+//      function (Value: TDeletion): string
+//      begin
+//        Result := Value.Id;
+//        Display(TutorialHub, Value);
+//      end)
+//    .&Catch(
+//      procedure (E: Exception)
+//      begin
+//        Display(TutorialHub, E.Message);
+//      end);
 ```
 
 The JSON response.
@@ -1157,6 +1349,28 @@ To create the file store containing ***file1*** and ***file2***, the provided co
 //  finally
 //    Value.Free;
 //  end;
+
+  //Asynchronous promise example
+//  var Promise := Client.VectorStoreFiles.AsyncAwaitCreate(
+//    TutorialHub.id,
+//    procedure (Params: TVectorStoreFilesCreateParams)
+//    begin
+//      Params.FileId(Id1); // or Params.FileId(Id2);
+//      TutorialHub.JSONRequest := Params.ToFormat();
+//    end);
+//
+//  Promise
+//    .&Then<TVectorStoreFile>(
+//      function (Value: TVectorStoreFile): TVectorStoreFile
+//      begin
+//        Result := Value;
+//        Display(TutorialHub, Value);
+//      end)
+//    .&Catch(
+//      procedure (E: Exception)
+//      begin
+//        Display(TutorialHub, E.Message);
+//      end);
 ```
 
 The JSON response:
@@ -1212,6 +1426,22 @@ Returns a list of vector store files.
 //  finally
 //    Value.Free;
 //  end;
+
+  //Asynchronous promise example
+//  var Promise := Client.VectorStoreFiles.AsyncAwaitList(TutorialHub.Id);
+//
+//  promise
+//    .&Then<TVectorStoreFiles>(
+//      function (Value: TVectorStoreFiles): TVectorStoreFiles
+//      begin
+//        Result := Value;
+//        Display(TutorialHub, Value);
+//      end)
+//    .&Catch(
+//      procedure (E: Exception)
+//      begin
+//        Display(TutorialHub, E.Message);
+//      end);
 ```
 
 <br/>
@@ -1253,6 +1483,27 @@ Refert to [parameters documentation](https://platform.openai.com/docs/api-refere
 //  finally
 //    Value.Free;
 //  end;
+
+  //Asynchronous promise example
+//  var Promise := Client.VectorStoreFiles.AsyncAwaitList(TutorialHub.Id,
+//    procedure (Params: TVectorStoreFilesUrlParams)
+//    begin
+//      Params.Limit(5);
+//      Params.Filter('completed');
+//    end);
+//
+//  promise
+//    .&Then<TVectorStoreFiles>(
+//      function (Value: TVectorStoreFiles): TVectorStoreFiles
+//      begin
+//        Result := Value;
+//        Display(TutorialHub, Value);
+//      end)
+//    .&Catch(
+//      procedure (E: Exception)
+//      begin
+//        Display(TutorialHub, E.Message);
+//      end);
 ```
 
 The JSON response:
@@ -1337,6 +1588,23 @@ Retrieves a vector store file.
 //  finally
 //    Value.Free;
 //  end;
+
+  //Asynchronous promise example
+//  var Promise := Client.VectorStoreFiles.AsyncAwaitRetrieve(TutorialHub.Id, Id);
+//
+//  Promise
+//    .&Then<int64>(
+//      function (Value: TVectorStoreFile): int64
+//      begin
+//        Result := Value.UsageBytes;
+//        Display(TutorialHub, Value);
+//        ShowMessage((Result div 1000000).ToString + ' MB created at : ' + Value.CreatedAtAsString);
+//      end)
+//    .&Catch(
+//      procedure (E: Exception)
+//      begin
+//        Display(TutorialHub, E.Message);
+//      end);
 ```
 
 The JSON response:
@@ -1394,6 +1662,22 @@ Remove a vector store file. This action will detach the file from the vector sto
 //  finally
 //    Value.Free;
 //  end;
+
+  //Asynchronous promise example
+//  var Promise := Client.VectorStore.AsyncAwaitDelete(TutorialHub.Id);
+//
+//  Promise
+//    .&Then<string>(
+//      function (Value: TDeletion): string
+//      begin
+//        Result := Value.Id;
+//        Display(TutorialHub, Value);
+//      end)
+//    .&Catch(
+//      procedure (E: Exception)
+//      begin
+//        Display(TutorialHub, E.Message);
+//      end);
 ```
 
 The JSON response:
