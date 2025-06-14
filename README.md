@@ -68,7 +68,6 @@ ___
 
 # Introduction
 
->[!IMPORTANT]
 > **Built with Delphi 12 Community Edition**  
 > You can compile and test this wrapper **freely and with no commitment**  
 > thanks to Delphi CE.  
