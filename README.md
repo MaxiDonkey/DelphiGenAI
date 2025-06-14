@@ -69,8 +69,7 @@ ___
 # Introduction
 
 > **Built with Delphi 12 Community Edition**  
-> You can compile and test this wrapper **freely and with no commitment**  
-> thanks to Delphi CE.  
+> You can compile and test this wrapper **freely and with no commitment**, thanks to Delphi CE.  
 > The CE licence itself is free for individuals, startups and non-profits  
 > *whose yearly revenue (or funding) does not exceed USD 5 000 and up to five
 > developers.*  
