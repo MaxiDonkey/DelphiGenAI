@@ -68,6 +68,9 @@ ___
 
 # Introduction
 
+>[!IMPORTANT]
+> The project was developed using the Delphi Community Edition (currently version 12.1 Patch 1), allowing anyone to test and use the code free of charge.
+
 **GenAI** is a powerful Delphi library that brings the latest OpenAI APIs to your desktop, mobile, and server apps.
 
 **Core capabilities**  
