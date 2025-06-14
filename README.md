@@ -69,7 +69,16 @@ ___
 # Introduction
 
 >[!IMPORTANT]
-> The project was developed using the Delphi Community Edition (currently version 12.1 Patch 1), allowing anyone to test and use the code free of charge.
+> **Built with Delphi 12 Community Edition**  
+> You can compile and test this wrapper **freely and with no commitment**  
+> thanks to Delphi CE.  
+> The CE licence itself is free for individuals, startups and non-profits  
+> *whose yearly revenue (or funding) does not exceed USD 5 000 and up to five
+> developers.*  
+> See the full [Delphi CE FAQ](https://www.embarcadero.com/products/delphi/starter/faq).
+>
+> *Delphi* and the Delphi logo are trademarks of Embarcadero Technologies;  
+> their mention here is purely descriptive and does **not** imply any endorsement.
 
 **GenAI** is a powerful Delphi library that brings the latest OpenAI APIs to your desktop, mobile, and server apps.
 
