@@ -13,6 +13,8 @@ var version = Client.Version;
 
 - `AsyncAwaitCreateStream` now handles the error event directly, immediately rejecting the promise on the `v1/responses` endpoint. 
 
+<br>
+
 ### 2025, June 4 version 1.0.7 (**Getit version**)
 - Added streaming events to the `v1/responses` endpoint.
     - response.image_generation_call.completed
@@ -45,9 +47,13 @@ var version = Client.Version;
 
 - Added the `GenAI.Async.Promise` unit, providing **JavaScript-style** asynchronous task chaining.
 
+<br>
+
 #### 2025, May 27 version 1.0.6
 - Fix “No mapping for the Unicode character exists in the target multi-byte code page.” <br > 
 For the `v1/responses` endpoint, buffer the incoming chunks and process them only once they’re fully received to avoid the error. 
+
+<br>
 
 #### 2025, May 27 version 1.0.5
 - Fix Stream Events v1/responses endpoint
