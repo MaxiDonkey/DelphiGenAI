@@ -68,8 +68,9 @@ ___
 
 # Introduction
 
-> **Built with Delphi 12 Community Edition**  
-> The project was developed using the Delphi Community Edition (currently version 12.1 Patch 1), allowing anyone to test and use the code free of charge.
+> **Built with Delphi 12 Community Edition** (v12.1 Patch 1)  
+>The wrapper itself is MIT-licensed.  
+>You can compile and test it free of charge with Delphi CE; any recent commercial Delphi edition works as well.
 
 **GenAI** is a powerful Delphi library that brings the latest OpenAI APIs to your desktop, mobile, and server apps.
 
