@@ -10,7 +10,7 @@ ___
 <br>
 
 NEW: 
-- Getit current version: 1.0.7
+- Getit current version: 1.1.0
 - [Changelog v1.1.0](https://github.com/MaxiDonkey/DelphiGenAI/blob/main/Changelog.md)
 - [Mini-lab to experiment with the v1/responses endpoint `File2knowledge`](https://github.com/MaxiDonkey/file2knowledge)  
 - [Responses endpoint](https://github.com/MaxiDonkey/DelphiGenAI/blob/main/Responses.md)

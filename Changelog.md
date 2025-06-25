@@ -1,4 +1,4 @@
-#### 2025, June 14 version 1.1.0
+### 2025, June 14 version 1.1.0 (**Getit version**)
 - Given the project’s rapid progress, it’s now essential to embed versioning directly into the GenAI wrapper’s source code. For any client implementing the IGenAI interface, the version number can be retrieved via the Version property, for example:
 ```Delphi
 var version = Client.Version;
@@ -15,7 +15,7 @@ var version = Client.Version;
 
 <br>
 
-### 2025, June 4 version 1.0.7 (**Getit version**)
+#### 2025, June 4 version 1.0.7 
 - Added streaming events to the `v1/responses` endpoint.
     - response.image_generation_call.completed
     - response.image_generation_call.generating
