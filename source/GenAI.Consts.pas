@@ -17,7 +17,7 @@ const
   TIME_FORMAT = 'hh:nn:ss';
   DATE_TIME_FORMAT = DATE_FORMAT + ' ' + TIME_FORMAT;
 
-  AudioTypeAccepted: TArray<string> = ['audio/wav', 'audio/mpeg'];
+  AudioTypeAccepted: TArray<string> = ['audio/wav', 'audio/mpeg', 'audio/webm', 'audio/opus', 'audio/ogg'];
   ImageTypeAccepted: TArray<string> = ['image/png', 'image/jpeg', 'image/gif', 'image/webp', 'binary/octet-stream'];
   DocTypeAccepted: TArray<string> = ['application/pdf'];
 

@@ -68,7 +68,7 @@ uses
   GenAI.Responses.OutputParams, GenAI.Async.Promise, GenAI.Responses.Internal;
 
 const
-  VERSION = 'GenAIv1.1.0';
+  VERSION = 'GenAIv1.1.1';
 
 type
   /// <summary>
@@ -1248,7 +1248,13 @@ type
   /// </remarks>
   TAsynChat = GenAI.Chat.TAsynChat;
 
-  //
+  /// <summary>
+  /// Represents a promise-based asynchronous callback for chat completion operations.
+  /// </summary>
+  /// <remarks>
+  /// Alias of <c>TPromiseCallBack&lt;TChat&gt;</c>, this type allows you to await the result
+  /// of a chat completion request and handle it as a <see cref="TChat"/> instance.
+  /// </remarks>
   TPromiseChat = GenAI.Chat.TPromiseChat;
 
   /// <summary>
@@ -1261,7 +1267,13 @@ type
   /// </remarks>
   TAsynChatStream = GenAI.Chat.TAsynChatStream;
 
-  //
+  /// <summary>
+  /// Represents a promise-based asynchronous callback for streaming chat completion operations.
+  /// </summary>
+  /// <remarks>
+  /// Alias of <c>TPromiseStreamCallBack&lt;TChat&gt;</c>, this type provides a <see cref="TChat"/> stream
+  /// that can be awaited, delivering partial <see cref="TChat"/> updates as they arrive.
+  /// </remarks>
   TPromiseChatStream = GenAI.Chat.TPromiseChatStream;
 
   /// <summary>
@@ -1317,7 +1329,13 @@ type
   /// </remarks>
   TAsynChatMessages = GenAI.Chat.TAsynChatMessages;
 
-  //
+  /// <summary>
+  /// Represents a promise-based asynchronous callback for retrieving chat messages.
+  /// </summary>
+  /// <remarks>
+  /// Alias of <c>TPromiseCallBack&lt;TChatMessages&gt;</c>, this type allows you to await the result
+  /// of fetching messages for a stored chat completion, delivering a <see cref="TChatMessages"/> instance.
+  /// </remarks>
   TPromiseChatMessages = GenAI.Chat.TPromiseChatMessages;
 
   /// <summary>
@@ -1329,7 +1347,13 @@ type
   /// </remarks>
   TAsynChatCompletion = GenAI.Chat.TAsynChatCompletion;
 
-  //
+  /// <summary>
+  /// Represents a promise-based asynchronous callback for listing chat completion results.
+  /// </summary>
+  /// <remarks>
+  /// Alias of <c>TPromiseCallBack&lt;TChatCompletion&gt;</c>, this type allows you to await the
+  /// result of a paginated chat completions request and receive it as a <see cref="TChatCompletion"/> instance.
+  /// </remarks>
   TPromiseChatCompletion = GenAI.Chat.TPromiseChatCompletion;
 
   /// <summary>
@@ -1341,7 +1365,14 @@ type
   /// </remarks>
   TAsynChatDelete = GenAI.Chat.TAsynChatDelete;
 
-  //
+  /// <summary>
+  /// Represents a promise-based asynchronous callback for deleting a chat completion.
+  /// </summary>
+  /// <remarks>
+  /// Alias of <c>TPromiseCallBack&lt;TChatDelete&gt;</c>, this type allows you to await
+  /// the result of a chat completion deletion request and receive a <see cref="TChatDelete"/>
+  /// instance indicating whether the deletion was successful.
+  /// </remarks>
   TPromiseChatDelete = GenAI.Chat.TPromiseChatDelete;
 
   {$ENDREGION}
@@ -3390,6 +3421,12 @@ type
 
   TLocalShellToolParams = GenAI.Responses.InputParams.TLocalShellToolParams;
 
+  TToolParamsFormatParams = GenAI.Responses.InputParams.TToolParamsFormatParams;
+
+  TCustomToolParams = GenAI.Responses.InputParams.TCustomToolParams;
+
+  TPromptParams = GenAI.Responses.InputParams.TPromptParams;
+
   TResponsesParams = GenAI.Responses.InputParams.TResponsesParams;
 
   TInputImageMaskParams = GenAI.Responses.InputParams.TInputImageMaskParams;
@@ -3484,13 +3521,15 @@ type
 
   TResponseItemCodeInterpreter = GenAI.Responses.InputItemList.TResponseItemCodeInterpreter;
 
-  TResponseItemLocalShell = GenAI.Responses.InputItemList.TResponseItemLocalShell;
+  TResponseItemLocalShellCall = GenAI.Responses.InputItemList.TResponseItemLocalShellCall;
 
   TResponseItemMCPTool = GenAI.Responses.InputItemList.TResponseItemMCPTool;
 
   TResponseItemMCPList = GenAI.Responses.InputItemList.TResponseItemMCPList;
 
-  TResponseItemMCPApproval = GenAI.Responses.InputItemList.TResponseItemMCPApproval;
+  TResponseItemMCPApprovalRequest = GenAI.Responses.InputItemList.TResponseItemMCPApprovalRequest;
+
+  TResponseItemMCPApprovalResponse = GenAI.Responses.InputItemList.TResponseItemMCPApprovalResponse;
 
   TResponseItem = GenAI.Responses.InputItemList.TResponseItem;
 
@@ -3645,8 +3684,6 @@ type
   TResponseContentpartDone = GenAI.Responses.OutputParams.TResponseContentpartDone;
 
   TResponseOutputTextDelta = GenAI.Responses.OutputParams.TResponseOutputTextDelta;
-
-  TResponseOutputTextAnnotationAdded = GenAI.Responses.OutputParams.TResponseOutputTextAnnotationAdded;
 
   TResponseOutputTextDone = GenAI.Responses.OutputParams.TResponseOutputTextDone;
 

@@ -22,7 +22,8 @@ const
     '"schema": {', '"schema":{',                   //GenAI.Responses
     '"env": {', '"env":{',                         //GenAI.Responses
     '"headers": {', '"headers":{',                 //GenAI.Responses
-    '"input_schema": {', '"input_schema":{'        //GenAI.Responses
+    '"input_schema": {', '"input_schema":{',       //GenAI.Responses
+    '"variables": {', '"variables":{'              //GenAI.Responses
   ];
 
 (*
@@ -120,6 +121,7 @@ type
     /// </para>
     /// </remarks>
     function UpdateFieldValue(const Value, Field: string): string; overload;
+
     /// <summary>
     /// Scans the JSON string for multiple specified fields and updates each of their
     /// contents to ensure valid JSON syntax. Replaces certain delimiters and characters
@@ -162,6 +164,7 @@ type
     /// </para>
     /// </remarks>
     function Convert(const Value: string): string;
+
     /// <summary>
     /// Factory method for creating an instance of the <c>TDeserializationPrepare</c> class.
     /// Returns an interface reference to <c>ICustomFieldsPrepare</c>.

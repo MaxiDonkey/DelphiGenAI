@@ -29,6 +29,7 @@ type
     /// The updated number of active requests.
     /// </returns>
     function Inc: Integer;
+
     /// <summary>
     /// Decrements the request counter.
     /// </summary>
@@ -36,6 +37,7 @@ type
     /// The updated number of active requests.
     /// </returns>
     function Dec: Integer;
+
     /// <summary>
     /// Checks if there are active requests being processed.
     /// </summary>
@@ -58,7 +60,9 @@ type
     FCount: Integer;
   public
     constructor Create;
+
     destructor Destroy; override;
+
     /// <summary>
     /// Increments the request counter in a thread-safe manner.
     /// </summary>
@@ -66,6 +70,7 @@ type
     /// The updated number of active requests.
     /// </returns>
     function Inc: Integer;
+
     /// <summary>
     /// Decrements the request counter in a thread-safe manner.
     /// </summary>
@@ -73,6 +78,7 @@ type
     /// The updated number of active requests.
     /// </returns>
     function Dec: Integer;
+
     /// <summary>
     /// Checks if there are any active requests.
     /// </summary>

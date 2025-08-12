@@ -180,6 +180,7 @@ type
   procedure Display(Sender: TObject; Value: TChatMessages); overload;
   procedure Display(Sender: TObject; Value: TChatCompletion); overload;
   procedure Display(Sender: TObject; Value: TChatDelete); overload;
+  procedure Display(Sender: TObject; Value: TResponseItem); overload;
 
   procedure DisplayStream(Sender: TObject; Value: string); overload;
   procedure DisplayStream(Sender: TObject; Value: TChat); overload;
@@ -720,11 +721,7 @@ begin
   TutorialHub.JSONResponse := Value.JSONResponse;
   for var Item in Value.Data do
     begin
-      for var SubItem in Item.Content do
-        begin
-          Display(Sender, SubItem.Text);
-          Display(Sender);
-        end;
+      Display(Sender, Item);
     end;
 end;
 
@@ -756,6 +753,16 @@ begin
   TutorialHub.JSONResponse := Value.JSONResponse;
   Display(Sender, Value.Id);
   Display(Sender, F('Deleted', BoolToStr(Value.Deleted, True)));
+  Display(Sender);
+end;
+
+procedure Display(Sender: TObject; Value: TResponseItem);
+begin
+  Display(Sender, Value.Id);
+  for var Item in Value.Content do
+    begin
+      Display(Sender, Item.Text);
+    end;
   Display(Sender);
 end;
 
@@ -825,7 +832,7 @@ end;
 
 procedure DisplayChunk(Value: string);
 begin
-   var JSONValue := TJSONObject.ParseJSONValue(Value);
+  var JSONValue := TJSONObject.ParseJSONValue(Value);
   TutorialHub.Memo3.Lines.BeginUpdate;
   try
     Display(TutorialHub.Memo3, JSONValue.ToString);
@@ -1023,7 +1030,7 @@ end;
 procedure TFMXTutorialHub.SetJSONResponse(const Value: string);
 begin
   Memo3.Lines.Text := Value;
-  Memo2.SelStart := 0;
+  Memo3.SelStart := 0;
   Application.ProcessMessages;
 end;
 
@@ -1036,11 +1043,13 @@ end;
 procedure TFMXTutorialHub.SetMemo2(const Value: TMemo);
 begin
   FMemo2 := Value;
+  FMemo2.TextSettings.WordWrap := False;
 end;
 
 procedure TFMXTutorialHub.SetMemo3(const Value: TMemo);
 begin
   FMemo3 := Value;
+  FMemo3.TextSettings.WordWrap := False;
 end;
 
 procedure TFMXTutorialHub.SpeechChat(const Value: string);

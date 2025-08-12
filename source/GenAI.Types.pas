@@ -66,6 +66,18 @@ type
     procedure StringReverter(Data: TObject; Field: string; Arg: string); override;
   end;
 
+  TStreamOptions = TJSONParam;
+
+  TIncludeObfuscation = class(TStreamOptions)
+    function IncludeObfuscation(const Value: Boolean): TIncludeObfuscation;
+    class function New(const Value: Boolean = True): TIncludeObfuscation;
+  end;
+
+  TIncludeUsage = class(TStreamOptions)
+    function IncludeUsage: TIncludeUsage;
+    class function New: TIncludeUsage;
+  end;
+
   {$REGION 'GenAI.Batch.Interfaces'}
 
   /// <summary>
@@ -599,6 +611,22 @@ type
   TSearchWebOptionsHelper = record Helper for TSearchWebOptions
     constructor Create(const Value: string);
     function ToString: string;
+  end;
+
+  TVerbosityType = (
+    low,
+    medium,
+    high
+  );
+
+  TVerbosityTypeHelper = record Helper for TVerbosityType
+    constructor Create(const Value: string);
+    function ToString: string;
+  end;
+
+  TVerbosityTypeInterceptor = class(TJSONInterceptorStringToString)
+    function StringConverter(Data: TObject; Field: string): string; override;
+    procedure StringReverter(Data: TObject; Field: string; Arg: string); override;
   end;
 
   {$ENDREGION}
@@ -1437,14 +1465,18 @@ type
     /// <summary>
     /// Includes an encrypted version of reasoning tokens in reasoning item outputs. This enables reasoning
     /// items to be used in multi-turn conversations when using the Responses API statelessly (like when
-    /// the store parameter is set to false, or when an organization is enrolled in the zero data retention
-    /// program).
+    /// the "store" parameter is set to "false", or when an organization is enrolled in the zero data
+    /// retention program).
     /// </summary>
     reasoning_encrypted_content,
     /// <summary>
     ///  Includes the outputs of python code execution in code interpreter tool call items.
     /// </summary>
-    code_interpreter_call
+    code_interpreter_call,
+    /// <summary>
+    /// nclude logprobs with assistant messages.
+    /// </summary>
+    message_text_logprobs
   );
 
   TOutputIncludingHelper = record Helper for TOutputIncluding
@@ -1459,6 +1491,37 @@ type
   );
 
   TReasoningGenerateSummaryHelper = record Helper for TReasoningGenerateSummary
+    constructor Create(const Value: string);
+    function ToString: string;
+  end;
+
+  TFidelityType = (
+    low,
+    high
+  );
+
+  TFidelityTypeHelper = record Helper for TFidelityType
+    constructor Create(const Value: string);
+    function ToString: string;
+  end;
+
+
+  TToolParamsFormatType = (
+    text,
+    grammar
+  );
+
+  TToolParamsFormatTypeHelper = record Helper for TToolParamsFormatType
+    constructor Create(const Value: string);
+    function ToString: string;
+  end;
+
+  TSyntaxFormatType = (
+    lark,
+    regex
+  );
+
+  TSyntaxFormatTypeHelper = record Helper for TSyntaxFormatType
     constructor Create(const Value: string);
     function ToString: string;
   end;
@@ -1592,9 +1655,11 @@ type
     image_generation_call,
     code_interpreter_call,
     local_shell_call,
+    local_shell_call_output,
     mcp_call,
     mcp_list_tools,
-    mcp_approval_request
+    mcp_approval_request,
+    mcp_approval_response
   );
 
   TResponseTypesHelper = record Helper for TResponseTypes
@@ -1750,7 +1815,6 @@ type
     content_part_added,
     content_part_done,
     output_text_delta,
-    output_text_annotation_added,
     output_text_done,
     refusal_delta,
     refusal_done,
@@ -1762,12 +1826,12 @@ type
     web_search_call_in_progress,
     web_search_call_searching,
     web_search_call_completed,
-
-    reasoning_summary_part_add,
+    reasoning_summary_part_added,
     reasoning_summary_part_done,
     reasoning_summary_text_delta,
     reasoning_summary_text_done,
-
+    reasoning_text_delta,
+    reasoning_text_done,
     image_generation_call_completed,
     image_generation_call_generating,
     image_generation_call_in_progress,
@@ -1780,12 +1844,15 @@ type
     mcp_list_tools_completed,
     mcp_list_tools_failed,
     mcp_list_tools_in_progress,
+    code_interpreter_call_in_progress,
+    code_interpreter_call_interpreting,
+    code_interpreter_call_completed,
+    code_interpreter_call_code_delta,
+    code_interpreter_call_code_done,
+    output_text_annotation_added,
     queued,
-    reasoning_delta,
-    reasoning_done,
-    reasoning_summary_delta,
-    reasoning_summary_done,
-
+    custom_tool_call_input_delta,
+    custom_tool_call_input_done,
     error
   );
 
@@ -1827,6 +1894,30 @@ begin
   if Value <= 0 then
     Result := 'null' else
     Result := DateTimeToStr(TimestampToDateTime(Value, UTC))
+end;
+
+{ TIncludeObfuscation }
+
+function TIncludeObfuscation.IncludeObfuscation(const Value: Boolean): TIncludeObfuscation;
+begin
+  Result := TIncludeObfuscation(Add('include_obfuscation', Value));
+end;
+
+class function TIncludeObfuscation.New(const Value: Boolean): TIncludeObfuscation;
+begin
+  Result := TIncludeObfuscation.Create.IncludeObfuscation(Value);
+end;
+
+{ TIncludeUsage }
+
+function TIncludeUsage.IncludeUsage: TIncludeUsage;
+begin
+  Result := TIncludeUsage(Add('include_usage', True));
+end;
+
+class function TIncludeUsage.New: TIncludeUsage;
+begin
+  Result := TIncludeUsage.Create.IncludeUsage;
 end;
 
 { TEnumValueRecovery }
@@ -2994,7 +3085,8 @@ begin
              'message.input_image.image_url',
              'computer_call_output.output.image_url',
              'reasoning.encrypted_content',
-             'code_interpreter_call.outputs']);
+             'code_interpreter_call.outputs',
+             'message.output_text.logprobs']);
 end;
 
 function TOutputIncludingHelper.ToString: string;
@@ -3010,6 +3102,8 @@ begin
       Exit('reasoning.encrypted_content');
     TOutputIncluding.code_interpreter_call:
       Exit('code_interpreter_call.outputs');
+    TOutputIncluding.message_text_logprobs:
+      Exit('message.output_text.logprobs');
   end;
 end;
 
@@ -3278,9 +3372,11 @@ begin
              'image_generation_call',
              'code_interpreter_call',
              'local_shell_call',
+             'local_shell_call_output',
              'mcp_call',
              'mcp_list_tools',
-             'mcp_approval_request']);
+             'mcp_approval_request',
+             'mcp_approval_response']);
 end;
 
 function TResponseTypesHelper.ToString: string;
@@ -3308,12 +3404,16 @@ begin
       Exit('code_interpreter_call');
     TResponseTypes.local_shell_call:
       Exit('local_shell_call');
+    TResponseTypes.local_shell_call_output:
+      Exit('local_shell_call_output');
     TResponseTypes.mcp_call:
       Exit('mcp_call');
     TResponseTypes.mcp_list_tools:
       Exit('mcp_list_tools');
     TResponseTypes.mcp_approval_request:
       Exit('mcp_approval_request');
+    TResponseTypes.mcp_approval_response:
+      Exit('mcp_approval_response');
   end;
 end;
 
@@ -3629,7 +3729,6 @@ begin
               'response.content_part.added',
               'response.content_part.done',
               'response.output_text.delta',
-              'response.output_text.annotation.added',
               'response.output_text.done',
               'response.refusal.delta',
               'response.refusal.done',
@@ -3645,23 +3744,29 @@ begin
               'response.reasoning_summary_part.done',
               'response.reasoning_summary_text.delta',
               'response.reasoning_summary_text.done',
+              'response.reasoning_text.delta',
+              'response.reasoning_text.done',
               'response.image_generation_call.completed',
               'response.image_generation_call.generating',
               'response.image_generation_call.in_progress',
               'response.image_generation_call.partial_image',
-              'response.mcp_call.arguments.delta',
-              'response.mcp_call.arguments.done',
+              'response.mcp_call_arguments.delta',
+              'response.mcp_call_arguments.done',
               'response.mcp_call.completed',
               'response.mcp_call.failed',
               'response.mcp_call.in_progress',
               'response.mcp_list_tools.completed',
               'response.mcp_list_tools.failed',
               'response.mcp_list_tools.in_progress',
+              'response.code_interpreter_call.in_progress',
+              'response.code_interpreter_call.interpreting',
+              'response.code_interpreter_call.completed',
+              'response.code_interpreter_call_code.delta',
+              'response.code_interpreter_call_code.done',
+              'response.output_text.annotation.added',
               'response.queued',
-              'response.reasoning.delta',
-              'response.reasoning.done',
-              'response.reasoning_summary.delta',
-              'response.reasoning_summary.done',
+              'response.custom_tool_call_input.delta',
+              'response.custom_tool_call_input.done',
               'error'
             ]);
 end;
@@ -3689,8 +3794,6 @@ begin
       Exit('response.content_part.done');
     TResponseStreamType.output_text_delta:
       Exit('response.output_text.delta');
-    TResponseStreamType.output_text_annotation_added:
-      Exit('response.output_text.annotation.added');
     TResponseStreamType.output_text_done:
       Exit('response.output_text.done');
     TResponseStreamType.refusal_delta:
@@ -3713,7 +3816,7 @@ begin
       Exit('response.web_search_call.searching');
     TResponseStreamType.web_search_call_completed:
       Exit('response.web_search_call.completed');
-    TResponseStreamType.reasoning_summary_part_add:
+    TResponseStreamType.reasoning_summary_part_added:
       Exit('response.reasoning_summary_part.added');
     TResponseStreamType.reasoning_summary_part_done:
       Exit('response.reasoning_summary_part.done');
@@ -3721,6 +3824,10 @@ begin
       Exit('response.reasoning_summary_text.delta');
     TResponseStreamType.reasoning_summary_text_done:
       Exit('response.reasoning_summary_text.done');
+    TResponseStreamType.reasoning_text_delta:
+      Exit('response.reasoning_text.delta');
+    TResponseStreamType.reasoning_text_done:
+      Exit('response.reasoning_text.done');
     TResponseStreamType.image_generation_call_completed:
       Exit('response.image_generation_call.completed');
     TResponseStreamType.image_generation_call_generating:
@@ -3730,9 +3837,9 @@ begin
     TResponseStreamType.image_generation_call_partial_image:
       Exit('response.image_generation_call.partial_image');
     TResponseStreamType.mcp_call_arguments_delta:
-      Exit('response.mcp_call.arguments.delta');
+      Exit('response.mcp_call_arguments.delta');
     TResponseStreamType.mcp_call_arguments_done:
-      Exit('response.mcp_call.arguments.done');
+      Exit('response.mcp_call_arguments.done');
     TResponseStreamType.mcp_call_completed:
       Exit('response.mcp_call.completed');
     TResponseStreamType.mcp_call_failed:
@@ -3745,18 +3852,24 @@ begin
       Exit('response.mcp_list_tools.failed');
     TResponseStreamType.mcp_list_tools_in_progress:
       Exit('response.mcp_list_tools.in_progress');
+    TResponseStreamType.code_interpreter_call_in_progress:
+      Exit('response.code_interpreter_call.in_progress');
+    TResponseStreamType.code_interpreter_call_interpreting:
+      Exit('response.code_interpreter_call.interpreting');
+    TResponseStreamType.code_interpreter_call_completed:
+      Exit('response.code_interpreter_call.completed');
+    TResponseStreamType.code_interpreter_call_code_delta:
+      Exit('response.code_interpreter_call_code.delta');
+    TResponseStreamType.code_interpreter_call_code_done:
+      Exit('response.code_interpreter_call_code.done');
+    TResponseStreamType.output_text_annotation_added:
+      Exit('response.output_text.annotation.added');
     TResponseStreamType.queued:
       Exit('response.queued');
-    TResponseStreamType.reasoning_delta:
-      Exit('response.reasoning.delta');
-    TResponseStreamType.reasoning_done:
-      Exit('response.reasoning.done');
-    TResponseStreamType.reasoning_summary_delta:
-      Exit('response.reasoning_summary.delta');
-    TResponseStreamType.reasoning_summary_done:
-      Exit('response.reasoning_summary.done');
-
-
+    TResponseStreamType.custom_tool_call_input_delta:
+      Exit('response.custom_tool_call_input.delta');
+    TResponseStreamType.custom_tool_call_input_done:
+      Exit('response.custom_tool_call_input.done');
     TResponseStreamType.error:
       Exit('error');
   end;
@@ -3855,6 +3968,94 @@ begin
       Exit('standard');
     TImageQualityType.auto:
       Exit('auto');
+  end;
+end;
+
+{ TVerbosityTypeHelper }
+
+constructor TVerbosityTypeHelper.Create(const Value: string);
+begin
+  Self := TEnumValueRecovery.TypeRetrieve<TVerbosityType>(Value,
+            ['low', 'medium', 'high']);
+end;
+
+function TVerbosityTypeHelper.ToString: string;
+begin
+  case self of
+    TVerbosityType.low:
+      Exit('low');
+    TVerbosityType.medium:
+      Exit('medium');
+    TVerbosityType.high:
+      Exit('high');
+  end;
+end;
+
+{ TVerbosityTypeInterceptor }
+
+function TVerbosityTypeInterceptor.StringConverter(Data: TObject;
+  Field: string): string;
+begin
+  Result := RTTI.GetType(Data.ClassType).GetField(Field).GetValue(Data).AsType<TVerbosityType>.ToString;
+end;
+
+procedure TVerbosityTypeInterceptor.StringReverter(Data: TObject; Field,
+  Arg: string);
+begin
+  RTTI.GetType(Data.ClassType).GetField(Field).SetValue(Data, TValue.From(TVerbosityType.Create(Arg)));
+end;
+
+{ TFidelityTypeHelper }
+
+constructor TFidelityTypeHelper.Create(const Value: string);
+begin
+  Self := TEnumValueRecovery.TypeRetrieve<TFidelityType>(Value,
+            ['low', 'high']);
+end;
+
+function TFidelityTypeHelper.ToString: string;
+begin
+  case Self of
+    TFidelityType.low:
+      Exit('low');
+    TFidelityType.high:
+      Exit('high');
+  end;
+end;
+
+{ TToolParamsFormatTypeHelper }
+
+constructor TToolParamsFormatTypeHelper.Create(const Value: string);
+begin
+  Self := TEnumValueRecovery.TypeRetrieve<TToolParamsFormatType>(Value,
+            ['text', 'grammargrammar']);
+end;
+
+function TToolParamsFormatTypeHelper.ToString: string;
+begin
+  case Self of
+    TToolParamsFormatType.text:
+      Exit('text');
+    TToolParamsFormatType.grammar:
+      Exit('grammar');
+  end;
+end;
+
+{ TSyntaxFormatTypeHelper }
+
+constructor TSyntaxFormatTypeHelper.Create(const Value: string);
+begin
+  Self := TEnumValueRecovery.TypeRetrieve<TSyntaxFormatType>(Value,
+            ['lark', 'regex']);
+end;
+
+function TSyntaxFormatTypeHelper.ToString: string;
+begin
+  case Self of
+    TSyntaxFormatType.lark:
+      Exit('lark');
+    TSyntaxFormatType.regex:
+      Exit('regex');
   end;
 end;
 

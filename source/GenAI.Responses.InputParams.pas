@@ -1315,6 +1315,34 @@ type
     /// </para>
     /// </summary>
     function Format(const Value: TTextFormatParams): TTextParams;
+
+    /// <summary>
+    /// Constrains the verbosity of the model's response. Lower values will result in more concise responses, while higher values will result in more verbose responses.
+    /// </summary>
+    /// <param name="Value">
+    /// Enum value of [low, medium, high]
+    /// </param>
+    /// <returns>
+    /// An instance of TChatParams configured with the user identifier.
+    /// </returns>
+    /// <remarks>
+    /// Currently supported values are low, medium, and high.
+    /// </remarks>
+    function Verbosity(const Value: TVerbosityType): TTextParams; overload;
+
+    /// <summary>
+    /// Constrains the verbosity of the model's response. Lower values will result in more concise responses, while higher values will result in more verbose responses.
+    /// </summary>
+    /// <param name="Value">
+    /// string value "low", or "medium" or "high"
+    /// </param>
+    /// <returns>
+    /// An instance of TChatParams configured with the user identifier.
+    /// </returns>
+    /// <remarks>
+    /// Currently supported values are low, medium, and high.
+    /// </remarks>
+    function Verbosity(const Value: string): TTextParams; overload;
   end;
 
   /// <summary>
@@ -1735,6 +1763,11 @@ type
     /// </summary>
     function RequireApproval(const Value: TMCPRequireApprovalParams): TResponseMCPToolParams; overload;
 
+    /// <summary>
+    /// Optional description of the MCP server, used to provide more context.
+    /// </summary>
+    function ServerDescription(const Value: string): TResponseMCPToolParams;
+
     class function New: TResponseMCPToolParams;
   end;
 
@@ -1804,6 +1837,18 @@ type
     function Background(const Value: TBackGroundType): TResponseImageGenerationParams; overload;
 
     /// <summary>
+    /// Control how much effort the model will exert to match the style and features, especially facial features,
+    /// of input images. This parameter is only supported for gpt-image-1. Supports high and low. Defaults to low.
+    /// </summary>
+    function InputFidelity(const Value: string): TResponseImageGenerationParams; overload;
+
+    /// <summary>
+    /// Control how much effort the model will exert to match the style and features, especially facial features,
+    /// of input images. This parameter is only supported for gpt-image-1. Supports high and low. Defaults to low.
+    /// </summary>
+    function InputFidelity(const Value: TFidelityType): TResponseImageGenerationParams; overload;
+
+    /// <summary>
     /// Optional mask for inpainting. Contains image_url (string, optional) and file_id (string, optional).
     /// </summary>
     function InputImageMask(const Value: TInputImageMaskParams): TResponseImageGenerationParams;
@@ -1870,7 +1915,114 @@ type
     class function New: TLocalShellToolParams;
   end;
 
+  TToolParamsFormatParams = class(TJSONParam)
+    /// <summary>
+    /// Unconstrained text format "text" or Grammar format "grammar"
+    /// </summary>
+    function &Type(const Value: TToolParamsFormatType): TToolParamsFormatParams; overload;
+
+    /// <summary>
+    /// Unconstrained text format "text" or Grammar format "grammar"
+    /// </summary>
+    function &Type(const Value: string): TToolParamsFormatParams; overload;
+
+    /// <summary>
+    /// The grammar definition.
+    /// </summary>
+    function Definition(const Value: string): TToolParamsFormatParams;
+
+    /// <summary>
+    /// The syntax of the grammar definition. One of lark or regex.
+    /// </summary>
+    function Syntax(const Value: TSyntaxFormatType): TToolParamsFormatParams; overload;
+
+    /// <summary>
+    /// The syntax of the grammar definition. One of lark or regex.
+    /// </summary>
+    function Syntax(const Value: string): TToolParamsFormatParams; overload;
+
+    class function New(const Value: TToolParamsFormatType): TToolParamsFormatParams; overload;
+    class function New(const Value: string): TToolParamsFormatParams; overload;
+  end;
+
+  TCustomToolParams = class(TResponseToolParams)
+    /// <summary>
+    /// The type of the custom tool. Always custom
+    /// </summary>
+    function &Type(const Value: string = 'custom'): TCustomToolParams;
+
+    /// <summary>
+    /// The name of the custom tool, used to identify it in tool calls.
+    /// </summary>
+    function Name(const Value: string): TCustomToolParams;
+
+    /// <summary>
+    /// Optional description of the custom tool, used to provide more context.
+    /// </summary>
+    function Description(const Value: string): TCustomToolParams;
+
+    /// <summary>
+    /// The input format for the custom tool. Default is unconstrained text.
+    /// </summary>
+    function Format(const Value: TToolParamsFormatParams): TCustomToolParams;
+
+    class function New: TCustomToolParams;
+  end;
+
+  TPromptParams = class(TJsonParam)
+    /// <summary>
+    /// The unique identifier of the prompt template to use.
+    /// </summary>
+    function Id(const Value: string): TPromptParams;
+
+    /// <summary>
+    /// Optional map of values to substitute in for variables in your prompt. The substitution values
+    /// can either be strings, or other Response input types like images or files.
+    /// </summary>
+    function Variables(const Value: TJSONObject): TPromptParams;
+
+    /// <summary>
+    /// Optional version of the prompt template.
+    /// </summary>
+    function Version(const Value: string): TPromptParams;
+
+    class function New: TPromptParams;
+  end;
+
   TResponsesParams = class(TJSONParam)
+    /// <summary>
+    /// Whether to run the model response in the background.
+    /// </summary>
+    function Background(const Value: Boolean): TResponsesParams;
+
+    /// <summary>
+    /// Specify additional output data to include in the model response. Currently supported values are:
+    /// <para>
+    /// file_search_call.results: Include the search results of the file search tool call.
+    /// </para>
+    /// <para>
+    /// message.input_image.image_url: Include image urls from the input message.
+    /// </para>
+    /// <para>
+    /// computer_call_output.output.image_url: Include image urls from the computer call output.
+    /// </para>
+    /// </summary>
+    function Include(const Value: TArray<TOutputIncluding>): TResponsesParams; overload;
+
+    /// <summary>
+    /// Specify additional output data to include in the model response. Currently supported values are:
+    /// <para>
+    /// file_search_call.results: Include the search results of the file search tool call.
+    /// </para>
+    /// <para>
+    /// message.input_image.image_url: Include image urls from the input message.
+    /// </para>
+    /// <para>
+    /// computer_call_output.output.image_url: Include image urls from the computer call output.
+    /// </para>
+    /// </summary>
+    function Include(const Value: TArray<string>): TResponsesParams; overload;
+
     /// <summary>
     /// Text, image, or file inputs to the model, used to generate a response.
     /// </summary>
@@ -1906,46 +2058,6 @@ type
     function Input(const Content: string; const Docs: TArray<string>; const Role: string = 'user'): TResponsesParams; overload;
 
     /// <summary>
-    /// Model ID used to generate the response, like gpt-4o or o1. OpenAI offers a wide range of models
-    /// with different capabilities, performance characteristics, and price points. Refer to the model
-    /// guide to browse and compare available models.
-    /// </summary>
-    function Model(const Value: string): TResponsesParams;
-
-    /// <summary>
-    /// Whether to run the model response in the background.
-    /// </summary>
-    function Background(const Value: Boolean): TResponsesParams;
-
-    /// <summary>
-    /// Specify additional output data to include in the model response. Currently supported values are:
-    /// <para>
-    /// file_search_call.results: Include the search results of the file search tool call.
-    /// </para>
-    /// <para>
-    /// message.input_image.image_url: Include image urls from the input message.
-    /// </para>
-    /// <para>
-    /// computer_call_output.output.image_url: Include image urls from the computer call output.
-    /// </para>
-    /// </summary>
-    function Include(const Value: TArray<TOutputIncluding>): TResponsesParams; overload;
-
-    /// <summary>
-    /// Specify additional output data to include in the model response. Currently supported values are:
-    /// <para>
-    /// file_search_call.results: Include the search results of the file search tool call.
-    /// </para>
-    /// <para>
-    /// message.input_image.image_url: Include image urls from the input message.
-    /// </para>
-    /// <para>
-    /// computer_call_output.output.image_url: Include image urls from the computer call output.
-    /// </para>
-    /// </summary>
-    function Include(const Value: TArray<string>): TResponsesParams; overload;
-
-    /// <summary>
     /// Inserts a system (or developer) message as the first item in the model's context.
     /// </summary>
     /// <remarks>
@@ -1961,6 +2073,13 @@ type
     function MaxOutputTokens(const Value: Integer): TResponsesParams;
 
     /// <summary>
+    ///  The maximum number of total calls to built-in tools that can be processed in a response. This
+    /// maximum number applies across all built-in tool calls, not per individual tool. Any further
+    /// attempts to call a tool by the model will be ignored.
+    /// </summary>
+    function MaxToolCalls(const Value: Integer): TResponsesParams;
+
+    /// <summary>
     /// Set of 16 key-value pairs that can be attached to an object. This can be useful for storing additional information
     /// about the object in a structured format, and querying for objects via API or the dashboard.
     /// </summary>
@@ -1968,6 +2087,13 @@ type
     /// Keys are strings with a maximum length of 64 characters. Values are strings with a maximum length of 512 characters.
     /// </remarks>
     function Metadata(const Value: TJSONObject): TResponsesParams;
+
+    /// <summary>
+    /// Model ID used to generate the response, like gpt-4o or o1. OpenAI offers a wide range of models
+    /// with different capabilities, performance characteristics, and price points. Refer to the model
+    /// guide to browse and compare available models.
+    /// </summary>
+    function Model(const Value: string): TResponsesParams;
 
     /// <summary>
     /// Whether to allow the model to run tool calls in parallel.
@@ -1981,6 +2107,22 @@ type
     function PreviousResponseId(const Value: string): TResponsesParams;
 
     /// <summary>
+    /// Reference to a prompt template and its variables.
+    /// </summary>
+    /// <remarks>
+    /// Refer to https://platform.openai.com/docs/guides/text?api-mode=responses&prompt-templates-examples=simple#reusable-prompts
+    /// </remarks>
+    function Prompt(const Value: TPromptParams): TResponsesParams;
+
+    /// <summary>
+    /// Used by OpenAI to cache responses for similar requests to optimize your cache hit rates. Replaces the user field.
+    /// </summary>
+    /// <remarks>
+    /// Refer to https://platform.openai.com/docs/guides/prompt-caching
+    /// </remarks>
+    function PromptCacheKey(const Value: string): TResponsesParams;
+
+    /// <summary>
     /// o-series models only. Configuration options for reasoning models.
     /// </summary>
     function Reasoning(const Value: TReasoningParams): TResponsesParams; overload;
@@ -1989,6 +2131,16 @@ type
     /// o-series models only. Configuration options for reasoning models.
     /// </summary>
     function Reasoning(const Value: string): TResponsesParams; overload;
+
+    /// <summary>
+    /// A stable identifier used to help detect users of your application that may be violating OpenAI's
+    /// usage policies. The IDs should be a string that uniquely identifies each user. We recommend hashing
+    /// their username or email address, in order to avoid sending us any identifying information.
+    /// </summary>
+    /// <remarks>
+    /// Refer to https://platform.openai.com/docs/guides/safety-best-practices#safety-identifiers
+    /// </remarks>
+    function SafetyIdentifier(const Value: string): TResponsesParams;
 
     /// <summary>
     /// Specifies the latency tier to use for processing the request. This parameter is relevant for
@@ -2024,6 +2176,17 @@ type
     /// if set to true, the model response data will be streamed to the client as it is generated using server-sent events.
     /// </summary>
     function Stream(const Value: Boolean = True): TResponsesParams;
+
+    /// <summary>
+    /// Configures options for streaming responses, such as inclusion of usage data.
+    /// </summary>
+    /// <param name="Value">
+    /// A JSON object specifying streaming options.
+    /// </param>
+    /// <returns>
+    /// Returns an instance of TChatParams with streaming options set.
+    /// </returns>
+    function StreamOptions(const Value: TStreamOptions): TResponsesParams;
 
     /// <summary>
     /// What sampling temperature to use, between 0 and 2. Higher values like 0.8 will make the output more random, while
@@ -2135,6 +2298,12 @@ type
     /// </para>
     /// </remarks>
     function Tools(const Value: TArray<TResponseToolParams>): TResponsesParams; overload;
+
+    /// <summary>
+    /// An integer between 0 and 20 specifying the number of most likely tokens to return at each token
+    /// position, each with an associated log probability.
+    /// </summary>
+    function TopLogprobs(const Value: Integer): TResponsesParams;
 
     /// <summary>
     /// An alternative to sampling with temperature, called nucleus sampling, where the model considers the results of
@@ -3763,6 +3932,16 @@ begin
   Result := TTextParams(Add('format', Value.Detach));
 end;
 
+function TTextParams.Verbosity(const Value: TVerbosityType): TTextParams;
+begin
+  Result := TTextParams(Add('verbosity', Value.ToString));
+end;
+
+function TTextParams.Verbosity(const Value: string): TTextParams;
+begin
+  Result := TTextParams(Add('verbosity', TVerbosityType.Create(Value).ToString));
+end;
+
 { THostedToolParams }
 
 function THostedToolParams.&Type(
@@ -4192,6 +4371,12 @@ begin
   Result := TResponseMCPToolParams(Add('require_approval', Value.Detach));
 end;
 
+function TResponseMCPToolParams.ServerDescription(
+  const Value: string): TResponseMCPToolParams;
+begin
+  Result := TResponseMCPToolParams(Add('server_description', Value));
+end;
+
 function TResponseMCPToolParams.ServerLabel(
   const Value: string): TResponseMCPToolParams;
 begin
@@ -4345,6 +4530,11 @@ begin
   Result := TResponsesParams(Add('max_output_tokens', Value));
 end;
 
+function TResponsesParams.MaxToolCalls(const Value: Integer): TResponsesParams;
+begin
+  Result := TResponsesParams(Add('max_tool_calls', Value));
+end;
+
 function TResponsesParams.Metadata(const Value: TJSONObject): TResponsesParams;
 begin
   Result := TResponsesParams(Add('metadata', Value));
@@ -4367,6 +4557,16 @@ begin
   Result := TResponsesParams(Add('previous_response_id', Value));
 end;
 
+function TResponsesParams.Prompt(const Value: TPromptParams): TResponsesParams;
+begin
+  Result := TResponsesParams(Add('prompt', Value.Detach));
+end;
+
+function TResponsesParams.PromptCacheKey(const Value: string): TResponsesParams;
+begin
+  Result := TResponsesParams(Add('prompt_cache_key', Value));
+end;
+
 function TResponsesParams.Reasoning(const Value: TReasoningParams): TResponsesParams;
 begin
   Result := TResponsesParams(Add('reasoning', Value.Detach));
@@ -4375,6 +4575,12 @@ end;
 function TResponsesParams.Reasoning(const Value: string): TResponsesParams;
 begin
   Result := TResponsesParams(Add('reasoning', TReasoningParams.New.Effort(Value).Detach));
+end;
+
+function TResponsesParams.SafetyIdentifier(
+  const Value: string): TResponsesParams;
+begin
+  Result := TResponsesParams(Add('safety_identifier', Value));
 end;
 
 function TResponsesParams.ServiceTier(const Value: string): TResponsesParams;
@@ -4390,6 +4596,12 @@ end;
 function TResponsesParams.Stream(const Value: Boolean): TResponsesParams;
 begin
   Result := TResponsesParams(Add('stream', Value));
+end;
+
+function TResponsesParams.StreamOptions(
+  const Value: TStreamOptions): TResponsesParams;
+begin
+   Result := TResponsesParams(Add('stream_options', Value.Detach));
 end;
 
 function TResponsesParams.Temperature(const Value: Double): TResponsesParams;
@@ -4427,6 +4639,11 @@ begin
   for var Item in Value do
     JSONArray.Add(Item.Detach);
   Result := TResponsesParams(Add('tools', JSONArray));
+end;
+
+function TResponsesParams.TopLogprobs(const Value: Integer): TResponsesParams;
+begin
+  Result := TResponsesParams(Add('top_logprobs', Value));
 end;
 
 function TResponsesParams.TopP(const Value: Double): TResponsesParams;
@@ -4500,6 +4717,18 @@ function TResponseImageGenerationParams.Background(
   const Value: TBackGroundType): TResponseImageGenerationParams;
 begin
   Result := TResponseImageGenerationParams(Add('background', Value.ToString));
+end;
+
+function TResponseImageGenerationParams.InputFidelity(
+  const Value: string): TResponseImageGenerationParams;
+begin
+  Result := TResponseImageGenerationParams(Add('input_fidelity', TFidelityType.Create(Value).ToString));
+end;
+
+function TResponseImageGenerationParams.InputFidelity(
+  const Value: TFidelityType): TResponseImageGenerationParams;
+begin
+  Result := TResponseImageGenerationParams(Add('input_fidelity', Value.ToString));
 end;
 
 function TResponseImageGenerationParams.InputImageMask(
@@ -4596,6 +4825,100 @@ end;
 class function TInputImageMaskParams.New: TInputImageMaskParams;
 begin
   Result := TInputImageMaskParams.Create;
+end;
+
+{ TPromptParams }
+
+function TPromptParams.Id(const Value: string): TPromptParams;
+begin
+  Result := TPromptParams(Add('id', Value));
+end;
+
+class function TPromptParams.New: TPromptParams;
+begin
+  Result := TPromptParams.Create;
+end;
+
+function TPromptParams.Variables(const Value: TJSONObject): TPromptParams;
+begin
+  Result := TPromptParams(Add('variables', Value));
+end;
+
+function TPromptParams.Version(const Value: string): TPromptParams;
+begin
+  Result := TPromptParams(Add('version', Value));
+end;
+
+{ TCustomToolParams }
+
+function TCustomToolParams.&Type(const Value: string): TCustomToolParams;
+begin
+  Result := TCustomToolParams(Add('type', Value));
+end;
+
+function TCustomToolParams.Description(const Value: string): TCustomToolParams;
+begin
+  Result := TCustomToolParams(Add('description', Value));
+end;
+
+function TCustomToolParams.Format(
+  const Value: TToolParamsFormatParams): TCustomToolParams;
+begin
+  Result := TCustomToolParams(Add('format', Value.Detach));
+end;
+
+function TCustomToolParams.Name(const Value: string): TCustomToolParams;
+begin
+  Result := TCustomToolParams(Add('name', Value));
+end;
+
+class function TCustomToolParams.New: TCustomToolParams;
+begin
+  Result := TCustomToolParams.Create.&Type();
+end;
+
+{ TToolParamsFormatParams }
+
+function TToolParamsFormatParams.Definition(
+  const Value: string): TToolParamsFormatParams;
+begin
+  Result := TToolParamsFormatParams(Add('definition', Value));
+end;
+
+function TToolParamsFormatParams.Syntax(
+  const Value: TSyntaxFormatType): TToolParamsFormatParams;
+begin
+  Result := TToolParamsFormatParams(Add('syntax', Value.ToString));
+end;
+
+class function TToolParamsFormatParams.New(
+  const Value: TToolParamsFormatType): TToolParamsFormatParams;
+begin
+  Result := TToolParamsFormatParams.Create.&Type(Value);
+end;
+
+class function TToolParamsFormatParams.New(
+  const Value: string): TToolParamsFormatParams;
+begin
+  Result := TToolParamsFormatParams.Create.&Type(Value);
+end;
+
+function TToolParamsFormatParams.Syntax(
+  const Value: string): TToolParamsFormatParams;
+begin
+  Result := TToolParamsFormatParams(Add('syntax', TSyntaxFormatType.Create(Value).ToString));
+end;
+
+function TToolParamsFormatParams.&Type(
+  const Value: TToolParamsFormatType): TToolParamsFormatParams;
+begin
+  Result := TToolParamsFormatParams(Add('type', Value.ToString));
+end;
+
+function TToolParamsFormatParams.&Type(
+  const Value: string): TToolParamsFormatParams;
+begin
+  Result := TToolParamsFormatParams(Add('type', TToolParamsFormatType.Create(Value).ToString));
 end;
 
 end.

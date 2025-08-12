@@ -1,3 +1,42 @@
+#### 2025, August 12 version 1.2.0
+**Modifications to ensure full use of the gtp-5 model**
+
+- JSON Normalization Before Deserialization
+  - New `GenAI.API.Normalizer` module (`TJSONNormalizer`, `TWrapKind`, `TNormalizationRule`) to unify polymorphic fields (e.g., string vs. object).
+  - Direct integration in the HTTP layer: new `Get(..., Path)` overloads allow targeted normalization of a JSON subtree before object mapping.
+
+- Canceling Background Requests
+  - New `Responses.AsyncAwaitCancel(response_id)` method to cancel an asynchronous (`background = true`) response, with full callback support (`OnStart`, `OnSuccess`, `OnError`).
+
+- Streaming Enhancements
+  - Extended typed coverage for streaming events and outputs (MCP, Code Interpreter, Image Generation, etc.) via new `Responses.OutputParams` classes (`TResponseOutput*`, `TResponseImageGenerationTool`, `TResponseCodeInterpreter`, etc.).
+
+- New Types and Parameters
+  - InputParams: full coverage for computer interactions, local shell, MCP, web search, code, image generation, reasoning, text/JSON formats, tool choice/hosted tool, and file search filters.
+  - OutputParams: states (`Created`, `InProgress`, etc.), events (`Added`, `Delta`), usage metrics, and statistics.
+  - New enums (`TOutputIncluding`, `TReasoningGenerateSummary`, `TFidelityType`, etc.).
+
+- API `v1/chat/completions`
+  - New parameters:
+    - `prompt_cache_key` (prompt caching)
+    - `safety_identifier` (stable ID for safety monitoring)
+    - `verbosity` (low/medium/high)
+
+- API `v1/responses`
+  - New parameters:
+    - `max_tool_calls`
+    - `prompt` (template reference via `TPromptParams`)
+    - `prompt_cache_key`, `safety_identifier`
+    - `stream_options`, `top_logprobs`, `verbosity`
+
+- Structured System and Developer Messages
+  - New overloads:
+    - `TMessagePayload.Developer(const Content: TArray; const Name: string = '')`
+    - `TMessagePayload.System(const Content: TArray; const Name: string = '')`
+  - Improves parity between plain text and structured content flows.
+
+<br>
+
 ### 2025, June 14 version 1.1.0 (**Getit version**)
 - Given the project’s rapid progress, it’s now essential to embed versioning directly into the GenAI wrapper’s source code. For any client implementing the IGenAI interface, the version number can be retrieved via the Version property, for example:
 ```Delphi

@@ -7,30 +7,33 @@ unit GenAI.API;
 
  ------------------------------------------------------------------------------}
 
-(*
-  --- NOTE ---
-  The  GenAI.HttpClientInterface  unit  defines  an  IHttpClientAPI  interface, which
-  allows  for decoupling  the specific implementation  of  the HTTP  client used  for
-  web requests. This introduces  an abstraction  that  enhances flexibility, improves
-  testability, and simplifies code maintenance.
-
-  The IHttpClientAPI interface  ensures that  client code can interact  with  the web
-  without  being  dependent  on a specific class, thus  facilitating  the replacement
-  or modification  of the  underlying  HTTP implementation  details without impacting
-  the rest  of  the application. It also  enables  easy mocking  during unit testing,
-  offering the ability to test  HTTP request behaviors in an isolated  and controlled
-  manner.
-
-  This approach adheres to the SOLID principles of dependency inversion, contributing
-  to a robust, modular, and adaptable software architecture.
-*)
-
 interface
+
+{$REGION 'Dev note'}
+  (*
+    --- NOTE ---
+    The  GenAI.HttpClientInterface  unit  defines  an  IHttpClientAPI  interface, which
+    allows  for decoupling  the specific implementation  of  the HTTP  client used  for
+    web requests. This introduces  an abstraction  that  enhances flexibility, improves
+    testability, and simplifies code maintenance.
+
+    The IHttpClientAPI interface  ensures that  client code can interact  with  the web
+    without  being  dependent  on a specific class, thus  facilitating  the replacement
+    or modification  of the  underlying  HTTP implementation  details without impacting
+    the rest  of  the application. It also  enables  easy mocking  during unit testing,
+    offering the ability to test  HTTP request behaviors in an isolated  and controlled
+    manner.
+
+    This approach adheres to the SOLID principles of dependency inversion, contributing
+    to a robust, modular, and adaptable software architecture.
+  *)
+{$ENDREGION}
 
 uses
   System.SysUtils, System.Classes, System.Net.HttpClient, System.Net.URLClient,
   System.Net.Mime, System.JSON, GenAI.API.Params, GenAI.API.Utils, GenAI.Errors,
-  GenAI.Exceptions, GenAI.HttpClientInterface, GenAI.HttpClientAPI, GenAI.Monitoring;
+  GenAI.Exceptions, GenAI.HttpClientInterface, GenAI.HttpClientAPI, GenAI.Monitoring,
+  GenAI.API.Normalizer;
 
 type
   /// <summary>
@@ -86,6 +89,7 @@ type
     /// A list of headers including authorization and optional organization information.
     /// </returns>
     function BuildHeaders: TNetHeaders; virtual;
+
     /// <summary>
     /// Builds headers specific to JSON-based API requests.
     /// </summary>
@@ -93,6 +97,7 @@ type
     /// A list of headers including JSON content-type and authorization details.
     /// </returns>
     function BuildJsonHeaders: TNetHeaders; virtual;
+
     /// <summary>
     /// Constructs the full URL for a specific API endpoint.
     /// </summary>
@@ -103,6 +108,7 @@ type
     /// The full URL including the base URL and endpoint.
     /// </returns>
     function BuildUrl(const Endpoint: string): string; overload; virtual;
+
     /// <summary>
     /// Constructs the full URL for a specific API endpoint.
     /// </summary>
@@ -118,18 +124,22 @@ type
     function BuildUrl(const Endpoint, Parameters: string): string; overload; virtual;
   public
     constructor Create; overload;
+
     /// <summary>
     /// The API key used for authentication.
     /// </summary>
     property APIKey: string read FAPIKey write SetAPIKey;
+
     /// <summary>
     /// The base URL for API requests.
     /// </summary>
     property BaseUrl: string read FBaseUrl write SetBaseUrl;
+
     /// <summary>
     /// The organization identifier used for the API.
     /// </summary>
     property Organization: string read FOrganization write SetOrganization;
+
     /// <summary>
     /// Custom headers to include in API requests.
     /// </summary>
@@ -151,6 +161,7 @@ type
     FHttpClient: IHttpClientAPI;
   public
     constructor Create;
+
     /// <summary>
     /// The HTTP client used to send requests to the API.
     /// </summary>
@@ -183,6 +194,7 @@ type
     /// Raised if the error response cannot be parsed or contains invalid data.
     /// </exception>
     procedure DeserializeErrorData(const Code: Int64; const ResponseText: string); virtual;
+
     /// <summary>
     /// Raises an exception corresponding to the API error code.
     /// </summary>
@@ -193,6 +205,7 @@ type
     /// The deserialized error object containing error details.
     /// </param>
     procedure RaiseError(Code: Int64; Error: TErrorCore); virtual;
+
     /// <summary>
     /// Deserializes the API response into a strongly typed object.
     /// </summary>
@@ -214,6 +227,7 @@ type
     function Deserialize<T: class, constructor>(const Code: Int64; const ResponseText: string): T;
   public
     class constructor Create;
+
     /// <summary>
     /// Deserializes the API response into a strongly typed object.
     /// </summary>
@@ -253,6 +267,7 @@ type
     /// The API key used for authenticating requests to the GenAI API.
     /// </param>
     constructor Create(const AAPIKey: string); overload;
+
     /// <summary>
     /// Sends a GET request to the specified API endpoint and returns a strongly typed object.
     /// </summary>
@@ -269,6 +284,31 @@ type
     /// Raised if the response cannot be deserialized or is non-compliant.
     /// </exception>
     function Get<TResult: class, constructor>(const Endpoint: string): TResult; overload;
+
+    /// <summary>
+    /// Sends a GET request without parameters, optionally normalizes a sub-tree of the JSON
+    /// response, and deserializes the result into a strongly typed object.
+    /// </summary>
+    /// <typeparam name="TResult">
+    /// The target type to deserialize into. Must be a class with a parameterless constructor.
+    /// </typeparam>
+    /// <param name="Endpoint">
+    /// The relative API endpoint (e.g., <c>"models"</c>).
+    /// </param>
+    /// <param name="Path">
+    /// A normalization path specification consumed by the JSON normalizer to project or extract a
+    /// specific sub-tree before deserialization (e.g., flattening or selecting nested fields). Pass an
+    /// empty array to deserialize the raw payload.
+    /// </param>
+    /// <returns>
+    /// An instance of <c>TResult</c> populated from the (optionally normalized) JSON response.
+    /// </returns>
+    /// <remarks>
+    /// Sends a GET request to the specified endpoint with standard headers, applies JSON normalization
+    /// using <c>Path</c>, and deserializes the resulting JSON into <c>TResult</c>.
+    /// </remarks>
+    function Get<TResult: class, constructor>(const Endpoint: string; const Path: TArray<TArray<string>>): TResult; overload;
+
     /// <summary>
     /// Sends a GET request with parameters and returns a strongly typed object.
     /// </summary>
@@ -291,6 +331,39 @@ type
     /// Raised if the response cannot be deserialized or is non-compliant.
     /// </exception>
     function Get<TResult: class, constructor; TParams: TUrlParam>(const Endpoint: string; ParamProc: TProc<TParams>): TResult; overload;
+
+    /// <summary>
+    /// Sends a GET request with URL parameters, optionally normalizes a sub-tree of the JSON
+    /// response, and deserializes the result into a strongly typed object.
+    /// </summary>
+    /// <typeparam name="TResult">
+    /// The target type to deserialize into. Must be a class with a parameterless constructor.
+    /// </typeparam>
+    /// <typeparam name="TParams">
+    /// The URL-parameter builder type (derives from <c>TUrlParam</c>) used to construct the query string.
+    /// </typeparam>
+    /// <param name="Endpoint">
+    /// The relative API endpoint (e.g., <c>"models"</c>).
+    /// </param>
+    /// <param name="ParamProc">
+    /// A procedure that configures an instance of <c>TParams</c>; its <c>Value</c> is appended to the
+    /// endpoint as the query string. Can be <c>nil</c> if no parameters are needed.
+    /// </param>
+    /// <param name="Path">
+    /// A normalization path specification consumed by the JSON normalizer to project or extract a
+    /// specific sub-tree before deserialization (e.g., flattening or selecting nested fields). Pass an
+    /// empty array to deserialize the raw payload.
+    /// </param>
+    /// <returns>
+    /// An instance of <c>TResult</c> populated from the (optionally normalized) JSON response.
+    /// </returns>
+    /// <remarks>
+    /// Builds the request URL via <c>BuildUrl(Endpoint, Params.Value)</c>, issues the GET with standard
+    /// headers, applies JSON normalization using <c>Path</c>, then deserializes the resulting JSON into
+    /// <c>TResult</c>.
+    /// </remarks>
+    function Get<TResult: class, constructor; TParams: TUrlParam>(const Endpoint: string; ParamProc: TProc<TParams>; const Path: TArray<TArray<string>>): TResult; overload;
+
     /// <summary>
     /// Sends a GET request to retrieve a file from the specified API endpoint.
     /// </summary>
@@ -304,6 +377,7 @@ type
     /// The HTTP status code of the API response.
     /// </returns>
     function GetFile(const Endpoint: string; Response: TStream): Integer; overload;
+
     /// <summary>
     /// Sends a GET request to retrieve a file and deserializes it into a strongly typed object.
     /// <para>
@@ -323,6 +397,7 @@ type
     /// A deserialized object of type <c>TResult</c> containing the file data.
     /// </returns>
     function GetFile<TResult: class, constructor>(const Endpoint: string; const JSONFieldName: string = 'data'): TResult; overload;
+
     /// <summary>
     /// Sends a DELETE request to the specified API endpoint and returns a strongly typed object.
     /// </summary>
@@ -336,6 +411,7 @@ type
     /// A deserialized object of type <c>TResult</c> containing the API response.
     /// </returns>
     function Delete<TResult: class, constructor>(const Endpoint: string): TResult; overload;
+
     /// <summary>
     /// Sends a POST request with parameters and streams the response.
     /// </summary>
@@ -361,6 +437,7 @@ type
     /// Raised if the response cannot be deserialized or is non-compliant.
     /// </exception>
     function Post<TParams: TJSONParam>(const Endpoint: string; ParamProc: TProc<TParams>; Response: TStringStream; Event: TReceiveDataCallback): Boolean; overload;
+
     /// <summary>
     /// Sends a POST request with parameters and streams the response.
     /// </summary>
@@ -386,6 +463,7 @@ type
     /// Raised if the response cannot be deserialized or is non-compliant.
     /// </exception>
     function Post<TParams: TJSONParam>(const Endpoint: string; ParamProc: TProc<TParams>; Response: TStream; Event: TReceiveDataCallback): Boolean; overload;
+
     /// <summary>
     /// Sends a POST request with parameters and returns a strongly typed object.
     /// </summary>
@@ -411,6 +489,38 @@ type
     /// Raised if the response cannot be deserialized or is non-compliant.
     /// </exception>
     function Post<TResult: class, constructor; TParams: TJSONParam>(const Endpoint: string; ParamProc: TProc<TParams>; const RawByteFieldName: string = ''): TResult; overload;
+
+    /// <summary>
+    /// Sends a POST request with JSON parameters, optionally normalizes a sub-tree of the JSON
+    /// response, and deserializes the result into a strongly typed object.
+    /// </summary>
+    /// <typeparam name="TResult">
+    /// The target type to deserialize into. Must be a class with a parameterless constructor.
+    /// </typeparam>
+    /// <typeparam name="TParams">
+    /// The JSON-parameter builder type (derives from <c>TJSONParam</c>) used to construct the request body.
+    /// </typeparam>
+    /// <param name="Endpoint">
+    /// The relative API endpoint (e.g., <c>"responses"</c>).
+    /// </param>
+    /// <param name="ParamProc">
+    /// A procedure that configures an instance of <c>TParams</c> to define the request body.
+    /// Can be <c>nil</c> if no parameters are required.
+    /// </param>
+    /// <param name="Path">
+    /// A normalization path specification consumed by the JSON normalizer to project or extract a
+    /// specific sub-tree before deserialization (e.g., flattening or selecting nested fields). Pass an
+    /// empty array to deserialize the raw payload.
+    /// </param>
+    /// <returns>
+    /// An instance of <c>TResult</c> populated from the (optionally normalized) JSON response.
+    /// </returns>
+    /// <remarks>
+    /// Builds the request body from <c>TParams</c>, sends the POST request with JSON headers, applies
+    /// JSON normalization using <c>Path</c>, and deserializes the resulting JSON into <c>TResult</c>.
+    /// </remarks>
+    function Post<TResult: class, constructor; TParams: TJSONParam>(const Endpoint: string; ParamProc: TProc<TParams>; const Path: TArray<TArray<string>>): TResult; overload;
+
     /// <summary>
     /// Sends a POST request to the specified API endpoint.
     /// </summary>
@@ -424,6 +534,31 @@ type
     /// A deserialized object of type <c>TResult</c> containing the API response.
     /// </returns>
     function Post<TResult: class, constructor>(const Endpoint: string): TResult; overload;
+
+    /// <summary>
+    /// Sends a POST request without parameters, optionally normalizes a sub-tree of the JSON
+    /// response, and deserializes the result into a strongly typed object.
+    /// </summary>
+    /// <typeparam name="TResult">
+    /// The target type to deserialize into. Must be a class with a parameterless constructor.
+    /// </typeparam>
+    /// <param name="Endpoint">
+    /// The relative API endpoint (e.g., <c>"responses"</c>).
+    /// </param>
+    /// <param name="Path">
+    /// A normalization path specification consumed by the JSON normalizer to project or extract a
+    /// specific sub-tree before deserialization (e.g., flattening or selecting nested fields). Pass an
+    /// empty array to deserialize the raw payload.
+    /// </param>
+    /// <returns>
+    /// An instance of <c>TResult</c> populated from the (optionally normalized) JSON response.
+    /// </returns>
+    /// <remarks>
+    /// Sends a POST request to the specified endpoint with standard headers, applies JSON normalization
+    /// using <c>Path</c>, and deserializes the resulting JSON into <c>TResult</c>.
+    /// </remarks>
+    function Post<TResult: class, constructor>(const Endpoint: string; const Path: TArray<TArray<string>>): TResult; overload;
+
     /// <summary>
     /// Sends a PATCH request with parameters and returns a strongly typed object.
     /// </summary>
@@ -443,6 +578,7 @@ type
     /// A deserialized object of type <c>TResult</c> containing the API response.
     /// </returns>
     function Patch<TResult: class, constructor; TParams: TJSONParam>(const Endpoint: string; ParamProc: TProc<TParams>): TResult; overload;
+
     /// <summary>
     /// Sends a POST request with multipart form data and returns a strongly typed object.
     /// </summary>
@@ -485,15 +621,16 @@ type
     procedure HeaderCustomize; virtual;
   public
     /// <summary>
+    /// The GenAI API instance associated with this route.
+    /// </summary>
+    property API: TGenAIAPI read FAPI write SetAPI;
+
+    /// <summary>
     /// Initializes a new instance of the <c>TGenAIRoute</c> class with the given API instance.
     /// </summary>
     /// <param name="AAPI">
     /// The <c>TGenAIAPI</c> instance to associate with the route.
     /// </param>
-    property API: TGenAIAPI read FAPI write SetAPI;
-    /// <summary>
-    /// The GenAI API instance associated with this route.
-    /// </summary>
     constructor CreateRoute(AAPI: TGenAIAPI); reintroduce; virtual;
   end;
 
@@ -605,6 +742,54 @@ begin
   end;
 end;
 
+function TGenAIAPI.Post<TResult, TParams>(const Endpoint: string;
+  ParamProc: TProc<TParams>; const Path: TArray<TArray<string>>): TResult;
+begin
+  Monitoring.Inc;
+  var Response := TStringStream.Create('', TEncoding.UTF8);
+  var Params := TParams.Create;
+  try
+    if Assigned(ParamProc) then
+      ParamProc(Params);
+    var Code := HttpClient.Post(BuildUrl(Endpoint), Params.JSON, Response, BuildJsonHeaders, nil);
+    case Code of
+      200..299:
+        begin
+          if Length(Path) = 0 then
+            Result := Deserialize<TResult>(Code, Response.DataString)
+          else
+            begin
+              var S := TJSONNormalizer.Normalize(Response.DataString, Path);
+              Result := Deserialize<TResult>(Code, S);
+            end;
+        end;
+      else
+        Result := Deserialize<TResult>(Code, Response.DataString)
+    end;
+  finally
+    Params.Free;
+    Response.Free;
+    ResetCustomHeader;
+    Monitoring.Dec;
+  end;
+end;
+
+function TGenAIAPI.Post<TResult>(const Endpoint: string;
+  const Path: TArray<TArray<string>>): TResult;
+begin
+  Monitoring.Inc;
+  var Response := TStringStream.Create('', TEncoding.UTF8);
+  try
+    var Code := HttpClient.Post(BuildUrl(Endpoint), Response, BuildHeaders);
+    var S := TJSONNormalizer.Normalize(Response.DataString, Path);
+    Result := Deserialize<TResult>(Code, S);
+  finally
+    Response.Free;
+    ResetCustomHeader;
+    Monitoring.Dec;
+  end;
+end;
+
 function TGenAIAPI.Post<TResult>(const Endpoint: string): TResult;
 begin
   Monitoring.Inc;
@@ -665,6 +850,42 @@ begin
   finally
     Response.Free;
     Params.Free;
+    ResetCustomHeader;
+    Monitoring.Dec;
+  end;
+end;
+
+function TGenAIAPI.Get<TResult, TParams>(const Endpoint: string;
+  ParamProc: TProc<TParams>; const Path: TArray<TArray<string>>): TResult;
+begin
+   Monitoring.Inc;
+  var Response := TStringStream.Create('', TEncoding.UTF8);
+  var Params := TParams.Create;
+  try
+    if Assigned(ParamProc) then
+      ParamProc(Params);
+    var Code := HttpClient.Get(BuildUrl(Endpoint, Params.Value), Response, BuildHeaders);
+    var S := TJSONNormalizer.Normalize(Response.DataString, Path);
+    Result := Deserialize<TResult>(Code, S);
+  finally
+    Response.Free;
+    Params.Free;
+    ResetCustomHeader;
+    Monitoring.Dec;
+  end;
+end;
+
+function TGenAIAPI.Get<TResult>(const Endpoint: string;
+  const Path: TArray<TArray<string>>): TResult;
+begin
+  Monitoring.Inc;
+  var Response := TStringStream.Create('', TEncoding.UTF8);
+  try
+    var Code := HttpClient.Get(BuildUrl(Endpoint), Response, BuildHeaders);
+    var S := TJSONNormalizer.Normalize(Response.DataString, Path);
+    Result := Deserialize<TResult>(Code, Response.DataString);
+  finally
+    Response.Free;
     ResetCustomHeader;
     Monitoring.Dec;
   end;

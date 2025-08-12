@@ -20,6 +20,7 @@ type
   TFormatHelper = record
     const S_DETAIL = 'detail=';
     const S_FILEID = 'file_id';
+
     /// <summary>
     /// Retrieves the MIME type for the given file location or URL and extracts any detail parameter.
     /// </summary>
@@ -27,12 +28,14 @@ type
     /// <param name="Detail">Output parameter that receives the detail string if present; otherwise returns an empty string.</param>
     /// <returns>The MIME type as a string, or "file_id" for unknown or remote identifiers.</returns>
     class function GetMimeType(const FileLocation: string; var Detail: string): string; overload; static;
+
     /// <summary>
     /// Retrieves the MIME type for the given file location or URL.
     /// </summary>
     /// <param name="FileLocation">The path or URL of the file.</param>
     /// <returns>The MIME type as a string, or "file_id" if the file does not exist locally.</returns>
     class function GetMimeType(const FileLocation: string): string; overload; static;
+
     /// <summary>
     /// Extracts the base file name and detail parameter from a file location string.
     /// </summary>
@@ -41,12 +44,14 @@ type
     /// </param>
     /// <returns>The base file name or URL without the detail segment.</returns>
     class function ExtractFileName(const FileLocation: string; var Detail: string): string; static;
+
     /// <summary>
     /// Checks if the specified MIME type represents a PDF document.
     /// </summary>
     /// <param name="MimeType">The MIME type to check.</param>
     /// <returns>True if the MIME type corresponds to a PDF; otherwise False.</returns>
     class function IsPDFDocument(const MimeType: string): Boolean; static;
+
     /// <summary>
     /// Checks if the specified MIME type represents an accepted image document.
     /// </summary>

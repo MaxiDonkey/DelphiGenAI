@@ -179,6 +179,7 @@ type
   procedure Display(Sender: TObject; Value: TChatMessages); overload;
   procedure Display(Sender: TObject; Value: TChatCompletion); overload;
   procedure Display(Sender: TObject; Value: TChatDelete); overload;
+  procedure Display(Sender: TObject; Value: TResponseItem); overload;
 
   procedure DisplayStream(Sender: TObject; Value: string); overload;
   procedure DisplayStream(Sender: TObject; Value: TChat); overload;
@@ -708,6 +709,19 @@ begin
         end
       else
         begin
+          for var inst in Value.Instructions do
+            begin
+              Display(Sender, '* ' + inst.&Type);
+              Display(Sender, '* ' + inst.Role.ToString);
+              for var Content in inst.Content do
+                begin
+                  if not Content.Text.IsEmpty then
+                  Display(Sender, '  * ' + Content.Text);
+                end;
+            end;
+          Display(Sender);
+
+
           for var SubItem in Item.Content do
             Display(Sender, SubItem.Text);
         end;
@@ -730,11 +744,7 @@ begin
   TutorialHub.JSONResponse := Value.JSONResponse;
   for var Item in Value.Data do
     begin
-      for var SubItem in Item.Content do
-        begin
-          Display(Sender, SubItem.Text);
-          Display(Sender);
-        end;
+      Display(Sender, Item);
     end;
 end;
 
@@ -769,46 +779,15 @@ begin
   Display(Sender);
 end;
 
-//procedure DisplayStream(Sender: TObject; Value: string);
-//var
-//  M: TMemo;
-//  CurrentLine: string;
-//  Lines: TArray<string>;
-//begin
-//  if Value.Trim.IsEmpty then
-//    Exit;
-//  if Sender is TMemo then
-//    M := TMemo(Sender) else
-//    M := (Sender as TVCLTutorialHub).Memo1;
-//  var OldSelStart := M.SelStart;
-//  var ShouldScroll := (OldSelStart = M.GetTextLen);
-//  M.Lines.BeginUpdate;
-//  try
-//    Lines := Value.Split([#10]);
-//    if System.Length(Lines) > 0 then
-//    begin
-//      if M.Lines.Count > 0 then
-//        CurrentLine := M.Lines[M.Lines.Count - 1]
-//      else
-//        CurrentLine := '';
-//      CurrentLine := CurrentLine + Lines[0];
-//      if M.Lines.Count > 0 then
-//        M.Lines[M.Lines.Count - 1] := CurrentLine
-//      else
-//        M.Lines.Add(CurrentLine);
-//      for var i := 1 to High(Lines) do
-//        M.Lines.Add(Lines[i]);
-//    end;
-//  finally
-//    M.Lines.EndUpdate;
-//  end;
-//  if ShouldScroll then
-//  begin
-//    M.SelStart := M.GetTextLen;
-//    M.SelLength := 0;
-//    M.Perform(EM_SCROLLCARET, 0, 0);
-//  end;
-//end;
+procedure Display(Sender: TObject; Value: TResponseItem);
+begin
+  Display(Sender, Value.Id);
+  for var Item in Value.Content do
+    begin
+      Display(Sender, Item.Text);
+    end;
+  Display(Sender);
+end;
 
 procedure DisplayStream(Sender: TObject; Value: string);
 var
@@ -862,7 +841,8 @@ procedure DisplayStream(Sender: TObject; Value: TResponseStream);
 begin
   if Assigned(Value) then
     begin
-      DisplayStream(Sender, Value.Delta);
+      if Value.&Type = TResponseStreamType.output_text_delta then
+        DisplayStream(Sender, Value.Delta);
       DisplayChunk(Value);
     end;
 end;

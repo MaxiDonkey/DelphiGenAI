@@ -13,7 +13,8 @@ uses
   System.SysUtils, System.Classes, System.Threading,
   GenAI.API.Params, GenAI.API, GenAI.Consts, GenAI.Types,
   GenAI.Async.Params, GenAI.Async.Support, GenAI.Async.Promise, GenAI.Chat.Parallel,
-  GenAI.Responses.InputParams, GenAI.Responses.InputItemList, GenAI.Responses.OutputParams;
+  GenAI.Responses.InputParams, GenAI.Responses.InputItemList, GenAI.Responses.OutputParams,
+  GenAI.API.Normalizer;
 
 type
   /// <summary>
@@ -130,11 +131,15 @@ type
     FCurrentEvent: string;
     FCurrentData: string;
   protected
-    function ProcessLines(Event: TResponseEvent): Boolean;
+    function ProcessLines(Event: TResponseEvent; const Path: TArray<TArray<string>>): Boolean;
 
-    function DecodeChunk(const ABytes: TBytes; Event: TResponseEvent): Boolean;
+    function DecodeChunk(const ABytes: TBytes; Event: TResponseEvent;
+      const Path: TArray<TArray<string>>): Boolean;
 
-    function InternalCreateStream(ParamProc: TProc<TResponsesParams>; Event: TResponseEvent): Boolean;
+    function InternalCreateStream(ParamProc: TProc<TResponsesParams>; Event: TResponseEvent;
+      const Path: TArray<TArray<string>>): Boolean; overload;
+
+    function InternalCreateStream(ParamProc: TProc<TResponsesParams>; Event: TResponseEvent): Boolean; overload;
   end;
 
   TInternalResponseRoute = class(TInternalStreaming)
@@ -476,7 +481,8 @@ end;
 {$ENDREGION}
 
 function TInternalStreaming.DecodeChunk(const ABytes: TBytes;
-  Event: TResponseEvent): Boolean;
+  Event: TResponseEvent;
+  const Path: TArray<TArray<string>>): Boolean;
 var
   SafeLen: Integer;
   Utf8Enc: TEncoding;
@@ -531,11 +537,11 @@ begin
 
   {--- Processes complete lines }
   if FCharBuffer.Length > 0 then
-    Result := ProcessLines(Event);
+    Result := ProcessLines(Event, Path);
 end;
 
 function TInternalStreaming.InternalCreateStream(
-  ParamProc: TProc<TResponsesParams>; Event: TResponseEvent): Boolean;
+  ParamProc: TProc<TResponsesParams>; Event: TResponseEvent;const Path: TArray<TArray<string>>): Boolean;
 
 {$REGION  'Dev notes event samples'}
 
@@ -594,7 +600,7 @@ begin
               1. Manages binary accumulation
               2. Cuts cleanly at UTF-8 borders
               3. Pushes the decoded strings into the character buffer }
-        DecodeChunk(Chunk, Event);
+        DecodeChunk(Chunk, Event, Path);
 
         {$REGION  'Dev notes'}
 
@@ -611,7 +617,7 @@ begin
     if FCharBuffer.Length > 0 then
       begin
         {--- if there are unprocessed characters in the character buffer then flush them }
-        Result := ProcessLines(Event);
+        Result := ProcessLines(Event, Path);
       end;
 
     FCharBuffer.Free;
@@ -619,7 +625,13 @@ begin
   end;
 end;
 
-function TInternalStreaming.ProcessLines(Event: TResponseEvent): Boolean;
+function TInternalStreaming.InternalCreateStream(
+  ParamProc: TProc<TResponsesParams>; Event: TResponseEvent): Boolean;
+begin
+  Result := InternalCreateStream(ParamProc, Event, []);
+end;
+
+function TInternalStreaming.ProcessLines(Event: TResponseEvent; const Path: TArray<TArray<string>>): Boolean;
 var
   RespObj: TResponseStream;
   IsDone: Boolean;
@@ -650,7 +662,8 @@ begin
 
               {--- Parse the “data” into a response object }
               try
-                RespObj := TApiDeserializer.Parse<TResponseStream>(FCurrentData);
+                var S := TJSONNormalizer.Normalize(FCurrentData, Path);
+                RespObj := TApiDeserializer.Parse<TResponseStream>(S);
               except
                 RespObj := nil;
               end;

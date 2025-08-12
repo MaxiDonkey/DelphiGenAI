@@ -112,7 +112,7 @@ The Chat API can be used for both single-turn requests and multi-turn, stateless
 //      procedure (E: Exception)
 //      begin
 //        Display(TutorialHub, E.Message);
-//      end
+//      end);
 ```
 <br>
 

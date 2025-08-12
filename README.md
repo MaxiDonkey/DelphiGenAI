@@ -5,13 +5,13 @@ ___
 ![GitHub](https://img.shields.io/badge/IDE%20Version-Delphi%2010.4/11/12-ffffba)
 [![GetIt – Available](https://img.shields.io/badge/GetIt-Available-baffc9?logo=delphi&logoColor=white)](https://getitnow.embarcadero.com/genai-optimized-openai-integration-wrapper/)
 ![GitHub](https://img.shields.io/badge/platform-all%20platforms-baffc9)
-![GitHub](https://img.shields.io/badge/Updated%20on%20June%2013,%202025-blue)
+![GitHub](https://img.shields.io/badge/Updated%20on%20August%2012,%202025-blue)
 
 <br>
 
 NEW: 
 - Getit current version: 1.1.0
-- [Changelog v1.1.0](https://github.com/MaxiDonkey/DelphiGenAI/blob/main/Changelog.md)
+- [Changelog v1.2.0](https://github.com/MaxiDonkey/DelphiGenAI/blob/main/Changelog.md)
 - [Mini-lab to experiment with the v1/responses endpoint `File2knowledge`](https://github.com/MaxiDonkey/file2knowledge)  
 - [Responses endpoint](https://github.com/MaxiDonkey/DelphiGenAI/blob/main/Responses.md)
 ___
@@ -75,7 +75,7 @@ ___
 **GenAI** is a powerful Delphi library that brings the latest OpenAI APIs to your desktop, mobile, and server apps.
 
 **Core capabilities**  
-- Unified access to text, vision, speech, and audio endpoints  
+- Unified access to text, vision, speech and audio endpoints  
 - Agentic workflows via the `v1/responses` endpoint, with built-in tools `file_search`, `web_search`, `Code Interpreter`, and `remote MCP`  
 - Supports state-of-the-art models, including ***gpt-4o***, ***gpt-4.1***, ***gpt-4.5*** and the reasoning-centric *o1 · o3 · o4* series  
 

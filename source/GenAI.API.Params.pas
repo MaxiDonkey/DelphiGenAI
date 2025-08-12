@@ -612,7 +612,6 @@ end;
 function TUrlParam.Add(const Name, Value: string): TUrlParam;
 begin
   Check(Name);
-//  var S := Format('%s=%s', [Name, Value]);
   var S := Format('%s=%s', [Name, TNetEncoding.URL.Encode(Value).Replace('+', '%20')]);
   if FValue.IsEmpty then
     FValue := S else

@@ -231,6 +231,15 @@ type
     class function AddFile(const FileLocation: string): TContentParams;
   end;
 
+  TContentPart = class(TJSONParam)
+    function &Type(const Value: string = 'text'): TContentPart;
+
+    function Text(const Value: string): TContentPart;
+
+    class function New: TContentPart; overload;
+    class function New(const Value: string): TContentPart; overload;
+  end;
+
   /// <summary>
   /// Manages function parameters for API requests, allowing the setting of a function's
   /// name and its JSON-formatted arguments.
@@ -464,6 +473,8 @@ type
     /// </returns>
     function Content(const Value: string): TMessagePayload; overload;
 
+    function Content(const Value: TArray<TContentPart>): TMessagePayload; overload;
+
     /// <summary>
     /// Adds content to the message payload, which can be text, an array of content parts,
     /// or structured JSON data, depending on the message's intended purpose.
@@ -577,6 +588,8 @@ type
     /// </returns>
     class function New(const Role: TRole; const Content: string; const Name: string = ''):TMessagePayload; overload;
 
+    class function New(const Role: TRole; const Content: TArray<TContentPart>; const Name: string = ''):TMessagePayload; overload;
+
     /// <summary>
     /// Factory method to create a developer role message payload.
     /// </summary>
@@ -589,7 +602,9 @@ type
     /// <returns>
     /// Returns a TMessagePayload instance representing a developer message.
     /// </returns>
-    class function Developer(const Content: string; const Name: string = ''):TMessagePayload;
+    class function Developer(const Content: string; const Name: string = ''):TMessagePayload; overload;
+
+    class function Developer(const Content: TArray<TContentPart>; const Name: string = ''):TMessagePayload; overload;
 
     /// <summary>
     /// Factory method to create a system role message payload.
@@ -603,7 +618,9 @@ type
     /// <returns>
     /// Returns a TMessagePayload instance representing a system message.
     /// </returns>
-    class function System(const Content: string; const Name: string = ''):TMessagePayload;
+    class function System(const Content: string; const Name: string = ''):TMessagePayload; overload;
+
+    class function System(const Content: TArray<TContentPart>; const Name: string = ''):TMessagePayload; overload;
 
     /// <summary>
     /// Factory method to create a user role message payload.
@@ -1103,6 +1120,34 @@ type
     function Messages(const Value: TJSONArray): TChatParams; overload;
 
     /// <summary>
+    /// Specifies the audio parameters for responses, including voice type and format.
+    /// </summary>
+    /// <param name="Voice">
+    /// The voice setting for the audio output.
+    /// </param>
+    /// <param name="Format">
+    /// The audio format (e.g., mp3, wav).
+    /// </param>
+    /// <returns>
+    /// An instance of TChatParams configured with specified audio settings.
+    /// </returns>
+    function Audio(const Voice: TChatVoice; const Format: TAudioFormat): TChatParams; overload;
+
+    /// <summary>
+    /// Specifies the audio parameters for responses, including voice type and format.
+    /// </summary>
+    /// <param name="Voice">
+    /// The voice setting for the audio output.
+    /// </param>
+    /// <param name="Format">
+    /// The audio format (e.g., mp3, wav).
+    /// </param>
+    /// <returns>
+    /// An instance of TChatParams configured with specified audio settings.
+    /// </returns>
+    function Audio(const Voice, Format: string): TChatParams; overload;
+
+    /// <summary>
     /// Specifies the model to use for generating chat completions.
     /// </summary>
     /// <param name="Value">
@@ -1112,39 +1157,6 @@ type
     /// Returns an instance of TChatParams with the model set.
     /// </returns>
     function Model(const Value: string): TChatParams;
-
-    /// <summary>
-    /// Enables or disables the storing of output from chat completion requests.
-    /// </summary>
-    /// <param name="Value">
-    /// Boolean value indicating whether to store the output.
-    /// </param>
-    /// <returns>
-    /// Returns an instance of TChatParams with the storage option configured.
-    /// </returns>
-    function Store(const Value: Boolean = True): TChatParams;
-
-    /// <summary>
-    /// Specifies the effort level for reasoning when generating responses.
-    /// </summary>
-    /// <param name="Value">
-    /// A string representing the desired effort level ('low', 'medium', or 'high').
-    /// </param>
-    /// <returns>
-    /// Returns an instance of TChatParams with the reasoning effort set.
-    /// </returns>
-    function ReasoningEffort(const Value: TReasoningEffort): TChatParams; overload;
-
-    /// <summary>
-    /// Specifies the effort level for reasoning when generating responses.
-    /// </summary>
-    /// <param name="Value">
-    /// A string representing the desired effort level ('low', 'medium', or 'high').
-    /// </param>
-    /// <returns>
-    /// Returns an instance of TChatParams with the reasoning effort set.
-    /// </returns>
-    function ReasoningEffort(const Value: string): TChatParams; overload;
 
     /// <summary>
     /// Sets user-defined metadata for filtering or identifying completions in the dashboard.
@@ -1191,17 +1203,6 @@ type
     function Logprobs(const Value: Boolean): TChatParams;
 
     /// <summary>
-    /// Specifies the number of the most likely tokens to return at each token position.
-    /// </summary>
-    /// <param name="Value">
-    /// The number of top log probabilities to return.
-    /// </param>
-    /// <returns>
-    /// An instance of TChatParams with top log probabilities configured.
-    /// </returns>
-    function TopLogprobs(const Value: Integer): TChatParams;
-
-    /// <summary>
     /// Sets the maximum number of tokens that can be generated for a completion.
     /// </summary>
     /// <param name="Value">
@@ -1246,6 +1247,17 @@ type
     function Modalities(const Value: TArray<TModalities>): TChatParams; overload;
 
     /// <summary>
+    /// Enables or disables parallel tool calls during tool use.
+    /// </summary>
+    /// <param name="Value">
+    /// True to enable parallel calls, false to disable.
+    /// </param>
+    /// <returns>
+    /// An instance of TChatParams configured for parallel tool calling.
+    /// </returns>
+    function ParallelToolCalls(const Value: Boolean): TChatParams;
+
+    /// <summary>
     /// Configures predictions for the chat completion, aiming to optimize response generation.
     /// </summary>
     /// <param name="Value">
@@ -1268,34 +1280,6 @@ type
     function Prediction(const Value: TArray<TPredictionPartParams>): TChatParams; overload;
 
     /// <summary>
-    /// Specifies the audio parameters for responses, including voice type and format.
-    /// </summary>
-    /// <param name="Voice">
-    /// The voice setting for the audio output.
-    /// </param>
-    /// <param name="Format">
-    /// The audio format (e.g., mp3, wav).
-    /// </param>
-    /// <returns>
-    /// An instance of TChatParams configured with specified audio settings.
-    /// </returns>
-    function Audio(const Voice: TChatVoice; const Format: TAudioFormat): TChatParams; overload;
-
-    /// <summary>
-    /// Specifies the audio parameters for responses, including voice type and format.
-    /// </summary>
-    /// <param name="Voice">
-    /// The voice setting for the audio output.
-    /// </param>
-    /// <param name="Format">
-    /// The audio format (e.g., mp3, wav).
-    /// </param>
-    /// <returns>
-    /// An instance of TChatParams configured with specified audio settings.
-    /// </returns>
-    function Audio(const Voice, Format: string): TChatParams; overload;
-
-    /// <summary>
     /// Sets a penalty on generating tokens that introduce new topics, encouraging focus on the current topics.
     /// </summary>
     /// <param name="Value">
@@ -1305,6 +1289,30 @@ type
     /// An instance of TChatParams with the presence penalty configured.
     /// </returns>
     function PresencePenalty(const Value: Double): TChatParams;
+
+    function PromptCacheKey(const Value: string): TChatParams;
+
+    /// <summary>
+    /// Specifies the effort level for reasoning when generating responses.
+    /// </summary>
+    /// <param name="Value">
+    /// A string representing the desired effort level ('low', 'medium', or 'high').
+    /// </param>
+    /// <returns>
+    /// Returns an instance of TChatParams with the reasoning effort set.
+    /// </returns>
+    function ReasoningEffort(const Value: TReasoningEffort): TChatParams; overload;
+
+    /// <summary>
+    /// Specifies the effort level for reasoning when generating responses.
+    /// </summary>
+    /// <param name="Value">
+    /// A string representing the desired effort level ('low', 'medium', or 'high').
+    /// </param>
+    /// <returns>
+    /// Returns an instance of TChatParams with the reasoning effort set.
+    /// </returns>
+    function ReasoningEffort(const Value: string): TChatParams; overload;
 
     /// <summary>
     /// Specifies the format that the model must output, supporting structured and JSON outputs.
@@ -1338,6 +1346,9 @@ type
     /// An instance of TChatParams with response format settings applied.
     /// </returns>
     function ResponseFormat(const Value: TJSONObject): TChatParams; overload;
+
+
+    function SafetyIdentifier(const Value: string): TChatParams;
 
     /// <summary>
     /// Sets the seed for deterministic generation, ensuring repeatable results across sessions.
@@ -1383,6 +1394,17 @@ type
     /// </returns>
     function Stop(const Value: TArray<string>): TChatParams; overload;
 
+    /// <summary>
+    /// Enables or disables the storing of output from chat completion requests.
+    /// </summary>
+    /// <param name="Value">
+    /// Boolean value indicating whether to store the output.
+    /// </param>
+    /// <returns>
+    /// Returns an instance of TChatParams with the storage option configured.
+    /// </returns>
+    function Store(const Value: Boolean = True): TChatParams;
+
    /// <summary>
     /// Enables streaming of chat completions, allowing partial responses to be processed as they are generated.
     /// </summary>
@@ -1414,7 +1436,7 @@ type
     /// <returns>
     /// Returns an instance of TChatParams with streaming options set.
     /// </returns>
-    function StreamOptions(const IncludeUsage: Boolean): TChatParams; overload;
+    function StreamOptions(const Value: TStreamOptions): TChatParams; overload;
 
     /// <summary>
     /// Sets the temperature for generating responses, influencing the randomness and variety.
@@ -1426,50 +1448,6 @@ type
     /// Returns an instance of TChatParams with the temperature set.
     /// </returns>
     function Temperature(const Value: Double): TChatParams;
-
-    /// <summary>
-    /// Specifies the nucleus sampling threshold, determining how focused or broad the responses should be.
-    /// </summary>
-    /// <param name="Value">
-    /// The top-p as a double, representing the probability mass threshold.
-    /// </param>
-    /// <returns>
-    /// Returns an instance of TChatParams with the top-p configured.
-    /// </returns>
-    function TopP(const Value: Double): TChatParams;
-
-    /// <summary>
-    /// Configures which tools the model may call during the session.
-    /// </summary>
-    /// <param name="Value">
-    /// An array of tools or functions the model can use.
-    /// </param>
-    /// <returns>
-    /// An instance of TChatParams with tools configured.
-    /// </returns>
-    function Tools(const Value: TArray<TChatMessageTool>): TChatParams; overload;
-
-    /// <summary>
-    /// Configures which tools the model may call during the session.
-    /// </summary>
-    /// <param name="Value">
-    /// An array of tools or functions the model can use.
-    /// </param>
-    /// <returns>
-    /// An instance of TChatParams with tools configured.
-    /// </returns>
-    function Tools(const Value: TArray<IFunctionCore>): TChatParams; overload;
-
-    /// <summary>
-    /// Configures which tools the model may call during the session.
-    /// </summary>
-    /// <param name="Value">
-    /// An array of tools or functions the model can use.
-    /// </param>
-    /// <returns>
-    /// An instance of TChatParams with tools configured.
-    /// </returns>
-    function Tools(const Value: TJSONObject): TChatParams; overload;
 
     /// <summary>
     /// Sets the tool choice for the chat session, specifying how tools should be used.
@@ -1516,15 +1494,59 @@ type
     function ToolChoice(const Value: TToolChoiceParams): TChatParams; overload;
 
     /// <summary>
-    /// Enables or disables parallel tool calls during tool use.
+    /// Configures which tools the model may call during the session.
     /// </summary>
     /// <param name="Value">
-    /// True to enable parallel calls, false to disable.
+    /// An array of tools or functions the model can use.
     /// </param>
     /// <returns>
-    /// An instance of TChatParams configured for parallel tool calling.
+    /// An instance of TChatParams with tools configured.
     /// </returns>
-    function ParallelToolCalls(const Value: Boolean): TChatParams;
+    function Tools(const Value: TArray<TChatMessageTool>): TChatParams; overload;
+
+    /// <summary>
+    /// Configures which tools the model may call during the session.
+    /// </summary>
+    /// <param name="Value">
+    /// An array of tools or functions the model can use.
+    /// </param>
+    /// <returns>
+    /// An instance of TChatParams with tools configured.
+    /// </returns>
+    function Tools(const Value: TArray<IFunctionCore>): TChatParams; overload;
+
+    /// <summary>
+    /// Configures which tools the model may call during the session.
+    /// </summary>
+    /// <param name="Value">
+    /// An array of tools or functions the model can use.
+    /// </param>
+    /// <returns>
+    /// An instance of TChatParams with tools configured.
+    /// </returns>
+    function Tools(const Value: TJSONObject): TChatParams; overload;
+
+    /// <summary>
+    /// Specifies the number of the most likely tokens to return at each token position.
+    /// </summary>
+    /// <param name="Value">
+    /// The number of top log probabilities to return.
+    /// </param>
+    /// <returns>
+    /// An instance of TChatParams with top log probabilities configured.
+    /// </returns>
+    function TopLogprobs(const Value: Integer): TChatParams;
+
+    /// <summary>
+    /// Specifies the nucleus sampling threshold, determining how focused or broad the responses should be.
+    /// </summary>
+    /// <param name="Value">
+    /// The top-p as a double, representing the probability mass threshold.
+    /// </param>
+    /// <returns>
+    /// Returns an instance of TChatParams with the top-p configured.
+    /// </returns>
+    function TopP(const Value: Double): TChatParams;
 
     /// <summary>
     /// Specifies a unique identifier for the end-user, helping monitor and prevent abuse.
@@ -1536,6 +1558,34 @@ type
     /// An instance of TChatParams configured with the user identifier.
     /// </returns>
     function User(const Value: string): TChatParams;
+
+    /// <summary>
+    /// Constrains the verbosity of the model's response. Lower values will result in more concise responses, while higher values will result in more verbose responses.
+    /// </summary>
+    /// <param name="Value">
+    /// Enum value of [low, medium, high]
+    /// </param>
+    /// <returns>
+    /// An instance of TChatParams configured with the user identifier.
+    /// </returns>
+    /// <remarks>
+    /// Currently supported values are low, medium, and high.
+    /// </remarks>
+    function Verbosity(const Value: TVerbosityType): TChatParams; overload;
+
+    /// <summary>
+    /// Constrains the verbosity of the model's response. Lower values will result in more concise responses, while higher values will result in more verbose responses.
+    /// </summary>
+    /// <param name="Value">
+    /// string value "low", or "medium" or "high"
+    /// </param>
+    /// <returns>
+    /// An instance of TChatParams configured with the user identifier.
+    /// </returns>
+    /// <remarks>
+    /// Currently supported values are low, medium, and high.
+    /// </remarks>
+    function Verbosity(const Value: string): TChatParams; overload;
 
     /// <summary>
     /// Configures web search options for chat completion requests, allowing
@@ -2496,6 +2546,7 @@ type
     FSystemFingerprint: string;
     FObject: string;
     FUsage: TUsage;
+    FObfuscation: string;
   private
     function GetCreatedAsString: string;
     function GetCreated: Int64;
@@ -2574,6 +2625,8 @@ type
     /// A TUsage object that includes detailed token usage data for assessing computational resource allocation.
     /// </returns>
     property Usage: TUsage read FUsage write FUsage;
+
+    property Obfuscation: string read FObfuscation write FObfuscation;
 
     destructor Destroy; override;
   end;
@@ -2770,7 +2823,13 @@ type
   /// </remarks>
   TAsynChat = TAsynCallBack<TChat>;
 
-  //
+  /// <summary>
+  /// Represents a promise-based asynchronous callback for chat completion operations.
+  /// </summary>
+  /// <remarks>
+  /// Alias of <c>TPromiseCallBack&lt;TChat&gt;</c>, this type allows you to await the result
+  /// of a chat completion request and handle it as a <see cref="TChat"/> instance.
+  /// </remarks>
   TPromiseChat = TPromiseCallBack<TChat>;
 
   /// <summary>
@@ -2783,7 +2842,13 @@ type
   /// </remarks>
   TAsynChatStream = TAsynStreamCallBack<TChat>;
 
-  //
+  /// <summary>
+  /// Represents a promise-based asynchronous callback for streaming chat completion operations.
+  /// </summary>
+  /// <remarks>
+  /// Alias of <c>TPromiseStreamCallBack&lt;TChat&gt;</c>, this type provides a <see cref="TChat"/> stream
+  /// that can be awaited, delivering partial <see cref="TChat"/> updates as they arrive.
+  /// </remarks>
   TPromiseChatStream = TPromiseStreamCallBack<TChat>;
 
   /// <summary>
@@ -2795,7 +2860,13 @@ type
   /// </remarks>
   TAsynChatMessages = TAsynCallBack<TChatMessages>;
 
-  //
+  /// <summary>
+  /// Represents a promise-based asynchronous callback for retrieving chat messages.
+  /// </summary>
+  /// <remarks>
+  /// Alias of <c>TPromiseCallBack&lt;TChatMessages&gt;</c>, this type allows you to await the result
+  /// of fetching messages for a stored chat completion, delivering a <see cref="TChatMessages"/> instance.
+  /// </remarks>
   TPromiseChatMessages = TPromiseCallBack<TChatMessages>;
 
   /// <summary>
@@ -2807,7 +2878,13 @@ type
   /// </remarks>
   TAsynChatCompletion = TAsynCallBack<TChatCompletion>;
 
-  //
+  /// <summary>
+  /// Represents a promise-based asynchronous callback for listing chat completion results.
+  /// </summary>
+  /// <remarks>
+  /// Alias of <c>TPromiseCallBack&lt;TChatCompletion&gt;</c>, this type allows you to await the
+  /// result of a paginated chat completions request and receive it as a <see cref="TChatCompletion"/> instance.
+  /// </remarks>
   TPromiseChatCompletion = TPromiseCallBack<TChatCompletion>;
 
   /// <summary>
@@ -2819,7 +2896,14 @@ type
   /// </remarks>
   TAsynChatDelete = TAsynCallBack<TChatDelete>;
 
-  //
+  /// <summary>
+  /// Represents a promise-based asynchronous callback for deleting a chat completion.
+  /// </summary>
+  /// <remarks>
+  /// Alias of <c>TPromiseCallBack&lt;TChatDelete&gt;</c>, this type allows you to await
+  /// the result of a chat completion deletion request and receive a <see cref="TChatDelete"/>
+  /// instance indicating whether the deletion was successful.
+  /// </remarks>
   TPromiseChatDelete = TPromiseCallBack<TChatDelete>;
 
   /// <summary>
@@ -3225,6 +3309,15 @@ begin
 end;
 
 function TMessagePayload.Content(
+  const Value: TArray<TContentPart>): TMessagePayload;
+begin
+  var JSONArray := TJSONArray.Create;
+  for var Item in Value do
+    JSONArray.Add(Item.Detach);
+  Result := TMessagePayload(Add('content', JSONArray));
+end;
+
+function TMessagePayload.Content(
   const Value: TArray<TAssistantContentParams>): TMessagePayload;
 begin
   var JSONArray := TJSONArray.Create;
@@ -3243,6 +3336,12 @@ begin
   Result := TMessagePayload(Add('content', Value));
 end;
 
+class function TMessagePayload.Developer(const Content: TArray<TContentPart>;
+  const Name: string): TMessagePayload;
+begin
+  Result := New(TRole.developer, Content, Name);
+end;
+
 class function TMessagePayload.Developer(const Content,
   Name: string): TMessagePayload;
 begin
@@ -3252,6 +3351,14 @@ end;
 function TMessagePayload.Name(const Value: string): TMessagePayload;
 begin
   Result := TMessagePayload(Add('name', Value));
+end;
+
+class function TMessagePayload.New(const Role: TRole;
+  const Content: TArray<TContentPart>; const Name: string): TMessagePayload;
+begin
+  Result := TMessagePayload.Create.Role(Role).Content(Content);
+  if not Name.IsEmpty then
+    Result := Result.Name(Name);
 end;
 
 class function TMessagePayload.New(const Role: TRole; const Content,
@@ -3275,6 +3382,12 @@ end;
 function TMessagePayload.Role(const Value: TRole): TMessagePayload;
 begin
   Result := TMessagePayload(Add('role', Value.ToString));
+end;
+
+class function TMessagePayload.System(const Content: TArray<TContentPart>;
+  const Name: string): TMessagePayload;
+begin
+  Result := New(TRole.system, Content, Name);
 end;
 
 class function TMessagePayload.System(const Content,
@@ -3437,6 +3550,11 @@ begin
   Result := TChatParams(Add('presence_penalty', Value));
 end;
 
+function TChatParams.PromptCacheKey(const Value: string): TChatParams;
+begin
+  Result := TChatParams(Add('prompt_cache_key', Value));
+end;
+
 function TChatParams.Prediction(const Value: string): TChatParams;
 begin
   Result := TChatParams(Add('prediction', TPredictionParams.New(Value).Detach));
@@ -3475,6 +3593,11 @@ begin
   Result := TChatParams(Add('response_format', Value));
 end;
 
+function TChatParams.SafetyIdentifier(const Value: string): TChatParams;
+begin
+  Result := TChatParams(Add('safety_identifier', Value));
+end;
+
 function TChatParams.Seed(const Value: Integer): TChatParams;
 begin
   Result := TChatParams(Add('seed', Value));
@@ -3505,9 +3628,9 @@ begin
   Result := TChatParams(Add('stream', Value));
 end;
 
-function TChatParams.StreamOptions(const IncludeUsage: Boolean): TChatParams;
+function TChatParams.StreamOptions(const Value: TStreamOptions): TChatParams;
 begin
-  Result := StreamOptions(TJSONObject.Create.AddPair('stream_options', IncludeUsage));
+  Result := TChatParams(Add('stream_options', Value.Detach));
 end;
 
 function TChatParams.StreamOptions(const Value: TJSONObject): TChatParams;
@@ -3578,6 +3701,16 @@ end;
 function TChatParams.User(const Value: string): TChatParams;
 begin
   Result := TChatParams(Add('user', Value));
+end;
+
+function TChatParams.Verbosity(const Value: string): TChatParams;
+begin
+  Result := TChatParams(Add('verbosity', TVerbosityType.Create(Value).ToString));
+end;
+
+function TChatParams.Verbosity(const Value: TVerbosityType): TChatParams;
+begin
+  Result := TChatParams(Add('verbosity', Value.ToString));
 end;
 
 function TChatParams.WebSearchOptions(
@@ -4272,7 +4405,10 @@ begin
             begin
               if Assigned(CallBacks.OnProgress) then
                 CallBacks.OnProgress(Sender, Event);
-              Buffer := Buffer + Event.FChoices[0].Delta.Content;
+              try
+                Buffer := Buffer + Event.FChoices[0].Delta.Content;
+              except
+              end;
             end;
 
           Result.OnSuccess :=
@@ -4778,6 +4914,28 @@ function TChatUpdateParams.Metadata(
   const Value: TJSONObject): TChatUpdateParams;
 begin
   Result := TChatUpdateParams(Add('metadata', Value));
+end;
+
+{ TContentPart }
+
+class function TContentPart.New: TContentPart;
+begin
+  Result := TContentPart.Create.&Type();
+end;
+
+class function TContentPart.New(const Value: string): TContentPart;
+begin
+  Result := TContentPart.New.Text(Value);
+end;
+
+function TContentPart.Text(const Value: string): TContentPart;
+begin
+  Result := TContentPart(Add('text', Value));
+end;
+
+function TContentPart.&Type(const Value: string): TContentPart;
+begin
+  Result := TContentPart(Add('type', Value));
 end;
 
 end.

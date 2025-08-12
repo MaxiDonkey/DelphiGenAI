@@ -13,6 +13,7 @@
         - [Get a model response](#get-a-model-response)
         - [Delete a model response](#delete-a-model-response)
         - [List input items](#list-input-items)
+    - [Canceling Background Tasks](#canceling-background-tasks)
 - [Vision](#vision)
     - [Analyze single source](#analyze-single-source)
     - [Analyze multi-source](#analyze-multi-source)
@@ -615,6 +616,62 @@ Returns a list of input items for a given response. Refer to the [official docum
 //      begin
 //        Display(TutorialHub, E.Message);
 //      end);
+```
+
+<br>
+
+___
+
+### Canceling Background Tasks
+
+Terminates an ongoing model response identified by its ID. This action is only available for responses that were initiated with the `background` parameter set to `true`.
+
+Some reasoning models—such as Codex and Deep Research—can take several minutes to solve complex problems. Background mode allows you to run long-running operations on models like o3 and o1-pro more reliably, avoiding timeouts and network interruptions.
+
+When background mode is enabled, the task starts asynchronously. You can then periodically poll the response object to monitor its progress. To start a background process, send an API request with `background` set to `true`.
+
+And, of course, you can cancel a background task, as shown below.
+
+<br>
+
+```pascal
+//uses GenAI, GenAI.Types, GenAI.Tutorial.VCL;
+
+  TutorialHub.JSONRequestClear;
+
+  //Asynchronous promise example
+  var Promise := Client.Responses.AsyncAwaitCancel('Response_ID');
+    
+  Promise
+    .&Then<TResponse>(
+      function (Value: TResponse): TResponse
+      begin
+        Result := Value;
+        Display(TutorialHub, Value);
+      end)
+    .&Catch(
+      procedure (E: Exception)
+      begin
+        Display(TutorialHub, E.Message);
+      end);
+
+  //Asynchronous example
+//  Client.Responses.AsynCancel('Response_ID',
+//    function : TAsynResponse
+//    begin
+//      Result.Sender := TutorialHub;
+//      Result.OnStart := Start;
+//      Result.OnSuccess := Display;
+//      Result.OnError := Display;
+//    end);
+
+  //Synchronous example
+//  var Value := Client.Responses.Cancel('Response_ID');
+//  try
+//    Display(TutorialHub, Value);
+//  finally
+//    Value.Free;
+//  end;
 ```
 
 <br>

@@ -347,6 +347,32 @@ type
       const CallBacks: TFunc<TPromiseResponses> = nil): TPromise<TResponses>; overload;
 
     /// <summary>
+    /// Asynchronously requests the cancellation of a background AI response and returns a promise
+    /// that resolves when the server acknowledges the cancellation.
+    /// </summary>
+    /// <param name="ResponseId">
+    /// The unique identifier of the AI response to cancel. Only responses created with
+    /// <c>background = true</c> are eligible for cancellation.
+    /// </param>
+    /// <param name="CallBacks">
+    /// A function returning a <see cref="TPromiseResponse"/> to handle lifecycle events:
+    /// <para>- <c>OnStart</c>: triggered before sending the request.</para>
+    /// <para>- <c>OnSuccess</c>: triggered when the server successfully processes the cancellation; receives the updated <c>TResponse</c>.</para>
+    /// <para>- <c>OnError</c>: triggered if the cancellation request fails; can return a string to override the error message.</para>
+    /// </param>
+    /// <returns>
+    /// A <see cref="TPromise{TResponse}"/> that resolves with the updated <c>TResponse</c> returned by the
+    /// <c>/v1/responses/{response_id}/cancel</c> endpoint, or rejects with an exception if an error occurs.
+    /// </returns>
+    /// <remarks>
+    /// This method sends a non-blocking cancellation request to the <c>responses/{id}/cancel</c> endpoint.
+    /// If the response has already completed or is not eligible for cancellation, the promise will be rejected
+    /// with the server's error message.
+    /// </remarks>
+    function AsyncAwaitCancel(const ResponseId: string;
+      const CallBacks: TFunc<TPromiseResponse> = nil): TPromise<TResponse>;
+
+    /// <summary>
     /// Synchronously creates a new AI response.
     /// </summary>
     /// <param name="ParamProc">
@@ -567,6 +593,24 @@ type
     /// </remarks>
     function List(const ResponseId: string;
       const ParamProc: TProc<TUrlResponseListParams>): TResponses; overload;
+
+    /// <summary>
+    /// Synchronously requests the cancellation of a background AI response and returns the updated response object.
+    /// </summary>
+    /// <param name="ResponseId">
+    /// The unique identifier of the AI response to cancel. Only responses created with
+    /// <c>background = true</c> are eligible for cancellation.
+    /// </param>
+    /// <returns>
+    /// A <see cref="TResponse"/> instance containing the server’s acknowledgement and the updated state
+    /// of the cancelled response.
+    /// </returns>
+    /// <remarks>
+    /// This method issues a blocking HTTP POST request to the <c>/v1/responses/{response_id}/cancel</c> endpoint.
+    /// If the response has already completed or is not eligible for cancellation, an exception will be raised
+    /// with the error returned by the server.
+    /// </remarks>
+    function Cancel(const ResponseId: string): TResponse;
 
     /// <summary>
     /// Initiates parallel processing of "responses" prompts by creating multiple "responses"
@@ -811,6 +855,28 @@ type
     procedure AsynList(const ResponseId: string;
       const ParamProc: TProc<TUrlResponseListParams>;
       const CallBacks: TFunc<TAsynResponses>); overload;
+
+    /// <summary>
+    /// Asynchronously requests the cancellation of a background AI response using a callback-based pattern.
+    /// </summary>
+    /// <param name="ResponseId">
+    /// The unique identifier of the AI response to cancel. Only responses created with
+    /// <c>background = true</c> are eligible for cancellation.
+    /// </param>
+    /// <param name="CallBacks">
+    /// A function returning a <see cref="TAsynResponse"/> instance to handle lifecycle events:
+    /// <para>- <c>OnStart</c>: triggered before sending the cancellation request.</para>
+    /// <para>- <c>OnSuccess</c>: triggered when the server successfully processes the cancellation; receives the updated <c>TResponse</c>.</para>
+    /// <para>- <c>OnError</c>: triggered if the cancellation request fails; can return a string to override the error message.</para>
+    /// </param>
+    /// <remarks>
+    /// This method sends a non-blocking cancellation request to the <c>responses/{id}/cancel</c> endpoint,
+    /// invoking the provided callbacks during the request lifecycle. If the target response has already
+    /// completed or is not eligible for cancellation, the <c>OnError</c> callback will be triggered with
+    /// the server's error message.
+    /// </remarks>
+    procedure AsynCancel(const ResponseId: string;
+      const CallBacks: TFunc<TAsynResponse>);
   end;
 
 implementation
@@ -819,6 +885,17 @@ uses
   System.StrUtils;
 
 { TResponsesRoute }
+
+function TResponsesRoute.AsyncAwaitCancel(const ResponseId: string;
+  const CallBacks: TFunc<TPromiseResponse>): TPromise<TResponse>;
+begin
+  Result := TAsyncAwaitHelper.WrapAsyncAwait<TResponse>(
+    procedure(const CallBackParams: TFunc<TAsynResponse>)
+    begin
+      ASynCancel(ResponseId, CallBackParams);
+    end,
+    CallBacks);
+end;
 
 function TResponsesRoute.AsyncAwaitCreate(const ParamProc: TProc<TResponsesParams>;
   const CallBacks: TFunc<TPromiseResponse>): TPromise<TResponse>;
@@ -962,6 +1039,25 @@ begin
     CallBacks);
 end;
 
+procedure TResponsesRoute.AsynCancel(const ResponseId: string;
+  const CallBacks: TFunc<TAsynResponse>);
+begin
+  with TAsynCallBackExec<TAsynResponse, TResponse>.Create(CallBacks) do
+  try
+    Sender := Use.Param.Sender;
+    OnStart := Use.Param.OnStart;
+    OnSuccess := Use.Param.OnSuccess;
+    OnError := Use.Param.OnError;
+    Run(
+      function: TResponse
+      begin
+        Result := Self.Cancel(ResponseId);
+      end);
+  finally
+    Free;
+  end;
+end;
+
 procedure TResponsesRoute.AsynCreate(const ParamProc: TProc<TResponsesParams>;
   const CallBacks: TFunc<TAsynResponse>);
 begin
@@ -1071,9 +1167,24 @@ begin
   end;
 end;
 
+function TResponsesRoute.Cancel(const ResponseId: string): TResponse;
+begin
+  Result := API.Post<TResponse>('responses/' + ResponseId + '/cancel',
+    [
+     ['instructions', '*', 'content'],
+     ['instructions', 'output', '{}'],
+     ['instructions']
+    ]);
+end;
+
 function TResponsesRoute.Create(ParamProc: TProc<TResponsesParams>): TResponse;
 begin
-  Result := API.Post<TResponse, TResponsesParams>('responses', ParamProc);
+  Result := API.Post<TResponse, TResponsesParams>('responses', ParamProc,
+    [
+     ['instructions', '*', 'content'],
+     ['instructions', 'output', '{}'],
+     ['instructions']
+    ]);
 end;
 
 procedure TResponsesRoute.CreateParallel(ParamProc: TProc<TBundleParams>;
@@ -1084,13 +1195,23 @@ end;
 
 function TResponsesRoute.Retrieve(const ResponseId: string): TResponse;
 begin
-  Result := API.Get<TResponse>('responses/' + ResponseID);
+  Result := API.Get<TResponse>('responses/' + ResponseID,
+    [
+     ['instructions', '*', 'content'],
+     ['instructions', 'output', '{}'],
+     ['instructions']
+    ]);
 end;
 
 function TResponsesRoute.CreateStream(ParamProc: TProc<TResponsesParams>;
   Event: TResponseEvent): Boolean;
 begin
-  Result := InternalCreateStream(ParamProc, Event);
+  Result := InternalCreateStream(ParamProc, Event,
+    [
+     ['response', 'instructions', '*', 'content'],
+     ['response', 'instructions', 'output', '{}'],
+     ['response', 'instructions']
+    ]);
 end;
 
 function TResponsesRoute.Delete(const ResponseId: string): TResponseDelete;
@@ -1101,12 +1222,18 @@ end;
 function TResponsesRoute.List(const ResponseId: string;
   const ParamProc: TProc<TUrlResponseListParams>): TResponses;
 begin
-  Result := API.Get<TResponses, TUrlResponseListParams>('responses/' + ResponseId + '/input_items', ParamProc);
+  Result := API.Get<TResponses, TUrlResponseListParams>('responses/' + ResponseId + '/input_items', ParamProc,
+    [
+      ['data', '*', 'output']
+    ]);
 end;
 
 function TResponsesRoute.List(const ResponseId: string): TResponses;
 begin
-  Result := API.Get<TResponses>('responses/' + ResponseId + '/input_items');
+  Result := API.Get<TResponses>('responses/' + ResponseId + '/input_items',
+    [
+      ['data', '*', 'output']
+    ]);
 end;
 
 function TResponsesRoute.Retrieve(const ResponseId: string;
