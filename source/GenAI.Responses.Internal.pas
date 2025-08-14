@@ -1,4 +1,4 @@
-unit GenAI.Responses.Internal;
+Ôªøunit GenAI.Responses.Internal;
 
 {-------------------------------------------------------------------------------
 
@@ -17,6 +17,8 @@ uses
   GenAI.API.Normalizer;
 
 type
+  TStreamMode = (smUnknown, smSSE, smNDJSON);
+
   /// <summary>
   /// Represents the callback procedure type used for processing streaming AI responses.
   /// </summary>
@@ -130,6 +132,7 @@ type
     FCharBuffer: TStringBuilder;
     FCurrentEvent: string;
     FCurrentData: string;
+    FMode: TStreamMode;
   protected
     function ProcessLines(Event: TResponseEvent; const Path: TArray<TArray<string>>): Boolean;
 
@@ -454,7 +457,7 @@ end;
             |
             v
       [Find the last safe UTF-8 boundary]
-      We search for the last ìsafeî UTF-8 boundary so we never cut a multi-byte
+      We search for the last ‚Äúsafe‚Äù UTF-8 boundary so we never cut a multi-byte
       character in half.
             |
             v
@@ -573,7 +576,7 @@ begin
   {--- To accumulate the bytes received at each network callback }
   Response := TMemoryStream.Create;
 
-  {--- To allow only new bytes to be processed on each pass (you process ìin deltaî so as not to reprocess
+  {--- To allow only new bytes to be processed on each pass (you process ‚Äúin delta‚Äù so as not to reprocess
        the entire stream on each callback). }
   Consumed := 0;
 
@@ -600,12 +603,13 @@ begin
               1. Manages binary accumulation
               2. Cuts cleanly at UTF-8 borders
               3. Pushes the decoded strings into the character buffer }
+
         DecodeChunk(Chunk, Event, Path);
 
         {$REGION  'Dev notes'}
 
         (*
-           - The "consumed/delta" pattern avoids parsing the same data multiple times, itís clean.
+           - The "consumed/delta" pattern avoids parsing the same data multiple times, it‚Äôs clean.
            - The Event callback will eventually be called in the ProcessLines stack
         *)
 
@@ -635,67 +639,107 @@ function TInternalStreaming.ProcessLines(Event: TResponseEvent; const Path: TArr
 var
   RespObj: TResponseStream;
   IsDone: Boolean;
-begin
-  Result := False;
 
-  var StartPos := 0;
-  while True do
-    begin
-      {--- Search for line break (#10, so LF) }
-      var LFPos := FCharBuffer.ToString.IndexOf(#10, StartPos);
-      if LFPos = -1 then Break;
+  function LooksLikeJson(const S: string): Boolean;
+  begin
+    Result := (S <> '') and ((S[Low(S)] = '{') or (S[Low(S)] = '['));
+  end;
 
-      {--- 1. Extract the current line (from the last starting point to the next LF)
-           2. Clean the line (spaces, CR and LF) }
-      var Line := FCharBuffer.ToString.Substring(StartPos, LFPos - StartPos).Trim([' ', #13, #10]);
+  procedure Dispatch(const Payload, EventName: string);
+  var
+    S: string;
+  begin
+    {--- "IsDone" SSE (event type) or NDJSON (detects 'response.completed' in the JSON) }
+    IsDone := SameText(EventName, 'response.completed')
+              or (Pos('"type":"response.completed"', Payload) > 0)
+              or (Pos('"type": "response.completed"', Payload) > 0);
 
-      {--- We position the start for the next loop }
-      StartPos := LFPos + 1;
-
-      if Line.IsEmpty then
-        begin
-          {--- If the line is empty AND there was ìdataî stored, the event is considered complete }
-          if not FCurrentData.Trim.IsEmpty then
-            begin
-              IsDone := SameText(FCurrentEvent, 'response.completed');
-              RespObj := nil;
-
-              {--- Parse the ìdataî into a response object }
-              try
-                var S := TJSONNormalizer.Normalize(FCurrentData, Path);
-                RespObj := TApiDeserializer.Parse<TResponseStream>(S);
-              except
-                RespObj := nil;
-              end;
-
-              {--- Trigger the callback }
-              Event(RespObj, IsDone, Result);
-              RespObj.Free;
-            end;
-
-          {--- Reset the event buffer }
-          FCurrentEvent := EmptyStr;
-          FCurrentData := EmptyStr;
-        end
-      else
-        if Line.StartsWith('event: ') then
-          begin
-            {--- Store the name of the current event }
-            FCurrentEvent := Line.Substring(7).Trim;
-          end
-        else
-          if Line.StartsWith('data: ') then
-            begin
-              {--- If there is already data in the buffer, add a line break (to separate the data blocks:
-                   if multi-line) }
-              if not FCurrentData.IsEmpty then
-                FCurrentData := FCurrentData + sLineBreak;
-              {--- Add the data to the current event. }
-              FCurrentData := FCurrentData + Line.Substring(6).Trim;
-            end;
+    RespObj := nil;
+    try
+      S := TJSONNormalizer.Normalize(Payload, Path);
+      RespObj := TApiDeserializer.Parse<TResponseStream>(S);
+    except
+      RespObj := nil;
     end;
 
-  {--- Removes all the lines already processed from the buffer, leaving only what remains to be parsed }
+    Event(RespObj, IsDone, Result);
+    RespObj.Free;
+  end;
+
+var
+  StartPos: Integer;
+  LFPos: Integer;
+  Line: string;
+begin
+  Result := False;
+  StartPos := 0;
+
+  while True do
+  begin
+    LFPos := FCharBuffer.ToString.IndexOf(#10, StartPos);
+    if LFPos = -1 then Break;
+
+    Line := FCharBuffer.ToString.Substring(StartPos, LFPos - StartPos)
+              .Trim([' ', #13, #10]);
+    StartPos := LFPos + 1;
+
+    {--- One-time mode detection }
+    if (FMode = smUnknown) and (not Line.IsEmpty) then
+      begin
+        if Line.StartsWith('event: ') or Line.StartsWith('data: ') then
+          FMode := smSSE
+        else if LooksLikeJson(Line) then
+          FMode := smNDJSON;
+      end;
+
+    {--- NDJSON mode: 1 line = 1 message }
+    if FMode = smNDJSON then
+      begin
+        if not Line.IsEmpty then
+          Dispatch(Line, '');
+        Continue;
+      end;
+
+    {--- SSE mode (original behavior, + safeguards) }
+    if Line.IsEmpty then
+      begin
+        if not FCurrentData.Trim.IsEmpty then
+          Dispatch(FCurrentData, FCurrentEvent);
+        FCurrentEvent := EmptyStr;
+        FCurrentData  := EmptyStr;
+      end
+    else
+    if Line.StartsWith('event: ') then
+      begin
+        {--- New event header while we already have data ‚Üí flush }
+        if not FCurrentData.Trim.IsEmpty then
+          Dispatch(FCurrentData, FCurrentEvent);
+        FCurrentEvent := Line.Substring(7).Trim;
+        FCurrentData  := EmptyStr;
+      end
+    else
+    if Line.StartsWith('data: ') then
+      begin
+        var Payload := Line.Substring(6).Trim;
+
+        {--- If the current payload looks like a complete JSON and a new one arrives,
+             we flush it immediately to avoid the coalescence of 2 chunks }
+        if not FCurrentData.IsEmpty
+           and LooksLikeJson(FCurrentData)
+           and (FCurrentData.EndsWith('}')) then
+          begin
+            Dispatch(FCurrentData, FCurrentEvent);
+            FCurrentData := EmptyStr;
+          end;
+
+        if not FCurrentData.IsEmpty then
+          FCurrentData := FCurrentData + sLineBreak;
+
+        FCurrentData := FCurrentData + Payload;
+      end;
+  end;
+
+  {--- We remove what has been treated }
   if StartPos > 0 then
     FCharBuffer.Remove(0, StartPos);
 end;

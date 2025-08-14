@@ -2660,8 +2660,6 @@ end;
 
 destructor TResponseOutputComputer.Destroy;
 begin
-  if Assigned(FAction) then
-    FAction.Free;
   for var Item in FPendingSafetyChecks do
     Item.Free;
   inherited;

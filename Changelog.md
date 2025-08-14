@@ -1,3 +1,6 @@
+#### 2025, August 14 version 1.2.1
+- Fix the destructor `TResponseOutputComputer.Destroy;` method in `GenAI.Responses.OutputParams module`.
+
 #### 2025, August 12 version 1.2.0
 **Modifications to ensure full use of the gtp-5 model**
 

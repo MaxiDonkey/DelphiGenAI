@@ -68,7 +68,7 @@ uses
   GenAI.Responses.OutputParams, GenAI.Async.Promise, GenAI.Responses.Internal;
 
 const
-  VERSION = 'GenAIv1.1.1';
+  VERSION = 'GenAIv1.2.1';
 
 type
   /// <summary>
