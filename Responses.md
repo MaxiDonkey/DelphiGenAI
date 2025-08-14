@@ -994,12 +994,25 @@ ___
 ## Reasoning with o1, o3, o4 or gpt-5
 
 **Advanced models for reasoning and problem-solving.**
-Reasoning models, such as **OpenAI’s** `o1`, `o3` `o4-mini`, are large language models trained using reinforcement learning to handle complex reasoning tasks. These models “think” before generating a response by forming a detailed internal chain of reasoning. This approach allows them to excel in areas like advanced problem-solving, coding, scientific analysis, and multi-step planning within agent-driven workflows.
+Reasoning models, such as **OpenAI’s** `o1`, `o3` `o4-mini`, `gpt-5` are large language models trained using reinforcement learning to handle complex reasoning tasks. These models “think” before generating a response by forming a detailed internal chain of reasoning. This approach allows them to excel in areas like advanced problem-solving, coding, scientific analysis, and multi-step planning within agent-driven workflows.
 
 Similar to GPT models, they offer two options: a smaller, faster, and more cost-effective model (`o4-mini`) and a larger model (`o1`, `o3`) that, while slower and more expensive per token, often produces higher-quality responses for challenging tasks and demonstrates stronger generalization across various domains.
 
 Since these models can require response times ranging from a few seconds to several tens of seconds, it is more prudent and efficient to use asynchronous methods when using them.
 
+
+### Verbosity with gpt-5
+
+`Verbosity` refers to the number of output tokens generated. Lower verbosity produces shorter responses, reducing generation time.
+While the model’s reasoning process remains largely the same, it adjusts its expression to be more or less detailed — which can, depending on the context, either enhance or reduce output quality.
+
+  - High verbosity: best suited for in-depth document analysis or extensive code refactoring.
+
+  - Low verbosity: preferable when concise answers or short code snippets are needed, such as SQL queries.
+
+Before **GPT-5**, the default setting was medium. With **GPT-5**, you can now explicitly choose between low, medium, or high verbosity.
+
+<br>
 
 ```Delphi
 //uses GenAI, GenAI.Types, GenAI.Tutorial.VCL;
@@ -1094,7 +1107,7 @@ Since these models can require response times ranging from a few seconds to seve
 
 <br>
 
-The OpenAI `o1`, `o3` and `o4` series models are highly capable across several advanced tasks, including:
+The OpenAI `o1`, `o3`, `o4` and `gpt-5` series models are highly capable across several advanced tasks, including:
 
 - **Implementing complex algorithms and generating code:** For example, a prompt can instruct the o1 model to refactor a React component based on specific requirements.
 
