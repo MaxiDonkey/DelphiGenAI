@@ -19,7 +19,7 @@
     - [Analyze multi-source](#analyze-multi-source)
     - [Low or high fidelity image understanding](#low-or-high-fidelity-image-understanding)
 - [PDF file inputs](#pdf-file-inputs)
-- [Reasoning with o1, o3 or o4](#reasoning-with-o1-o3-or-o4)
+- [Reasoning with o1, o3, o4 or gpt-5](#reasoning-with-o1-o3-o4-or-gpt-5)
 - [Web search](#web-search)
     - [User location](#user-location)
     - [Web_search code exemple](#web-search-code-exemple)
@@ -991,7 +991,7 @@ Only models that can handle both text and image inputs—such as gpt-4o, gpt-4o-
 <br>
 ___
 
-## Reasoning with o1, o3 or o4
+## Reasoning with o1, o3, o4 or gpt-5
 
 **Advanced models for reasoning and problem-solving.**
 Reasoning models, such as **OpenAI’s** `o1`, `o3` `o4-mini`, are large language models trained using reinforcement learning to handle complex reasoning tasks. These models “think” before generating a response by forming a detailed internal chain of reasoning. This approach allows them to excel in areas like advanced problem-solving, coding, scientific analysis, and multi-step planning within agent-driven workflows.
@@ -1012,24 +1012,28 @@ Since these models can require response times ranging from a few seconds to seve
   var Promise := Client.Responses.AsyncAwaitCreateStream(
     procedure (Params: TResponsesParams)
     begin
-      Params.Model('o4-mini');
-      Params.Instructions('You are an expert in bash script.');
-      Params.Input('Write a bash script that takes a matrix represented as a string with format \"[1,2],[3,4],[5,6]\" and prints the transpose in the same format.');
+      Params.Model('gpt-5');
+      Params.Instructions('You are an expert in html/js script.');
+      Params.Input('Write a html/js that takes a matrix represented as a string with format \"[1,2],[3,4],[5,6]\" and prints the transpose in the same format.');
       //Simplified
       //Params.Reasoning('high' );
       //or detailed
       Params.Reasoning(
         TReasoningParams.New.Effort('high').Summary('detailed')
       );
+      Params.Text(TTextParams.Create.Verbosity(TVerbosityType.high)); //verbosity low, medium or high; only with gpt-5 models
       Params.Stream;
       Params.Store(False);
       TutorialHub.JSONRequest := Params.ToFormat();
     end,
     function : TPromiseResponseStream
     begin
+      Result.Sender := TutorialHub;
       Result.OnProgress :=
         procedure (Sender: TObject; Chunk: TResponseStream)
         begin
+          if Chunk.&Type = TResponseStreamType.reasoning_summary_text_delta then
+            DisplayStream(TutorialHub, Chunk.Delta);
           DisplayStream(TutorialHub, Chunk);
         end;
       Result.OnDoCancel := DoCancellation;
@@ -1065,6 +1069,7 @@ Since these models can require response times ranging from a few seconds to seve
 //      Params.Reasoning(
 //        TReasoningParams.New.Effort('high').Summary('detailed')
 //      );
+//      // Params.Text(TTextParams.Create.Verbosity(TVerbosityType.high));  //verbosity low, medium or high; only with gpt-5 models
 //      Params.Stream;
 //      Params.Store(False);
 //      TutorialHub.JSONRequest := Params.ToFormat();
