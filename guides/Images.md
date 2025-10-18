@@ -117,9 +117,9 @@ end;
 
 <br>
 
-<div style="text-align:center;">
-  <img src="https://github.com/MaxiDonkey/DelphiGenAI/blob/main/images/DallePreview.png?raw=true" style="width:700px;"/>
-</div>
+<p align="center">
+  <img src="https://github.com/MaxiDonkey/DelphiGenAI/blob/main/images/DallePreview.png?raw=true" width="700"/>
+</p>
 
 <br>
 
@@ -212,9 +212,9 @@ An example of image creation with gpt-image-1 (Asynchronous because response tim
 
 <br>
 
-<div style="text-align:center;">
-  <img src="https://github.com/MaxiDonkey/DelphiGenAI/blob/main/images/CreationGpt-image-1.png?raw=true" style="width:700px;"/>
-</div>
+<p align="center">
+  <img src="https://github.com/MaxiDonkey/DelphiGenAI/blob/main/images/CreationGpt-image-1.png?raw=true" width="700"/>
+</p>
 
 <br>
 

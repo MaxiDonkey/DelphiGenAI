@@ -125,9 +125,9 @@ This interface represents OpenAI’s most advanced environment for driving model
 
 By using the GenAI.Tutorial.VCL unit along with the initialization described [above](#Strategies-for-quickly-using-the-code-examples), you can achieve results similar to the example shown below.
 
-<div style="text-align:center;">
-  <img src="https://github.com/MaxiDonkey/DelphiGenAI/blob/main/images/GenAIResponseRequest.png?raw=true" style="width:700px;"/>
-</div>
+<p align="center">
+  <img src="https://github.com/MaxiDonkey/DelphiGenAI/blob/main/images/GenAIResponseRequest.png?raw=true" width="700"/>
+</p>
 
 <br>
 
@@ -228,12 +228,11 @@ When you create a Response with `stream` set to `true`, the server will emit ser
 >
 >- When an `error` or `response.failed` event is received, the promise is automatically rejected, just as it is when an SSE reception is `canceled` by the user. In such cases, it is not possible to guarantee the return of a valid `TResponseStream` object.
 
-<div style="text-align:center;">
-  <img src="https://github.com/MaxiDonkey/DelphiGenAI/blob/main/images/GenAIResponseStreamedRequest.png?raw=true" style="width:700px;"/>
-</div>
+<p align="center">
+  <img src="https://github.com/MaxiDonkey/DelphiGenAI/blob/main/images/GenAIResponseStreamedRequest.png?raw=true" width="700"/>
+</p>
 
 <br>
-
 
 ### Multi-turn conversations
 

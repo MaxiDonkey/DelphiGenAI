@@ -124,9 +124,9 @@ The Chat API can be used for both single-turn requests and multi-turn, stateless
 
 By using the GenAI.Tutorial.VCL unit along with the initialization described [above](https://github.com/MaxiDonkey/DelphiGenAI?tab=readme-ov-file#strategies-for-quickly-using-the-code-examples), you can achieve results similar to the example shown below.
 
-<div style="text-align:center;">
-  <img src="https://github.com/MaxiDonkey/DelphiGenAI/blob/main/images/GenAIChatRequest.png?raw=true" style="width:700px;"/>
-</div>
+<p align="center">
+  <img src="https://github.com/MaxiDonkey/DelphiGenAI/blob/main/images/GenAIChatRequest.png?raw=true" width="700"/>
+</p>
 
 <br>
 
@@ -228,9 +228,9 @@ By using the GenAI.Tutorial.VCL unit along with the initialization described [ab
 //      end);
 ```
 
-<div style="text-align:center;">
-  <img src="https://github.com/MaxiDonkey/DelphiGenAI/blob/main/images/GenAIChatStreamedRequest.png?raw=true" style="width:700px;"/>
-</div>
+<p align="center">
+  <img src="https://github.com/MaxiDonkey/DelphiGenAI/blob/main/images/GenAIChatStreamedRequest.png?raw=true" width="700"/>
+</p>
 
 <br>
 
