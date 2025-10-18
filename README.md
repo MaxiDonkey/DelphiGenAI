@@ -82,8 +82,7 @@ Comprehensive Project Documentation Reference
 
 - [Changelog](Changelog.md)
 - [About this project](guides/GenAI.md#about-this-project)
-- [Chat completion](guides/ChatCompletion.md#chat-completion)
-- [Responses](guides/Responses.md#responses)
+- Detailed documentation with synchronous and asynchronous examples is located in the guides [folder](guides).
 
 <br>
 
