@@ -112,12 +112,8 @@ To streamline the implementation of the code examples provided in this tutorial,
 
 This [project](https://github.com/MaxiDonkey/file2knowledge/blob/main/README.md), built with `DelphiGenAI` , allows you to consult GenAI documentation and code in order to streamline and accelerate your upskilling.
 
-<div style="text-align:center;">
-  <img src="https://github.com/MaxiDonkey/DelphiGenAI/blob/main/images/File2knowledge.png?raw=true" style="width:700px;"/>
-</div>
-
 <p align="center">
-  <img src="images/File2knowledge.png?raw=true" width="700"/>
+  <img src="https://github.com/MaxiDonkey/DelphiGenAI/tree/main/images/File2knowledge.png?raw=true" width="700"/>
 </p>
 
 <br>
