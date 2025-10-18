@@ -116,6 +116,10 @@ This [project](https://github.com/MaxiDonkey/file2knowledge/blob/main/README.md)
   <img src="https://github.com/MaxiDonkey/DelphiGenAI/blob/main/images/File2knowledge.png?raw=true" style="width:700px;"/>
 </div>
 
+<p align="center">
+  <img src="images/File2knowledge.png?raw=true" width="700"/>
+</p>
+
 <br>
 
 ## Obtain an api key
