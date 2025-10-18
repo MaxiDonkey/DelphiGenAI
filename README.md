@@ -48,22 +48,7 @@ ___
 >The wrapper itself is MIT-licensed.  
 >You can compile and test it free of charge with Delphi CE; any recent commercial Delphi edition works as well.
 
-**GenAI** is a powerful Delphi library that brings the latest OpenAI APIs to your desktop, mobile, and server apps.
-
-**Core capabilities**  
-- Unified access to text, vision, speech and audio endpoints  
-- Agentic workflows via the `v1/responses` endpoint, with built-in tools `file_search`, `web_search`, `Code Interpreter`, and `remote MCP`  
-- Supports state-of-the-art models, including ***gpt-4o***, ***gpt-4.1***, ***gpt-4.5*** and the reasoning-centric *o1 · o3 · o4* series  
-
-**Developer tooling**  
-- Ready-made `Sync`, `Async`, and `Await` code snippets (TutorialHUB compatible)  
-- Batch processing, function calling, file management, and content moderation out of the box  
-- Built-in DUnit test helpers and a modular JSON configuration for streamlined setup  
-- Mock-friendly design: the HTTP layer is injected via dependency injection, so you can swap in stubs or fakes for testing  
-
-Integrate OpenAI into Delphi—no boilerplate, just results.
-
-_Check out the full [GenAI project](guides/GenAI.md) for details._
+**DelphiGenAI** is a full OpenAI wrapper for Delphi, covering the entire platform: text, vision, audio, image generation, video (Sora-2), embeddings, conversations, containers, and the latest `v1/responses` agentic workflows. It offers a unified interface with sync/async/await support across major Delphi platforms, making it easy to leverage modern multimodal and tool-based AI capabilities in Delphi applications.
 
 <br>
 
