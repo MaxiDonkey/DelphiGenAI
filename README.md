@@ -10,7 +10,7 @@ ___
 <br>
 
 NEW: 
-- Getit current version: 1.1.0
+- Getit current version: 1.2.0
 - [Changelog v1.2.0](Changelog.md)
 - [Mini-lab to experiment with the v1/responses endpoint `File2knowledge`](https://github.com/MaxiDonkey/file2knowledge)  
 - [Responses endpoint](guides/Responses.md#responses)
