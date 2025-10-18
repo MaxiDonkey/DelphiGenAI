@@ -1,7 +1,7 @@
 #### 2025, August 14 version 1.2.1
 - Fix the destructor `TResponseOutputComputer.Destroy;` method in `GenAI.Responses.OutputParams module`.
 
-#### 2025, August 12 version 1.2.0
+### 2025, August 12 version 1.2.0 (**Getit version**)
 **Modifications to ensure full use of the gtp-5 model**
 
 - JSON Normalization Before Deserialization
@@ -40,7 +40,7 @@
 
 <br>
 
-### 2025, June 14 version 1.1.0 (**Getit version**)
+#### 2025, June 14 version 1.1.0 
 - Given the project’s rapid progress, it’s now essential to embed versioning directly into the GenAI wrapper’s source code. For any client implementing the IGenAI interface, the version number can be retrieved via the Version property, for example:
 ```Delphi
 var version = Client.Version;
