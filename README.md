@@ -82,7 +82,7 @@ Comprehensive Project Documentation Reference
 
 - [Changelog](Changelog.md)
 - [About this project](guides/GenAI.md#about-this-project)
-- Detailed documentation with synchronous and asynchronous examples is located in the guides [folder](guides).
+- Detailed documentation with synchronous and asynchronous examples is located in the [guides folder](guides).
 
 <br>
 
