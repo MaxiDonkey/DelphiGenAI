@@ -31,6 +31,8 @@ Sora leverages multimodal diffusion, advanced 3D spatial understanding, motion c
 
 Sora lets you generate, extend, or remix videos programmatically, from first draft concepts to production-ready footage.
 
+Refer to the [official documentation](https://platform.openai.com/docs/guides/video-generation)
+
 <br>
 
 ## Create video
