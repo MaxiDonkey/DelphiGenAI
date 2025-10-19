@@ -31,7 +31,8 @@ interface
 
 uses
   System.SysUtils, System.Classes, System.Net.HttpClient, System.Net.URLClient,
-  System.Net.Mime, System.JSON, GenAI.API.Params, GenAI.API.Utils, GenAI.Errors,
+  System.Net.Mime, System.JSON,
+  GenAI.API.Params, GenAI.API.Utils, GenAI.Errors,
   GenAI.Exceptions, GenAI.HttpClientInterface, GenAI.HttpClientAPI, GenAI.Monitoring,
   GenAI.API.Normalizer;
 
@@ -365,6 +366,38 @@ type
     function Get<TResult: class, constructor; TParams: TUrlParam>(const Endpoint: string; ParamProc: TProc<TParams>; const Path: TArray<TArray<string>>): TResult; overload;
 
     /// <summary>
+    /// Issues a GET request to the specified API <paramref name="Endpoint"/> and returns
+    /// the response body as raw bytes. This method is intended for binary assets
+    /// (e.g., video/image files) and handles server-side redirects to short-lived
+    /// signed URLs before reading the final content.
+    /// </summary>
+    /// <param name="Endpoint">
+    /// The relative endpoint path (for example, <c>"videos/{id}/content"</c>).
+    /// The full request URL is built using the configured base URL.
+    /// </param>
+    /// <returns>
+    /// A <see cref="TBytes"/> buffer containing the binary contents of the final response.
+    /// </returns>
+    /// <remarks>
+    /// <para>
+    /// This method uses <c>IHttpClientAPI.GetFollowRedirect</c> to explicitly follow 3xx
+    /// redirects and to control header propagation across hops. The initial request includes
+    /// standard authentication headers; on redirected requests, the <c>Authorization</c>
+    /// header may be omitted to accommodate signed download URLs.
+    /// </para>
+    /// <para>
+    /// Only the body of the terminal (non-redirect) response is returned; intermediate
+    /// redirect responses are ignored. The method expects a successful final HTTP status
+    /// (typically 200) and non-empty content.
+    /// </para>
+    /// <para>
+    /// Any custom headers configured on the API instance are reset after the request
+    /// completes. Monitoring counters are updated on entry/exit.
+    /// </para>
+    /// </remarks>
+    function GetBinary(const Endpoint: string): TBytes;
+
+    /// <summary>
     /// Sends a GET request to retrieve a file from the specified API endpoint.
     /// </summary>
     /// <param name="Endpoint">
@@ -489,6 +522,53 @@ type
     /// Raised if the response cannot be deserialized or is non-compliant.
     /// </exception>
     function Post<TResult: class, constructor; TParams: TJSONParam>(const Endpoint: string; ParamProc: TProc<TParams>; const RawByteFieldName: string = ''): TResult; overload;
+
+    /// <summary>
+    /// Sends a POST request to <paramref name="Endpoint"/> with URL query parameters and a JSON body,
+    /// then optionally normalizes a sub-tree of the JSON response before deserializing it into
+    /// <typeparamref name="TResult"/>.
+    /// </summary>
+    /// <typeparam name="TResult">
+    /// The target type to deserialize the response into. Must be a class with a parameterless constructor.
+    /// </typeparam>
+    /// <typeparam name="TUrlParams">
+    /// The URL-parameter builder type (derives from <c>TUrlParam</c>) used to construct the query string.
+    /// </typeparam>
+    /// <typeparam name="TParams">
+    /// The JSON-parameter builder type (derives from <c>TJSONParam</c>) used to construct the request body.
+    /// </typeparam>
+    /// <param name="Endpoint">
+    /// The relative API endpoint (for example, <c>"responses"</c>).
+    /// The final URL is produced by appending the query string from <typeparamref name="TUrlParams"/>.
+    /// </param>
+    /// <param name="UrlProc">
+    /// A configuration procedure that initializes an instance of <typeparamref name="TUrlParams"/>.
+    /// Its <c>Value</c> is appended to <paramref name="Endpoint"/> as the query string.
+    /// </param>
+    /// <param name="ParamProc">
+    /// A configuration procedure that initializes an instance of <typeparamref name="TParams"/> to build
+    /// the JSON request body. Can be <c>nil</c> if no JSON body is required.
+    /// </param>
+    /// <param name="Path">
+    /// A normalization path specification consumed by the JSON normalizer to project or extract a specific
+    /// sub-tree of the response prior to deserialization (e.g., flattening or selecting nested fields).
+    /// Pass an empty array to deserialize the raw payload.
+    /// </param>
+    /// <returns>
+    /// An instance of <typeparamref name="TResult"/> populated from the (optionally normalized) JSON response.
+    /// </returns>
+    /// <remarks>
+    /// <para>
+    /// The method builds the request URL via <c>BuildUrl(Endpoint, UrlParams.Value)</c>, constructs the JSON body
+    /// from <typeparamref name="TParams"/>, posts with JSON headers, applies normalization using
+    /// <paramref name="Path"/>, and deserializes the resulting JSON into <typeparamref name="TResult"/>.
+    /// </para>
+    /// <para>
+    /// Custom headers configured on the API instance are reset after the request completes.
+    /// Monitoring counters are updated on entry and exit.
+    /// </para>
+    /// </remarks>
+    function Post<TResult: class, constructor; TUrlParams: TUrlParam; TParams: TJSONParam>(const Endpoint: string; UrlProc: TProc<TUrlParams>; ParamProc: TProc<TParams>; const Path: TArray<TArray<string>>): TResult; overload;
 
     /// <summary>
     /// Sends a POST request with JSON parameters, optionally normalizes a sub-tree of the JSON
@@ -774,6 +854,44 @@ begin
   end;
 end;
 
+function TGenAIAPI.Post<TResult, TUrlParams, TParams>(const Endpoint: string;
+  UrlProc: TProc<TUrlParams>;
+  ParamProc: TProc<TParams>;
+  const Path: TArray<TArray<string>>): TResult;
+begin
+  Monitoring.Inc;
+  var Response := TStringStream.Create('', TEncoding.UTF8);
+  var UrlParams := TUrlParams.Create;
+  var Params := TParams.Create;
+  try
+    if Assigned(UrlProc) then
+      UrlProc(UrlParams);
+    if Assigned(ParamProc) then
+      ParamProc(Params);
+    var Code := HttpClient.Post(BuildUrl(Endpoint, UrlParams.Value), Params.JSON, Response, BuildJsonHeaders, nil);
+    case Code of
+      200..299:
+        begin
+          if Length(Path) = 0 then
+            Result := Deserialize<TResult>(Code, Response.DataString)
+          else
+            begin
+              var S := TJSONNormalizer.Normalize(Response.DataString, Path);
+              Result := Deserialize<TResult>(Code, S);
+            end;
+        end;
+      else
+        Result := Deserialize<TResult>(Code, Response.DataString)
+    end;
+  finally
+    Params.Free;
+    UrlParams.Free;
+    Response.Free;
+    ResetCustomHeader;
+    Monitoring.Dec;
+  end;
+end;
+
 function TGenAIAPI.Post<TResult>(const Endpoint: string;
   const Path: TArray<TArray<string>>): TResult;
 begin
@@ -887,6 +1005,37 @@ begin
   finally
     Response.Free;
     ResetCustomHeader;
+    Monitoring.Dec;
+  end;
+end;
+
+function TGenAIAPI.GetBinary(const Endpoint: string): TBytes;
+var
+  Url: string;
+  MemoryStream: TMemoryStream;
+  Code: Integer;
+begin
+  Monitoring.Inc;
+  try
+    Url := BuildUrl(Endpoint);
+    MemoryStream := TMemoryStream.Create;
+    try
+      Code := HttpClient.GetFollowRedirect(Url, MemoryStream, BuildHeaders);
+
+      if Code <> 200 then
+        raise Exception.CreateFmt('Download failed: %d', [Code]);
+
+      if MemoryStream.Size = 0 then
+        raise Exception.Create('Empty binary content');
+
+      SetLength(Result, MemoryStream.Size);
+      MemoryStream.Position := 0;
+      MemoryStream.ReadBuffer(Result[0], MemoryStream.Size);
+    finally
+      MemoryStream.Free;
+      ResetCustomHeader;
+    end;
+  finally
     Monitoring.Dec;
   end;
 end;

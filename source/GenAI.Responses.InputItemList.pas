@@ -1,4 +1,4 @@
-unit GenAI.Responses.InputItemList;
+﻿unit GenAI.Responses.InputItemList;
 
 {-------------------------------------------------------------------------------
 
@@ -16,6 +16,8 @@ uses
   GenAI.Async.Params, GenAI.Async.Support, GenAI.Assistants;
 
 type
+  {$REGION 'log probs'}
+
   TTopLogprobs = class
   private
     FBytes   : TArray<Double>;
@@ -42,137 +44,24 @@ type
     destructor Destroy; override;
   end;
 
-  TCodeInterpreterOutput = class
+  {$ENDREGION}
+
+  {$REGION 'actions'}
+
+    {$REGION 'search action source'}
+
+  TSearchActionSource = class
   private
     FType : string;
-    FLogs : string;
     FUrl  : string;
   public
-    property &Type: string read FType write FType;
-    property Logs: string read FLogs write FLogs;
+    property &Type : string read FType write FType;
     property Url: string read FUrl write FUrl;
   end;
 
-  /// <summary>
-  /// The output of a code interpreter tool call that is a file.
-  /// </summary>
-  TCodeInterpreterResultFiles = class
-  private
-    [JsonNameAttribute('file_id')]
-    FFileId   : string;
-    [JsonNameAttribute('mime_type')]
-    FMimeType : string;
-  public
-    /// <summary>
-    /// The ID of the file.
-    /// </summary>
-    property FileId: string read FFileId write FFileId;
-
-    /// <summary>
-    /// The MIME type of the file.
-    /// </summary>
-    property MimeType: string read FMimeType write FMimeType;
-  end;
-
-  TCodeInterpreterResult = class
-  private
-    FLogs  : string;
-    FType  : string;
-    FFiles : TArray<TCodeInterpreterResultFiles>;
-  public
-    /// <summary>
-    /// The logs of the code interpreter tool call.
-    /// </summary>
-    property Logs: string read FLogs write FLogs;
-
-    /// <summary>
-    /// The output of a code interpreter tool call that is a file.
-    /// </summary>
-    property &Type: string read FType write FType;
-
-    /// <summary>
-    /// The output of a code interpreter tool call that is a file.
-    /// </summary>
-    property Files: TArray<TCodeInterpreterResultFiles> read FFiles write FFiles;
-
-    destructor Destroy; override;
-  end;
-
-  /// <summary>
-  /// The results of the file search tool call.
-  /// </summary>
-  /// <remarks>
-  /// Inherits from TCodeInterpreterResult because both tools have a Results field in common !!!
-  /// </remarks>
-  TFileSearchResult = class(TCodeInterpreterResult)
-  private
-    [JsonReflectAttribute(ctString, rtString, TMetadataInterceptor)]
-    FAttributes : string;
-    [JsonNameAttribute('file_id')]
-    FFileId     : string;
-    FFilename   : string;
-    FScore      : Double;
-    FText       : string;
-  public
-    /// <summary>
-    /// Set of 16 key-value pairs that can be attached to an object. This can be useful for storing additional information
-    /// about the object in a structured format, and querying for objects via API or the dashboard. Keys are strings with
-    /// a maximum length of 64 characters. Values are strings with a maximum length of 512 characters, booleans, or numbers.
-    /// </summary>
-    property Attributes: string read FAttributes write FAttributes;
-
-    /// <summary>
-    /// The unique ID of the file.
-    /// </summary>
-    property FileId: string read FFileId write FFileId;
-
-    /// <summary>
-    /// The name of the file.
-    /// </summary>
-    property Filename: string read FFilename write FFilename;
-
-    /// <summary>
-    /// The relevance score of the file - a value between 0 and 1.
-    /// </summary>
-    property Score: Double read FScore write FScore;
-
-    /// <summary>
-    /// The text that was retrieved from the file.
-    /// </summary>
-    property Text: string read FText write FText;
-  end;
-
-  TMCPListTool = class
-  private
-    [JsonReflectAttribute(ctString, rtString, TMetadataInterceptor)]
-    [JsonNameAttribute('input_schema')]
-    FInputSchema : string;
-    FName        : string;
-    FDescription : string;
-    {$REGION  'Dev notes'}
-    (*
-         FAnnotations: string > Automatic deserialization not possible-
-            Ambiguous object or name already used
-
-         Access to field contents from JSONResponse string possible
-    *)
     {$ENDREGION}
-  public
-    /// <summary>
-    /// The JSON schemas string describing the tool's input.
-    /// </summary>
-    property InputSchema: string read FInputSchema write FInputSchema;
 
-    /// <summary>
-    /// The name of the tool.
-    /// </summary>
-    property Name: string read FName write FName;
-
-    /// <summary>
-    /// The description of the tool.
-    /// </summary>
-    property Description: string read FDescription write FDescription;
-  end;
+    {$REGION 'drag point'}
 
   TDragPoint = class
   private
@@ -190,87 +79,7 @@ type
     property Y: Int64 read FY write FY;
   end;
 
-  TPendingSafetyChecks = class
-  private
-    FCode    : string;
-    FId      : string;
-    FMessage : string;
-  public
-    /// <summary>
-    /// The type of the pending safety check.
-    /// </summary>
-    property Code: string read FCode write FCode;
-
-    /// <summary>
-    /// The ID of the pending safety check.
-    /// </summary>
-    property Id: string read FId write FId;
-
-    /// <summary>
-    /// Details about the pending safety check.
-    /// </summary>
-    property Message: string read FMessage write FMessage;
-  end;
-
-  TComputerOutput = class
-  private
-    FType     : string;
-    [JsonNameAttribute('file_id')]
-    FFileId   : string;
-    [JsonNameAttribute('image_url')]
-    FImageUrl : string;
-    FText     : string;
-  public
-    /// <summary>
-    /// The identifier of an uploaded file that contains the screenshot.
-    /// </summary>
-    property FileId: string read FFileId write FFileId;
-
-    /// <summary>
-    /// The URL of the screenshot image.
-    /// </summary>
-    property ImageUrl: string read FImageUrl write FImageUrl;
-
-    /// <summary>
-    /// Specifies the event type. For a computer screenshot, this property is always set to computer_screenshot.
-    /// </summary>
-    property &Type: string read FType write FType;
-
-    /// <summary>
-    /// <para>
-    /// - The output from the tool call.
-    /// </para>
-    /// <para>
-    /// - The output from the custom tool call generated by your code.
-    /// </para>
-    /// <para>
-    /// - A JSON string of the output of the local shell tool call.
-    /// </para>
-    /// </summary>
-    property Text: string read FText write FText;
-  end;
-
-  TAcknowledgedSafetyCheck = class
-  private
-    FCode    : string;
-    FId      : string;
-    FMessage : string;
-  public
-    /// <summary>
-    /// The type of the pending safety check.
-    /// </summary>
-    property Code: string read FCode write FCode;
-
-    /// <summary>
-    /// The ID of the pending safety check.
-    /// </summary>
-    property Id: string read FId write FId;
-
-    /// <summary>
-    /// Details about the pending safety check.
-    /// </summary>
-    property Message: string read FMessage write FMessage;
-  end;
+    {$ENDREGION}
 
   TComputerActionCommon = class
   private
@@ -431,6 +240,8 @@ type
     FQuery   : string;
     FUrl     : string;
     FPattern : string;
+    FSources : TArray<TSearchActionSource>;
+
   public
     /// <summary>
     /// The web search query.
@@ -451,9 +262,27 @@ type
     /// The pattern or text to search for within the page.
     /// </summary>
     property Pattern: string read FPattern write FPattern;
+
+    /// <summary>
+    /// The sources used in the search.
+    /// </summary>
+    property Sources: TArray<TSearchActionSource> read FSources write FSources;
+
+    destructor Destroy; override;
   end;
 
-  TAction = class(TWebSearchAction);
+  TOpenPageAction = class(TWebSearchAction)
+  end;
+
+  TFindAction = class(TOpenPageAction)
+  end;
+
+
+  TAction = class(TFindAction);
+
+  {$ENDREGION}
+
+  {$REGION 'annotations'}
 
   TResponseMessageAnnotationCommon = class
   private
@@ -542,6 +371,26 @@ type
   {$ENDREGION}
   TResponseMessageAnnotation = class(TAnnotationFilePath);
 
+  {$ENDREGION}
+
+  {$REGION 'item content'}
+
+  TItemInputAudio = class
+  private
+    FData   : string;
+    FFormat : string;
+  public
+    /// <summary>
+    /// Base64-encoded audio data.
+    /// </summary>
+    property Data: string read FData write FData;
+
+    /// <summary>
+    /// The format of the audio data. Currently supported formats are mp3 and wav.
+    /// </summary>
+    property Format: string read FFormat write FFormat;
+  end;
+
   TResponseItemContentCommon = class
   private
     [JsonReflectAttribute(ctString, rtString, TResponseItemContentTypeInterceptor)]
@@ -612,7 +461,19 @@ type
     property FileUrl: string read FFileUrl write FFileUrl;
   end;
 
-  TResponseItemContentOutputText = class(TResponseItemContentFileInput)
+  TResponseItemAudioInput = class(TResponseItemContentFileInput)
+  private
+    [JsonNameAttribute('input_audio')]
+    FInputAudio : TItemInputAudio;
+  public
+    /// <summary>
+    ///  An audio input to the model.
+    /// </summary>
+    property InputAudio: TItemInputAudio read FInputAudio write FInputAudio;
+    destructor Destroy; override;
+  end;
+
+  TResponseItemContentOutputText = class(TResponseItemAudioInput)
   private
     FAnnotations : TArray<TResponseMessageAnnotation>;
     FLogprobs    : TArray<TLogprobs>;
@@ -651,16 +512,20 @@ type
   {$ENDREGION}
   TResponseItemContent = class(TResponseItemContentRefusal);
 
-  {$REGION 'Dev note'}
+  {$ENDREGION}
+
+  {$REGION 'Response item'}
+
+    {$REGION 'Dev note'}
 (******************************************************************************
 
-  TResponseItem diff�rent from TResponseOutput from GenAI.Responses unit
+  TResponseItem différent from TResponseOutput from GenAI.Responses unit
   ======================================================================
 
   At first glance, one might think to directly reuse the architecture of the
   TResponseOutput class (from the GenAI.Responses unit). In reality, however,
-  the classes that make it up differ slightly�or are even missing
-  entirely�depending on the category.
+  the classes that make it up differ slightly—or are even missing
+  entirely—depending on the category.
 
   Therefore, we need to build TResponseItem entirely from scratch. Although
   this makes the code more substantial, it guarantees that the class retains
@@ -668,9 +533,247 @@ type
   deserialization.
 
 *******************************************************************************)
-  {$ENDREGION}
+    {$ENDREGION}
 
-  TResponseItemCommon = class
+    {$REGION 'code interpreter output'}
+
+  TCodeInterpreterOutput = class
+  private
+    FType : string;
+    FLogs : string;
+    FUrl  : string;
+  public
+    property &Type: string read FType write FType;
+    property Logs: string read FLogs write FLogs;
+    property Url: string read FUrl write FUrl;
+  end;
+
+    {$ENDREGION}
+
+    {$REGION 'code interpreter file search result'}
+
+    /// <summary>
+  /// The output of a code interpreter tool call that is a file.
+  /// </summary>
+  TCodeInterpreterResultFiles = class
+  private
+    [JsonNameAttribute('file_id')]
+    FFileId   : string;
+    [JsonNameAttribute('mime_type')]
+    FMimeType : string;
+  public
+    /// <summary>
+    /// The ID of the file.
+    /// </summary>
+    property FileId: string read FFileId write FFileId;
+
+    /// <summary>
+    /// The MIME type of the file.
+    /// </summary>
+    property MimeType: string read FMimeType write FMimeType;
+  end;
+
+  TCodeInterpreterResult = class
+  private
+    FLogs  : string;
+    FType  : string;
+    FFiles : TArray<TCodeInterpreterResultFiles>;
+  public
+    /// <summary>
+    /// The logs of the code interpreter tool call.
+    /// </summary>
+    property Logs: string read FLogs write FLogs;
+
+    /// <summary>
+    /// The output of a code interpreter tool call that is a file.
+    /// </summary>
+    property &Type: string read FType write FType;
+
+    /// <summary>
+    /// The output of a code interpreter tool call that is a file.
+    /// </summary>
+    property Files: TArray<TCodeInterpreterResultFiles> read FFiles write FFiles;
+
+    destructor Destroy; override;
+  end;
+
+  /// <summary>
+  /// The results of the file search tool call.
+  /// </summary>
+  /// <remarks>
+  /// Inherits from TCodeInterpreterResult because both tools have a Results field in common !!!
+  /// </remarks>
+  TFileSearchResult = class(TCodeInterpreterResult)
+  private
+    [JsonReflectAttribute(ctString, rtString, TMetadataInterceptor)]
+    FAttributes : string;
+    [JsonNameAttribute('file_id')]
+    FFileId     : string;
+    FFilename   : string;
+    FScore      : Double;
+    FText       : string;
+  public
+    /// <summary>
+    /// Set of 16 key-value pairs that can be attached to an object. This can be useful for storing additional information
+    /// about the object in a structured format, and querying for objects via API or the dashboard. Keys are strings with
+    /// a maximum length of 64 characters. Values are strings with a maximum length of 512 characters, booleans, or numbers.
+    /// </summary>
+    property Attributes: string read FAttributes write FAttributes;
+
+    /// <summary>
+    /// The unique ID of the file.
+    /// </summary>
+    property FileId: string read FFileId write FFileId;
+
+    /// <summary>
+    /// The name of the file.
+    /// </summary>
+    property Filename: string read FFilename write FFilename;
+
+    /// <summary>
+    /// The relevance score of the file - a value between 0 and 1.
+    /// </summary>
+    property Score: Double read FScore write FScore;
+
+    /// <summary>
+    /// The text that was retrieved from the file.
+    /// </summary>
+    property Text: string read FText write FText;
+  end;
+
+    {$ENDREGION}
+
+    {$REGION 'MCP list tool'}
+
+  TMCPListTool = class
+  private
+    [JsonReflectAttribute(ctString, rtString, TMetadataInterceptor)]
+    [JsonNameAttribute('input_schema')]
+    FInputSchema : string;
+    FName        : string;
+    FDescription : string;
+    {$REGION  'Dev notes'}
+    (*
+         FAnnotations: string > Automatic deserialization not possible-
+            Ambiguous object or name already used
+
+         Access to field contents from JSONResponse string possible
+    *)
+    {$ENDREGION}
+  public
+    /// <summary>
+    /// The JSON schemas string describing the tool's input.
+    /// </summary>
+    property InputSchema: string read FInputSchema write FInputSchema;
+
+    /// <summary>
+    /// The name of the tool.
+    /// </summary>
+    property Name: string read FName write FName;
+
+    /// <summary>
+    /// The description of the tool.
+    /// </summary>
+    property Description: string read FDescription write FDescription;
+  end;
+
+    {$ENDREGION}
+
+    {$REGION 'pending safety checks'}
+
+  TPendingSafetyChecks = class
+  private
+    FCode    : string;
+    FId      : string;
+    FMessage : string;
+  public
+    /// <summary>
+    /// The type of the pending safety check.
+    /// </summary>
+    property Code: string read FCode write FCode;
+
+    /// <summary>
+    /// The ID of the pending safety check.
+    /// </summary>
+    property Id: string read FId write FId;
+
+    /// <summary>
+    /// Details about the pending safety check.
+    /// </summary>
+    property Message: string read FMessage write FMessage;
+  end;
+
+    {$ENDREGION}
+
+    {$REGION 'computer output'}
+
+  TComputerOutput = class
+  private
+    FType     : string;
+    [JsonNameAttribute('file_id')]
+    FFileId   : string;
+    [JsonNameAttribute('image_url')]
+    FImageUrl : string;
+    FText     : string;
+  public
+    /// <summary>
+    /// The identifier of an uploaded file that contains the screenshot.
+    /// </summary>
+    property FileId: string read FFileId write FFileId;
+
+    /// <summary>
+    /// The URL of the screenshot image.
+    /// </summary>
+    property ImageUrl: string read FImageUrl write FImageUrl;
+
+    /// <summary>
+    /// Specifies the event type. For a computer screenshot, this property is always set to computer_screenshot.
+    /// </summary>
+    property &Type: string read FType write FType;
+
+    /// <summary>
+    /// <para>
+    /// - The output from the tool call.
+    /// </para>
+    /// <para>
+    /// - The output from the custom tool call generated by your code.
+    /// </para>
+    /// <para>
+    /// - A JSON string of the output of the local shell tool call.
+    /// </para>
+    /// </summary>
+    property Text: string read FText write FText;
+  end;
+
+    {$ENDREGION}
+
+    {$REGION 'acknowledge safety check'}
+
+  TAcknowledgedSafetyCheck = class
+  private
+    FCode    : string;
+    FId      : string;
+    FMessage : string;
+  public
+    /// <summary>
+    /// The type of the pending safety check.
+    /// </summary>
+    property Code: string read FCode write FCode;
+
+    /// <summary>
+    /// The ID of the pending safety check.
+    /// </summary>
+    property Id: string read FId write FId;
+
+    /// <summary>
+    /// Details about the pending safety check.
+    /// </summary>
+    property Message: string read FMessage write FMessage;
+  end;
+
+    {$ENDREGION}
+
+  TResponseItemCommon = class(TJSONFingerprint)
   private
     [JsonReflectAttribute(ctString, rtString, TResponseTypesInterceptor)]
     FType    : TResponseTypes;
@@ -845,7 +948,6 @@ type
     [JsonNameAttribute('server_label')]
     FServerLabel : string;
     FError       : string;
-    FOutput      : string;
   public
     /// <summary>
     /// The label of the MCP server running the tool.
@@ -856,14 +958,9 @@ type
     /// The error from the tool call, if any.
     /// </summary>
     property Error: string read FError write FError;
-
-    /// <summary>
-    /// The output from the tool call.
-    /// </summary>
-    property Output: string read FOutput write FOutput;
   end;
 
-  TResponseItemMCPList = class(TResponseItemMCPTool)   
+  TResponseItemMCPList = class(TResponseItemMCPTool)
   private
     FTools : TArray<TMCPListTool>;
   public
@@ -901,6 +998,9 @@ type
     property Reason: string read FReason write FReason;
   end;
 
+  TResponseItemMCPToolCall = class(TResponseItemMCPApprovalResponse)
+  end;
+
   {$REGION 'Dev note'}
   {--- This class is made up of the following classes:
     TResponseItemCommon,
@@ -920,9 +1020,9 @@ type
     TResponseItemMCPApprovalResponse
   }
   {$ENDREGION}
-  TResponseItem = class(TResponseItemMCPApprovalResponse);
+  TResponseItem = class(TResponseItemMCPToolCall);
 
-(*  End TResponseItem definition ............................................ *)
+  {$ENDREGION}
 
   TResponses = class(TJSONFingerprint)
   private
@@ -964,6 +1064,191 @@ type
   end;
 
 implementation
+
+  {$REGION 'Dev note'}
+(*
+      GenAI.Responses.InputItemList — Inheritance Documentation
+      =========================================================
+      Version: internal developer reference
+      Language: Delphi / Object Pascal
+      Context: Response data models for GenAI framework
+      ---------------------------------------------------------
+
+
+      INTRODUCTION
+      ------------
+
+      This document represents the inheritance tree and class relationships defined
+      in the unit GenAI.Responses.InputItemList. It is meant as a quick reference
+      for developers who need to understand the object model without reading the full
+      source code.
+
+      Each section focuses on one functional family of classes. Under each class,
+      children are shown with indentation to represent inheritance.
+
+      Legend:
+        - |__ means "inherits from"
+        - Comments describe the purpose and usage of each group.
+
+
+      ---------------------------------------------------------
+      1. COMPUTER ACTIONS AND TOOL CALLS
+      ---------------------------------------------------------
+
+      These classes represent user-computer interactions and tool execution
+      requests/responses. They form the backbone of automation events.
+
+      TComputerActionCommon
+        |__ TComputerActionClick
+              |__ TComputerActionDoubleClick
+                    |__ TComputerActionDrag
+                          |__ TComputerActionKeyPressed
+                                |__ TComputerActionMove
+                                      |__ TComputerActionScreenshot
+                                            |__ TComputerActionScroll
+                                                  |__ TComputerActionType
+                                                        |__ TComputerActionWait
+                                                              |__ TComputerAction
+
+      TComputerAction
+        |__ TToolCallAction
+              |__ TWebSearchAction
+                    |__ TOpenPageAction
+                          |__ TFindAction
+                                |__ TAction
+
+      Explanation:
+      - TComputerActionCommon is the root for mouse/keyboard/screen actions.
+      - Derived types progressively add details: click → drag → key press, etc.
+      - TToolCallAction extends computer actions with shell commands and web calls.
+      - TAction is the ultimate unified action type used in tool calls.
+
+
+      ---------------------------------------------------------
+      2. ANNOTATIONS (CITATIONS AND PATHS)
+      ---------------------------------------------------------
+
+      These classes describe citations and references used in model responses.
+
+      TResponseMessageAnnotationCommon
+        |__ TAnnotationFileCitation
+              |__ TAnnotationUrlCitation
+                    |__ TAnnotationContainerFileCitation
+                          |__ TAnnotationFilePath
+                                |__ TResponseMessageAnnotation
+
+      Explanation:
+      - Used to annotate text responses with references to files, URLs, or code
+        containers.
+      - Hierarchy refines the type of annotation from generic → file → URL → container.
+
+
+      ---------------------------------------------------------
+      3. ITEM CONTENT (INPUT / OUTPUT)
+      ---------------------------------------------------------
+
+      Classes describing input elements provided to the model or output generated by it.
+
+      TResponseItemContentCommon
+        |__ TResponseItemContentTextInput
+              |__ TResponseItemContentImageInput
+                    |__ TResponseItemContentFileInput
+                          |__ TResponseItemAudioInput
+                                |__ TResponseItemContentOutputText
+                                      |__ TResponseItemContentRefusal
+                                            |__ TResponseItemContent
+
+      Explanation:
+      - Starts with generic content → text → image → file → audio → text output.
+      - Final TResponseItemContent is the root for all input/output content types.
+
+
+      ---------------------------------------------------------
+      4. CODE INTERPRETER AND FILE SEARCH RESULTS
+      ---------------------------------------------------------
+
+      Results produced by code execution or file searching tools.
+
+      TCodeInterpreterResult
+        |__ TFileSearchResult
+
+      Explanation:
+      - TCodeInterpreterResult represents code execution logs and outputs.
+      - TFileSearchResult adds metadata such as score, attributes, and retrieved text.
+
+
+      ---------------------------------------------------------
+      5. RESPONSE ITEM HIERARCHY
+      ---------------------------------------------------------
+
+      This is the central class tree representing all possible response items
+      returned by the API.
+
+      TResponseItemCommon
+        |__ TResponseItemInputMessage
+              |__ TResponseItemOutputMessage
+                    |__ TResponseItemFileSearchToolCall
+                          |__ TResponseItemComputerToolCall
+                                |__ TResponseItemComputerToolCallOutput
+                                      |__ TResponseItemWebSearchToolCall
+                                            |__ TResponseItemFunctionToolCall
+                                                  |__ TResponseItemFunctionToolCallOutput
+                                                        |__ TResponseItemImageGeneration
+                                                              |__ TResponseItemCodeInterpreter
+                                                                    |__ TResponseItemLocalShellCall
+                                                                          |__ TResponseItemLocalShellCallOutput
+                                                                                |__ TResponseItemMCPTool
+                                                                                      |__ TResponseItemMCPList
+                                                                                            |__ TResponseItemMCPApprovalRequest
+                                                                                                  |__ TResponseItemMCPApprovalResponse
+                                                                                                        |__ TResponseItemMCPToolCall
+                                                                                                              |__ TResponseItem
+
+      Explanation:
+      - This chain represents the entire lifecycle of responses:
+        - Input/Output messages
+        - Tool calls (file search, computer, web, function)
+        - Code execution and image generation
+        - Local shell calls and MCP (Model Control Protocol) tool calls
+      - TResponseItem is the most derived and complete form.
+
+
+      ---------------------------------------------------------
+      6. LIST WRAPPER
+      ---------------------------------------------------------
+
+      TJSONFingerprint
+        |__ TResponses
+
+      Explanation:
+      - TResponses is a wrapper for paginated API responses containing multiple TResponseItem objects.
+
+
+      ---------------------------------------------------------
+      7. STANDALONE CLASSES
+      ---------------------------------------------------------
+
+      The following classes inherit directly from TObject and have no specialized
+      subclasses in this unit:
+
+      - TTopLogprobs
+      - TLogprobs
+      - TSearchActionSource
+      - TDragPoint
+      - TCodeInterpreterOutput
+      - TCodeInterpreterResultFiles
+      - TMCPListTool
+      - TPendingSafetyChecks
+      - TComputerOutput
+      - TAcknowledgedSafetyCheck
+      - TItemInputAudio
+
+      Explanation:
+      - These are helper/data container types used by higher-level objects.
+      - They hold structured data (e.g., log probabilities, search sources, audio data).
+*)
+
+  {$ENDREGION}
 
 { TResponseItemContentOutputText }
 
@@ -1067,6 +1352,24 @@ destructor TResponseItemCodeInterpreter.Destroy;
 begin
   for var Item in FOutputs do
     Item.Free;
+  inherited;
+end;
+
+{ TWebSearchAction }
+
+destructor TWebSearchAction.Destroy;
+begin
+  for var Item in FSources do
+    Item.Free;
+  inherited;
+end;
+
+{ TResponseItemAudioInput }
+
+destructor TResponseItemAudioInput.Destroy;
+begin
+  if Assigned(FInputAudio) then
+    FInputAudio.Free;
   inherited;
 end;
 

@@ -181,6 +181,17 @@ type
   procedure Display(Sender: TObject; Value: TChatCompletion); overload;
   procedure Display(Sender: TObject; Value: TChatDelete); overload;
   procedure Display(Sender: TObject; Value: TResponseItem); overload;
+  procedure Display(Sender: TObject; Value: TConversations); overload;
+  procedure Display(Sender: TObject; Value: TVideoJob); overload;
+  procedure Display(Sender: TObject; Value: TVideoJobList); overload;
+  procedure Display(Sender: TObject; Value: TVideoDownloaded); overload;
+  procedure Display(Sender: TObject; Value: TContainer); overload;
+  procedure Display(Sender: TObject; Value: TContainerList); overload;
+  procedure Display(Sender: TObject; Value: TContainersDelete); overload;
+  procedure Display(Sender: TObject; Value: TContainerFile); overload;
+  procedure Display(Sender: TObject; Value: TContainerFileList); overload;
+  procedure Display(Sender: TObject; Value: TContainerFilesDelete); overload;
+  procedure Display(Sender: TObject; Value: TContainerFileContent); overload;
 
   procedure DisplayStream(Sender: TObject; Value: string); overload;
   procedure DisplayStream(Sender: TObject; Value: TChat); overload;
@@ -758,13 +769,109 @@ end;
 
 procedure Display(Sender: TObject; Value: TResponseItem);
 begin
-  Display(Sender, Value.Id);
+  if not Value.JSONResponse.IsEmpty then
+    TutorialHub.JSONResponse := Value.JSONResponse;
+  Display(Sender, F('id', Value.Id));
   for var Item in Value.Content do
     begin
       Display(Sender, Item.Text);
     end;
   Display(Sender);
 end;
+
+procedure Display(Sender: TObject; Value: TConversations); overload;
+begin
+  TutorialHub.JSONResponse := Value.JSONResponse;
+  Display(Sender, F('id', Value.Id));
+  Display(Sender, F('object', Value.&Object));
+  Display(Sender, F('metadata', Value.Metadata));
+end;
+
+procedure Display(Sender: TObject; Value: TVideoJob);
+begin
+  if not Value.JSONResponse.IsEmpty then
+    TutorialHub.JSONResponse := Value.JSONResponse;
+  Display(Sender, F('id', Value.Id));
+  Display(Sender, F('progress', Value.Progress.ToString));
+  Display(Sender, F('status', Value.Status));
+  Display(Sender);
+end;
+
+procedure Display(Sender: TObject; Value: TVideoJobList);
+begin
+  TutorialHub.JSONResponse := Value.JSONResponse;
+  for var item in Value.Data do
+    Display(Sender, Item);
+  Display(Sender);
+end;
+
+procedure Display(Sender: TObject; Value: TVideoDownloaded);
+begin
+  if TutorialHub.FileName.IsEmpty then
+    Exit;
+  Value.SaveToFile(TutorialHub.FileName);
+  Display(Sender, TutorialHub.FileName + ' downloaded');
+end;
+
+procedure Display(Sender: TObject; Value: TContainer);
+begin
+  if not Value.JSONResponse.IsEmpty then
+    TutorialHub.JSONResponse := Value.JSONResponse;
+  Display(Sender, F('id', Value.Id));
+  Display(Sender, F('Name', Value.Name));
+  Display(Sender, F('status', Value.Status));
+  Display(Sender, F('expire_after', Value.ExpiresAfter.Minutes.ToString + ' minutes'));
+  Display(Sender, F('created_at', TInt64OrNull(Value.CreatedAt).ToUtcDateString));
+end;
+
+procedure Display(Sender: TObject; Value: TContainerList);
+begin
+  TutorialHub.JSONResponse := Value.JSONResponse;
+  for var Item in Value.Data do
+    Display(Sender, Item);
+  Display(TutorialHub);
+end;
+
+procedure Display(Sender: TObject; Value: TContainersDelete);
+begin
+  TutorialHub.JSONResponse := Value.JSONResponse;
+  Display(Sender, F('id', Value.Id));
+  Display(Sender, F('deleted', BoolToStr(Value.Deleted, True)));
+end;
+
+procedure Display(Sender: TObject; Value: TContainerFile);
+begin
+  if not Value.JSONResponse.IsEmpty then
+    TutorialHub.JSONResponse := Value.JSONResponse;
+  Display(Sender, F('id', Value.Id));
+  Display(Sender, F('bytes', Value.Bytes.ToString));
+  Display(Sender, F('container_id', Value.ContainerId));
+  Display(Sender, F('path', Value.Path));
+  Display(Sender, F('source', Value.source));
+end;
+
+procedure Display(Sender: TObject; Value: TContainerFileList);
+begin
+  TutorialHub.JSONResponse := Value.JSONResponse;
+  for var Item in Value.Data do
+    Display(TutorialHub, Item);
+  Display(TutorialHub);
+end;
+
+procedure Display(Sender: TObject; Value: TContainerFilesDelete);
+begin
+  TutorialHub.JSONResponse := Value.JSONResponse;
+  Display(Sender, F('id', Value.Id));
+  Display(Sender, F('deleted', BoolToStr(Value.Deleted, True)));
+end;
+
+procedure Display(Sender: TObject; Value: TContainerFileContent);
+begin
+  Display(Sender, 'Retrieve container file content');
+  Display(Sender);
+  Display(TutorialHub.Memo3, Value.AsString);
+end;
+
 
 procedure DisplayStream(Sender: TObject; Value: string);
 var

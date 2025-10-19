@@ -7,6 +7,8 @@ unit GenAI.Messages;
 
  ------------------------------------------------------------------------------}
 
+{--- deprecated unit use conversations }
+
 interface
 
 uses
@@ -567,13 +569,13 @@ type
     /// <param name="CallBacks">A function to handle the asynchronous call result.</param>
     procedure AsynCreate(const ThreadId: string;
       const ParamProc: TProc<TThreadsMessageParams>;
-      const CallBacks: TFunc<TAsynMessages>);
+      const CallBacks: TFunc<TAsynMessages>); deprecated;
     /// <summary>
     /// Asynchronously retrieves the list of messages within the specified thread.
     /// </summary>
     /// <param name="ThreadId">The ID of the thread to retrieve messages from.</param>
     /// <param name="CallBacks">A function to handle the asynchronous call result.</param>
-    procedure AsynList(const ThreadId: string; const CallBacks: TFunc<TAsynMessagesList>); overload;
+    procedure AsynList(const ThreadId: string; const CallBacks: TFunc<TAsynMessagesList>); overload; deprecated;
     /// <summary>
     /// Asynchronously retrieves the list of messages within the specified thread using additional URL parameters.
     /// </summary>
@@ -581,7 +583,7 @@ type
     /// <param name="ParamProc">A procedure to configure the URL parameters.</param>
     /// <param name="CallBacks">A function to handle the asynchronous call result.</param>
     procedure AsynList(const ThreadId: string; const ParamProc: TProc<TAssistantsUrlParams>;
-      const CallBacks: TFunc<TAsynMessagesList>); overload;
+      const CallBacks: TFunc<TAsynMessagesList>); overload; deprecated;
     /// <summary>
     /// Asynchronously retrieves a specific message by its ID within a thread.
     /// </summary>
@@ -589,7 +591,7 @@ type
     /// <param name="MessageId">The ID of the message to retrieve.</param>
     /// <param name="CallBacks">A function to handle the asynchronous call result.</param>
     procedure AsynRetrieve(const ThreadId: string; const MessageId: string;
-      const CallBacks: TFunc<TAsynMessages>);
+      const CallBacks: TFunc<TAsynMessages>); deprecated;
     /// <summary>
     /// Asynchronously updates an existing message within a thread.
     /// </summary>
@@ -599,7 +601,7 @@ type
     /// <param name="CallBacks">A function to handle the asynchronous call result.</param>
     procedure AsynUpdate(const ThreadId: string; const MessageId: string;
       const ParamProc: TProc<TMessagesUpdateParams>;
-      const CallBacks: TFunc<TAsynMessages>);
+      const CallBacks: TFunc<TAsynMessages>); deprecated;
     /// <summary>
     /// Asynchronously deletes a message within a thread.
     /// </summary>
@@ -607,7 +609,7 @@ type
     /// <param name="MessageId">The ID of the message to delete.</param>
     /// <param name="CallBacks">A function to handle the asynchronous call result.</param>
     procedure AsynDelete(const ThreadId: string; const MessageId: string;
-      const CallBacks: TFunc<TAsynDeletion>);
+      const CallBacks: TFunc<TAsynDeletion>); deprecated;
     /// <summary>
     /// Creates a new message within the specified thread.
     /// </summary>
@@ -616,7 +618,7 @@ type
     /// <returns>
     /// The newly created message object.
     /// </returns>
-    function Create(const ThreadId: string; const ParamProc: TProc<TThreadsMessageParams>): TMessages;
+    function Create(const ThreadId: string; const ParamProc: TProc<TThreadsMessageParams>): TMessages; deprecated;
     /// <summary>
     /// Retrieves the list of messages within the specified thread.
     /// </summary>
@@ -624,7 +626,7 @@ type
     /// <returns>
     /// A list of messages associated with the thread.
     /// </returns>
-    function List(const ThreadId: string): TMessagesList; overload;
+    function List(const ThreadId: string): TMessagesList; overload; deprecated;
     /// <summary>
     /// Retrieves the list of messages within the specified thread using additional URL parameters.
     /// </summary>
@@ -633,7 +635,7 @@ type
     /// <returns>
     /// A list of messages associated with the thread.
     /// </returns>
-    function List(const ThreadId: string; const ParamProc: TProc<TAssistantsUrlParams>): TMessagesList; overload;
+    function List(const ThreadId: string; const ParamProc: TProc<TAssistantsUrlParams>): TMessagesList; overload; deprecated;
     /// <summary>
     /// Retrieves a specific message by its ID within a thread.
     /// </summary>
@@ -642,7 +644,7 @@ type
     /// <returns>
     /// The message object matching the specified ID.
     /// </returns>
-    function Retrieve(const ThreadId: string; const MessageId: string): TMessages;
+    function Retrieve(const ThreadId: string; const MessageId: string): TMessages; deprecated;
     /// <summary>
     /// Updates an existing message within a thread.
     /// </summary>
@@ -652,7 +654,7 @@ type
     /// <returns>
     /// The updated message object.
     /// </returns>
-    function Update(const ThreadId: string; const MessageId: string; const ParamProc: TProc<TMessagesUpdateParams>): TMessages;
+    function Update(const ThreadId: string; const MessageId: string; const ParamProc: TProc<TMessagesUpdateParams>): TMessages; deprecated;
     /// <summary>
     /// Deletes a message within a thread.
     /// </summary>
@@ -661,7 +663,7 @@ type
     /// <returns>
     /// An object representing the deletion status.
     /// </returns>
-    function Delete(const ThreadId: string; const MessageId: string): TDeletion;
+    function Delete(const ThreadId: string; const MessageId: string): TDeletion; deprecated;
   end;
 
 implementation

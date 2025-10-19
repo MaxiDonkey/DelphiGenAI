@@ -62,13 +62,16 @@ uses
   GenAI.Functions.Core, GenAI.Batch.Interfaces, GenAI.Schema, GenAI.Embeddings,
   GenAI.Audio, GenAI.Chat, GenAI.Moderation, GenAI.Images, GenAI.Files, GenAI.Uploads,
   GenAI.Batch, GenAI.Batch.Reader, GenAI.Batch.Builder, GenAI.Completions, GenAI.FineTuning,
-  GenAI.Assistants, GenAI.Threads, GenAI.Messages, GenAI.Runs, GenAI.RunSteps,
   GenAI.Vector, GenAI.VectorFiles, GenAI.VectorBatch, GenAI.Monitoring, GenAI.Chat.Parallel,
   GenAI.Responses, GenAI.Responses.InputParams, GenAI.Responses.InputItemList,
-  GenAI.Responses.OutputParams, GenAI.Async.Promise, GenAI.Responses.Internal;
+  GenAI.Responses.OutputParams, GenAI.Async.Promise, GenAI.Responses.Internal,
+  GenAI.Conversations, GenAI.Video, GenAI.Containers, GenAI.ContainerFiles,
+
+  {--- deprecated }
+  GenAI.Assistants, GenAI.Threads, GenAI.Messages, GenAI.Runs, GenAI.RunSteps;
 
 const
-  VERSION = 'GenAIv1.2.1';
+  VERSION = 'GenAIv1.3.0';
 
 type
   /// <summary>
@@ -90,7 +93,7 @@ type
     procedure SetBaseUrl(const Value: string);
     function GetVersion: string;
 
-    function GetAssistantsRoute: TAssistantsRoute;
+    function GetAssistantsRoute: TAssistantsRoute; deprecated;
     function GetAudioRoute: TAudioRoute;
     function GetBatchRoute: TBatchRoute;
     function GetChatRoute: TChatRoute;
@@ -99,17 +102,21 @@ type
     function GetFilesRoute: TFilesRoute;
     function GetFineTuningRoute: TFineTuningRoute;
     function GetImagesRoute: TImagesRoute;
-    function GetMesssagesRoute: TMessagesRoute;
+    function GetMesssagesRoute: TMessagesRoute; deprecated;
     function GetModelsRoute: TModelsRoute;
     function GetModerationRoute: TModerationRoute;
-    function GetRunsRoute: TRunsRoute;
-    function GetRunStepRoute: TRunStepRoute;
-    function GetThreadsRoute: TThreadsRoute;
+    function GetRunsRoute: TRunsRoute; deprecated;
+    function GetRunStepRoute: TRunStepRoute; deprecated;
+    function GetThreadsRoute: TThreadsRoute; deprecated;
     function GetUploadsRoute: TUploadsRoute;
     function GetVectorStoreRoute: TVectorStoreRoute;
     function GetVectorStoreBatchRoute: TVectorStoreBatchRoute;
     function GetVectorStoreFilesRoute: TVectorStoreFilesRoute;
-    function GetResponses: TResponsesRoute;
+    function GetResponsesRoute: TResponsesRoute;
+    function GetConversationsRoute: TConversationsRoute;
+    function GetVideoRoute: TVideoRoute;
+    function GetContainersRoute: TContainersRoute;
+    function GetContainerFilesRoute: TContainerFilesRoute;
 
     /// <summary>
     /// Gets the current version of the GenAI library.
@@ -131,7 +138,7 @@ type
     /// using the OpenAI API. It extends <c>TGenAIRoute</c> to handle API interactions and
     /// custom headers.
     /// </remarks>
-    property Assistants: TAssistantsRoute read GetAssistantsRoute;
+    property Assistants: TAssistantsRoute read GetAssistantsRoute; //deprecated;
 
     /// <summary>
     /// Provides routes to handle audio-related requests including speech generation, transcription, and translation.
@@ -169,6 +176,20 @@ type
     /// for generating text completions.
     /// </summary>
     property Completion: TCompletionRoute read GetCompletionRoute;
+
+    /// <summary>
+    /// Provides routes for managing conversations and their items.
+    /// </summary>
+    /// <remarks>
+    /// Use this route to create, retrieve, update, and delete conversations, as well as
+    /// to list, add, or remove items (such as messages) within a conversation. Conversations
+    /// allow you to persist and manage state across multiple Response API calls.
+    /// <para>
+    /// Each conversation supports optional metadata for structured storage and querying,
+    /// and can hold multiple message-like items forming a conversational context.
+    /// </para>
+    /// </remarks>
+    property Conversations: TConversationsRoute read GetConversationsRoute;
 
     /// <summary>
     /// Provides routes for creating embeddings via the OpenAI API.
@@ -215,7 +236,7 @@ type
     /// This class provides methods to create, retrieve, update, delete, and list messages
     /// within a thread. It also supports asynchronous operations for non-blocking message handling.
     /// </remarks>
-    property Messages : TMessagesRoute read GetMesssagesRoute;
+    property Messages : TMessagesRoute read GetMesssagesRoute; //deprecated:
 
     /// <summary>
     /// Provides routes for managing model data via API calls, including listing, retrieving, and deleting models.
@@ -246,7 +267,7 @@ type
     /// This class provides methods to create, retrieve, update, list, and manage execution runs on threads.
     /// It handles both synchronous and asynchronous requests, allowing efficient interaction with the OpenAI API for execution management.
     /// </remarks>
-    property Runs: TRunsRoute read GetRunsRoute;
+    property Runs: TRunsRoute read GetRunsRoute; //deprecated;
 
     /// <summary>
     /// Represents the route for managing run steps within execution runs in the OpenAI API.
@@ -255,7 +276,7 @@ type
     /// This class provides methods to list or retrieve details of run steps. It handles both synchronous
     /// and asynchronous requests, enabling efficient interaction with the OpenAI API for managing run steps.
     /// </remarks>
-    property RunStep: TRunStepRoute read GetRunStepRoute;
+    property RunStep: TRunStepRoute read GetRunStepRoute; //deprecated;
 
     /// <summary>
     /// Provides an interface for interacting with OpenAI threads via API routes.
@@ -273,7 +294,7 @@ type
     /// to threads for storing structured information.
     /// </para>
     /// </remarks>
-    property Threads: TThreadsRoute read GetThreadsRoute;
+    property Threads: TThreadsRoute read GetThreadsRoute; //deprecated;
 
     /// <summary>
     /// Manages routes for handling file uploads, including creating uploads, adding parts, completing uploads, and canceling uploads.
@@ -315,6 +336,66 @@ type
     property VectorStoreFiles: TVectorStoreFilesRoute read GetVectorStoreFilesRoute;
 
     /// <summary>
+    /// Provides routes for interacting with OpenAI’s Sora Video API.
+    /// </summary>
+    /// <remarks>
+    /// Use this route to create, retrieve, download, list, and delete video render jobs
+    /// generated by the Sora model. The API supports asynchronous workflows for creating
+    /// videos from text or image prompts and retrieving the resulting MP4 files.
+    /// <para>
+    /// Two model variants are available: <c>sora-2</c> for fast iterations and
+    /// <c>sora-2-pro</c> for higher-quality production results.
+    /// </para>
+    /// </remarks>
+    property Video: TVideoRoute read GetVideoRoute;
+
+    /// <summary>
+    /// Provides routes for managing containers within the GenAI framework.
+    /// </summary>
+    /// <remarks>
+    /// Use this route to create, retrieve, list, update, and delete containers that hold
+    /// related resources such as files, datasets, or execution environments. A container
+    /// acts as a logical grouping unit, allowing the organization and isolation of
+    /// resources within the API.
+    /// <para>
+    /// The <c>TContainersRoute</c> class exposes both synchronous methods
+    /// (<c>Create</c>, <c>List</c>, <c>Retrieve</c>, <c>Delete</c>) and
+    /// asynchronous patterns (<c>Asyn*</c> callbacks and <c>AsyncAwait*</c> promises),
+    /// ensuring flexibility between blocking and non-blocking workflows.
+    /// </para>
+    /// <para>
+    /// Each container object includes metadata such as its unique identifier, creation
+    /// timestamp, and associated resources. You can manage the contents of a container
+    /// (e.g., files) via the <c>ContainerFiles</c> route.
+    /// </para>
+    /// <para>
+    /// Underlying endpoints follow the form <c>/containers</c> and related subpaths.
+    /// Errors and API exceptions are handled consistently with other GenAI route classes.
+    /// </para>
+    /// </remarks>
+    property Containers: TContainersRoute read GetContainersRoute;
+
+    /// <summary>
+    /// Provides routes for managing files inside a container.
+    /// </summary>
+    /// <remarks>
+    /// Use this route to upload/create files, list files in a container, retrieve file metadata,
+    /// download file content, and delete files. Both synchronous methods (e.g., <c>Create</c>,
+    /// <c>List</c>, <c>Retrieve</c>, <c>GetContent</c>, <c>Delete</c>) and asynchronous patterns
+    /// are available (<c>Asyn*</c> callbacks and <c>AsyncAwait*</c> promises).
+    /// <para>
+    /// Binary content is returned as Base64 via <c>TContainerFileContent.Data</c>; for source-code
+    /// files you can convert to text using <c>TContainerFileContent.AsString</c> (which leverages
+    /// the shared text codec to detect and decode common encodings).
+    /// </para>
+    /// <para>
+    /// Underlying endpoints follow the form <c>/containers/{container_id}/files</c> and related
+    /// subpaths. Errors are raised as exceptions consistent with the rest of the GenAI routes.
+    /// </para>
+    /// </remarks>
+    property ContainerFiles: TContainerFilesRoute read GetContainerFilesRoute;
+
+    /// <summary>
     /// Provides access to the <c>v1/responses</c> API endpoint for managing and retrieving response objects.
     /// </summary>
     /// <remarks>
@@ -325,7 +406,7 @@ type
     /// <returns>
     /// An instance of <c>TResponsesRoute</c> for handling response-related API operations.
     /// </returns>
-    property Responses: TResponsesRoute read GetResponses;
+    property Responses: TResponsesRoute read GetResponsesRoute;
 
     /// <summary>
     /// the main API object used for making requests.
@@ -357,13 +438,6 @@ type
     /// </returns>
     property BaseURL: string read GetBaseUrl write SetBaseUrl;
 
-    /// <summary>
-    /// Provides access to agent completion API.
-    /// An AI agent is an autonomous system using large language models (LLM) to perform tasks based on high-level instructions.
-    /// </summary>
-    /// <returns>
-    /// An instance of TAgentRoute for agent-related operations.
-    /// </returns>
   end;
 
   TGenAIFactory = class
@@ -384,7 +458,7 @@ type
   private
     FAPI: TGenAIAPI;
 
-    FAssistantsRoute: TAssistantsRoute;
+    FAssistantsRoute: TAssistantsRoute; //deprecated;
     FAudioRoute: TAudioRoute;
     FBatchRoute: TBatchRoute;
     FChatRoute: TChatRoute;
@@ -393,17 +467,21 @@ type
     FFilesRoute: TFilesRoute;
     FFineTuningRoute: TFineTuningRoute;
     FImagesRoute: TImagesRoute;
-    FMessagesRoute: TMessagesRoute;
+    FMessagesRoute: TMessagesRoute; //deprecated;
     FModelsRoute: TModelsRoute;
     FModerationRoute: TModerationRoute;
-    FRunsRoute: TRunsRoute;
-    FRunStepRoute: TRunStepRoute;
-    FThreadsRoute: TThreadsRoute;
+    FRunsRoute: TRunsRoute; //deprecated;
+    FRunStepRoute: TRunStepRoute; //deprecated;
+    FThreadsRoute: TThreadsRoute; //deprecated;
     FUploadsRoute: TUploadsRoute;
     FVectorStoreRoute: TVectorStoreRoute;
     FVectorStoreBatchRoute: TVectorStoreBatchRoute;
     FVectorStoreFilesRoute: TVectorStoreFilesRoute;
     FResponsesRoute: TResponsesRoute;
+    FConversationsRoute: TConversationsRoute;
+    FVideoRoute: TVideoRoute;
+    FContainersRoute: TContainersRoute;
+    FContainerFilesRoute: TContainerFilesRoute;
 
     function GetVersion: string;
     function GetAPI: TGenAIAPI;
@@ -412,26 +490,30 @@ type
     function GetBaseUrl: string;
     procedure SetBaseUrl(const Value: string);
 
-    function GetAssistantsRoute: TAssistantsRoute;
+    function GetAssistantsRoute: TAssistantsRoute; deprecated;
     function GetAudioRoute: TAudioRoute;
     function GetBatchRoute: TBatchRoute;
     function GetChatRoute: TChatRoute;
     function GetCompletionRoute: TCompletionRoute;
+    function GetConversationsRoute: TConversationsRoute;
     function GetEmbeddingsRoute: TEmbeddingsRoute;
     function GetFilesRoute: TFilesRoute;
     function GetFineTuningRoute: TFineTuningRoute;
     function GetImagesRoute: TImagesRoute;
-    function GetMesssagesRoute: TMessagesRoute;
+    function GetMesssagesRoute: TMessagesRoute; deprecated;
     function GetModelsRoute: TModelsRoute;
     function GetModerationRoute: TModerationRoute;
-    function GetRunsRoute: TRunsRoute;
-    function GetRunStepRoute: TRunStepRoute;
-    function GetThreadsRoute: TThreadsRoute;
+    function GetResponsesRoute: TResponsesRoute;
+    function GetRunsRoute: TRunsRoute; deprecated;
+    function GetRunStepRoute: TRunStepRoute; deprecated;
+    function GetThreadsRoute: TThreadsRoute; deprecated;
     function GetUploadsRoute: TUploadsRoute;
     function GetVectorStoreRoute: TVectorStoreRoute;
     function GetVectorStoreBatchRoute: TVectorStoreBatchRoute;
     function GetVectorStoreFilesRoute: TVectorStoreFilesRoute;
-    function GetResponses: TResponsesRoute;
+    function GetVideoRoute: TVideoRoute;
+    function GetContainersRoute: TContainersRoute;
+    function GetContainerFilesRoute: TContainerFilesRoute;
 
   public
     /// <summary>
@@ -2142,7 +2224,7 @@ type
   /// how search results are ranked and filtered. It extends <c>TJSONParam</c> to support
   /// serialization to JSON format.
   /// </remarks>
-  TRankingOptionsParams = GenAI.Assistants.TRankingOptionsParams;
+  TRankingOptionsParams = GenAI.Assistants.TRankingOptionsParams; //deprecated;
 
   /// <summary>
   /// Represents the parameters used to configure the file search tool in an assistant.
@@ -2151,7 +2233,7 @@ type
   /// This class provides methods to set the maximum number of results and ranking options
   /// for the file search operation. It extends <c>TJSONParam</c> to enable JSON serialization.
   /// </remarks>
-  TFileSearchToolParams = GenAI.Assistants.TFileSearchToolParams;
+  TFileSearchToolParams = GenAI.Assistants.TFileSearchToolParams; //deprecated;
 
   /// <summary>
   /// Represents the parameters used to define a custom function for an assistant.
@@ -2160,7 +2242,7 @@ type
   /// This class provides methods to set the function's name, description, parameters,
   /// and strict mode. It extends <c>TJSONParam</c> to enable JSON serialization.
   /// </remarks>
-  TAssistantsFunctionParams = GenAI.Assistants.TAssistantsFunctionParams;
+  TAssistantsFunctionParams = GenAI.Assistants.TAssistantsFunctionParams; //deprecated;
 
   /// <summary>
   /// Represents the parameters used to configure tools for an assistant.
@@ -2170,7 +2252,7 @@ type
   /// file search and custom functions. It extends <c>TJSONParam</c> to support
   /// JSON serialization.
   /// </remarks>
-  TAssistantsToolsParams = GenAI.Assistants.TAssistantsToolsParams;
+  TAssistantsToolsParams = GenAI.Assistants.TAssistantsToolsParams; //deprecated;
 
   /// <summary>
   /// Represents the parameters used to configure the code interpreter tool for an assistant.
@@ -2179,7 +2261,7 @@ type
   /// This class provides methods to specify the file IDs that the code interpreter tool
   /// can access. It extends <c>TJSONParam</c> to enable JSON serialization.
   /// </remarks>
-  TCodeInterpreterParams = GenAI.Assistants.TCodeInterpreterParams;
+  TCodeInterpreterParams = GenAI.Assistants.TCodeInterpreterParams; //deprecated;
 
   /// <summary>
   /// Represents the parameters used to configure static chunking for file processing.
@@ -2189,7 +2271,7 @@ type
   /// It is used to control how large text or data is divided into manageable parts for
   /// processing. The class extends <c>TJSONParam</c> to enable JSON serialization.
   /// </remarks>
-  TChunkStaticParams = GenAI.Assistants.TChunkStaticParams;
+  TChunkStaticParams = GenAI.Assistants.TChunkStaticParams; //deprecated;
 
   /// <summary>
   /// Represents the parameters used to configure the chunking strategy for file processing.
@@ -2199,7 +2281,7 @@ type
   /// specific parameters, such as static chunking options. It extends <c>TJSONParam</c>
   /// to enable JSON serialization.
   /// </remarks>
-  TChunkingStrategyParams = GenAI.Assistants.TChunkingStrategyParams;
+  TChunkingStrategyParams = GenAI.Assistants.TChunkingStrategyParams; //deprecated;
 
   /// <summary>
   /// Represents the parameters used to configure vector stores for file search operations.
@@ -2208,7 +2290,7 @@ type
   /// This class provides methods to specify file IDs, chunking strategies, and metadata
   /// associated with vector stores. It extends <c>TJSONParam</c> to enable JSON serialization.
   /// </remarks>
-  TVectorStoresParams = GenAI.Assistants.TVectorStoresParams;
+  TVectorStoresParams = GenAI.Assistants.TVectorStoresParams; //deprecated;
 
   /// <summary>
   /// Represents the parameters used to configure file search operations in an assistant.
@@ -2217,7 +2299,7 @@ type
   /// This class provides methods to specify vector store IDs and configure vector stores
   /// for efficient file searching. It extends <c>TJSONParam</c> to enable JSON serialization.
   /// </remarks>
-  TFileSearchParams = GenAI.Assistants.TFileSearchParams;
+  TFileSearchParams = GenAI.Assistants.TFileSearchParams; //deprecated;
 
   /// <summary>
   /// Represents the parameters used to configure tool resources for an assistant.
@@ -2226,7 +2308,7 @@ type
   /// This class provides methods to specify resources for the code interpreter and
   /// file search tools. It extends <c>TJSONParam</c> to enable JSON serialization.
   /// </remarks>
-  TToolResourcesParams = GenAI.Assistants.TToolResourcesParams;
+  TToolResourcesParams = GenAI.Assistants.TToolResourcesParams; //deprecated;
 
   /// <summary>
   /// Represents the parameters used to define a JSON schema for structured responses.
@@ -2236,7 +2318,7 @@ type
   /// It allows strict schema adherence for function calls and output validation.
   /// Extends <c>TJSONParam</c> to enable JSON serialization.
   /// </remarks>
-  TJsonSchemaParams = GenAI.Assistants.TJsonSchemaParams;
+  TJsonSchemaParams = GenAI.Assistants.TJsonSchemaParams; //deprecated;
 
   /// <summary>
   /// Represents the parameters used to configure the response format for an assistant.
@@ -2245,7 +2327,7 @@ type
   /// This class provides methods to define the type of response format, including JSON
   /// schema and structured outputs. It extends <c>TJSONParam</c> to enable JSON serialization.
   /// </remarks>
-  TResponseFormatParams = GenAI.Assistants.TResponseFormatParams;
+  TResponseFormatParams = GenAI.Assistants.TResponseFormatParams; //deprecated;
 
   /// <summary>
   /// Represents the parameters used to configure an assistant.
@@ -2255,7 +2337,7 @@ type
   /// instructions, tools, and response format. It extends <c>TJSONParam</c> to enable
   /// JSON serialization.
   /// </remarks>
-  TAssistantsParams = GenAI.Assistants.TAssistantsParams;
+  TAssistantsParams = GenAI.Assistants.TAssistantsParams; //deprecated;
 
   /// <summary>
   /// Represents the ranking options for a file search operation.
@@ -2264,7 +2346,7 @@ type
   /// This class provides properties to configure the ranking mechanism of a file search,
   /// including the ranker type and score threshold for filtering results.
   /// </remarks>
-  TRankingOptions = GenAI.Assistants.TRankingOptions;
+  TRankingOptions = GenAI.Assistants.TRankingOptions; //deprecated;
 
   /// <summary>
   /// Represents the file search configuration for an assistant.
@@ -2273,7 +2355,7 @@ type
   /// This class provides properties to define the file search behavior, including the
   /// maximum number of search results and ranking options for filtering results.
   /// </remarks>
-  TAssistantsFileSearch = GenAI.Assistants.TAssistantsFileSearch;
+  TAssistantsFileSearch = GenAI.Assistants.TAssistantsFileSearch; //deprecated;
 
   /// <summary>
   /// Represents a custom function definition for an assistant.
@@ -2282,7 +2364,7 @@ type
   /// This class provides properties to define a function's name, description, parameters,
   /// and strict mode. Functions allow the assistant to execute predefined operations.
   /// </remarks>
-  TAssistantsFunction = GenAI.Assistants.TAssistantsFunction;
+  TAssistantsFunction = GenAI.Assistants.TAssistantsFunction; //deprecated;
 
   /// <summary>
   /// Represents a tool configuration for an assistant.
@@ -2292,7 +2374,7 @@ type
   /// can use, such as file search or custom functions. Each tool configuration includes
   /// specific settings based on its type.
   /// </remarks>
-  TAssistantsTools = GenAI.Assistants.TAssistantsTools;
+  TAssistantsTools = GenAI.Assistants.TAssistantsTools; //deprecated;
 
   /// <summary>
   /// Represents the configuration for the code interpreter tool.
@@ -2301,7 +2383,7 @@ type
   /// This class provides properties to specify the files accessible to the code interpreter.
   /// It enables the assistant to process and analyze code-related files.
   /// </remarks>
-  TCodeInterpreter = GenAI.Assistants.TCodeInterpreter;
+  TCodeInterpreter = GenAI.Assistants.TCodeInterpreter; //deprecated;
 
   /// <summary>
   /// Represents the configuration for the file search tool.
@@ -2310,7 +2392,7 @@ type
   /// This class provides properties to specify the vector stores used for file searching.
   /// It enables the assistant to perform efficient and accurate file searches.
   /// </remarks>
-  TFileSearch = GenAI.Assistants.TFileSearch;
+  TFileSearch = GenAI.Assistants.TFileSearch; //deprecated;
 
   /// <summary>
   /// Represents the resources used by the tools configured for an assistant.
@@ -2320,7 +2402,7 @@ type
   /// the code interpreter and file search. These resources ensure that tools can perform
   /// their operations efficiently.
   /// </remarks>
-  TToolResources = GenAI.Assistants.TToolResources;
+  TToolResources = GenAI.Assistants.TToolResources; //deprecated;
 
   /// <summary>
   /// Represents an assistant configuration and its associated properties.
@@ -2330,7 +2412,7 @@ type
   /// name, model, instructions, tools, and metadata. It extends <c>TJSONFingerprint</c>
   /// to support JSON serialization.
   /// </remarks>
-  TAssistant = GenAI.Assistants.TAssistant;
+  TAssistant = GenAI.Assistants.TAssistant; //deprecated;
 
   /// <summary>
   /// Represents a list of assistant objects.
@@ -2340,7 +2422,7 @@ type
   /// <c>TAssistant</c> objects. It includes pagination metadata and provides access to
   /// multiple assistant configurations in a structured format.
   /// </remarks>
-  TAssistants = GenAI.Assistants.TAssistants;
+  TAssistants = GenAI.Assistants.TAssistants; //deprecated;
 
   /// <summary>
   /// Manages asynchronous callBacks for a request using <c>TAssistant</c> as the response type.
@@ -2350,7 +2432,7 @@ type
   /// It provides event handlers that trigger at various stages, such as when the operation starts, completes successfully, or encounters an error.
   /// This structure facilitates non-blocking operations.
   /// </remarks>
-  TAsynAssistant = GenAI.Assistants.TAsynAssistant;
+  TAsynAssistant = GenAI.Assistants.TAsynAssistant; //deprecated;
 
   /// <summary>
   /// Manages asynchronous callBacks for a request using <c>TAssistants</c> as the response type.
@@ -2360,7 +2442,7 @@ type
   /// It provides event handlers that trigger at various stages, such as when the operation starts, completes successfully, or encounters an error.
   /// This structure facilitates non-blocking operations.
   /// </remarks>
-  TAsynAssistants = GenAI.Assistants.TAsynAssistants;
+  TAsynAssistants = GenAI.Assistants.TAsynAssistants; //deprecated;
 
   {$ENDREGION}
 
@@ -2373,7 +2455,7 @@ type
   /// This class extends <c>TUrlAdvancedParams</c> to provide additional parameters
   /// that can be added to API calls when interacting with assistant-related threads.
   /// </remarks>
-  TAssistantsUrlParams = GenAI.Messages.TAssistantsUrlParams;
+  TAssistantsUrlParams = GenAI.Messages.TAssistantsUrlParams; //deprecated;
 
   /// <summary>
   /// Represents parameters used for updating messages within a thread in the OpenAI API.
@@ -2382,7 +2464,7 @@ type
   /// This class extends <c>TJSONParam</c> to provide structured key-value pairs
   /// for modifying messages, such as attaching metadata or updating message-specific details.
   /// </remarks>
-  TMessagesUpdateParams = GenAI.Messages.TMessagesUpdateParams;
+  TMessagesUpdateParams = GenAI.Messages.TMessagesUpdateParams; //deprecated;
 
   /// <summary>
   /// Represents details related to incomplete messages within a thread in the OpenAI API.
@@ -2391,7 +2473,7 @@ type
   /// This class contains information on why a message was marked as incomplete,
   /// typically providing a reason for the failure or interruption during processing.
   /// </remarks>
-  TIncompleteDetails = GenAI.Messages.TIncompleteDetails;
+  TIncompleteDetails = GenAI.Messages.TIncompleteDetails; //deprecated;
 
   /// <summary>
   /// Represents an image file attached to a message within a thread in the OpenAI API.
@@ -2400,7 +2482,7 @@ type
   /// This class is used to reference an image that is included as part of a message.
   /// The image is identified by its file ID and can have an associated detail level.
   /// </remarks>
-  TMessagesImageFile = GenAI.Messages.TMessagesImageFile;
+  TMessagesImageFile = GenAI.Messages.TMessagesImageFile; //deprecated;
 
   /// <summary>
   /// Represents an external image URL attached to a message within a thread in the OpenAI API.
@@ -2409,7 +2491,7 @@ type
   /// This class is used to reference an image located at an external URL.
   /// The image can have an associated detail level, which determines the resolution or processing cost.
   /// </remarks>
-  TMessagesImageUrl = GenAI.Messages.TMessagesImageUrl;
+  TMessagesImageUrl = GenAI.Messages.TMessagesImageUrl; //deprecated;
 
   /// <summary>
   /// Represents a citation within a message that references a specific portion of a file in the OpenAI API.
@@ -2418,7 +2500,7 @@ type
   /// This class is used to provide contextual citations by referencing parts of a file
   /// that the assistant used during message generation or processing.
   /// </remarks>
-  TFileCitation = GenAI.Messages.TFileCitation;
+  TFileCitation = GenAI.Messages.TFileCitation; //deprecated;
 
   /// <summary>
   /// Represents the file path of a file generated or referenced during message processing in the OpenAI API.
@@ -2427,7 +2509,7 @@ type
   /// This class is used to reference a file by its path or identifier, typically when
   /// files are generated dynamically during tasks like code execution or data processing.
   /// </remarks>
-  TFilePath = GenAI.Messages.TFilePath;
+  TFilePath = GenAI.Messages.TFilePath; //deprecated;
 
   /// <summary>
   /// Represents an annotation within a message, providing contextual references such as file citations or file paths.
@@ -2436,7 +2518,7 @@ type
   /// This class is used to add annotations that point to specific parts of external files,
   /// providing traceable references within the message content.
   /// </remarks>
-  TMesssagesAnnotation = GenAI.Messages.TMesssagesAnnotation;
+  TMesssagesAnnotation = GenAI.Messages.TMesssagesAnnotation; //deprecated;
 
   /// <summary>
   /// Represents the text content of a message within the OpenAI API, including any associated annotations.
@@ -2445,7 +2527,7 @@ type
   /// This class stores the text content of a message along with any annotations that provide
   /// additional context, such as file citations or file paths.
   /// </remarks>
-  TMessagesText = GenAI.Messages.TMessagesText;
+  TMessagesText = GenAI.Messages.TMessagesText; //deprecated;
 
   /// <summary>
   /// Represents the content of a message in the OpenAI API, including text, images, and refusal reasons.
@@ -2455,7 +2537,7 @@ type
   /// such as plain text, image references, or refusal messages indicating that the assistant
   /// declined to respond.
   /// </remarks>
-  TMessagesContent = GenAI.Messages.TMessagesContent;
+  TMessagesContent = GenAI.Messages.TMessagesContent; //deprecated;
 
   /// <summary>
   /// Represents a tool associated with an attachment in a message within the OpenAI API.
@@ -2464,7 +2546,7 @@ type
   /// This class specifies the type of tool linked to an attachment, such as a code interpreter
   /// or file search tool, which can be used during message processing.
   /// </remarks>
-  TAttachmentTool = GenAI.Messages.TAttachmentTool;
+  TAttachmentTool = GenAI.Messages.TAttachmentTool; //deprecated;
 
   /// <summary>
   /// Represents an attachment associated with a message in the OpenAI API.
@@ -2473,7 +2555,7 @@ type
   /// This class stores information about a file attached to a message and the tools
   /// that can be used to process or interact with the file.
   /// </remarks>
-  TAttachment = GenAI.Messages.TAttachment;
+  TAttachment = GenAI.Messages.TAttachment; //deprecated;
 
   /// <summary>
   /// Represents a message within a thread in the OpenAI API, including its content, status, metadata, and attachments.
@@ -2482,7 +2564,7 @@ type
   /// This class stores all the details related to a message, such as its creation timestamp,
   /// role, status, and the content it contains (text, images, or other media).
   /// </remarks>
-  TMessages = GenAI.Messages.TMessages;
+  TMessages = GenAI.Messages.TMessages; //deprecated;
 
   /// <summary>
   /// Represents a list of messages within a thread in the OpenAI API.
@@ -2491,7 +2573,7 @@ type
   /// This class extends <c>TAdvancedList</c> to provide a collection of <c>TMessages</c> objects,
   /// allowing for easy iteration and manipulation of messages retrieved from the API.
   /// </remarks>
-  TMessagesList = GenAI.Messages.TMessagesList;
+  TMessagesList = GenAI.Messages.TMessagesList; //deprecated;
 
   /// <summary>
   /// Manages asynchronous callBacks for a request using <c>TMessages</c> as the response type.
@@ -2501,7 +2583,7 @@ type
   /// It provides event handlers that trigger at various stages, such as when the operation starts, completes successfully, or encounters an error.
   /// This structure facilitates non-blocking operations.
   /// </remarks>
-  TAsynMessages = GenAI.Messages.TAsynMessages;
+  TAsynMessages = GenAI.Messages.TAsynMessages; //deprecated;
 
   /// <summary>
   /// Manages asynchronous callBacks for a request using <c>TMessagesList</c> as the response type.
@@ -2511,7 +2593,7 @@ type
   /// It provides event handlers that trigger at various stages, such as when the operation starts, completes successfully, or encounters an error.
   /// This structure facilitates non-blocking operations.
   /// </remarks>
-  TAsynMessagesList = GenAI.Messages.TAsynMessagesList;
+  TAsynMessagesList = GenAI.Messages.TAsynMessagesList; //deprecated;
 
   {$ENDREGION}
 
@@ -2521,49 +2603,49 @@ type
   /// Represents parameters for specifying image files in OpenAI threads.
   /// This class is used to define image-related details such as the file ID and image detail level.
   /// </summary>
-  TThreadsImageFileParams = GenAI.Threads.TThreadsImageFileParams;
+  TThreadsImageFileParams = GenAI.Threads.TThreadsImageFileParams; //deprecated;
 
   /// <summary>
   /// Represents parameters for specifying image URLs in OpenAI threads.
   /// This class is used to define URL-related details such as the image URL and its detail level.
   /// </summary>
-  TThreadsImageUrlParams = GenAI.Threads.TThreadsImageUrlParams;
+  TThreadsImageUrlParams = GenAI.Threads.TThreadsImageUrlParams; //deprecated;
 
   /// <summary>
   /// Represents the parameters used to define the content of messages in OpenAI threads.
   /// This can include text content, image files, or image URLs.
   /// </summary>
-  TThreadsContentParams = GenAI.Threads.TThreadsContentParams;
+  TThreadsContentParams = GenAI.Threads.TThreadsContentParams; //deprecated;
 
   /// <summary>
   /// Represents attachments that can be included in messages in OpenAI threads.
   /// Attachments can be files with specific tools applied, such as a code interpreter or file search.
   /// </summary>
-  TThreadsAttachment = GenAI.Threads.TThreadsAttachment;
+  TThreadsAttachment = GenAI.Threads.TThreadsAttachment; //deprecated;
 
   /// <summary>
   /// Represents the parameters used to define a message in OpenAI threads.
   /// A message contains details such as its role, content, attachments, and metadata.
   /// </summary>
-  TThreadsMessageParams = GenAI.Threads.TThreadsMessageParams;
+  TThreadsMessageParams = GenAI.Threads.TThreadsMessageParams; //deprecated;
 
   /// <summary>
   /// Represents the parameters for creating a new thread in OpenAI threads.
   /// This includes defining initial messages, tool resources, and metadata.
   /// </summary>
-  TThreadsCreateParams = GenAI.Threads.TThreadsCreateParams;
+  TThreadsCreateParams = GenAI.Threads.TThreadsCreateParams; //deprecated;
 
   /// <summary>
   /// Represents the parameters used to modify an existing thread in OpenAI threads.
   /// This includes updating tool resources and metadata.
   /// </summary>
-  TThreadsModifyParams = GenAI.Threads.TThreadsModifyParams;
+  TThreadsModifyParams = GenAI.Threads.TThreadsModifyParams; //deprecated;
 
   /// <summary>
   /// Represents a thread object in OpenAI threads.
   /// A thread contains messages, tool resources, metadata, and other properties related to its creation and management.
   /// </summary>
-  TThreads = GenAI.Threads.TThreads;
+  TThreads = GenAI.Threads.TThreads; //deprecated;
 
   /// <summary>
   /// Manages asynchronous callBacks for a request using <c>TThreads</c> as the response type.
@@ -2573,7 +2655,7 @@ type
   /// It provides event handlers that trigger at various stages, such as when the operation starts, completes successfully, or encounters an error.
   /// This structure facilitates non-blocking operations.
   /// </remarks>
-  TAsynThreads = GenAI.Threads.TAsynThreads;
+  TAsynThreads = GenAI.Threads.TAsynThreads; //deprecated;
 
   {$ENDREGION}
 
@@ -2586,7 +2668,7 @@ type
   /// This class is used to customize and configure URL-based parameters for retrieving or managing runs in API requests.
   /// It extends the base functionality of <c>TUrlAdvancedParams</c>, enabling additional customization for OpenAI API endpoints related to execution runs.
   /// </remarks>
-  TRunsUrlParams = GenAI.Runs.TRunsUrlParams;
+  TRunsUrlParams = GenAI.Runs.TRunsUrlParams; //deprecated;
 
   /// <summary>
   /// Represents the configuration for selecting a tool choice when creating or running an execution run on a thread in the OpenAI API.
@@ -2595,7 +2677,7 @@ type
   /// This class allows specifying the tool type and, optionally, the name of the function to be called during the run.
   /// The tool choice is essential for directing the assistant to use specific tools like functions during an API run execution.
   /// </remarks>
-  TRunsToolChoice = GenAI.Runs.TRunsToolChoice;
+  TRunsToolChoice = GenAI.Runs.TRunsToolChoice; //deprecated;
 
   /// <summary>
   /// Represents the truncation strategy configuration for a run in the OpenAI API.
@@ -2604,7 +2686,7 @@ type
   /// This class allows specifying how the thread context should be truncated when constructing the prompt for the run.
   /// Different truncation strategies help optimize token usage and focus the context on relevant messages.
   /// </remarks>
-  TRunsTruncationStrategy = GenAI.Runs.TRunsTruncationStrategy;
+  TRunsTruncationStrategy = GenAI.Runs.TRunsTruncationStrategy; //deprecated;
 
   /// <summary>
   /// Represents the core parameters for creating or modifying a run in the OpenAI API.
@@ -2612,7 +2694,7 @@ type
   /// <remarks>
   /// This class provides methods to configure various settings such as model selection, instructions, token limits, tool usage, and other options that affect the behavior of the run.
   /// </remarks>
-  TRunsCoreParams = GenAI.Runs.TRunsCoreParams;
+  TRunsCoreParams = GenAI.Runs.TRunsCoreParams; //deprecated;
 
   /// <summary>
   /// Represents the parameters for creating a run in the OpenAI API, extending the core parameters with additional settings.
@@ -2621,7 +2703,7 @@ type
   /// This class extends <c>TRunsCoreParams</c> by adding options for including additional messages at the start of the thread.
   /// It allows fine-tuning the initial context and behavior of the assistant during the run.
   /// </remarks>
-  TRunsParams = GenAI.Runs.TRunsParams;
+  TRunsParams = GenAI.Runs.TRunsParams; //deprecated;
 
   /// <summary>
   /// Represents the parameters for creating a new thread and running it in the OpenAI API.
@@ -2630,7 +2712,7 @@ type
   /// This class extends <c>TRunsCoreParams</c> and allows configuring both the thread and the tools/resources available to the assistant during the run.
   /// It is used when you need to create a new conversation thread and immediately execute the run.
   /// </remarks>
-  TCreateRunsParams = GenAI.Runs.TCreateRunsParams;
+  TCreateRunsParams = GenAI.Runs.TCreateRunsParams; //deprecated;
 
   /// <summary>
   /// Represents the parameters for updating an existing run in the OpenAI API.
@@ -2638,7 +2720,7 @@ type
   /// <remarks>
   /// This class allows modifying metadata associated with a run, enabling the attachment of key-value pairs for tracking additional information.
   /// </remarks>
-  TRunUpdateParams = GenAI.Runs.TRunUpdateParams;
+  TRunUpdateParams = GenAI.Runs.TRunUpdateParams; //deprecated;
 
   /// <summary>
   /// Represents the parameters for submitting tool outputs to a run in the OpenAI API.
@@ -2647,7 +2729,7 @@ type
   /// This class allows specifying the output generated by a tool and associating it with the appropriate tool call within the run.
   /// Tool outputs are required to continue or complete certain runs that depend on external computations.
   /// </remarks>
-  TToolOutputParam = GenAI.Runs.TToolOutputParam;
+  TToolOutputParam = GenAI.Runs.TToolOutputParam; //deprecated;
 
   /// <summary>
   /// Represents the parameters for submitting tool outputs to a run in the OpenAI API.
@@ -2656,7 +2738,7 @@ type
   /// This class is used when a run requires external tool outputs to continue.
   /// It allows specifying the outputs from the tools and submitting them in a structured manner.
   /// </remarks>
-  TSubmitToolParams = GenAI.Runs.TSubmitToolParams;
+  TSubmitToolParams = GenAI.Runs.TSubmitToolParams; //deprecated;
 
   /// <summary>
   /// Represents the tool output submissions required to continue a run in the OpenAI API.
@@ -2665,7 +2747,7 @@ type
   /// This class holds the collection of tool call outputs that are needed to satisfy the required action of a run.
   /// Each tool call output contains the necessary details to be processed by the run.
   /// </remarks>
-  TSubmitToolOutputs = GenAI.Runs.TSubmitToolOutputs;
+  TSubmitToolOutputs = GenAI.Runs.TSubmitToolOutputs; //deprecated;
 
   /// <summary>
   /// Represents details about an action required to continue an execution run in the OpenAI API.
@@ -2673,7 +2755,7 @@ type
   /// <remarks>
   /// When a run is paused and requires input or tool output to proceed, this class provides information on the specific action needed.
   /// </remarks>
-  TRequiredAction = GenAI.Runs.TRequiredAction;
+  TRequiredAction = GenAI.Runs.TRequiredAction; //deprecated;
 
   /// <summary>
   /// Represents details about the last error encountered during an execution run in the OpenAI API.
@@ -2681,7 +2763,7 @@ type
   /// <remarks>
   /// This class provides information about the error, including its code and a descriptive message.
   /// </remarks>
-  TLastError = GenAI.Runs.TLastError;
+  TLastError = GenAI.Runs.TLastError; //deprecated;
 
   /// <summary>
   /// Represents details about why an execution run is incomplete in the OpenAI API.
@@ -2689,7 +2771,7 @@ type
   /// <remarks>
   /// This class provides the reason explaining why the run did not complete successfully, such as token limits or other restrictions.
   /// </remarks>
-  TIncompleteDetailsReason = GenAI.Runs.TIncompleteDetailsReason;
+  TIncompleteDetailsReason = GenAI.Runs.TIncompleteDetailsReason; //deprecated;
 
   /// <summary>
   /// Represents token usage statistics for an execution run in the OpenAI API.
@@ -2697,7 +2779,7 @@ type
   /// <remarks>
   /// This class tracks the number of tokens used during the run, including prompt tokens, completion tokens, and the total token count.
   /// </remarks>
-  TRunUsage = GenAI.Runs.TRunUsage;
+  TRunUsage = GenAI.Runs.TRunUsage; //deprecated;
 
   /// <summary>
   /// Represents the truncation strategy used to manage the context window for an execution run in the OpenAI API.
@@ -2705,7 +2787,7 @@ type
   /// <remarks>
   /// This class allows control over how much of the thread's context is included in the prompt, which helps optimize token usage.
   /// </remarks>
-  TTruncationStrategy = GenAI.Runs.TTruncationStrategy;
+  TTruncationStrategy = GenAI.Runs.TTruncationStrategy; //deprecated;
 
   /// <summary>
   /// Represents an execution run on a thread in the OpenAI API.
@@ -2713,7 +2795,7 @@ type
   /// <remarks>
   /// This class contains information about the run, such as its status, associated assistant, model, instructions, token usage, and any errors encountered.
   /// </remarks>
-  TRun = GenAI.Runs.TRun;
+  TRun = GenAI.Runs.TRun; //deprecated;
 
   /// <summary>
   /// Represents a list of execution runs on a thread in the OpenAI API.
@@ -2722,7 +2804,7 @@ type
   /// This class is a collection of <c>TRun</c> objects, providing access to multiple execution runs associated with a specific thread.
   /// It can be used to iterate through and retrieve information about each run.
   /// </remarks>
-  TRuns = GenAI.Runs.TRuns;
+  TRuns = GenAI.Runs.TRuns; //deprecated;
 
   /// <summary>
   /// Manages asynchronous callBacks for a request using <c>TRun</c> as the response type.
@@ -2732,7 +2814,7 @@ type
   /// It provides event handlers that trigger at various stages, such as when the operation starts, completes successfully, or encounters an error.
   /// This structure facilitates non-blocking operations.
   /// </remarks>
-  TAsynRun = GenAI.Runs.TAsynRun;
+  TAsynRun = GenAI.Runs.TAsynRun; //deprecated;
 
   /// <summary>
   /// Manages asynchronous callBacks for a request using <c>TRuns</c> as the response type.
@@ -2742,7 +2824,7 @@ type
   /// It provides event handlers that trigger at various stages, such as when the operation starts, completes successfully, or encounters an error.
   /// This structure facilitates non-blocking operations.
   /// </remarks>
-  TAsynRuns = GenAI.Runs.TAsynRuns;
+  TAsynRuns = GenAI.Runs.TAsynRuns; //deprecated;
 
   {$ENDREGION}
 
@@ -2755,7 +2837,7 @@ type
   /// This class is used to customize URL parameters when making requests to retrieve details about
   /// specific steps within an execution run. It enables including additional fields in the API response.
   /// </remarks>
-  TRetrieveStepUrlParam = GenAI.RunSteps.TRetrieveStepUrlParam;
+  TRetrieveStepUrlParam = GenAI.RunSteps.TRetrieveStepUrlParam; //deprecated;
 
   /// <summary>
   /// Represents URL parameters for listing or retrieving multiple run steps in the OpenAI API.
@@ -2764,7 +2846,7 @@ type
   /// This class is used to customize URL parameters when making requests to list or retrieve details
   /// about multiple steps within an execution run. It allows for including additional data in the API response.
   /// </remarks>
-  TRunStepUrlParam = GenAI.RunSteps.TRunStepUrlParam;
+  TRunStepUrlParam = GenAI.RunSteps.TRunStepUrlParam; //deprecated;
 
   /// <summary>
   /// Represents details about the message creation step within an execution run in the OpenAI API.
@@ -2773,7 +2855,7 @@ type
   /// This class provides information related to a message created during a run step, such as
   /// the unique identifier of the created message.
   /// </remarks>
-  TRunStepMessageCreation = GenAI.RunSteps.TRunStepMessageCreation;
+  TRunStepMessageCreation = GenAI.RunSteps.TRunStepMessageCreation; //deprecated;
 
   /// <summary>
   /// Represents details of an image output generated during a code interpreter run step in the OpenAI API.
@@ -2781,7 +2863,7 @@ type
   /// <remarks>
   /// This class provides information about an image output, including the unique file identifier.
   /// </remarks>
-  TOutputImage = GenAI.RunSteps.TOutputImage;
+  TOutputImage = GenAI.RunSteps.TOutputImage; //deprecated;
 
   /// <summary>
   /// Represents the output generated by the code interpreter during a run step in the OpenAI API.
@@ -2790,7 +2872,7 @@ type
   /// This class contains details about the output from the code interpreter, which can include logs
   /// and image outputs.
   /// </remarks>
-  TCodeInterpreterOutput = GenAI.RunSteps.TCodeInterpreterOutput;
+  TCodeInterpreterOutput = GenAI.RunSteps.TCodeInterpreterOutput; //deprecated;
 
   /// <summary>
   /// Represents the details of a code interpreter step within an execution run in the OpenAI API.
@@ -2799,7 +2881,7 @@ type
   /// This class contains information about the input provided to the code interpreter and the outputs
   /// it generated, such as logs or images.
   /// </remarks>
-  TRunStepCodeInterpreter = GenAI.RunSteps.TRunStepCodeInterpreter;
+  TRunStepCodeInterpreter = GenAI.RunSteps.TRunStepCodeInterpreter; //deprecated;
 
   /// <summary>
   /// Represents the content of a search result within a file search tool call during an execution run in the OpenAI API.
@@ -2807,7 +2889,7 @@ type
   /// <remarks>
   /// This class contains details about the content type and the corresponding text found during the file search.
   /// </remarks>
-  TResultContent = GenAI.RunSteps.TResultContent;
+  TResultContent = GenAI.RunSteps.TResultContent; //deprecated;
 
   /// <summary>
   /// Represents a result from a file search tool call within an execution run in the OpenAI API.
@@ -2816,7 +2898,7 @@ type
   /// This class contains information about a file search result, including the file details, score, and
   /// the content found within the file.
   /// </remarks>
-  TRunFileSearchResult = GenAI.RunSteps.TRunFileSearchResult;
+  TRunFileSearchResult = GenAI.RunSteps.TRunFileSearchResult; //deprecated;
 
   /// <summary>
   /// Represents details of a file search tool call within an execution run in the OpenAI API.
@@ -2825,7 +2907,7 @@ type
   /// This class contains information about the file search operation, including the ranking options used
   /// and the results retrieved from the search.
   /// </remarks>
-  TRunStepFileSearch = GenAI.RunSteps.TRunStepFileSearch;
+  TRunStepFileSearch = GenAI.RunSteps.TRunStepFileSearch; //deprecated;
 
   /// <summary>
   /// Represents details of a function tool call within an execution run in the OpenAI API.
@@ -2834,7 +2916,7 @@ type
   /// This class contains information about a function tool call, including the function name,
   /// arguments passed, and the output generated.
   /// </remarks>
-  TRunStepFunction = GenAI.RunSteps.TRunStepFunction;
+  TRunStepFunction = GenAI.RunSteps.TRunStepFunction; //deprecated;
 
   /// <summary>
   /// Represents details of tool calls made during a specific run step in the OpenAI API.
@@ -2843,7 +2925,7 @@ type
   /// This class provides information about various tool calls, such as code interpreter executions,
   /// file searches, or function invocations.
   /// </remarks>
-  TRunStepToolCalls = GenAI.RunSteps.TRunStepToolCalls;
+  TRunStepToolCalls = GenAI.RunSteps.TRunStepToolCalls; //deprecated;
 
   /// <summary>
   /// Represents the detailed information of a run step within an execution run in the OpenAI API.
@@ -2852,7 +2934,7 @@ type
   /// This class provides details about the type of run step and any associated tool calls
   /// or message creation activities.
   /// </remarks>
-  TRunStepDetails = GenAI.RunSteps.TRunStepDetails;
+  TRunStepDetails = GenAI.RunSteps.TRunStepDetails; //deprecated;
 
   /// <summary>
   /// Represents a specific step within an execution run in the OpenAI API.
@@ -2861,7 +2943,7 @@ type
   /// This class contains details about the run step, such as its type, status, associated assistant,
   /// and any outputs or errors generated during the step.
   /// </remarks>
-  TRunStep = GenAI.RunSteps.TRunStep;
+  TRunStep = GenAI.RunSteps.TRunStep; //deprecated;
 
   /// <summary>
   /// Represents a collection of run steps within an execution run in the OpenAI API.
@@ -2870,7 +2952,7 @@ type
   /// This class is a list of <c>TRunStep</c> objects, providing access to multiple steps within a run.
   /// It allows for iteration over the run steps to retrieve their details, such as outputs, statuses, or errors.
   /// </remarks>
-  TRunSteps = GenAI.RunSteps.TRunSteps;
+  TRunSteps = GenAI.RunSteps.TRunSteps; //deprecated;
 
   /// <summary>
   /// Manages asynchronous callBacks for a request using <c>TRunStep</c> as the response type.
@@ -2880,7 +2962,7 @@ type
   /// It provides event handlers that trigger at various stages, such as when the operation starts, completes successfully, or encounters an error.
   /// This structure facilitates non-blocking operations.
   /// </remarks>
-  TAsynRunStep = GenAI.RunSteps.TAsynRunStep;
+  TAsynRunStep = GenAI.RunSteps.TAsynRunStep; //deprecated;
 
   /// <summary>
   /// Manages asynchronous callBacks for a request using <c>TRunSteps</c> as the response type.
@@ -2890,7 +2972,7 @@ type
   /// It provides event handlers that trigger at various stages, such as when the operation starts, completes successfully, or encounters an error.
   /// This structure facilitates non-blocking operations.
   /// </remarks>
-  TAsynRunSteps = GenAI.RunSteps.TAsynRunSteps;
+  TAsynRunSteps = GenAI.RunSteps.TAsynRunSteps; //deprecated;
 
   {$ENDREGION}
 
@@ -3255,7 +3337,7 @@ type
   /// enabling structured handling of callback events.
   /// </remarks>
   TAsynBundleList = GenAI.Chat.Parallel.TAsynBundleList;
-  TAsynBuffer = TAsynBundleList; //deprecated : naming error
+  TAsynBuffer = TAsynBundleList;
 
   /// <summary>
   /// Represents an asynchronous callback buffer for handling parallele chat responses for promise chaining
@@ -3335,6 +3417,14 @@ type
 
   TFunctionToolCall = GenAI.Responses.InputParams.TFunctionToolCall;
 
+  TFunctionOutput = GenAI.Responses.InputParams.TFunctionOutput;
+
+  TFunctionInputText = GenAI.Responses.InputParams.TFunctionInputText;
+
+  TFunctionInputImage = GenAI.Responses.InputParams.TFunctionInputImage;
+
+  TFunctionInputFile = GenAI.Responses.InputParams.TFunctionInputFile;
+
   TFunctionToolCalloutput = GenAI.Responses.InputParams.TFunctionToolCalloutput;
 
   TReasoningTextContent = GenAI.Responses.InputParams.TReasoningTextContent;
@@ -3345,13 +3435,9 @@ type
 
   TImageGeneration = GenAI.Responses.InputParams.TImageGeneration;
 
-  TCodeInterpreterToolCallResult = GenAI.Responses.InputParams.TCodeInterpreterToolCallResult;
+  TCodeInterpreterOutputs = GenAI.Responses.InputParams.TCodeInterpreterOutputs;
 
-  TCodeInterpreterTextOutput = GenAI.Responses.InputParams.TCodeInterpreterTextOutput;
-
-  TCodeInterpreterFile = GenAI.Responses.InputParams.TCodeInterpreterFile;
-
-  TCodeInterpreterFileOutput = GenAI.Responses.InputParams.TCodeInterpreterFileOutput;
+  TCodeInterpreterOutputLogs = GenAI.Responses.InputParams.TCodeInterpreterOutputLogs;
 
   TCodeInterpreterToolCall = GenAI.Responses.InputParams.TCodeInterpreterToolCall;
 
@@ -3370,6 +3456,10 @@ type
   TMCPApprovalResponse = GenAI.Responses.InputParams.TMCPApprovalResponse;
 
   TMCPToolCall = GenAI.Responses.InputParams.TMCPToolCall;
+
+  TCustomToolCallOutput = GenAI.Responses.InputParams.TCustomToolCallOutput;
+
+  TCustomToolCall = GenAI.Responses.InputParams.TCustomToolCall;
 
   TReasoningParams = GenAI.Responses.InputParams.TReasoningParams;
 
@@ -3425,9 +3515,21 @@ type
 
   TCustomToolParams = GenAI.Responses.InputParams.TCustomToolParams;
 
+  TWebSearchPreviewParams = GenAI.Responses.InputParams.TWebSearchPreviewParams;
+
   TPromptParams = GenAI.Responses.InputParams.TPromptParams;
 
   TResponsesParams = GenAI.Responses.InputParams.TResponsesParams;
+
+  TWebSearchAction = GenAI.Responses.InputParams.TWebSearchAction;
+
+  TSearchActionSource = GenAI.Responses.InputParams.TSearchActionSource;
+
+  TSearchAction = GenAI.Responses.InputParams.TSearchAction;
+
+  TOpenPageAction = GenAI.Responses.InputParams.TOpenPageAction;
+
+  TFindAction = GenAI.Responses.InputParams.TFindAction;
 
   TInputImageMaskParams = GenAI.Responses.InputParams.TInputImageMaskParams;
 
@@ -3713,6 +3815,623 @@ type
 
   {$ENDREGION}
 
+  {$REGION 'GenAI.Conversations'}
+
+  TConversationsParams = GenAI.Conversations.TConversationsParams;
+
+  TUpdateConversationsParams = GenAI.Conversations.TUpdateConversationsParams;
+
+  TUrlListItemsParams = GenAI.Conversations.TUrlListItemsParams;
+
+  TConversationsItemParams = GenAI.Conversations.TConversationsItemParams;
+
+  TConversations = GenAI.Conversations.TConversations;
+
+  TAsynConversations = GenAI.Conversations.TAsynConversations;
+
+  TPromiseConversations = GenAI.Conversations.TPromiseConversations;
+
+  TConversationsDeleted = GenAI.Conversations.TConversationsDeleted;
+
+  TAsynConversationsDeleted = GenAI.Conversations.TAsynConversationsDeleted;
+
+  TPromiseConversationsDeleted = GenAI.Conversations.TPromiseConversationsDeleted;
+
+  TConversationList = GenAI.Conversations.TConversationList;
+
+  TAsynConversationList = GenAI.Conversations.TAsynConversationList;
+
+  TPromiseConversationList = GenAI.Conversations.TPromiseConversationList;
+
+  TConversationsItem = GenAI.Conversations.TConversationsItem;
+
+  TAsynConversationsItem = GenAI.Conversations.TAsynConversationsItem;
+
+  TPromiseConversationsItem = GenAI.Conversations.TPromiseConversationsItem;
+
+  {$ENDREGION}
+
+  {$REGION 'GenAI.Video'}
+
+  TVideoParams = GenAI.Video.TVideoParams;
+
+  TRemixParams = GenAI.Video.TRemixParams;
+
+  TUrlVideoParams = GenAI.Video.TUrlVideoParams;
+
+  TVideoJob = GenAI.Video.TVideoJob;
+
+  TVideoJobList = GenAI.Video.TVideoJobList;
+
+  /// <summary>
+  /// Represents a downloaded video payload returned by the API.
+  /// </summary>
+  /// <remarks>
+  /// <para>
+  /// The <c>Data</c> property stores the video content as a Base64-encoded string.
+  /// Use <see cref="SaveToFile"/> to decode and persist the video to disk as an MP4 (or any
+  /// binary format provided by the API).
+  /// </para>
+  /// <para>
+  /// This class is a lightweight container meant to integrate with asynchronous flows:
+  /// obtain an instance from the download route, then call <c>SaveToFile</c> when you are
+  /// ready to write the file.
+  /// </para>
+  /// </remarks>
+  TVideoDownloaded = GenAI.Video.TVideoDownloaded;
+
+  /// <summary>
+  /// Asynchronous callback wrapper for operations that return a <c>TVideoJob</c> result.
+  /// </summary>
+  /// <remarks>
+  /// <para>
+  /// Alias of <c>TAsynCallBack&lt;TVideoJob&gt;</c>. Exposes the framework’s event-driven async lifecycle
+  /// for video-job requests (e.g., create, remix, retrieve, delete), enabling non-blocking execution
+  /// with dispatcher-safe notifications.
+  /// </para>
+  /// <para>
+  /// Typical handlers include <c>OnStart</c> (invoked when the request begins), <c>OnSuccess</c>
+  /// (delivering the resolved <c>TVideoJob</c>), and <c>OnError</c> (propagating failures).
+  /// </para>
+  /// <para>
+  /// The resulting <c>TVideoJob</c> inherits <c>TJSONFingerprint</c>, providing access to the raw API
+  /// payload via <c>JSONResponse</c> alongside structured fields such as <c>Status</c>, <c>Progress</c>,
+  /// <c>Model</c>, and timestamps.
+  /// </para>
+  /// <para>
+  /// Use this alias with asynchronous route methods like <c>TVideoRoute.AsynCreate</c>,
+  /// <c>TVideoRoute.AsynRemix</c>, <c>TVideoRoute.AsynRetrieve</c>, or <c>TVideoRoute.AsynDelete</c>
+  /// to keep intent explicit and preserve strong typing of the callback payload.
+  /// </para>
+  /// </remarks>
+  TAsynVideoJob = GenAI.Video.TAsynVideoJob;
+
+  /// <summary>
+  /// Promise-style asynchronous wrapper for operations that return a <c>TVideoJob</c> result.
+  /// </summary>
+  /// <remarks>
+  /// <para>
+  /// Alias of <c>TPromiseCallBack&lt;TVideoJob&gt;</c>. Provides a promise-oriented async flow for
+  /// video-job operations (e.g., create, remix, retrieve, delete), enabling structured chaining,
+  /// continuation, and centralized error handling.
+  /// </para>
+  /// <para>
+  /// Standard promise handlers include <c>OnStart</c> (triggered when the request begins),
+  /// <c>OnSuccess</c> (resolve, invoked with the completed <c>TVideoJob</c>), and
+  /// <c>OnError</c> (reject, invoked on failure).
+  /// </para>
+  /// <para>
+  /// Use this alias with await-style route methods (e.g., <c>TVideoRoute.AsyncAwaitCreate</c>,
+  /// <c>TVideoRoute.AsyncAwaitRemix</c>, <c>TVideoRoute.AsyncAwaitRetrieve</c>,
+  /// <c>TVideoRoute.AsyncAwaitDelete</c>) to keep intent explicit while preserving strong typing of
+  /// the promised payload.
+  /// </para>
+  /// <para>
+  /// The resolved <c>TVideoJob</c> inherits <c>TJSONFingerprint</c>, exposing the raw API payload
+  /// via <c>JSONResponse</c> in addition to structured fields such as <c>Status</c>, <c>Progress</c>,
+  /// <c>Model</c>, and timestamps.
+  /// </para>
+  /// </remarks>
+  TPromiseVideoJob = GenAI.Video.TPromiseVideoJob;
+
+  /// <summary>
+  /// Asynchronous callback wrapper for operations that return a <c>TVideoJobList</c> result.
+  /// </summary>
+  /// <remarks>
+  /// <para>
+  /// Alias of <c>TAsynCallBack&lt;TVideoJobList&gt;</c>. Provides the framework’s event-driven asynchronous
+  /// lifecycle for list operations on video jobs (e.g., enumeration, pagination, or library management),
+  /// allowing non-blocking execution with dispatcher-safe notifications.
+  /// </para>
+  /// <para>
+  /// Typical handlers include <c>OnStart</c> (invoked when the listing request begins),
+  /// <c>OnSuccess</c> (delivering the resolved <c>TVideoJobList</c> payload), and
+  /// <c>OnError</c> (triggered on failure or network error).
+  /// </para>
+  /// <para>
+  /// Use this alias with asynchronous methods such as <c>TVideoRoute.AsynList</c> to keep the intent explicit
+  /// and preserve strong typing of the callback payload.
+  /// </para>
+  /// <para>
+  /// The resulting <c>TVideoJobList</c> inherits <c>TJSONFingerprint</c> and provides pagination
+  /// metadata (<c>FirstId</c>, <c>LastId</c>, <c>HasMore</c>) along with a collection of <c>TVideoJob</c>
+  /// instances accessible via the <c>Data</c> property.
+  /// </para>
+  /// </remarks>
+  TAsynVideoJobList = GenAI.Video.TAsynVideoJobList;
+
+  /// <summary>
+  /// Promise-style asynchronous wrapper for operations that return a <c>TVideoJobList</c> result.
+  /// </summary>
+  /// <remarks>
+  /// <para>
+  /// Alias of <c>TPromiseCallBack&lt;TVideoJobList&gt;</c>. Provides a promise-based asynchronous workflow
+  /// for list operations on video jobs (such as pagination, enumeration, or batch retrieval), enabling
+  /// structured chaining, continuation, and centralized error handling.
+  /// </para>
+  /// <para>
+  /// Standard promise handlers include <c>OnStart</c> (triggered when the listing request begins),
+  /// <c>OnSuccess</c> (resolve, invoked when the operation completes successfully with a
+  /// <c>TVideoJobList</c> payload), and <c>OnError</c> (reject, invoked in case of network or
+  /// server failure).
+  /// </para>
+  /// <para>
+  /// Use this alias with await-style methods such as <c>TVideoRoute.AsyncAwaitList</c> to make the
+  /// intent explicit while maintaining strong typing of the promised payload.
+  /// </para>
+  /// <para>
+  /// The resolved <c>TVideoJobList</c> inherits <c>TJSONFingerprint</c> and includes pagination
+  /// markers (<c>FirstId</c>, <c>LastId</c>, <c>HasMore</c>) along with a strongly typed array of
+  /// <c>TVideoJob</c> instances available through the <c>Data</c> property.
+  /// </para>
+  /// </remarks>
+  TPromiseVideoJobList = GenAI.Video.TPromiseVideoJobList;
+
+  /// <summary>
+  /// Asynchronous callback wrapper for operations that return a <c>TVideoDownloaded</c> result.
+  /// </summary>
+  /// <remarks>
+  /// <para>
+  /// Alias of <c>TAsynCallBack&lt;TVideoDownloaded&gt;</c>. Provides an event-driven asynchronous
+  /// lifecycle for video download operations, enabling non-blocking execution with thread-safe
+  /// callbacks and UI-friendly notifications.
+  /// </para>
+  /// <para>
+  /// Typical handlers include <c>OnStart</c> (triggered when the download begins),
+  /// <c>OnSuccess</c> (invoked when the download completes successfully with a
+  /// <c>TVideoDownloaded</c> payload), and <c>OnError</c> (triggered on failure or connection error).
+  /// </para>
+  /// <para>
+  /// Use this alias with asynchronous methods such as <c>TVideoRoute.AsynDownload</c> to keep the
+  /// intent explicit and maintain strong typing of the callback payload.
+  /// </para>
+  /// <para>
+  TAsynVideoDownloaded = GenAI.Video.TAsynVideoDownloaded;
+
+  /// <summary>
+  /// Promise-style asynchronous wrapper for operations that return a <c>TVideoDownloaded</c> result.
+  /// </summary>
+  /// <remarks>
+  /// <para>
+  /// Alias of <c>TPromiseCallBack&lt;TVideoDownloaded&gt;</c>. Provides a promise-based asynchronous
+  /// workflow for video download operations, enabling structured chaining, continuation, and error
+  /// handling in non-blocking execution flows.
+  /// </para>
+  /// <para>
+  /// Standard promise handlers include <c>OnStart</c> (triggered when the download begins),
+  /// <c>OnSuccess</c> (resolve, invoked when the operation completes successfully with a
+  /// <c>TVideoDownloaded</c> payload), and <c>OnError</c> (reject, invoked in case of failure).
+  /// </para>
+  /// <para>
+  /// Use this alias with await-style methods such as <c>TVideoRoute.AsyncAwaitDownload</c> to
+  /// preserve strong typing of the result and maintain clear intent for asynchronous file retrieval.
+  /// </para>
+  /// <para>
+  /// The resolved <c>TVideoDownloaded</c> instance contains a Base64-encoded representation of
+  /// the binary video data accessible via the <c>Data</c> property. To persist the video on disk,
+  /// call <see cref="TVideoDownloaded.SaveToFile"/> with the desired output path and file name.
+  /// </para>
+  /// </remarks>
+  TPromiseVideoDownloaded = GenAI.Video.TPromiseVideoDownloaded;
+
+  {$ENDREGION}
+
+  {$REGION 'GenAI.Containers'}
+
+  TContainerParams = GenAI.Containers.TContainerParams;
+
+  TUrlContainerParams = GenAI.Containers.TUrlContainerParams;
+
+  TContainer = GenAI.Containers.TContainer;
+
+  TContainerList = GenAI.Containers.TContainerList;
+
+  TContainersDelete = GenAI.Containers.TContainersDelete;
+
+  /// <summary>
+  /// Asynchronous callback wrapper for operations that return a <c>TContainer</c> result.
+  /// </summary>
+  /// <remarks>
+  /// <para>
+  /// Alias of <c>TAsynCallBack&lt;TContainer&gt;</c>. Exposes the framework’s event-driven async
+  /// lifecycle for container operations (create, list, retrieve, delete) with dispatcher-safe notifications.
+  /// </para>
+  /// <para>
+  /// Typical handlers include <c>OnStart</c> (invoked when the request begins), <c>OnSuccess</c>
+  /// (delivering the resolved <c>TContainer</c>), and <c>OnError</c> (propagating failures).
+  /// </para>
+  /// <para>
+  /// Use this alias with route methods such as <c>TContainersRoute.AsynCreate</c>,
+  /// <c>TContainersRoute.AsynRetrieve</c>, and <c>TContainersRoute.AsynDelete</c>. For list operations,
+  /// prefer <c>TAsynContainerList</c>.
+  /// </para>
+  /// <para>
+  /// The resulting <c>TContainer</c> inherits <c>TJSONFingerprint</c> and surfaces fields including
+  /// <c>Id</c>, <c>Name</c>, <c>Status</c>, <c>CreatedAt</c>, and <c>ExpiresAfter</c> (anchor/minutes).
+  /// </para>
+  /// </remarks>
+  TAsynContainer = GenAI.Containers.TAsynContainer;
+
+  /// <summary>
+  /// Promise-style asynchronous wrapper for operations that return a <c>TContainer</c> result.
+  /// </summary>
+  /// <remarks>
+  /// <para>
+  /// Alias of <c>TPromiseCallBack&lt;TContainer&gt;</c>. Provides a promise-based asynchronous workflow
+  /// for container operations (create, retrieve, delete), enabling structured chaining, continuation,
+  /// and centralized error handling in non-blocking flows.
+  /// </para>
+  /// <para>
+  /// Standard promise handlers include <c>OnStart</c> (triggered when the request begins),
+  /// <c>OnSuccess</c> (resolve, invoked with the completed <c>TContainer</c>), and
+  /// <c>OnError</c> (reject, invoked on failure).
+  /// </para>
+  /// <para>
+  /// Use this alias with await-style methods such as <c>TContainersRoute.AsyncAwaitCreate</c>,
+  /// <c>TContainersRoute.AsyncAwaitRetrieve</c>, or <c>TContainersRoute.AsyncAwaitDelete</c> to keep
+  /// intent explicit while preserving strong typing of the promised payload.
+  /// </para>
+  /// <para>
+  /// The resolved <c>TContainer</c> inherits <c>TJSONFingerprint</c> and exposes fields such as
+  /// <c>Id</c>, <c>Name</c>, <c>Status</c>, <c>CreatedAt</c>, and <c>ExpiresAfter</c> (anchor/minutes),
+  /// along with the raw API payload accessible through the <c>JSONResponse</c> property.
+  /// </para>
+  /// </remarks>
+  TPromiseContainer = GenAI.Containers.TPromiseContainer;
+
+  /// <summary>
+  /// Asynchronous callback wrapper for operations that return a <c>TContainerList</c> result.
+  /// </summary>
+  /// <remarks>
+  /// <para>
+  /// Alias of <c>TAsynCallBack&lt;TContainerList&gt;</c>. Exposes the framework’s event-driven asynchronous
+  /// lifecycle for list operations on containers (e.g., enumeration, pagination, or workspace management),
+  /// enabling non-blocking execution with dispatcher-safe notifications.
+  /// </para>
+  /// <para>
+  /// Typical handlers include <c>OnStart</c> (invoked when the listing request begins),
+  /// <c>OnSuccess</c> (delivering the resolved <c>TContainerList</c> payload), and
+  /// <c>OnError</c> (triggered on failure or network error).
+  /// </para>
+  /// <para>
+  /// Use this alias with asynchronous methods such as <c>TContainersRoute.AsynList</c> to keep intent explicit
+  /// and preserve strong typing of the callback payload.
+  /// </para>
+  /// <para>
+  /// The resulting <c>TContainerList</c> inherits <c>TJSONFingerprint</c> and provides pagination
+  /// metadata (<c>FirstId</c>, <c>LastId</c>, <c>HasMore</c>) along with a strongly typed collection of
+  /// <c>TContainer</c> instances accessible through the <c>Data</c> property.
+  /// </para>
+  /// </remarks>
+  TAsynContainerList = GenAI.Containers.TAsynContainerList;
+
+  /// <summary>
+  /// Promise-style asynchronous wrapper for operations that return a <c>TContainerList</c> result.
+  /// </summary>
+  /// <remarks>
+  /// <para>
+  /// Alias of <c>TPromiseCallBack&lt;TContainerList&gt;</c>. Provides a promise-based asynchronous workflow
+  /// for container list operations (such as pagination, enumeration, or bulk retrieval), enabling structured
+  /// chaining, continuation, and centralized error handling in non-blocking flows.
+  /// </para>
+  /// <para>
+  /// Standard promise handlers include <c>OnStart</c> (triggered when the request begins),
+  /// <c>OnSuccess</c> (resolve, invoked when the operation completes successfully with a
+  /// <c>TContainerList</c> payload), and <c>OnError</c> (reject, invoked in case of network or
+  /// server failure).
+  /// </para>
+  /// <para>
+  /// Use this alias with await-style methods such as <c>TContainersRoute.AsyncAwaitList</c> to make the
+  /// intent explicit while maintaining strong typing of the promised payload.
+  /// </para>
+  /// <para>
+  /// The resolved <c>TContainerList</c> inherits <c>TJSONFingerprint</c> and includes pagination markers
+  /// (<c>FirstId</c>, <c>LastId</c>, <c>HasMore</c>) along with a strongly typed array of <c>TContainer</c>
+  /// instances accessible via the <c>Data</c> property.
+  /// </para>
+  /// </remarks>
+  TPromiseContainerList = GenAI.Containers.TPromiseContainerList;
+
+  /// <summary>
+  /// Asynchronous callback wrapper for operations that return a <c>TContainersDelete</c> result.
+  /// </summary>
+  /// <remarks>
+  /// <para>
+  /// Alias of <c>TAsynCallBack&lt;TContainersDelete&gt;</c>. Exposes the framework’s event-driven asynchronous
+  /// lifecycle for container deletion operations, enabling non-blocking execution with dispatcher-safe and
+  /// UI-friendly notifications.
+  /// </para>
+  /// <para>
+  /// Typical handlers include <c>OnStart</c> (invoked when the deletion request begins),
+  /// <c>OnSuccess</c> (delivering the resolved <c>TContainersDelete</c> payload), and
+  /// <c>OnError</c> (triggered on failure or connection error).
+  /// </para>
+  /// <para>
+  /// Use this alias with asynchronous methods such as <c>TContainersRoute.AsynDelete</c> to make the intent
+  /// explicit and preserve strong typing of the callback payload.
+  /// </para>
+  /// <para>
+  /// The resulting <c>TContainersDelete</c> inherits <c>TJSONFingerprint</c> and provides information about
+  /// the deleted container, including its <c>Id</c>, <c>Object</c> type (always <c>container.deleted</c>),
+  /// and the <c>Deleted</c> flag confirming the deletion.
+  /// </para>
+  /// </remarks>
+  TAsynContainersDelete = GenAI.Containers.TAsynContainersDelete;
+
+  /// <summary>
+  /// Promise-style asynchronous wrapper for operations that return a <c>TContainersDelete</c> result.
+  /// </summary>
+  /// <remarks>
+  /// <para>
+  /// Alias of <c>TPromiseCallBack&lt;TContainersDelete&gt;</c>. Provides a promise-based asynchronous
+  /// workflow for container deletion operations, enabling structured chaining, continuation,
+  /// and centralized error handling in non-blocking execution flows.
+  /// </para>
+  /// <para>
+  /// Standard promise handlers include <c>OnStart</c> (triggered when the deletion request begins),
+  /// <c>OnSuccess</c> (resolve, invoked with the completed <c>TContainersDelete</c>), and
+  /// <c>OnError</c> (reject, invoked on failure).
+  /// </para>
+  /// <para>
+  /// Use this alias with await-style methods such as <c>TContainersRoute.AsyncAwaitDelete</c> to keep
+  /// intent explicit while preserving strong typing of the promised payload.
+  /// </para>
+  /// <para>
+  /// The resolved <c>TContainersDelete</c> inherits <c>TJSONFingerprint</c> and provides information about
+  /// the deleted container, including its <c>Id</c>, <c>Object</c> type (always <c>container.deleted</c>),
+  /// and the <c>Deleted</c> flag indicating successful deletion.
+  /// </para>
+  /// </remarks>
+  TPromiseContainersDelete = GenAI.Containers.TPromiseContainersDelete;
+
+  {$ENDREGION}
+
+  {$REGION 'GenAI.ContainerFiles'}
+
+  TContainerFilesParams = GenAI.ContainerFiles.TContainerFilesParams;
+
+  TUrlContainerFileParams = GenAI.ContainerFiles.TUrlContainerFileParams;
+
+  TContainerFile = GenAI.ContainerFiles.TContainerFile;
+
+  TContainerFileList = GenAI.ContainerFiles.TContainerFileList;
+
+  TContainerFilesDelete = GenAI.ContainerFiles.TContainerFilesDelete;
+
+  TContainerFileContent = GenAI.ContainerFiles.TContainerFileContent;
+
+  /// <summary>
+  /// Asynchronous callback wrapper for operations that return a <c>TContainerFile</c> result.
+  /// </summary>
+  /// <remarks>
+  /// <para>
+  /// Alias of <c>TAsynCallBack&lt;TContainerFile&gt;</c>. Exposes the framework’s event-driven async
+  /// lifecycle for container file operations such as upload/create and retrieve, with dispatcher-safe notifications.
+  /// </para>
+  /// <para>
+  /// Typical handlers include <c>OnStart</c> (invoked when the request begins), <c>OnSuccess</c>
+  /// (delivering the resolved <c>TContainerFile</c>), and <c>OnError</c> (propagating failures).
+  /// </para>
+  /// <para>
+  /// Use this alias with route methods like <c>TContainerFilesRoute.AsynCreate</c> and
+  /// <c>TContainerFilesRoute.AsynRetrieve</c>. For list operations, prefer <c>TAsynContainerFileList</c>;
+  /// for deletions, prefer <c>TAsynContainerFilesDelete</c>; and for content reads, prefer
+  /// <c>TAsynContainerFileContent</c>.
+  /// </para>
+  /// <para>
+  /// The resulting <c>TContainerFile</c> inherits <c>TJSONFingerprint</c> and surfaces fields including
+  /// <c>Id</c>, <c>Object</c> (always <c>container.file</c>), <c>CreatedAt</c>, <c>Bytes</c>,
+  /// <c>ContainerId</c>, <c>Path</c>, and <c>Source</c>, along with the raw API payload accessible through
+  /// the <c>JSONResponse</c> property.
+  /// </para>
+  /// </remarks>
+  TAsynContainerFile = GenAI.ContainerFiles.TAsynContainerFile;
+
+  /// <summary>
+  /// Promise-style asynchronous wrapper for operations that return a <c>TContainerFile</c> result.
+  /// </summary>
+  /// <remarks>
+  /// <para>
+  /// Alias of <c>TPromiseCallBack&lt;TContainerFile&gt;</c>. Provides a promise-based asynchronous workflow
+  /// for container file operations such as upload/create, retrieve, or content access, allowing structured chaining,
+  /// continuation, and centralized error handling in non-blocking execution flows.
+  /// </para>
+  /// <para>
+  /// Standard promise handlers include <c>OnStart</c> (triggered when the request begins),
+  /// <c>OnSuccess</c> (resolve, invoked with the completed <c>TContainerFile</c>), and
+  /// <c>OnError</c> (reject, invoked in case of failure or connection error).
+  /// </para>
+  /// <para>
+  /// Use this alias with await-style methods such as <c>TContainerFilesRoute.AsyncAwaitCreate</c>
+  /// or <c>TContainerFilesRoute.AsyncAwaitRetrieve</c> to make the intent explicit while preserving
+  /// strong typing of the promised payload.
+  /// </para>
+  /// <para>
+  /// The resolved <c>TContainerFile</c> inherits <c>TJSONFingerprint</c> and provides fields such as
+  /// <c>Id</c>, <c>Object</c> (always <c>container.file</c>), <c>CreatedAt</c>, <c>Bytes</c>,
+  /// <c>ContainerId</c>, <c>Path</c>, and <c>Source</c>, with the complete API payload accessible through
+  /// the <c>JSONResponse</c> property.
+  /// </para>
+  /// </remarks>
+  TPromiseContainerFile = GenAI.ContainerFiles.TPromiseContainerFile;
+
+  /// <summary>
+  /// Asynchronous callback wrapper for operations that return a <c>TContainerFileList</c> result.
+  /// </summary>
+  /// <remarks>
+  /// <para>
+  /// Alias of <c>TAsynCallBack&lt;TContainerFileList&gt;</c>. Exposes the framework’s event-driven asynchronous
+  /// lifecycle for list operations on container files (e.g., enumeration, pagination, or workspace inspection),
+  /// enabling non-blocking execution with dispatcher-safe notifications.
+  /// </para>
+  /// <para>
+  /// Typical handlers include <c>OnStart</c> (invoked when the listing request begins),
+  /// <c>OnSuccess</c> (delivering the resolved <c>TContainerFileList</c> payload), and
+  /// <c>OnError</c> (triggered on failure or network error).
+  /// </para>
+  /// <para>
+  /// Use this alias with asynchronous methods such as <c>TContainerFilesRoute.AsynList</c> to make the
+  /// intent explicit and preserve strong typing of the callback payload.
+  /// </para>
+  /// <para>
+  /// The resulting <c>TContainerFileList</c> inherits <c>TJSONFingerprint</c> and provides pagination
+  /// metadata (<c>FirstId</c>, <c>LastId</c>, <c>HasMore</c>) along with a strongly typed collection of
+  /// <c>TContainerFile</c> instances accessible through the <c>Data</c> property.
+  /// </para>
+  /// </remarks>
+  TAsynContainerFileList = GenAI.ContainerFiles.TAsynContainerFileList;
+
+  /// <summary>
+  /// Promise-style asynchronous wrapper for operations that return a <c>TContainerFileList</c> result.
+  /// </summary>
+  /// <remarks>
+  /// <para>
+  /// Alias of <c>TPromiseCallBack&lt;TContainerFileList&gt;</c>. Provides a promise-based asynchronous workflow
+  /// for container file list operations (such as enumeration, pagination, or bulk retrieval), enabling structured
+  /// chaining, continuation, and centralized error handling in non-blocking execution flows.
+  /// </para>
+  /// <para>
+  /// Standard promise handlers include <c>OnStart</c> (triggered when the request begins),
+  /// <c>OnSuccess</c> (resolve, invoked with the completed <c>TContainerFileList</c>), and
+  /// <c>OnError</c> (reject, invoked in case of network or server failure).
+  /// </para>
+  /// <para>
+  /// Use this alias with await-style methods such as <c>TContainerFilesRoute.AsyncAwaitList</c> to make the
+  /// intent explicit while maintaining strong typing of the promised payload.
+  /// </para>
+  /// <para>
+  /// The resolved <c>TContainerFileList</c> inherits <c>TJSONFingerprint</c> and includes pagination markers
+  /// (<c>FirstId</c>, <c>LastId</c>, <c>HasMore</c>) along with a strongly typed array of <c>TContainerFile</c>
+  /// instances accessible through the <c>Data</c> property.
+  /// </para>
+  /// </remarks>
+  TPromiseContainerFileList = GenAI.ContainerFiles.TPromiseContainerFileList;
+
+  /// <summary>
+  /// Asynchronous callback wrapper for operations that return a <c>TContainerFilesDelete</c> result.
+  /// </summary>
+  /// <remarks>
+  /// <para>
+  /// Alias of <c>TAsynCallBack&lt;TContainerFilesDelete&gt;</c>. Exposes the framework’s event-driven asynchronous
+  /// lifecycle for container file deletion operations, allowing non-blocking execution with dispatcher-safe and
+  /// UI-friendly notifications.
+  /// </para>
+  /// <para>
+  /// Typical handlers include <c>OnStart</c> (invoked when the deletion request begins),
+  /// <c>OnSuccess</c> (delivering the resolved <c>TContainerFilesDelete</c> payload), and
+  /// <c>OnError</c> (triggered on failure or network error).
+  /// </para>
+  /// <para>
+  /// Use this alias with asynchronous methods such as <c>TContainerFilesRoute.AsynDelete</c> to make the intent
+  /// explicit and preserve strong typing of the callback payload.
+  /// </para>
+  /// <para>
+  /// The resulting <c>TContainerFilesDelete</c> inherits <c>TJSONFingerprint</c> and provides information about
+  /// the deleted container file, including its <c>Id</c>, <c>Object</c> type (always <c>container.file.deleted</c>),
+  /// and the <c>Deleted</c> flag confirming the deletion.
+  /// </para>
+  /// </remarks>
+  TAsynContainerFilesDelete = GenAI.ContainerFiles.TAsynContainerFilesDelete;
+
+  /// <summary>
+  /// Promise-style asynchronous wrapper for operations that return a <c>TContainerFilesDelete</c> result.
+  /// </summary>
+  /// <remarks>
+  /// <para>
+  /// Alias of <c>TPromiseCallBack&lt;TContainerFilesDelete&gt;</c>. Provides a promise-based asynchronous workflow
+  /// for container file deletion operations, enabling structured chaining, continuation, and centralized error
+  /// handling in non-blocking execution flows.
+  /// </para>
+  /// <para>
+  /// Standard promise handlers include <c>OnStart</c> (triggered when the deletion request begins),
+  /// <c>OnSuccess</c> (resolve, invoked with the completed <c>TContainerFilesDelete</c>), and
+  /// <c>OnError</c> (reject, invoked in case of failure or connection error).
+  /// </para>
+  /// <para>
+  /// Use this alias with await-style methods such as <c>TContainerFilesRoute.AsyncAwaitDelete</c> to make the
+  /// intent explicit while preserving strong typing of the promised payload.
+  /// </para>
+  /// <para>
+  /// The resolved <c>TContainerFilesDelete</c> inherits <c>TJSONFingerprint</c> and provides details about
+  /// the deleted container file, including its <c>Id</c>, <c>Object</c> type (always <c>container.file.deleted</c>),
+  /// and the <c>Deleted</c> flag indicating successful deletion.
+  /// </para>
+  /// </remarks>
+  TPromiseContainerFilesDelete = GenAI.ContainerFiles.TPromiseContainerFilesDelete;
+
+  /// <summary>
+  /// Asynchronous callback wrapper for operations that return a <c>TContainerFileContent</c> result.
+  /// </summary>
+  /// <remarks>
+  /// <para>
+  /// Alias of <c>TAsynCallBack&lt;TContainerFileContent&gt;</c>. Exposes the framework’s event-driven asynchronous
+  /// lifecycle for container file content retrieval operations, enabling non-blocking data streaming and
+  /// dispatcher-safe notifications.
+  /// </para>
+  /// <para>
+  /// Typical handlers include <c>OnStart</c> (invoked when the content retrieval begins),
+  /// <c>OnSuccess</c> (delivering the resolved <c>TContainerFileContent</c> payload), and
+  /// <c>OnError</c> (triggered on failure, timeout, or network error).
+  /// </para>
+  /// <para>
+  /// Use this alias with asynchronous methods such as <c>TContainerFilesRoute.AsynGetContent</c> to make the
+  /// intent explicit and preserve strong typing of the callback payload.
+  /// </para>
+  /// <para>
+  /// The resulting <c>TContainerFileContent</c> provides access to the file’s binary data encoded as Base64,
+  /// available via the <c>Data</c> property, and includes helper methods such as <c>AsString</c> to obtain
+  /// a decoded text representation of the file content.
+  /// </para>
+  /// </remarks>
+  TAsynContainerFileContent = GenAI.ContainerFiles.TAsynContainerFileContent;
+
+  /// <summary>
+  /// Promise-style asynchronous wrapper for operations that return a <c>TContainerFileContent</c> result.
+  /// </summary>
+  /// <remarks>
+  /// <para>
+  /// Alias of <c>TPromiseCallBack&lt;TContainerFileContent&gt;</c>. Provides a promise-based asynchronous workflow
+  /// for container file content retrieval operations, enabling structured chaining, continuation, and centralized
+  /// error handling in non-blocking execution flows.
+  /// </para>
+  /// <para>
+  /// Standard promise handlers include <c>OnStart</c> (triggered when the content retrieval begins),
+  /// <c>OnSuccess</c> (resolve, invoked with the completed <c>TContainerFileContent</c>), and
+  /// <c>OnError</c> (reject, invoked in case of network or decoding errors).
+  /// </para>
+  /// <para>
+  /// Use this alias with await-style methods such as <c>TContainerFilesRoute.AsyncAwaitGetContent</c> to make the
+  /// intent explicit while preserving strong typing of the promised payload.
+  /// </para>
+  /// <para>
+  /// The resolved <c>TContainerFileContent</c> provides access to the retrieved file’s binary data encoded in Base64
+  /// through the <c>Data</c> property and includes helper methods like <c>AsString</c> for convenient decoding to text.
+  /// </para>
+  /// </remarks>
+  TPromiseContainerFileContent = GenAI.ContainerFiles.TPromiseContainerFileContent;
+
+  {$ENDREGION}
+
 function FromDeveloper(const Content: string; const Name: string = ''):TMessagePayload;
 function FromSystem(const Content: string; const Name: string = ''):TMessagePayload;
 function FromUser(const Content: string; const Name: string = ''):TMessagePayload; overload;
@@ -3909,6 +4628,10 @@ begin
   FVectorStoreBatchRoute.Free;
   FVectorStoreFilesRoute.Free;
   FResponsesRoute.Free;
+  FConversationsRoute.Free;
+  FVideoRoute.Free;
+  FContainersRoute.Free;
+  FContainerFilesRoute.Free;
   FAPI.Free;
   inherited;
 end;
@@ -3986,7 +4709,7 @@ begin
   Result := FModerationRoute;
 end;
 
-function TGenAI.GetResponses: TResponsesRoute;
+function TGenAI.GetResponsesRoute: TResponsesRoute;
 begin
   if not Assigned(FResponsesRoute) then
     FResponsesRoute := TResponsesRoute.CreateRoute(API);
@@ -4047,6 +4770,13 @@ begin
   Result := VERSION;
 end;
 
+function TGenAI.GetVideoRoute: TVideoRoute;
+begin
+  if not Assigned(FVideoRoute) then
+    FVideoRoute := TVideoRoute.CreateRoute(API);
+  Result := FVideoRoute;
+end;
+
 function TGenAI.GetChatRoute: TChatRoute;
 begin
   if not Assigned(FChatRoute) then
@@ -4059,6 +4789,27 @@ begin
   if not Assigned(FCompletionRoute) then
     FCompletionRoute := TCompletionRoute.CreateRoute(API);
   Result := FCompletionRoute;
+end;
+
+function TGenAI.GetContainerFilesRoute: TContainerFilesRoute;
+begin
+  if not Assigned(FContainerFilesRoute) then
+    FContainerFilesRoute := TContainerFilesRoute.CreateRoute(API);
+  Result := FContainerFilesRoute;
+end;
+
+function TGenAI.GetContainersRoute: TContainersRoute;
+begin
+  if not Assigned(FContainersRoute) then
+    FContainersRoute := TContainersRoute.CreateRoute(API);
+  Result := FContainersRoute;
+end;
+
+function TGenAI.GetConversationsRoute: TConversationsRoute;
+begin
+  if not Assigned(FConversationsRoute) then
+    FConversationsRoute := TConversationsRoute.CreateRoute(API);
+  Result := FConversationsRoute;
 end;
 
 function TGenAI.GetAPIKey: string;

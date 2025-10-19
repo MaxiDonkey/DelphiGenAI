@@ -72,6 +72,185 @@ type
 
 implementation
 
+  {$REGION 'Dev note'}
+
+(*
+    Usage Guide — GenAI.API.Normalizer
+
+    Unit: GenAI.API.Normalizer
+    Purpose: normalize text fields in a JSON (of type JSONString) into an array of objects
+    or a single object of the form { "type": "text", "text": "…" }, according to one or more paths.
+
+
+    1. TL;DR
+
+    * Converts JSON strings into {type,text} (object or array of objects)
+    * Targeted by paths (Path) + wrap type (wkArray, wkObject)
+    * Markers at the end: [] for array, {} for object
+    * Wildcard * to iterate over arrays
+    * Multi-rule application on the same DOM
+
+
+    2. API Overview
+
+    TWrapKind = (wkArray, wkObject);
+
+    TNormalizationRule = record
+    Path: TArray<string>;
+    Wrap: TWrapKind;
+    class function Make(const APath: array of string; AWrap: TWrapKind): TNormalizationRule; static;
+    end;
+
+    Normalize entry points:
+    Normalize(Raw, Path)                       (default: wkArray)
+    Normalize(Raw, Path, Wrap)                 (explicit selection)
+    Normalize(Raw, Rules)                      (multiple (path+wrap))
+    Normalize(Raw, PathsWithMarkers)           (syntax using [] / {})
+
+
+    3. Path Semantics
+
+    * Each Path is an array of keys.
+    * The last segment may be [] or {}.
+    * No marker => default wkArray.
+    * Wildcard * = iterate over array.
+
+    Examples:
+    ['choices','*','message','content']
+    ['data','items','[]']
+    ['payload','note','{}']
+
+
+    4. Normalization Behavior
+
+    * Already correct type => no-op.
+    * Null => no-op.
+    * JSONString => replaced by array or object depending on Wrap.
+    * Other types => exception.
+    * Missing path or invalid JSON => Raw returned unchanged.
+
+
+    5. Examples
+
+      5.1 Single path => array
+    Raw = '{"message":{"content":"Hello"}}';
+    Normalize(Raw, ['message','content']);
+    -> {"message":{"content":[{"type":"text","text":"Hello"}]}}
+
+      5.2 Single path => object
+    Normalize(Raw, ['message','content'], wkObject);
+    -> {"message":{"content":{"type":"text","text":"Hello"}}}
+
+      5.3 Wildcard *
+    Raw = '{"choices":[{"message":{"content":"A"}},{"message":{"content":"B"}}]}';
+    Normalize(Raw, ['choices','*','message','content']);
+    -> each content becomes an array of {type,text}
+
+      5.4 Multi-rules
+    Rules = [
+    Make(['choices','*','message','content'], wkArray),
+    Make(['usage','note'], wkObject)
+    ];
+    Normalize(Raw, Rules);
+
+      5.5 Markers
+    Normalize(Raw, [
+    ['choices','*','message','content','[]'],
+    ['usage','note','{}']
+    ]);
+
+      5.6 Missing key => no-op
+      5.7 Already normalized => no-op
+      5.8 null => no-op
+      5.9 Unsupported type => exception
+
+
+    6. Multi-rule Application
+
+    * Rules are applied sequentially on the same DOM.
+    * Order: from higher-level to deeper-level paths.
+
+
+    7. Performance and Safety
+
+    * O(n) on JSON size.
+    * Thread-safe (no global state).
+    * Proper cleanup via try/finally.
+
+
+    8. Error Handling
+
+    * Invalid JSON or missing path => Raw unchanged.
+    * Unexpected type => explicit exception with key and class name.
+
+
+    9. Best Practices
+
+    * Unit-test your paths.
+    * Prefer marker-based API for readability.
+    * Compose multiple rules rather than ad-hoc code.
+    * No implicit key creation.
+    * Handle null explicitly if needed.
+
+
+    10. FAQ
+
+    * Multiple targets? Yes, via multi-rules.
+    * Force array when it’s already an object? No-op.
+    * Wildcard * on object? No, only on arrays.
+    * Empty path? Raw unchanged.
+
+
+    11. Full Example
+
+    Before:
+    {
+    "choices":[{"message":{"content":"Hello"}}]
+    }
+
+    After:
+    Normalize(Raw, ['choices','*','message','content']);
+    {
+    "choices":[{"message":{"content":[{"type":"text","text":"Hello"}]}}]
+    }
+
+
+    12. Limitations / Design
+
+    * No creation of missing keys.
+    * No object<->array conversion.
+    * Only JSONString values are transformed.
+    * Exception if unexpected type.
+
+
+    13. Type-safe Tip
+        Encapsulate paths:
+
+    type
+
+      TPath = record
+        class function MsgContent: TArray<string>; static;
+      end;
+
+    class function TPath.MsgContent: TArray<string>;
+    begin
+      Result := ['choices','*','message','content'];
+    end;
+
+    out := TJSONNormalizer.Normalize(raw, TPath.MsgContent);
+
+
+    14. Feature Coverage
+        ✓ Multi-rules
+        ✓ Wildcard *
+        ✓ Markers [] / {}
+        ✓ No-op on null or already normalized
+        ✓ Exception on unexpected type
+
+*)
+
+  {$ENDREGION}
+
 { TNormalizationRule }
 
 class function TNormalizationRule.Make(const APath: array of string; AWrap: TWrapKind): TNormalizationRule;

@@ -24,6 +24,7 @@ const
   ReasoningModels: TArray<string> = ['o1', 'o1-mini', 'o1-pro', 'o3', 'o3-mini', 'o4-mini'];
 
 function IsReasoningModel(const Value: string): Boolean;
+function MimeTypeToAudioType(const MimeType: string): string;
 
 implementation
 
@@ -33,6 +34,16 @@ uses
 function IsReasoningModel(const Value: string): Boolean;
 begin
   Result := IndexStr(Value.Trim.Tolower, ReasoningModels) > -1;
+end;
+
+function MimeTypeToAudioType(const MimeType: string): string;
+begin
+  if MimeType = 'audio/wav' then
+    Exit('wav');
+  if MimeType = 'audio/mpeg' then
+    Exit('mp3');
+
+  raise Exception.Create('mp3 or wav audio files accepted');
 end;
 
 end.

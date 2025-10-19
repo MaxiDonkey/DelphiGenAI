@@ -7,6 +7,8 @@ unit GenAI.RunSteps;
 
  ------------------------------------------------------------------------------}
 
+{--- deprecated unit use conversations }
+
 interface
 
 uses
@@ -513,7 +515,7 @@ type
     /// <param name="CallBacks">Callback functions to handle the asynchronous execution.</param>
     procedure AsynList(const ThreadId: string;
       const RunId: string;
-      const CallBacks: TFunc<TAsynRunSteps>); overload;
+      const CallBacks: TFunc<TAsynRunSteps>); overload; deprecated;
     /// <summary>
     /// Asynchronously retrieves a filtered list of run steps based on specified parameters.
     /// </summary>
@@ -524,7 +526,7 @@ type
     procedure AsynList(const ThreadId: string;
       const RunId: string;
       const ParamProc: TProc<TRunStepUrlParam>;
-      const CallBacks: TFunc<TAsynRunSteps>); overload;
+      const CallBacks: TFunc<TAsynRunSteps>); overload; deprecated;
     /// <summary>
     /// Asynchronously retrieves details of a specific run step.
     /// </summary>
@@ -535,7 +537,7 @@ type
     procedure AsynRetrieve(const ThreadId: string;
       const RunId: string;
       const StepId: string;
-      const CallBacks: TFunc<TAsynRunStep>); overload;
+      const CallBacks: TFunc<TAsynRunStep>); overload; deprecated;
     /// <summary>
     /// Asynchronously retrieves details of a specific run step with additional options.
     /// </summary>
@@ -548,7 +550,7 @@ type
       const RunId: string;
       const StepId: string;
       const ParamProc: TProc<TRetrieveStepUrlParam>;
-      const CallBacks: TFunc<TAsynRunStep>); overload;
+      const CallBacks: TFunc<TAsynRunStep>); overload; deprecated;
     /// <summary>
     /// Retrieves a list of run steps associated with a specific execution run.
     /// </summary>
@@ -564,7 +566,7 @@ type
     /// <param name="ParamProc">A procedure specifying the filter parameters for the list.</param>
     /// <returns>A list of <c>TRunStep</c> objects representing the filtered steps.</returns>
     function List(const ThreadId: string; const RunId: string;
-      const ParamProc: TProc<TRunStepUrlParam>): TRunSteps; overload;
+      const ParamProc: TProc<TRunStepUrlParam>): TRunSteps; overload; deprecated;
     /// <summary>
     /// Retrieves details of a specific run step within an execution run.
     /// </summary>
@@ -573,7 +575,7 @@ type
     /// <param name="StepId">The ID of the run step to retrieve.</param>
     /// <returns>A <c>TRunStep</c> object containing the details of the specified run step.</returns>
     function Retrieve(const ThreadId: string; const RunId: string;
-      const StepId: string): TRunStep; overload;
+      const StepId: string): TRunStep; overload; deprecated;
     /// <summary>
     /// Retrieves details of a specific run step with additional options.
     /// </summary>
@@ -583,7 +585,7 @@ type
     /// <param name="ParamProc">A procedure specifying additional options for the retrieval.</param>
     /// <returns>A <c>TRunStep</c> object containing the details of the specified run step.</returns>
     function Retrieve(const ThreadId: string; const RunId: string;
-      const StepId: string; const ParamProc: TProc<TRetrieveStepUrlParam>): TRunStep; overload;
+      const StepId: string; const ParamProc: TProc<TRetrieveStepUrlParam>): TRunStep; overload; deprecated;
   end;
 
 implementation

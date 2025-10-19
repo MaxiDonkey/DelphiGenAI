@@ -7,6 +7,8 @@ unit GenAI.Threads;
 
  ------------------------------------------------------------------------------}
 
+{--- deprecated unit use conversations }
+
 interface
 
 uses
@@ -405,14 +407,14 @@ type
     /// <param name="CallBacks">
     /// A set of callback functions to handle the asynchronous response.
     /// </param>
-    procedure AsynCreate(const ParamProc: TProc<TThreadsCreateParams>; const CallBacks: TFunc<TAsynThreads>); overload;
+    procedure AsynCreate(const ParamProc: TProc<TThreadsCreateParams>; const CallBacks: TFunc<TAsynThreads>); overload; deprecated;
     /// <summary>
     /// Asynchronously creates a new thread using the default parameters and callback functions.
     /// </summary>
     /// <param name="CallBacks">
     /// A set of callback functions to handle the asynchronous response.
     /// </param>
-    procedure AsynCreate(const CallBacks: TFunc<TAsynThreads>); overload;
+    procedure AsynCreate(const CallBacks: TFunc<TAsynThreads>); overload; deprecated;
     /// <summary>
     /// Asynchronously retrieves a thread by its ID.
     /// </summary>
@@ -422,7 +424,7 @@ type
     /// <param name="CallBacks">
     /// A set of callback functions to handle the asynchronous response.
     /// </param>
-    procedure AsynRetrieve(const ThreadId: string; const CallBacks: TFunc<TAsynThreads>);
+    procedure AsynRetrieve(const ThreadId: string; const CallBacks: TFunc<TAsynThreads>); deprecated;
     /// <summary>
     /// Asynchronously modifies an existing thread using the specified parameters and callback functions.
     /// </summary>
@@ -436,7 +438,7 @@ type
     /// A set of callback functions to handle the asynchronous response.
     /// </param>
     procedure AsynModify(const ThreadId: string; const ParamProc: TProc<TThreadsModifyParams>;
-      const CallBacks: TFunc<TAsynThreads>);
+      const CallBacks: TFunc<TAsynThreads>); deprecated;
     /// <summary>
     /// Asynchronously deletes a thread by its ID.
     /// </summary>
@@ -446,7 +448,7 @@ type
     /// <param name="CallBacks">
     /// A set of callback functions to handle the asynchronous response.
     /// </param>
-    procedure AsynDelete(const ThreadId: string; const CallBacks: TFunc<TAsynDeletion>);
+    procedure AsynDelete(const ThreadId: string; const CallBacks: TFunc<TAsynDeletion>); deprecated;
     /// <summary>
     /// Synchronously creates a new thread using the specified parameters.
     /// </summary>
@@ -456,7 +458,7 @@ type
     /// <returns>
     /// The created thread object.
     /// </returns>
-    function Create(const ParamProc: TProc<TThreadsCreateParams> = nil): TThreads;
+    function Create(const ParamProc: TProc<TThreadsCreateParams> = nil): TThreads; deprecated;
     /// <summary>
     /// Synchronously retrieves a thread by its ID.
     /// </summary>
@@ -466,7 +468,7 @@ type
     /// <returns>
     /// The retrieved thread object.
     /// </returns>
-    function Retrieve(const ThreadId: string): TThreads;
+    function Retrieve(const ThreadId: string): TThreads; deprecated;
     /// <summary>
     /// Synchronously modifies an existing thread using the specified parameters.
     /// </summary>
@@ -479,7 +481,7 @@ type
     /// <returns>
     /// The modified thread object.
     /// </returns>
-    function Modify(const ThreadId: string; const ParamProc: TProc<TThreadsModifyParams>): TThreads;
+    function Modify(const ThreadId: string; const ParamProc: TProc<TThreadsModifyParams>): TThreads; deprecated;
     /// <summary>
     /// Synchronously deletes a thread by its ID.
     /// </summary>
@@ -489,7 +491,7 @@ type
     /// <returns>
     /// The deletion status of the thread.
     /// </returns>
-    function Delete(const ThreadId: string): TDeletion;
+    function Delete(const ThreadId: string): TDeletion; deprecated;
   end;
 
 implementation

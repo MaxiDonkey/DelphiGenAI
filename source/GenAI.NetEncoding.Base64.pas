@@ -251,7 +251,8 @@ begin
   var MimeType := GetMimeType(Value);
   var AcceptedMimeType :=
         (IndexStr(MimeType, ImageTypeAccepted) > -1) or
-        (IndexStr(MimeType, DocTypeAccepted) > -1);
+        (IndexStr(MimeType, DocTypeAccepted) > -1) or
+        (IndexStr(MimeType, AudioTypeAccepted) > -1);
 
   if not AcceptedMimeType then
     raise Exception.Create('Unsupported mime type');

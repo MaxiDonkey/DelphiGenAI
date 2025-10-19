@@ -1,5 +1,6 @@
 # Responses
 
+- [Conversations](#conversations)
 - [Text generation](#text-generation)
     - [Non streamed](#non-streamed) 
     - [Streamed](#streamed)
@@ -34,6 +35,17 @@
 - [Image generation](#image-generation)
 - [Remote MCP](#remote-mcp)
 - [Code Interpreter](#code-interpreter)
+- [Introduction to deep research in the OpenAI API](#introduction-to-deep-research-in-the-openai-api)
+
+<br>
+
+___
+
+## Conversations
+
+You can create a conversation from scratch and inject it into the request. For more details, refer to the section on [`conversations`](Conversations.md#conversations).
+
+This makes it possible to build and enrich the context in order to obtain a more relevant response.
 
 <br>
 
@@ -42,6 +54,8 @@ ___
 ## Text generation
 
 This interface represents OpenAI’s most advanced environment for driving model-generated responses. It supports both text and image inputs and outputs, and enables chaining interactions by automatically feeding the results of one turn back into the next. A suite of built-in tools (file exploration, web searches, system command execution, etc.) enhances the model’s capabilities. Additionally, function calls allow access to external systems and data to enrich interactions. 
+
+You can create a conversation from scratch and inject it into the request. For more details, refer to the section on [`conversations`](Conversations.md#conversations).
 
 >[!NOTE]
 > - if the `store` parameter is not specified in the request, its default value is `true`.
@@ -60,6 +74,7 @@ This interface represents OpenAI’s most advanced environment for driving model
       Params.Model('gpt-4.1-mini');
       Params.Input('What is the difference between a mathematician and a physicist?');
       Params.Store(False);  // Response not stored
+      //Params.conversation('conv_68f4de2260348193b6cbaa1a55d6673905e7c3018568d016'); to use conversation
       TutorialHub.JSONRequest := Params.ToFormat();
     end,
     function : TAsynResponse
@@ -1794,3 +1809,16 @@ Refer to [official documentation](https://platform.openai.com/docs/guides/tools-
       ]);
 ...
 ```
+
+You can now create and manage your containers by injecting the code you want to work on.
+
+To do so, refer to the documentation on `containers`, as well as the section on file containers (`containerfiles`) available through this [link](Containers.md#containers-managment).
+
+<br>
+
+## Introduction to deep research in the OpenAI API
+
+The **OpenAI Deep Research API** enables automation of complex research workflows that require reasoning, planning, and synthesis across real-world information.
+Unlike ChatGPT, where these steps are abstracted, the API provides direct programmatic access: the model breaks down the query into sub-tasks, performs web searches, executes code when needed, and returns a structured, citation-rich report.
+
+For more details, please refer to OpenAI’s [official documentation](https://cookbook.openai.com/examples/deep_research_api/introduction_to_deep_research_api).

@@ -9,6 +9,8 @@ unit GenAI.Assistants;
 
  (*
 
+  --- deprecated unit use conversations
+
   GenAI.Assistants - OpenAI Assistants API Integration
   -----------------------------------------------------
 
@@ -1180,14 +1182,14 @@ type
     /// <param name="CallBacks">
     /// A callback function to handle the asynchronous response.
     /// </param>
-    procedure AsynCreate(const ParamProc: TProc<TAssistantsParams>; const CallBacks: TFunc<TAsynAssistant>);
+    procedure AsynCreate(const ParamProc: TProc<TAssistantsParams>; const CallBacks: TFunc<TAsynAssistant>); deprecated;
     /// <summary>
     /// Asynchronously retrieves a list of assistants.
     /// </summary>
     /// <param name="CallBacks">
     /// A callback function to handle the asynchronous response.
     /// </param>
-    procedure AsynList(const CallBacks: TFunc<TAsynAssistants>); overload;
+    procedure AsynList(const CallBacks: TFunc<TAsynAssistants>); overload; deprecated;
     /// <summary>
     /// Asynchronously retrieves a list of assistants with additional parameters.
     /// </summary>
@@ -1198,7 +1200,7 @@ type
     /// <param name="CallBacks">
     /// A callback function to handle the asynchronous response.
     /// </param>
-    procedure AsynList(const ParamProc: TProc<TUrlAdvancedParams>; const CallBacks: TFunc<TAsynAssistants>); overload;
+    procedure AsynList(const ParamProc: TProc<TUrlAdvancedParams>; const CallBacks: TFunc<TAsynAssistants>); overload; deprecated;
     /// <summary>
     /// Asynchronously retrieves a specific assistant by ID.
     /// </summary>
@@ -1208,7 +1210,7 @@ type
     /// <param name="CallBacks">
     /// A callback function to handle the asynchronous response.
     /// </param>
-    procedure AsynRetrieve(const AssistantId: string; const CallBacks: TFunc<TAsynAssistant>);
+    procedure AsynRetrieve(const AssistantId: string; const CallBacks: TFunc<TAsynAssistant>); deprecated;
     /// <summary>
     /// Asynchronously updates an existing assistant by ID.
     /// </summary>
@@ -1223,7 +1225,7 @@ type
     /// A callback function to handle the asynchronous response.
     /// </param>
     procedure AsynUpdate(const AssistantId: string; const ParamProc: TProc<TAssistantsParams>;
-      const CallBacks: TFunc<TAsynAssistant>);
+      const CallBacks: TFunc<TAsynAssistant>); deprecated;
     /// <summary>
     /// Asynchronously deletes an assistant by ID.
     /// </summary>
@@ -1233,7 +1235,7 @@ type
     /// <param name="CallBacks">
     /// A callback function to handle the asynchronous response.
     /// </param>
-    procedure AsynDelete(const AssistantId: string; const CallBacks: TFunc<TAsynDeletion>);
+    procedure AsynDelete(const AssistantId: string; const CallBacks: TFunc<TAsynDeletion>); deprecated;
     /// <summary>
     /// Creates a new assistant synchronously.
     /// </summary>
@@ -1244,14 +1246,14 @@ type
     /// <returns>
     /// A <c>TAssistant</c> object representing the created assistant.
     /// </returns>
-    function Create(const ParamProc: TProc<TAssistantsParams>): TAssistant;
+    function Create(const ParamProc: TProc<TAssistantsParams>): TAssistant; deprecated;
     /// <summary>
     /// Retrieves a list of assistants synchronously.
     /// </summary>
     /// <returns>
     /// A <c>TAssistants</c> object containing a list of assistant configurations.
     /// </returns>
-    function List: TAssistants; overload;
+    function List: TAssistants; overload; deprecated;
     /// <summary>
     /// Retrieves a list of assistants synchronously with additional parameters.
     /// </summary>
@@ -1262,7 +1264,7 @@ type
     /// <returns>
     /// A <c>TAssistants</c> object containing a list of assistant configurations.
     /// </returns>
-    function List(const ParamProc: TProc<TUrlAdvancedParams>): TAssistants; overload;
+    function List(const ParamProc: TProc<TUrlAdvancedParams>): TAssistants; overload; deprecated;
     /// <summary>
     /// Retrieves a specific assistant synchronously by ID.
     /// </summary>
@@ -1272,7 +1274,7 @@ type
     /// <returns>
     /// A <c>TAssistant</c> object representing the retrieved assistant.
     /// </returns>
-    function Retrieve(const AssistantId: string): TAssistant;
+    function Retrieve(const AssistantId: string): TAssistant; deprecated;
     /// <summary>
     /// Updates an existing assistant synchronously by ID.
     /// </summary>
@@ -1286,7 +1288,7 @@ type
     /// <returns>
     /// A <c>TAssistant</c> object representing the updated assistant.
     /// </returns>
-    function Update(const AssistantId: string; const ParamProc: TProc<TAssistantsParams>): TAssistant;
+    function Update(const AssistantId: string; const ParamProc: TProc<TAssistantsParams>): TAssistant; deprecated;
     /// <summary>
     /// Deletes an assistant synchronously by ID.
     /// </summary>
@@ -1296,7 +1298,7 @@ type
     /// <returns>
     /// A <c>TAssistantDeletion</c> object containing the deletion status.
     /// </returns>
-    function Delete(const AssistantId: string): TDeletion;
+    function Delete(const AssistantId: string): TDeletion; deprecated;
   end;
 
 implementation

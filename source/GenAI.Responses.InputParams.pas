@@ -16,6 +16,59 @@ uses
   GenAI.Functions.Core;
 
 type
+  {$REGION 'output top logprobs'}
+
+  TOutputTopLogprobs  = class(TJSONParam)
+    function Bytes(const Value: TArray<Int64>): TOutputTopLogprobs;
+
+    function Logprob(const Value: Double): TOutputTopLogprobs;
+
+    function Token(const Value: string): TOutputTopLogprobs;
+
+    function New(const AToken: string): TOutputTopLogprobs;
+  end;
+
+  {$ENDREGION}
+
+  {$REGION 'conversation'}
+
+  TConversationParams = class(TJSONParam)
+    /// <summary>
+    /// The unique ID of the conversation.
+    /// </summary>
+    function Id(const Value: string): TConversationParams;
+
+    class function New(const Value: string): TConversationParams;
+  end;
+
+  {$ENDREGION}
+
+  {$REGION 'Input string or array'}
+
+  {$REGION 'Input message'}
+
+    {$REGION 'Input message content'}
+
+  TItemAudioContent = class(TJSONParam)
+    /// <summary>
+    /// Base64-encoded audio data.
+    /// </summary>
+    function Data(const Value: string): TItemAudioContent;
+
+    /// <summary>
+    /// The format of the audio data. Currently supported formats are mp3 and wav.
+    /// </summary>
+    function Format(const Value: TAudioFormat): TItemAudioContent; overload;
+
+    /// <summary>
+    /// The format of the audio data. Currently supported formats are mp3 and wav.
+    /// </summary>
+    function Format(const Value: string): TItemAudioContent; overload;
+
+    class function NewMp3(const Value: string): TItemAudioContent;
+    class function NewWav(const Value: string): TItemAudioContent;
+  end;
+
   TItemContent = class(TJSONParam)
     /// <summary>
     /// The type of the input item.
@@ -58,20 +111,85 @@ type
     function FileData(const Value: string): TItemContent;
 
     /// <summary>
+    /// The URL of the file to be sent to the model.
+    /// </summary>
+    function FileUrl(const Value: string): TItemContent;
+
+    /// <summary>
     /// The name of the file to be sent to the model.
     /// </summary>
     function FileName(const Value: string): TItemContent;
+
+    function InputAudio(const Value: TItemAudioContent): TItemContent;
 
     class function NewText: TItemContent;
     class function NewImage: TItemContent; overload;
     class function NewImage(const Value: string; const Detail: string = 'auto'): TItemContent; overload;
     class function NewFile: TItemContent;
     class function NewFileData(const FileLocation: string): TItemContent;
+    class function NewAudio: TItemContent; overload;
+    class function NewAudio(const FileLocation: string): TItemContent; overload;
   end;
 
   /// <summary>
-  /// Value is TInputListItem or his descendant e.g. TInputMessage, TItemInputMessage, TItemOutputMessage,
-  /// TItemOutputMessage, TFileSearchToolCall, TComputerToolCall, TInputItemReference
+  /// Value is TInputListItem or his descendant
+  /// <para>
+  /// - TInputMessage
+  /// </para>
+  /// <para>
+  /// - TItemOutputMessage
+  /// </para>
+  /// <para>
+  /// - TFileSearchToolCall
+  /// </para>
+  /// <para>
+  /// - TComputerToolCall
+  /// </para>
+  /// <para>
+  /// - TWebSearchToolCall
+  /// </para>
+  /// <para>
+  /// - TFunctionToolCall
+  /// </para>
+  /// <para>
+  /// - TFunctionToolCalloutput
+  /// </para>
+  /// <para>
+  /// - TReasoningObject
+  /// </para>
+  /// <para>
+  /// - TImageGeneration
+  /// </para>
+  /// <para>
+  /// - TCodeInterpreterToolCall
+  /// </para>
+  /// <para>
+  /// - TLocalShellCall
+  /// </para>
+  /// <para>
+  /// - TLocalShellCallOutput
+  /// </para>
+  /// <para>
+  /// - TMCPListTools
+  /// </para>
+  /// <para>
+  /// - TMCPApprovalRequest
+  /// </para>
+  /// <para>
+  /// - TMCPApprovalResponse
+  /// </para>
+  /// <para>
+  /// - TMCPToolCal
+  /// </para>
+  /// <para>
+  /// - TCustomToolCallOutput
+  /// </para>
+  /// <para>
+  /// - TCustomToolCall
+  /// </para>
+  /// <para>
+  /// - TInputItemReference
+  /// </para>
   /// </summary>
   TInputListItem = class(TJSONParam);
 
@@ -112,6 +230,8 @@ type
     class function New: TInputMessage;
   end;
 
+    {$ENDREGION}
+
   TItemInputMessage = class(TInputMessage)
     /// <summary>
     /// The role of the message input. One of user, system, or developer.
@@ -151,19 +271,20 @@ type
     class function New: TItemInputMessage;
   end;
 
-  TInputItemReference = class(TInputListItem)
-    /// <summary>
-    /// The ID of the item to reference.
-    /// </summary>
-    function Id(const Value: string): TInputItemReference;
+  {$ENDREGION}
 
-    /// <summary>
-    /// The type of item to reference. Always item_reference.
-    /// </summary>
-    function &Type(const Value: string = 'item_reference'): TInputItemReference;
+  {$REGION 'Output message'}
 
-    class function New: TInputItemReference; overload;
-    class function New(const Value: string): TInputItemReference; overload;
+    {$REGION 'Output message content'}
+
+  TOutputLogprobs  = class(TJSONParam)
+    function Bytes(const Value: TArray<Int64>): TOutputLogprobs;
+
+    function Logprob(const Value: Double): TOutputLogprobs;
+
+    function Token(const Value: string): TOutputLogprobs;
+
+    function New(const AToken: string): TOutputLogprobs;
   end;
 
   TOutputNotation = class(TJSONParam)
@@ -218,20 +339,6 @@ type
     class function NewUrlCitation: TOutputNotation;
   end;
 
-  TOutputTopLogprobs  = class(TJSONParam)
-    function Bytes(const Value: TArray<Int64>): TOutputTopLogprobs;
-    function Logprob(const Value: Double): TOutputTopLogprobs;
-    function Token(const Value: string): TOutputTopLogprobs;
-    function New(const AToken: string): TOutputTopLogprobs;
-  end;
-
-  TOutputLogprobs  = class(TJSONParam)
-    function Bytes(const Value: TArray<Int64>): TOutputLogprobs;
-    function Logprob(const Value: Double): TOutputLogprobs;
-    function Token(const Value: string): TOutputLogprobs;
-    function New(const AToken: string): TOutputLogprobs;
-  end;
-
   TOutputMessageContent = class(TJSONParam)
     /// <summary>
     /// The type of the output text. Always output_text.
@@ -268,6 +375,8 @@ type
     /// </summary>
     class function NewRefusal: TOutputMessageContent;
   end;
+
+    {$ENDREGION}
 
   TItemOutputMessage = class(TInputListItem)
     /// <summary>
@@ -310,6 +419,12 @@ type
     class function New: TItemOutputMessage;
   end;
 
+  {$ENDREGION}
+
+  {$REGION 'File search tool call'}
+
+    {$REGION 'File search tool call results'}
+
   TFileSearchToolCallResult = class(TJSONParam)
     /// <summary>
     /// Set of 16 key-value pairs that can be attached to an object. This can be useful for storing additional
@@ -341,6 +456,8 @@ type
 
     class function New: TFileSearchToolCallResult;
   end;
+
+    {$ENDREGION}
 
   TFileSearchToolCall = class(TInputListItem)
     /// <summary>
@@ -376,41 +493,11 @@ type
     class function New: TFileSearchToolCall;
   end;
 
-  TPendingSafetyCheck = class(TJSONParam)
-    /// <summary>
-    /// The type of the pending safety check.
-    /// </summary>
-    function Code(const Value: string): TPendingSafetyCheck;
+  {$ENDREGION}
 
-    /// <summary>
-    /// The ID of the pending safety check.
-    /// </summary>
-    function Id(const Value: string): TPendingSafetyCheck;
+  {$REGION 'Computer tool call'}
 
-    /// <summary>
-    /// Details about the pending safety check.
-    /// </summary>
-    function Message(const Value: string): TPendingSafetyCheck;
-  end;
-
-  TAcknowledgedSafetyCheckParams = class(TJSONParam)
-    /// <summary>
-    /// The type of the pending safety check.
-    /// </summary>
-    function Code(const Value: string): TAcknowledgedSafetyCheckParams;
-
-    /// <summary>
-    /// The ID of the pending safety check.
-    /// </summary>
-    function Id(const Value: string): TAcknowledgedSafetyCheckParams;
-
-    /// <summary>
-    /// Details about the pending safety check.
-    /// </summary>
-    function Message(const Value: string): TAcknowledgedSafetyCheckParams;
-
-    class function New: TAcknowledgedSafetyCheckParams;
-  end;
+    {$REGION 'Computer tool call utils'}
 
   TComputerToolCallOutputObject = class(TJSONParam)
     /// <summary>
@@ -430,6 +517,8 @@ type
 
     class function New: TComputerToolCallOutputObject;
   end;
+
+    {$REGION 'Computer tool actions'}
 
   TComputerToolCallAction = class(TJSONParam);
 
@@ -605,44 +694,26 @@ type
     class function New: TComputerWait;
   end;
 
-  TComputerToolCallOutput = class(TComputerToolCallAction)
+    {$ENDREGION}
+
+  TPendingSafetyCheck = class(TJSONParam)
     /// <summary>
-    /// acknowledged safety checks for computer tool call outpu
+    /// The type of the pending safety check.
     /// </summary>
-    function AcknowledgedSafetyChecks(const Value: TArray<TAcknowledgedSafetyCheckParams>): TComputerToolCallOutput;
+    function Code(const Value: string): TPendingSafetyCheck;
 
     /// <summary>
-    /// The ID of the computer tool call that produced the output.
+    /// The ID of the pending safety check.
     /// </summary>
-    function CallId(const Value: string): TComputerToolCallOutput;
+    function Id(const Value: string): TPendingSafetyCheck;
 
     /// <summary>
-    /// The unique ID of the computer tool call.
+    /// Details about the pending safety check.
     /// </summary>
-    function Id(const Value: string): TComputerToolCallOutput;
-
-    /// <summary>
-    /// The output of a computer tool call.
-    /// </summary>
-    function Output(const Value: TComputerToolCallOutputObject): TComputerToolCallOutput;
-
-    /// <summary>
-    /// The status of the file search tool call. One of in_progress, searching, incomplete or failed
-    /// </summary>
-    function Status(const Value: TMessageStatus): TComputerToolCallOutput; overload;
-
-    /// <summary>
-    /// The status of the file search tool call. One of in_progress, searching, incomplete or failed
-    /// </summary>
-    function Status(const Value: string): TComputerToolCallOutput; overload;
-
-    /// <summary>
-    /// The type of the computer tool call output. Always computer_call_output.
-    /// </summary>
-    function &Type(const Value: string = 'computer_call_output'): TComputerToolCallOutput;
-
-    class function New: TComputerToolCallOutput;
+    function Message(const Value: string): TPendingSafetyCheck;
   end;
+
+    {$ENDREGION}
 
   TComputerToolCall = class(TInputListItem)
     /// <summary>
@@ -689,7 +760,151 @@ type
     class function New: TComputerToolCall;
   end;
 
+  {$ENDREGION}
+
+  {$REGION 'Computer tool call output'}
+
+    {$REGION 'Acknowledged safety check'}
+
+  TAcknowledgedSafetyCheckParams = class(TJSONParam)
+    /// <summary>
+    /// The type of the pending safety check.
+    /// </summary>
+    function Code(const Value: string): TAcknowledgedSafetyCheckParams;
+
+    /// <summary>
+    /// The ID of the pending safety check.
+    /// </summary>
+    function Id(const Value: string): TAcknowledgedSafetyCheckParams;
+
+    /// <summary>
+    /// Details about the pending safety check.
+    /// </summary>
+    function Message(const Value: string): TAcknowledgedSafetyCheckParams;
+
+    class function New: TAcknowledgedSafetyCheckParams;
+  end;
+
+    {$ENDREGION}
+
+  TComputerToolCallOutput = class(TComputerToolCallAction)
+    /// <summary>
+    /// acknowledged safety checks for computer tool call outpu
+    /// </summary>
+    function AcknowledgedSafetyChecks(const Value: TArray<TAcknowledgedSafetyCheckParams>): TComputerToolCallOutput;
+
+    /// <summary>
+    /// The ID of the computer tool call that produced the output.
+    /// </summary>
+    function CallId(const Value: string): TComputerToolCallOutput;
+
+    /// <summary>
+    /// The unique ID of the computer tool call.
+    /// </summary>
+    function Id(const Value: string): TComputerToolCallOutput;
+
+    /// <summary>
+    /// The output of a computer tool call.
+    /// </summary>
+    function Output(const Value: TComputerToolCallOutputObject): TComputerToolCallOutput;
+
+    /// <summary>
+    /// The status of the file search tool call. One of in_progress, searching, incomplete or failed
+    /// </summary>
+    function Status(const Value: TMessageStatus): TComputerToolCallOutput; overload;
+
+    /// <summary>
+    /// The status of the file search tool call. One of in_progress, searching, incomplete or failed
+    /// </summary>
+    function Status(const Value: string): TComputerToolCallOutput; overload;
+
+    /// <summary>
+    /// The type of the computer tool call output. Always computer_call_output.
+    /// </summary>
+    function &Type(const Value: string = 'computer_call_output'): TComputerToolCallOutput;
+
+    class function New: TComputerToolCallOutput;
+  end;
+
+  {$ENDREGION}
+
+  {$REGION 'Web search tool call'}
+
+  TWebSearchAction = class(TJSONParam);
+
+    {$REGION 'Web search actions'}
+
+  TSearchActionSource = class(TJSONParam)
+    /// <summary>
+    /// The type of source. Always url.
+    /// </summary>
+    function &Type(const Value: string = 'url'): TSearchActionSource;
+
+    /// <summary>
+    /// The URL of the source.
+    /// </summary>
+    function Url(const Value: string): TSearchActionSource;
+
+    class function New: TSearchActionSource;
+  end;
+
+  TSearchAction = class(TWebSearchAction)
+    /// <summary>
+    /// The search query.
+    /// </summary>
+    function Query(const Value: string): TSearchAction;
+
+    /// <summary>
+    /// The action type.
+    /// </summary>
+    function &Type(const Value: string): TSearchAction;
+
+    /// <summary>
+    /// The sources used in the search.
+    /// </summary>
+    function Sources(const Value: TArray<TSearchActionSource>): TSearchAction;
+  end;
+
+  TOpenPageAction = class(TWebSearchAction)
+    /// <summary>
+    /// The action type.
+    /// </summary>
+    function &Type(const Value: string): TOpenPageAction;
+
+    /// <summary>
+    /// The URL opened by the model.
+    /// </summary>
+    function Url(const Value: string): TOpenPageAction;
+  end;
+
+  TFindAction = class(TWebSearchAction)
+    /// <summary>
+    /// The pattern or text to search for within the page.
+    /// </summary>
+    function Pattern(const Value: string): TFindAction;
+
+    /// <summary>
+    /// The action type.
+    /// </summary>
+    function &Type(const Value: string): TFindAction;
+
+    /// <summary>
+    /// The URL of the page searched for the pattern.
+    /// </summary>
+    function Url(const Value: string): TFindAction;
+  end;
+
+    {$ENDREGION}
+
   TWebSearchToolCall = class(TInputListItem)
+    /// <summary>
+    /// The results of a web search tool call.
+    /// </summary>
+    /// <remarks>
+    /// For more information, see https://platform.openai.com/docs/guides/tools-web-search
+    /// </remarks>
+    function Action(const Value: TWebSearchAction): TWebSearchToolCall;
+
     /// <summary>
     /// The unique ID of the web search tool call.
     /// </summary>
@@ -712,6 +927,10 @@ type
 
     class function New: TWebSearchToolCall;
   end;
+
+  {$ENDREGION}
+
+  {$REGION 'Function tool call object'}
 
   TFunctionToolCall = class(TInputListItem)
     /// <summary>
@@ -752,6 +971,89 @@ type
     class function New: TFunctionToolCall;
   end;
 
+  {$ENDREGION}
+
+  {$REGION 'Function tool call output object'}
+
+  TFunctionOutput = class(TJSONParam);
+
+    {$REGION 'Function output: text, image, file'}
+
+  TFunctionInputText = class(TFunctionOutput)
+    /// <summary>
+    /// The type of the input item. Always input_text.
+    /// </summary>
+    function &Type(const Value: string = 'input_text'): TFunctionInputText;
+
+    /// <summary>
+    /// The text input to the model.
+    /// </summary>
+    function Text(const Value: string): TFunctionInputText;
+
+    class function New: TFunctionInputText;
+  end;
+
+  TFunctionInputImage = class(TFunctionOutput)
+    /// <summary>
+    /// The type of the input item. Always input_image.
+    /// </summary>
+    function &Type(const Value: string = 'input_image'): TFunctionInputImage;
+
+    /// <summary>
+    /// The detail level of the image to be sent to the model. One of high, low, or auto. Defaults to auto.
+    /// </summary>
+    function Detail(const Value: TImageDetail): TFunctionInputImage; overload;
+
+    /// <summary>
+    /// The detail level of the image to be sent to the model. One of high, low, or auto. Defaults to auto.
+    /// </summary>
+    function Detail(const Value: string): TFunctionInputImage; overload;
+
+    /// <summary>
+    /// The ID of the file to be sent to the model.
+    /// </summary>
+    function FileId(const Value: string): TFunctionInputImage;
+
+    /// <summary>
+    /// The URL of the image to be sent to the model. A fully qualified URL or base64 encoded image
+    /// in a data URL.
+    /// </summary>
+    function ImageUrl(const Value: string): TFunctionInputImage;
+
+    class function New: TFunctionInputImage;
+  end;
+
+  TFunctionInputFile = class(TFunctionOutput)
+    /// <summary>
+    /// The type of the input item. Always input_file.
+    /// </summary>
+    function &Type(const Value: string = 'input_file'): TFunctionInputFile;
+
+    /// <summary>
+    /// The base64-encoded data of the file to be sent to the model.
+    /// </summary>
+    function FileData(const Value: string): TFunctionInputFile;
+
+    /// <summary>
+    /// The ID of the file to be sent to the model.
+    /// </summary>
+    function FileId(const Value: string): TFunctionInputFile;
+
+    /// <summary>
+    /// The URL of the file to be sent to the model.
+    /// </summary>
+    function FileUrl(const Value: string): TFunctionInputFile;
+
+    /// <summary>
+    /// The name of the file to be sent to the model.
+    /// </summary>
+    function Filename(const Value: string): TFunctionInputFile;
+
+    class function New: TFunctionInputFile;
+  end;
+
+    {$ENDREGION}
+
   TFunctionToolCalloutput = class(TInputListItem)
     /// <summary>
     /// The unique ID of the function tool call generated by the model.
@@ -766,7 +1068,12 @@ type
     /// <summary>
     /// A JSON string of the output of the function tool call.
     /// </summary>
-    function Output(const Value: string): TFunctionToolCalloutput;
+    function Output(const Value: string): TFunctionToolCalloutput; overload;
+
+    /// <summary>
+    /// A JSON string of the output of the function tool call.
+    /// </summary>
+    function Output(const Value: TArray<TFunctionOutput>): TFunctionToolCalloutput; overload;
 
     /// <summary>
     /// The status of the item. One of in_progress, completed, or incomplete. Populated when items are returned via API.
@@ -786,6 +1093,12 @@ type
     class function New: TFunctionToolCalloutput;
   end;
 
+  {$ENDREGION}
+
+  {$REGION 'Reasoning'}
+
+    {$REGION 'Reasoning summary'}
+
   TReasoningTextContent = class(TJSONParam)
     /// <summary>
     /// A short summary of the reasoning used by the model when generating the response.
@@ -799,6 +1112,8 @@ type
 
     class function New: TReasoningTextContent;
   end;
+
+    {$ENDREGION}
 
   TReasoningObject = class(TInputListItem)
     /// <summary>
@@ -835,6 +1150,10 @@ type
     class function New: TReasoningObject;
   end;
 
+  {$ENDREGION}
+
+  {$REGION 'Image generation call'}
+
   TImageGeneration = class(TInputListItem)
     /// <summary>
     /// The unique ID of the image generation call.
@@ -864,49 +1183,43 @@ type
     class function New: TImageGeneration;
   end;
 
-  TCodeInterpreterToolCallResult = class(TJSONParam);
+  {$ENDREGION}
 
-  TCodeInterpreterTextOutput = class(TCodeInterpreterToolCallResult)
+  {$REGION 'Code interpreter tool call'}
+
+  TCodeInterpreterOutputs = class(TJSONParam);
+
+    {$REGION 'Code interpreter outputs'}
+
+  TCodeInterpreterOutputLogs = class(TCodeInterpreterOutputs)
     /// <summary>
     /// The type of the code interpreter text output. Always logs.
     /// </summary>
-    function &Type(const Value: string = 'logs'): TCodeInterpreterTextOutput;
+    function &Type(const Value: string = 'logs'): TCodeInterpreterOutputLogs;
 
     /// <summary>
     /// The logs of the code interpreter tool call.
     /// </summary>
-    function Logs(const Value: string): TCodeInterpreterTextOutput;
+    function Logs(const Value: string): TCodeInterpreterOutputLogs;
 
-    class function New: TCodeInterpreterTextOutput;
+    class function New: TCodeInterpreterOutputLogs;
   end;
 
-  TCodeInterpreterFile = class(TJSONParam)
+  TCodeInterpreterOutputImage = class(TCodeInterpreterOutputs)
     /// <summary>
-    /// The ID of the file.
+    /// The type of the output. Always 'image'.
     /// </summary>
-    function FileId(const Value: string): TCodeInterpreterFile;
+    function &Type(const Value: string = 'image'): TCodeInterpreterOutputImage;
 
     /// <summary>
-    /// The MIME type of the file.
+    /// The URL of the image output from the code interpreter.
     /// </summary>
-    function MimeType(const Value: string): TCodeInterpreterFile;
+    function Url(const Value: string): TCodeInterpreterOutputImage;
 
-    class function New: TCodeInterpreterFile;
+    class function New: TCodeInterpreterOutputImage;
   end;
 
-  TCodeInterpreterFileOutput = class(TCodeInterpreterToolCallResult)
-    /// <summary>
-    /// The type of the code interpreter file output. Always files.
-    /// </summary>
-    function &Type(const Value: string = 'files'): TCodeInterpreterFileOutput;
-
-    /// <summary>
-    /// Files of the output of a code interpreter tool call
-    /// </summary>
-    function Files(const Value: TArray<TCodeInterpreterFile>): TCodeInterpreterFileOutput;
-
-    class function New: TCodeInterpreterFileOutput;
-  end;
+    {$ENDREGION}
 
   TCodeInterpreterToolCall = class(TInputListItem)
     /// <summary>
@@ -920,9 +1233,9 @@ type
     function Id(const Value: string): TCodeInterpreterToolCall;
 
     /// <summary>
-    /// The results of the code interpreter tool call.
+    /// The outputs generated by the code interpreter, such as logs or images. Can be null if no outputs are available.
     /// </summary>
-    function Results(const Value: TArray<TCodeInterpreterToolCallResult>): TCodeInterpreterToolCall;
+    function Outputs(const Value: TArray<TCodeInterpreterOutputs>): TCodeInterpreterToolCall;
 
     /// <summary>
     /// The status of the item. One of in_progress, completed, or incomplete. Populated when items are returned via API.
@@ -946,6 +1259,12 @@ type
 
     class function New: TCodeInterpreterToolCall;
   end;
+
+  {$ENDREGION}
+
+  {$REGION 'Local shell call'}
+
+    {$REGION 'Local shell call actions'}
 
   TLocalShellCallAction = class(TJSONParam)
     /// <summary>
@@ -981,6 +1300,8 @@ type
     class function New: TLocalShellCallAction;
   end;
 
+    {$ENDREGION}
+
   TLocalShellCall = class(TInputListItem)
     /// <summary>
     /// Execute a shell command on the server.
@@ -1015,6 +1336,10 @@ type
     class function New: TLocalShellCall;
   end;
 
+  {$ENDREGION}
+
+  {$REGION 'Local shell call output'}
+
   TLocalShellCallOutput = class(TInputListItem)
     /// <summary>
     /// The unique ID of the local shell tool call generated by the model.
@@ -1043,6 +1368,12 @@ type
 
     class function New: TLocalShellCallOutput;
   end;
+
+  {$ENDREGION}
+
+  {$REGION 'MCP list tools'}
+
+    {$REGION 'MCP tool'}
 
   TMCPTools = class(TJSONParam)
     /// <summary>
@@ -1078,6 +1409,8 @@ type
     class function New: TMCPTools;
   end;
 
+    {$ENDREGION}
+
   TMCPListTools = class(TInputListItem)
     /// <summary>
     /// The unique ID of the list.
@@ -1106,6 +1439,10 @@ type
 
     class function New: TMCPListTools;
   end;
+
+  {$ENDREGION}
+
+  {$REGION 'MCP approval request'}
 
   TMCPApprovalRequest = class(TInputListItem)
     /// <summary>
@@ -1136,6 +1473,10 @@ type
     class function New: TMCPApprovalRequest;
   end;
 
+  {$ENDREGION}
+
+  {$REGION 'MCP approval response'}
+
   TMCPApprovalResponse = class(TInputListItem)
     /// <summary>
     /// The ID of the approval request being answered.
@@ -1164,6 +1505,10 @@ type
 
     class function New: TMCPApprovalResponse;
   end;
+
+  {$ENDREGION}
+
+  {$REGION 'MCP tool call'}
 
   TMCPToolCall = class(TInputListItem)
     /// <summary>
@@ -1204,6 +1549,124 @@ type
     class function New: TMCPToolCall;
   end;
 
+  {$ENDREGION}
+
+  {$REGION 'Custom tool call output'}
+
+  TCustomToolCallOutput = class(TInputListItem)
+    /// <summary>
+    /// The call ID, used to map this custom tool call output to a custom tool call.
+    /// </summary>
+    function CallId(const Value: string): TCustomToolCallOutput;
+
+    /// <summary>
+    /// The output from the custom tool call generated by your code. Can be a string or an list
+    /// of output content.
+    /// </summary>
+    function Output(const Value: string): TCustomToolCallOutput; overload;
+
+    /// <summary>
+    /// The output from the custom tool call generated by your code. Can be a string or an list
+    /// of output content.
+    /// </summary>
+    /// <remarks>
+    /// We use 'TFunctionOupput' here because the properties are identical
+    /// </remarks>
+    function Output(const Value: TArray<TFunctionOutput>): TCustomToolCallOutput; overload;
+
+    /// <summary>
+    /// The type of the custom tool call output. Always custom_tool_call_output.
+    /// </summary>
+    function &Type(const Value: string = 'custom_tool_call_output'): TCustomToolCallOutput;
+
+    /// <summary>
+    /// The unique ID of the custom tool call output in the OpenAI platform.
+    /// </summary>
+    function Id(const Value: string): TCustomToolCallOutput;
+
+    class function New: TCustomToolCallOutput;
+  end;
+
+  {$ENDREGION}
+
+  {$REGION 'Custom tool call output'}
+
+  TCustomToolCall = class(TInputListItem)
+    /// <summary>
+    /// An identifier used to map this custom tool call to a tool call output.
+    /// </summary>
+    function CallId(const Value: string): TCustomToolCall;
+
+    /// <summary>
+    /// The input for the custom tool call generated by the model.
+    /// </summary>
+    function Input(const Value: string): TCustomToolCall;
+
+    /// <summary>
+    /// The name of the custom tool being called.
+    /// </summary>
+    function Name(const Value: string): TCustomToolCall;
+
+    /// <summary>
+    /// The type of the custom tool call. Always custom_tool_call.
+    /// </summary>
+    function &Type(const Value: string = 'custom_tool_call'): TCustomToolCall;
+
+    /// <summary>
+    /// The unique ID of the custom tool call in the OpenAI platform.
+    /// </summary>
+    function Id(const Value: string): TCustomToolCall;
+  end;
+
+  {$ENDREGION}
+
+  {$REGION 'Item reference'}
+
+  TInputItemReference = class(TInputListItem)
+    /// <summary>
+    /// The ID of the item to reference.
+    /// </summary>
+    function Id(const Value: string): TInputItemReference;
+
+    /// <summary>
+    /// The type of item to reference. Always item_reference.
+    /// </summary>
+    function &Type(const Value: string = 'item_reference'): TInputItemReference;
+
+    class function New: TInputItemReference; overload;
+    class function New(const Value: string): TInputItemReference; overload;
+  end;
+
+  {$ENDREGION}
+
+  {$ENDREGION}
+
+  {$REGION 'prompt'}
+
+  TPromptParams = class(TJsonParam)
+    /// <summary>
+    /// The unique identifier of the prompt template to use.
+    /// </summary>
+    function Id(const Value: string): TPromptParams;
+
+    /// <summary>
+    /// Optional map of values to substitute in for variables in your prompt. The substitution values
+    /// can either be strings, or other Response input types like images or files.
+    /// </summary>
+    function Variables(const Value: TJSONObject): TPromptParams;
+
+    /// <summary>
+    /// Optional version of the prompt template.
+    /// </summary>
+    function Version(const Value: string): TPromptParams;
+
+    class function New: TPromptParams;
+  end;
+
+  {$ENDREGION}
+
+  {$REGION 'reasoning'}
+
   TReasoningParams = class(TJSONParam)
     /// <summary>
     /// Constrains effort on reasoning for reasoning models. Currently supported values are low, medium, and high.
@@ -1237,6 +1700,10 @@ type
 
     class function New: TReasoningParams;
   end;
+
+  {$ENDREGION}
+
+  {$REGION 'text'}
 
   /// <summary>
   /// Value is TTextFormatParams or his descendant e.g. TTextFormatTextPrams, TTextJSONSchemaParams, TTextJSONObjectParams,
@@ -1345,6 +1812,10 @@ type
     function Verbosity(const Value: string): TTextParams; overload;
   end;
 
+  {$ENDREGION}
+
+  {$REGION 'tool_choice'}
+
   /// <summary>
   /// Value is TResponseToolChoiceParams or his descendant e.g. THostedToolParams, TFunctionToolParams
   /// </summary>
@@ -1401,6 +1872,59 @@ type
 
     class function New: TFunctionToolParams;
   end;
+
+  {$ENDREGION}
+
+  {$REGION 'tools'}
+
+  /// <summary>
+  /// Value is TResponseToolParams or his descendant e.g. TResponseFileSearchParams, TResponseFunctionParams,
+  /// TResponseComputerUseParams, TResponseWebSearchParams
+  /// </summary>
+  TResponseToolParams = class(TJSONParam);
+
+    {$REGION 'Function'}
+
+  TResponseFunctionParams = class(TResponseToolParams)
+    /// <summary>
+    /// A description of the function. Used by the model to determine whether or not to call the function.
+    /// </summary>
+    function Description(const Value: string): TResponseFunctionParams;
+
+    /// <summary>
+    /// The name of the function to call.
+    /// </summary>
+    function Name(const Value: string): TResponseFunctionParams;
+
+    /// <summary>
+    /// A JSON schema object describing the parameters of the function.
+    /// </summary>
+    function Parameters(const Value: TSchemaParams): TResponseFunctionParams; overload;
+
+    /// <summary>
+    /// A JSON schema object describing the parameters of the function.
+    /// </summary>
+    function Parameters(const Value: string): TResponseFunctionParams; overload;
+
+    /// <summary>
+    /// Whether to enforce strict parameter validation. Default true.
+    /// </summary>
+    function Strict(const Value: Boolean): TResponseFunctionParams;
+
+    /// <summary>
+    /// The type of the function tool. Always function.
+    /// </summary>
+    function &Type(const Value: string = 'function'): TResponseFunctionParams;
+
+    class function New: TResponseFunctionParams; overload;
+    class function New(const Value: IFunctionCore): TResponseFunctionParams; overload;
+  end;
+
+    {$ENDREGION}
+
+    {$REGION 'File search'}
+
+      {$REGION 'Filters'}
 
   /// <summary>
   /// Value is TFileSearchFilters or his descendant e.g. TComparisonFilter, TCompoundFilter
@@ -1516,11 +2040,7 @@ type
     class function &Or(const Value: TArray<TFileSearchFilters>): TCompoundFilter; overload;
   end;
 
-  /// <summary>
-  /// Value is TResponseToolParams or his descendant e.g. TResponseFileSearchParams, TResponseFunctionParams,
-  /// TResponseComputerUseParams, TResponseWebSearchParams
-  /// </summary>
-  TResponseToolParams = class(TJSONParam);
+      {$ENDREGION}
 
   TResponseFileSearchParams = class(TResponseToolParams)
     /// <summary>
@@ -1554,40 +2074,9 @@ type
     class function New: TResponseFileSearchParams;
   end;
 
-  TResponseFunctionParams = class(TResponseToolParams)
-    /// <summary>
-    /// A description of the function. Used by the model to determine whether or not to call the function.
-    /// </summary>
-    function Description(const Value: string): TResponseFunctionParams;
+    {$ENDREGION}
 
-    /// <summary>
-    /// The name of the function to call.
-    /// </summary>
-    function Name(const Value: string): TResponseFunctionParams;
-
-    /// <summary>
-    /// A JSON schema object describing the parameters of the function.
-    /// </summary>
-    function Parameters(const Value: TSchemaParams): TResponseFunctionParams; overload;
-
-    /// <summary>
-    /// A JSON schema object describing the parameters of the function.
-    /// </summary>
-    function Parameters(const Value: string): TResponseFunctionParams; overload;
-
-    /// <summary>
-    /// Whether to enforce strict parameter validation. Default true.
-    /// </summary>
-    function Strict(const Value: Boolean): TResponseFunctionParams;
-
-    /// <summary>
-    /// The type of the function tool. Always function.
-    /// </summary>
-    function &Type(const Value: string = 'function'): TResponseFunctionParams;
-
-    class function New: TResponseFunctionParams; overload;
-    class function New(const Value: IFunctionCore): TResponseFunctionParams; overload;
-  end;
+    {$REGION 'Computer use preview'}
 
   TResponseComputerUseParams = class(TResponseToolParams)
     /// <summary>
@@ -1612,6 +2101,10 @@ type
 
     class function New: TResponseComputerUseParams;
   end;
+
+      {$ENDREGION}
+
+    {$REGION 'Web search'}
 
   TResponseUserLocationParams = class(TJSONParam)
     /// <summary>
@@ -1680,10 +2173,16 @@ type
     /// - web_search_preview_2025_03_11
     /// </para>
     /// </summary>
-    function &Type(const Value: string = 'web_search_preview'): TResponseWebSearchParams; overload;
+    function &Type(const Value: string = 'web_search'): TResponseWebSearchParams; overload;
 
     class function New: TResponseWebSearchParams;
   end;
+
+    {$ENDREGION}
+
+    {$REGION 'MCP tool'}
+
+      {$REGION 'MCP tool utils '}
 
   TMCPToolsListParams = class(TJSONParam)
     /// <summary>
@@ -1712,6 +2211,8 @@ type
 
     class function New: TMCPRequireApprovalParams;
   end;
+
+      {$ENDREGION}
 
   TResponseMCPToolParams = class(TResponseToolParams)
     /// <summary>
@@ -1771,6 +2272,10 @@ type
     class function New: TResponseMCPToolParams;
   end;
 
+    {$ENDREGION}
+
+    {$REGION 'Code interpreter'}
+
   TCodeInterpreterContainerAutoParams = class(TJSONParam)
     /// <summary>
     /// Always auto
@@ -1805,6 +2310,10 @@ type
 
     class function New: TResponseCodeInterpreterParams;
   end;
+
+    {$ENDREGION}
+
+    {$REGION 'Image generation tool'}
 
   TInputImageMaskParams = class(TJSONParam)
     /// <summary>
@@ -1906,6 +2415,10 @@ type
     class function New: TResponseImageGenerationParams;
   end;
 
+    {$ENDREGION}
+
+    {$REGION 'Local shell tool'}
+
   TLocalShellToolParams = class(TResponseToolParams)
     /// <summary>
     /// The type of the local shell tool. Always local_shell.
@@ -1914,6 +2427,10 @@ type
 
     class function New: TLocalShellToolParams;
   end;
+
+    {$ENDREGION}
+
+    {$REGION 'Custom tool'}
 
   TToolParamsFormatParams = class(TJSONParam)
     /// <summary>
@@ -1969,31 +2486,64 @@ type
     class function New: TCustomToolParams;
   end;
 
-  TPromptParams = class(TJsonParam)
+    {$ENDREGION}
+
+    {$REGION 'Web search preview'}
+
+  TWebSearchPreviewParams = class(TResponseToolParams)
     /// <summary>
-    /// The unique identifier of the prompt template to use.
+    /// High level guidance for the amount of context window space to use for the search. One of low,
+    /// medium, or high. medium is the default.
     /// </summary>
-    function Id(const Value: string): TPromptParams;
+    function SearchContextSize(const Value: TSearchWebOptions): TWebSearchPreviewParams; overload;
 
     /// <summary>
-    /// Optional map of values to substitute in for variables in your prompt. The substitution values
-    /// can either be strings, or other Response input types like images or files.
+    /// High level guidance for the amount of context window space to use for the search. One of low,
+    /// medium, or high. medium is the default.
     /// </summary>
-    function Variables(const Value: TJSONObject): TPromptParams;
+    function SearchContextSize(const Value: string = 'medium'): TWebSearchPreviewParams; overload;
 
     /// <summary>
-    /// Optional version of the prompt template.
+    /// The user's location.
     /// </summary>
-    function Version(const Value: string): TPromptParams;
+    function UserLocation(const Value: TResponseUserLocationParams): TWebSearchPreviewParams;
 
-    class function New: TPromptParams;
+    /// <summary>
+    /// The type of the web search tool. One of web_search_preview or web_search_preview_2025_03_11
+    /// </summary>
+    function &Type(const Value: TWebSearchPreviewType): TWebSearchPreviewParams; overload;
+
+    /// <summary>
+    /// The type of the web search tool. One of web_search_preview or web_search_preview_2025_03_11
+    /// </summary>
+    function &Type(const Value: string = 'web_search_preview'): TWebSearchPreviewParams; overload;
+
+    class function New: TWebSearchPreviewParams;
   end;
+
+    {$ENDREGION}
+
+  {$ENDREGION}
 
   TResponsesParams = class(TJSONParam)
     /// <summary>
     /// Whether to run the model response in the background.
     /// </summary>
     function Background(const Value: Boolean): TResponsesParams;
+
+    /// <summary>
+    /// The conversation that this response belongs to. Items from this conversation are prepended
+    /// to input_items for this response request. Input items and output items from this response
+    /// are automatically added to this conversation after this response completes.
+    /// </summary>
+    function Conversation(const Value: string): TResponsesParams; overload;
+
+    /// <summary>
+    /// The conversation that this response belongs to. Items from this conversation are prepended
+    /// to input_items for this response request. Input items and output items from this response
+    /// are automatically added to this conversation after this response completes.
+    /// </summary>
+    function Conversation(const Value: TConversationParams): TResponsesParams; overload;
 
     /// <summary>
     /// Specify additional output data to include in the model response. Currently supported values are:
@@ -2032,8 +2582,7 @@ type
     /// Text, image, or file inputs to the model, used to generate a response.
     /// </summary>
     /// <param name="Value">
-    /// Value is TInputListItem or his descendant e.g. TInputMessage, TItemInputMessage, TItemOutputMessage,
-    /// TItemOutputMessage, TFileSearchToolCall, TComputerToolCall
+    /// Value is TInputListItem or his descendant
     /// </param>
     function Input(const Value: TArray<TInputListItem>): TResponsesParams; overload;
 
@@ -2383,6 +2932,11 @@ begin
   Result := TItemContent(Add('filename', Value));
 end;
 
+function TItemContent.FileUrl(const Value: string): TItemContent;
+begin
+  Result := TItemContent(Add('file_url', Value));
+end;
+
 function TItemContent.ImageUrl(const Value: string): TItemContent;
 var
   Detail: string;
@@ -2392,6 +2946,42 @@ begin
     Result := TItemContent(Add('image_url', GetUrlOrEncodeBase64(Value)))
   else
     Result := TItemContent(Add('image_url', GetUrlOrEncodeBase64(Filename))).Detail(Detail);
+end;
+
+function TItemContent.InputAudio(const Value: TItemAudioContent): TItemContent;
+begin
+  Result := TItemContent(Add('input_audio', Value.Detach));
+end;
+
+class function TItemContent.NewAudio: TItemContent;
+begin
+  Result := TItemContent.Create.&Type('input_audio');
+end;
+
+class function TItemContent.NewAudio(const FileLocation: string): TItemContent;
+var
+  MimeType: string;
+  Data: string;
+begin
+  {--- Retrieve mimetype }
+  if FileLocation.ToLower.StartsWith('http') then
+    begin
+      Data := THttpx.LoadDataToBase64(FileLocation, MimeType);
+      Data := Format('data:%s;base64,%s', [MimeType, Data]);
+    end
+  else
+    begin
+      MimeType := GetMimeType(FileLocation);
+      Data := GetUrlOrEncodeBase64(FileLocation);
+    end;
+
+  var AudioType := MimeTypeToAudioType(MimeType);
+
+  Result := NewAudio.InputAudio(
+    TItemAudioContent.Create
+      .Format(AudioType)
+      .Data(Data)
+  );
 end;
 
 class function TItemContent.NewFile: TItemContent;
@@ -2438,7 +3028,7 @@ begin
     Result := NewImage.Detail(Detail).ImageUrl(Value)
   else
   if FileExists(Value.Trim) then
-    Result :=  NewImage.Detail(Detail).ImageUrl(Value)
+    Result := NewImage.Detail(Detail).ImageUrl(Value)
   else
     Result := NewImage.Detail(Detail).FileId(Value);
 end;
@@ -2993,7 +3583,6 @@ begin
   Result := TComputerToolCallOutputObject.Create.&Type();
 end;
 
-
 { TAcknowledgedSafetyCheckParams }
 
 function TAcknowledgedSafetyCheckParams.Code(
@@ -3020,6 +3609,12 @@ begin
 end;
 
 { TWebSearchToolCall }
+
+function TWebSearchToolCall.Action(
+  const Value: TWebSearchAction): TWebSearchToolCall;
+begin
+  Result := TWebSearchToolCall(Add('action', Value.Detach));
+end;
 
 function TWebSearchToolCall.Id(const Value: string): TWebSearchToolCall;
 begin
@@ -3113,6 +3708,16 @@ end;
 class function TFunctionToolCalloutput.New: TFunctionToolCalloutput;
 begin
   Result := TFunctionToolCalloutput.Create.&Type();
+end;
+
+function TFunctionToolCalloutput.Output(
+  const Value: TArray<TFunctionOutput>): TFunctionToolCalloutput;
+begin
+  var JSONArray := TJSONArray.Create;
+  for var Item in Value do
+    JSONArray.Add(Item.Detach);
+
+  Result := TFunctionToolCalloutput(Add('output', JSONArray));
 end;
 
 function TFunctionToolCalloutput.Output(
@@ -3451,13 +4056,13 @@ begin
   Result := TCodeInterpreterToolCall.Create.&Type();
 end;
 
-function TCodeInterpreterToolCall.Results(
-  const Value: TArray<TCodeInterpreterToolCallResult>): TCodeInterpreterToolCall;
+function TCodeInterpreterToolCall.Outputs(
+  const Value: TArray<TCodeInterpreterOutputs>): TCodeInterpreterToolCall;
 begin
   var JSONArray := TJSONArray.Create;
   for var Item in Value do
     JSONArray.Add(Item.Detach);
-  Result := TCodeInterpreterToolCall(Add('results', JSONArray));
+  Result := TCodeInterpreterToolCall(Add('outputs', JSONArray));
 end;
 
 function TCodeInterpreterToolCall.Status(
@@ -3472,63 +4077,23 @@ begin
   Result := TCodeInterpreterToolCall(Add('status', Value.ToString));
 end;
 
-{ TCodeInterpreterTextOutput }
+{ TCodeInterpreterOutputLogs }
 
-class function TCodeInterpreterTextOutput.New: TCodeInterpreterTextOutput;
+class function TCodeInterpreterOutputLogs.New: TCodeInterpreterOutputLogs;
 begin
-  Result := TCodeInterpreterTextOutput.Create.&Type();
+  Result := TCodeInterpreterOutputLogs.Create.&Type();
 end;
 
-function TCodeInterpreterTextOutput.&Type(
-  const Value: string): TCodeInterpreterTextOutput;
+function TCodeInterpreterOutputLogs.&Type(
+  const Value: string): TCodeInterpreterOutputLogs;
 begin
-  Result := TCodeInterpreterTextOutput(Add('type', Value));
+  Result := TCodeInterpreterOutputLogs(Add('type', Value));
 end;
 
-function TCodeInterpreterTextOutput.Logs(
-  const Value: string): TCodeInterpreterTextOutput;
+function TCodeInterpreterOutputLogs.Logs(
+  const Value: string): TCodeInterpreterOutputLogs;
 begin
-  Result := TCodeInterpreterTextOutput(Add('logs', Value));
-end;
-
-{ TCodeInterpreterFileOutput }
-
-function TCodeInterpreterFileOutput.Files(
-  const Value: TArray<TCodeInterpreterFile>): TCodeInterpreterFileOutput;
-begin
-  var JSONArray := TJSONArray.Create;
-  for var Item in Value do
-    JSONArray.Add(Item.Detach);
-  Result := TCodeInterpreterFileOutput(Add('files', JSONArray));
-end;
-
-class function TCodeInterpreterFileOutput.New: TCodeInterpreterFileOutput;
-begin
-  Result := TCodeInterpreterFileOutput.Create.&Type();
-end;
-
-function TCodeInterpreterFileOutput.&Type(
-  const Value: string): TCodeInterpreterFileOutput;
-begin
-  Result := TCodeInterpreterFileOutput(Add('type', Value));
-end;
-
-{ TCodeInterpreterFile }
-
-function TCodeInterpreterFile.FileId(const Value: string): TCodeInterpreterFile;
-begin
-  Result := TCodeInterpreterFile(Add('file_id', Value));
-end;
-
-function TCodeInterpreterFile.MimeType(
-  const Value: string): TCodeInterpreterFile;
-begin
-  Result := TCodeInterpreterFile(Add('mime_type', Value));
-end;
-
-class function TCodeInterpreterFile.New: TCodeInterpreterFile;
-begin
-  Result := TCodeInterpreterFile.Create;
+  Result := TCodeInterpreterOutputLogs(Add('logs', Value));
 end;
 
 { TLocalShellCall }
@@ -4463,6 +5028,17 @@ begin
   Result := TResponsesParams(Add('background', Value));
 end;
 
+function TResponsesParams.Conversation(const Value: string): TResponsesParams;
+begin
+  Result := TResponsesParams(Add('conversation', Value));
+end;
+
+function TResponsesParams.Conversation(
+  const Value: TConversationParams): TResponsesParams;
+begin
+  Result := TResponsesParams(Add('conversation', Value.Detach));
+end;
+
 function TResponsesParams.Include(
   const Value: TArray<string>): TResponsesParams;
 begin
@@ -4920,5 +5496,318 @@ function TToolParamsFormatParams.&Type(
 begin
   Result := TToolParamsFormatParams(Add('type', TToolParamsFormatType.Create(Value).ToString));
 end;
+
+{ TItemAudioContent }
+
+function TItemAudioContent.Data(const Value: string): TItemAudioContent;
+begin
+  Result := TItemAudioContent(Add('data', Value));
+end;
+
+function TItemAudioContent.Format(const Value: TAudioFormat): TItemAudioContent;
+begin
+  Result := TItemAudioContent(Add('format', Value.ToString));
+end;
+
+function TItemAudioContent.Format(const Value: string): TItemAudioContent;
+begin
+  Result := TItemAudioContent(Add('format', TAudioFormat.Create(Value).ToString));
+end;
+
+class function TItemAudioContent.NewMp3(const Value: string): TItemAudioContent;
+begin
+  Result := TItemAudioContent.Create.Format(TAudioFormat.mp3)
+end;
+
+class function TItemAudioContent.NewWav(const Value: string): TItemAudioContent;
+begin
+  Result := TItemAudioContent.Create.Format(TAudioFormat.wav)
+end;
+
+{ TSearchAction }
+
+function TSearchAction.Sources(
+  const Value: TArray<TSearchActionSource>): TSearchAction;
+begin
+  var JSONArray := TJSONArray.Create;
+  for var Item in Value do
+    JSONArray.Add(Item.Detach);
+
+  Result := TSearchAction(Add('sources', JSONArray));
+end;
+
+function TSearchAction.&Type(const Value: string): TSearchAction;
+begin
+  Result := TSearchAction(Add('type', Value));
+end;
+
+function TSearchAction.Query(const Value: string): TSearchAction;
+begin
+  Result := TSearchAction(Add('query', Value));
+end;
+
+{ TSearchActionSource }
+
+class function TSearchActionSource.New: TSearchActionSource;
+begin
+  Result := TSearchActionSource.Create.&Type();
+end;
+
+function TSearchActionSource.&Type(const Value: string): TSearchActionSource;
+begin
+  Result := TSearchActionSource(Add('type', Value));
+end;
+
+function TSearchActionSource.Url(const Value: string): TSearchActionSource;
+begin
+  Result := TSearchActionSource(Add('url', Value));
+end;
+
+{ TOpenPageAction }
+
+function TOpenPageAction.&Type(const Value: string): TOpenPageAction;
+begin
+  Result := TOpenPageAction(Add('type', Value));
+end;
+
+function TOpenPageAction.Url(const Value: string): TOpenPageAction;
+begin
+  Result := TOpenPageAction(Add('url', Value));
+end;
+
+{ TFindAction }
+
+function TFindAction.&Type(const Value: string): TFindAction;
+begin
+  Result := TFindAction(Add('type', Value));
+end;
+
+function TFindAction.Url(const Value: string): TFindAction;
+begin
+  Result := TFindAction(Add('url', Value));
+end;
+
+function TFindAction.Pattern(const Value: string): TFindAction;
+begin
+  Result := TFindAction(Add('pattern', Value));
+end;
+
+{ TFunctionInputText }
+
+class function TFunctionInputText.New: TFunctionInputText;
+begin
+  Result := TFunctionInputText.Create.&Type();
+end;
+
+function TFunctionInputText.Text(const Value: string): TFunctionInputText;
+begin
+  Result := TFunctionInputText(Add('text', Value));
+end;
+
+function TFunctionInputText.&Type(const Value: string): TFunctionInputText;
+begin
+  Result := TFunctionInputText(Add('type', Value));
+end;
+
+{ TFunctionInputImage }
+
+function TFunctionInputImage.Detail(
+  const Value: TImageDetail): TFunctionInputImage;
+begin
+  Result := TFunctionInputImage(Add('detail', Value.ToString));
+end;
+
+function TFunctionInputImage.Detail(const Value: string): TFunctionInputImage;
+begin
+  Result := TFunctionInputImage(Add('detail', TImageDetail.Create(Value).ToString));
+end;
+
+function TFunctionInputImage.FileId(const Value: string): TFunctionInputImage;
+begin
+  Result := TFunctionInputImage(Add('file_id', Value));
+end;
+
+function TFunctionInputImage.ImageUrl(const Value: string): TFunctionInputImage;
+begin
+  Result := TFunctionInputImage(Add('image_url', Value)); //GetUrlOrEncodeBase64
+end;
+
+class function TFunctionInputImage.New: TFunctionInputImage;
+begin
+  Result := TFunctionInputImage.Create.&Type();
+end;
+
+function TFunctionInputImage.&Type(const Value: string): TFunctionInputImage;
+begin
+  Result := TFunctionInputImage(Add('type', Value));
+end;
+
+{ TFunctionInputFile }
+
+function TFunctionInputFile.FileData(const Value: string): TFunctionInputFile;
+begin
+  Result := TFunctionInputFile(Add('file_data', Value)); //GetUrlOrEncodeBase64
+end;
+
+function TFunctionInputFile.FileId(const Value: string): TFunctionInputFile;
+begin
+  Result := TFunctionInputFile(Add('file_id', Value));
+end;
+
+function TFunctionInputFile.Filename(const Value: string): TFunctionInputFile;
+begin
+  Result := TFunctionInputFile(Add('filename', Value));
+end;
+
+function TFunctionInputFile.FileUrl(const Value: string): TFunctionInputFile;
+begin
+  Result := TFunctionInputFile(Add('file_url', Value));
+end;
+
+class function TFunctionInputFile.New: TFunctionInputFile;
+begin
+  Result := TFunctionInputFile.Create.&Type();
+end;
+
+function TFunctionInputFile.&Type(const Value: string): TFunctionInputFile;
+begin
+  Result := TFunctionInputFile(Add('type', Value));
+end;
+
+{ TCodeInterpreterOutputImage }
+
+class function TCodeInterpreterOutputImage.New: TCodeInterpreterOutputImage;
+begin
+  Result := TCodeInterpreterOutputImage.Create.&Type();
+end;
+
+function TCodeInterpreterOutputImage.&Type(
+  const Value: string): TCodeInterpreterOutputImage;
+begin
+  Result := TCodeInterpreterOutputImage(Add('type', Value));
+end;
+
+function TCodeInterpreterOutputImage.Url(
+  const Value: string): TCodeInterpreterOutputImage;
+begin
+  Result := TCodeInterpreterOutputImage(Add('url', Value));
+end;
+
+{ TCustomToolCallOutput }
+
+function TCustomToolCallOutput.&Type(
+  const Value: string): TCustomToolCallOutput;
+begin
+  Result := TCustomToolCallOutput(Add('type', Value));
+end;
+
+function TCustomToolCallOutput.CallId(
+  const Value: string): TCustomToolCallOutput;
+begin
+  Result := TCustomToolCallOutput(Add('call_id', Value));
+end;
+
+function TCustomToolCallOutput.Output(
+  const Value: string): TCustomToolCallOutput;
+begin
+  Result := TCustomToolCallOutput(Add('output', Value));
+end;
+
+function TCustomToolCallOutput.Id(const Value: string): TCustomToolCallOutput;
+begin
+  Result := TCustomToolCallOutput(Add('id', Value));
+end;
+
+class function TCustomToolCallOutput.New: TCustomToolCallOutput;
+begin
+  Result := TCustomToolCallOutput.Create.&Type();
+end;
+
+function TCustomToolCallOutput.Output(
+  const Value: TArray<TFunctionOutput>): TCustomToolCallOutput;
+begin
+  var JSONArray := TJSONArray.Create;
+  for var Item in Value do
+    JSONArray.Add(Item.Detach);
+  Result := TCustomToolCallOutput(Add('output', JSONArray));
+end;
+
+{ TCustomToolCall }
+
+function TCustomToolCall.&Type(const Value: string): TCustomToolCall;
+begin
+  Result := TCustomToolCall(Add('type', Value));
+end;
+
+function TCustomToolCall.CallId(const Value: string): TCustomToolCall;
+begin
+  Result := TCustomToolCall(Add('call_id', Value));
+end;
+
+function TCustomToolCall.Id(const Value: string): TCustomToolCall;
+begin
+  Result := TCustomToolCall(Add('id', Value));
+end;
+
+function TCustomToolCall.Input(const Value: string): TCustomToolCall;
+begin
+  Result := TCustomToolCall(Add('input', Value));
+end;
+
+function TCustomToolCall.Name(const Value: string): TCustomToolCall;
+begin
+  Result := TCustomToolCall(Add('name', Value));
+end;
+
+{ TConversationParams }
+
+function TConversationParams.Id(const Value: string): TConversationParams;
+begin
+  Result := TConversationParams(Add('id', Value));
+end;
+
+class function TConversationParams.New(
+  const Value: string): TConversationParams;
+begin
+  Result := TConversationParams.Create.Id(Value);
+end;
+
+{ TWebSearchPreviewParams }
+
+function TWebSearchPreviewParams.&Type(
+  const Value: TWebSearchPreviewType): TWebSearchPreviewParams;
+begin
+  Result := TWebSearchPreviewParams(Add('type', Value.ToString));
+end;
+
+function TWebSearchPreviewParams.&Type(
+  const Value: string): TWebSearchPreviewParams;
+begin
+  Result := TWebSearchPreviewParams(Add('type', TWebSearchPreviewType.Create(Value).ToString));
+end;
+
+function TWebSearchPreviewParams.UserLocation(
+  const Value: TResponseUserLocationParams): TWebSearchPreviewParams;
+begin
+  Result := TWebSearchPreviewParams(Add('user_location', Value.Detach));
+end;
+
+function TWebSearchPreviewParams.SearchContextSize(
+  const Value: TSearchWebOptions): TWebSearchPreviewParams;
+begin
+  Result := TWebSearchPreviewParams(Add('search_context_size', Value.ToString));
+end;
+
+class function TWebSearchPreviewParams.New: TWebSearchPreviewParams;
+begin
+  Result := TWebSearchPreviewParams.Create.&Type();
+end;
+
+function TWebSearchPreviewParams.SearchContextSize(
+  const Value: string): TWebSearchPreviewParams;
+begin
+  Result := TWebSearchPreviewParams(Add('search_context_size', TSearchWebOptions.Create(Value).ToString));
+end;
+
 
 end.

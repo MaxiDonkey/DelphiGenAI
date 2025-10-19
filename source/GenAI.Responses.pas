@@ -1172,8 +1172,9 @@ begin
   Result := API.Post<TResponse>('responses/' + ResponseId + '/cancel',
     [
      ['instructions', '*', 'content'],
-     ['instructions', 'output', '{}'],
-     ['instructions']
+     ['instructions', '*', 'output', '[]'],
+     ['instructions'],
+     ['tools', '*', 'container', '{}']
     ]);
 end;
 
@@ -1182,8 +1183,9 @@ begin
   Result := API.Post<TResponse, TResponsesParams>('responses', ParamProc,
     [
      ['instructions', '*', 'content'],
-     ['instructions', 'output', '{}'],
-     ['instructions']
+     ['instructions', '*', 'output', '[]'],
+     ['instructions'],
+     ['tools', '*', 'container', '{}']
     ]);
 end;
 
@@ -1193,24 +1195,15 @@ begin
   InternalCreateParallel(ParamProc, CallBacks);
 end;
 
-function TResponsesRoute.Retrieve(const ResponseId: string): TResponse;
-begin
-  Result := API.Get<TResponse>('responses/' + ResponseID,
-    [
-     ['instructions', '*', 'content'],
-     ['instructions', 'output', '{}'],
-     ['instructions']
-    ]);
-end;
-
 function TResponsesRoute.CreateStream(ParamProc: TProc<TResponsesParams>;
   Event: TResponseEvent): Boolean;
 begin
   Result := InternalCreateStream(ParamProc, Event,
     [
      ['response', 'instructions', '*', 'content'],
-     ['response', 'instructions', 'output', '{}'],
-     ['response', 'instructions']
+     ['response', 'instructions', '*', 'output', '[]'],
+     ['response', 'instructions'],
+     ['tools', '*', 'container', '{}']
     ]);
 end;
 
@@ -1224,7 +1217,7 @@ function TResponsesRoute.List(const ResponseId: string;
 begin
   Result := API.Get<TResponses, TUrlResponseListParams>('responses/' + ResponseId + '/input_items', ParamProc,
     [
-      ['data', '*', 'output']
+      ['data', '*', 'output', '[]']
     ]);
 end;
 
@@ -1232,14 +1225,31 @@ function TResponsesRoute.List(const ResponseId: string): TResponses;
 begin
   Result := API.Get<TResponses>('responses/' + ResponseId + '/input_items',
     [
-      ['data', '*', 'output']
+      ['data', '*', 'output', '[]']
     ]);
 end;
 
 function TResponsesRoute.Retrieve(const ResponseId: string;
   const ParamProc: TProc<TURLIncludeParams>): TResponse;
 begin
-  Result := API.Get<TResponse, TURLIncludeParams>('responses/' + ResponseID, ParamProc);
+  Result := API.Get<TResponse, TURLIncludeParams>('responses/' + ResponseID, ParamProc,
+    [
+     ['instructions', '*', 'content'],
+     ['instructions', '*', 'output', '[]'],
+     ['instructions'],
+     ['tools', '*', 'container', '{}']
+    ]);
+end;
+
+function TResponsesRoute.Retrieve(const ResponseId: string): TResponse;
+begin
+  Result := API.Get<TResponse>('responses/' + ResponseID,
+    [
+     ['instructions', '*', 'content'],
+     ['instructions', '*', 'output', '[]'],
+     ['instructions'],
+     ['tools', '*', 'container', '{}']
+    ]);
 end;
 
 end.

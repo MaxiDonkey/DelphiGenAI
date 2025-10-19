@@ -7,6 +7,8 @@ unit GenAI.Runs;
 
  ------------------------------------------------------------------------------}
 
+{--- deprecated unit use conversations }
+
 interface
 
 uses
@@ -869,20 +871,20 @@ type
     /// <param name="ParamProc">A procedure specifying run parameters.</param>
     /// <param name="CallBacks">Callback functions to handle asynchronous execution.</param>
     procedure AsynCreate(const ThreadId: string; const ParamProc: TProc<TRunsParams>;
-      const CallBacks: TFunc<TAsynRun>);
+      const CallBacks: TFunc<TAsynRun>); deprecated;
     /// <summary>
     /// Asynchronously creates a thread and runs it in one request.
     /// </summary>
     /// <param name="ParamProc">A procedure specifying thread creation and run parameters.</param>
     /// <param name="CallBacks">Callback functions to handle asynchronous execution.</param>
     procedure AsynCreateAndRun(const ParamProc: TProc<TCreateRunsParams>;
-      const CallBacks: TFunc<TAsynRun>);
+      const CallBacks: TFunc<TAsynRun>); deprecated;
     /// <summary>
     /// Asynchronously retrieves a list of execution runs associated with a thread.
     /// </summary>
     /// <param name="ThreadId">The ID of the thread whose runs are to be listed.</param>
     /// <param name="CallBacks">Callback functions to handle asynchronous execution.</param>
-    procedure AsynList(const ThreadId: string; const CallBacks: TFunc<TAsynRuns>); overload;
+    procedure AsynList(const ThreadId: string; const CallBacks: TFunc<TAsynRuns>); overload; deprecated;
     /// <summary>
     /// Asynchronously retrieves a filtered list of execution runs associated with a thread.
     /// </summary>
@@ -890,7 +892,7 @@ type
     /// <param name="ParamProc">A procedure specifying filter parameters for listing runs.</param>
     /// <param name="CallBacks">Callback functions to handle asynchronous execution.</param>
     procedure AsynList(const ThreadId: string; const ParamProc: TProc<TRunsUrlParams>;
-      const CallBacks: TFunc<TAsynRuns>); overload;
+      const CallBacks: TFunc<TAsynRuns>); overload; deprecated;
     /// <summary>
     /// Asynchronously retrieves details of a specific execution run.
     /// </summary>
@@ -898,7 +900,7 @@ type
     /// <param name="RunId">The ID of the run to retrieve.</param>
     /// <param name="CallBacks">Callback functions to handle asynchronous execution.</param>
     procedure AsynRetrieve(const ThreadId: string; const RunId: string;
-      const CallBacks: TFunc<TAsynRun>);
+      const CallBacks: TFunc<TAsynRun>); deprecated;
     /// <summary>
     /// Asynchronously updates an existing execution run with new metadata.
     /// </summary>
@@ -908,7 +910,7 @@ type
     /// <param name="CallBacks">Callback functions to handle asynchronous execution.</param>
     procedure AsynUpdate(const ThreadId: string; const RunId: string;
       const ParamProc: TProc<TRunUpdateParams>;
-      const CallBacks: TFunc<TAsynRun>);
+      const CallBacks: TFunc<TAsynRun>); deprecated;
     /// <summary>
     /// Asynchronously submits tool outputs for a paused run that requires them to continue.
     /// </summary>
@@ -918,7 +920,7 @@ type
     /// <param name="CallBacks">Callback functions to handle asynchronous execution.</param>
     procedure AsynSubmitTool(const ThreadId: string; const RunId: string;
       const ParamProc: TProc<TSubmitToolParams>;
-      const CallBacks: TFunc<TAsynRun>);
+      const CallBacks: TFunc<TAsynRun>); deprecated;
     /// <summary>
     /// Asynchronously cancels an execution run that is in progress.
     /// </summary>
@@ -926,40 +928,40 @@ type
     /// <param name="RunId">The ID of the run to cancel.</param>
     /// <param name="CallBacks">Callback functions to handle asynchronous execution.</param>
     procedure AsynCancel(const ThreadId: string; const RunId: string;
-      const CallBacks: TFunc<TAsynRun>);
+      const CallBacks: TFunc<TAsynRun>); deprecated;
     /// <summary>
     /// Creates a new execution run on a thread.
     /// </summary>
     /// <param name="ThreadId">The ID of the thread to run.</param>
     /// <param name="ParamProc">A procedure specifying run parameters.</param>
     /// <returns>The created <c>TRun</c> object representing the execution run.</returns>
-    function Create(const ThreadId: string; const ParamProc: TProc<TRunsParams>): TRun;
+    function Create(const ThreadId: string; const ParamProc: TProc<TRunsParams>): TRun; deprecated;
     /// <summary>
     /// Creates a thread and runs it in one request.
     /// </summary>
     /// <param name="ParamProc">A procedure specifying thread creation and run parameters.</param>
     /// <returns>The created <c>TRun</c> object representing the execution run.</returns>
-    function CreateAndRun(const ParamProc: TProc<TCreateRunsParams>): TRun;
+    function CreateAndRun(const ParamProc: TProc<TCreateRunsParams>): TRun; deprecated;
     /// <summary>
     /// Retrieves a list of execution runs associated with a thread.
     /// </summary>
     /// <param name="ThreadId">The ID of the thread whose runs are to be listed.</param>
     /// <returns>A list of <c>TRun</c> objects representing the execution runs.</returns>
-    function List(const ThreadId: string): TRuns; overload;
+    function List(const ThreadId: string): TRuns; overload; deprecated;
     /// <summary>
     /// Retrieves a filtered list of execution runs associated with a thread.
     /// </summary>
     /// <param name="ThreadId">The ID of the thread whose runs are to be listed.</param>
     /// <param name="ParamProc">A procedure specifying filter parameters for listing runs.</param>
     /// <returns>A list of <c>TRun</c> objects representing the filtered execution runs.</returns>
-    function List(const ThreadId: string; const ParamProc: TProc<TRunsUrlParams>): TRuns; overload;
+    function List(const ThreadId: string; const ParamProc: TProc<TRunsUrlParams>): TRuns; overload; deprecated;
     /// <summary>
     /// Retrieves details of a specific execution run.
     /// </summary>
     /// <param name="ThreadId">The ID of the thread containing the run.</param>
     /// <param name="RunId">The ID of the run to retrieve.</param>
     /// <returns>The <c>TRun</c> object containing the run details.</returns>
-    function Retrieve(const ThreadId: string; const RunId: string): TRun;
+    function Retrieve(const ThreadId: string; const RunId: string): TRun; deprecated;
     /// <summary>
     /// Updates an existing execution run with new metadata.
     /// </summary>
@@ -968,7 +970,7 @@ type
     /// <param name="ParamProc">A procedure specifying update parameters.</param>
     /// <returns>The updated <c>TRun</c> object.</returns>
     function Update(const ThreadId: string; const RunId: string;
-      const ParamProc: TProc<TRunUpdateParams>): TRun;
+      const ParamProc: TProc<TRunUpdateParams>): TRun; deprecated;
     /// <summary>
     /// Submits tool outputs for a paused run that requires them to continue.
     /// </summary>
@@ -977,14 +979,14 @@ type
     /// <param name="ParamProc">A procedure specifying tool output parameters.</param>
     /// <returns>The updated <c>TRun</c> object after tool submission.</returns>
     function SubmitTool(const ThreadId: string; const RunId: string;
-      const ParamProc: TProc<TSubmitToolParams>): TRun;
+      const ParamProc: TProc<TSubmitToolParams>): TRun; deprecated;
     /// <summary>
     /// Cancels an execution run that is in progress.
     /// </summary>
     /// <param name="ThreadId">The ID of the thread containing the run.</param>
     /// <param name="RunId">The ID of the run to cancel.</param>
     /// <returns>The <c>TRun</c> object with the updated status indicating cancellation.</returns>
-    function Cancel(const ThreadId: string; const RunId: string): TRun;
+    function Cancel(const ThreadId: string; const RunId: string): TRun; deprecated;
   end;
 
 implementation

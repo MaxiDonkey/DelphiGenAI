@@ -13,6 +13,10 @@ uses
   System.SysUtils, System.TypInfo, System.Variants, System.Rtti, GenAI.Consts,
   GenAI.API.Params;
 
+{$IF Declared(varUInt64)}
+  {$DEFINE HAS_VARUINT64}
+{$ENDIF}
+
 {$SCOPEDENUMS ON}
 
 type
@@ -173,6 +177,7 @@ type
     /// clarifications, or actions requested by the user.
     /// </remarks>
     assistant,
+
     /// <summary>
     /// Represents messages sent by the end user of the model.
     /// </summary>
@@ -181,6 +186,7 @@ type
     /// questions, instructions, or other prompts to request information or perform tasks.
     /// </remarks>
     user,
+
     /// <summary>
     /// Represents instructions or configuration defined by the developer.
     /// </summary>
@@ -190,6 +196,7 @@ type
     /// the model in interpreting and responding to user inputs.
     /// </remarks>
     developer,
+
     /// <summary>
     /// Represents the system-level instructions or metadata.
     /// </summary>
@@ -199,6 +206,7 @@ type
     /// conversation at a higher level.
     /// </remarks>
     system,
+
     /// <summary>
     /// Represents a tool or action within the context of the conversation.
     /// </summary>
@@ -207,7 +215,39 @@ type
     /// to supplement the model's functionality. It is commonly used for
     /// retrieval, calculations, or integration with external APIs.
     /// </remarks>
-    tool
+    tool,
+
+    /// <summary>
+    /// Unknown or unrecognized role emitted by the API.
+    /// </summary>
+    /// <remarks>
+    /// This value can appear when the source role is not part of the documented set
+    /// or when experimental/internal roles are surfaced. It does not carry instruction
+    /// priority and should not be authored by clients. Log explicitly and handle per
+    /// your application’s policy.
+    /// </remarks>
+    unknown,
+
+    /// <summary>
+    /// Critic role used for model-internal critique or review.
+    /// </summary>
+    /// <remarks>
+    /// May be produced by reasoning/structured-generation pipelines to annotate
+    /// self-critique or evaluation text. It is not an instruction-bearing role and
+    /// should not override system/developer/user directives. Clients should not send
+    /// messages with this role.
+    /// </remarks>
+    critic,
+
+    /// <summary>
+    /// Discriminator role used for classification, safety, or scoring signals.
+    /// </summary>
+    /// <remarks>
+    /// Intended for internal discriminative outputs (e.g., safety/policy checks or
+    /// ranking metadata). It does not participate in the instruction hierarchy and
+    /// should not be authored by clients. Treat as auxiliary metadata only.
+    /// </remarks>
+    discriminator
   );
 
   TRoleHelper = record Helper for TRole
@@ -906,7 +946,7 @@ type
 
   THarmCategoriesHelper = record Helper for THarmCategories
     function ToString: string;
-    class function Create(const Value: string): TEncodingFormat; static;
+    class function Create(const Value: string): THarmCategories; static;
   end;
 
   {$ENDREGION}
@@ -1449,19 +1489,24 @@ type
 
   {$REGION 'GenAI.Responses'}
 
+  {$SCOPEDENUMS OFF}
+
   TOutputIncluding = (
     /// <summary>
     /// Include the search results of the file search tool call.
     /// </summary>
-    file_search_result,
+    file_search_call_results,
+
     /// <summary>
     /// Include image urls from the input message.
     /// </summary>
-    input_image_url,
+    message_input_image_image_url,
+
     /// <summary>
     /// Include image urls from the computer call output.
     /// </summary>
-    computer_call_image_url,
+    computer_call_output_output_image_url,
+
     /// <summary>
     /// Includes an encrypted version of reasoning tokens in reasoning item outputs. This enables reasoning
     /// items to be used in multi-turn conversations when using the Responses API statelessly (like when
@@ -1469,15 +1514,24 @@ type
     /// retention program).
     /// </summary>
     reasoning_encrypted_content,
+
     /// <summary>
-    ///  Includes the outputs of python code execution in code interpreter tool call items.
+    /// Includes the outputs of python code execution in code interpreter tool call items.
     /// </summary>
-    code_interpreter_call,
+    code_interpreter_call_outputs,
+
     /// <summary>
-    /// nclude logprobs with assistant messages.
+    /// Include logprobs with assistant messages.
     /// </summary>
-    message_text_logprobs
+    message_output_text_logprobs,
+
+    /// <summary>
+    /// Include the sources of the web search tool call.
+    /// </summary>
+    web_search_call_action_sources
   );
+
+  {$SCOPEDENUMS ON}
 
   TOutputIncludingHelper = record Helper for TOutputIncluding
     constructor Create(const Value: string);
@@ -1526,16 +1580,21 @@ type
     function ToString: string;
   end;
 
+  {$SCOPEDENUMS OFF}
+
   TInputItemType = (
     input_text,
     input_image,
-    input_file
+    input_file,
+    input_audio
   );
 
   TInputItemTypeHelper = record Helper for TInputItemType
     constructor Create(const Value: string);
     function ToString: string;
   end;
+
+  {$SCOPEDENUMS ON}
 
   TFileSearchToolCallType = (
     in_progress,
@@ -1623,11 +1682,21 @@ type
   end;
 
   TWebSearchType = (
+    web_search,
+    web_search_2025_08_26
+  );
+
+  TWebSearchTypeHelper = record Helper for TWebSearchType
+    constructor Create(const Value: string);
+    function ToString: string;
+  end;
+
+  TWebSearchPreviewType = (
     web_search_preview,
     web_search_preview_2025_03_11
   );
 
-  TWebSearchTypeHelper = record Helper for TWebSearchType
+  TWebSearchPreviewTypeHelper = record Helper for TWebSearchPreviewType
     constructor Create(const Value: string);
     function ToString: string;
   end;
@@ -1642,6 +1711,8 @@ type
     function ToString: string;
   end;
 
+  {$SCOPEDENUMS OFF}
+
   TResponseTypes = (
     message,
     file_search_call,
@@ -1651,7 +1722,6 @@ type
     reasoning,
     computer_call_output,
     function_call_output,
-
     image_generation_call,
     code_interpreter_call,
     local_shell_call,
@@ -1659,8 +1729,13 @@ type
     mcp_call,
     mcp_list_tools,
     mcp_approval_request,
-    mcp_approval_response
+    mcp_approval_response,
+
+    custom_tool_call,
+    custom_tool_call_output
   );
+
+  {$SCOPEDENUMS ON}
 
   TResponseTypesHelper = record Helper for TResponseTypes
     constructor Create(const Value: string);
@@ -1943,7 +2018,8 @@ end;
 constructor TRoleHelper.Create(const Value: string);
 begin
   Self := TEnumValueRecovery.TypeRetrieve<TRole>(Value,
-            ['assistant', 'user', 'developer', 'system', 'tool']);
+            ['assistant', 'user', 'developer', 'system', 'tool',
+             'unknown', 'critic', 'discriminator']);
 end;
 
 function TRoleHelper.ToString: string;
@@ -1959,6 +2035,12 @@ begin
       Exit('system');
     TRole.tool:
       Exit('tool');
+    TRole.unknown:
+      Exit('unknown');
+    TRole.critic:
+      Exit('critic');
+    TRole.discriminator:
+      Exit('discriminator');
   end;
 end;
 
@@ -2297,9 +2379,9 @@ end;
 { THarmCategoriesHelper }
 
 class function THarmCategoriesHelper.Create(
-  const Value: string): TEncodingFormat;
+  const Value: string): THarmCategories;
 begin
-  Result := TEnumValueRecovery.TypeRetrieve<TEncodingFormat>(Value,
+  Result := TEnumValueRecovery.TypeRetrieve<THarmCategories>(Value,
     ['hate', 'hate threatening', 'harassment', 'harassment threatening',
      'illicit', 'illicit violent', 'self harm', 'self harm intent',
      'self harm instructions', 'sexual', 'sexual minors', 'violence',
@@ -2431,7 +2513,7 @@ begin
     TFilesPurpose.evals:
       Exit('evals');
     TFilesPurpose.user_data:
-      Exit('user_data')
+      Exit('user_data');
   end;
 end;
 
@@ -2878,6 +2960,11 @@ end;
 
 { TStringOrNullHelper }
 
+function VariantIsEmptyOrNull(const V: Variant): Boolean;
+begin
+  Result := VarIsClear(V) or VarIsEmpty(V) or VarIsNull(V);
+end;
+
 constructor TStringOrNullHelper.Create(const Value: Variant);
 begin
   Self := Value;
@@ -2885,6 +2972,9 @@ end;
 
 function TStringOrNullHelper.isNull: Boolean;
 begin
+  if VariantIsEmptyOrNull(Self) then
+    Exit(True);
+
   case VarType(Self) of
     varString,
     varUString,
@@ -2911,13 +3001,18 @@ end;
 
 function TIntegerOrNullHelper.isNull: Boolean;
 begin
+  if VariantIsEmptyOrNull(Self)
+    then Exit(True);
+
   case VarType(Self) of
     varSmallint,
     varInteger,
     varShortInt,
     varByte,
     varWord,
-    varUInt32:
+    varUInt32,
+    varInt64,
+    {$IFDEF HAS_VARUINT64} varUInt64 {$ENDIF}:
       Exit(False);
     else
       Exit(True);
@@ -2925,10 +3020,20 @@ begin
 end;
 
 function TIntegerOrNullHelper.ToInteger: Integer;
+var
+  L: Int64;
 begin
   if Self.isNull then
-    Result := 0 else
-    Result := VarAsType(Self, varInteger);
+    Exit(0);
+  try
+    L := VarAsType(Self, varInt64);
+  except
+    L := High(Int64);
+  end;
+  if L < Low(Integer) then Result := Low(Integer)
+    else
+  if L > High(Integer) then Result := High(Integer)
+    else Result := Integer(L);
 end;
 
 function TIntegerOrNullHelper.ToString: string;
@@ -2947,6 +3052,9 @@ end;
 
 function TInt64OrNullHelper.isNull: Boolean;
 begin
+  if VariantIsEmptyOrNull(Self) then
+    Exit(True);
+
   case VarType(Self) of
     varSmallint,
     varInteger,
@@ -2955,7 +3063,7 @@ begin
     varByte,
     varWord,
     varUInt32,
-    varUInt64:
+    {$IFDEF HAS_VARUINT64} varUInt64 {$ENDIF}:
       Exit(False);
     else
       Exit(True);
@@ -2990,6 +3098,9 @@ end;
 
 function TDoubleOrNullHelper.isNull: Boolean;
 begin
+  if VariantIsEmptyOrNull(Self) then
+    Exit(True);
+
   case VarType(Self) of
     varSmallint,
     varInteger,
@@ -3001,7 +3112,7 @@ begin
     varByte,
     varWord,
     varUInt32,
-    varUInt64:
+    {$IFDEF HAS_VARUINT64} varUInt64 {$ENDIF}:
       Exit(False);
     else
       Exit(True);
@@ -3031,11 +3142,20 @@ end;
 
 function TBooleanOrNullHelper.isNull: Boolean;
 begin
+  if VariantIsEmptyOrNull(Self) then
+    Exit(True);
+
   case VarType(Self) of
     varBoolean:
       Exit(False);
     varByte,
-    varShortInt:
+    varShortInt,
+    varSmallint,
+    varInteger,
+    varInt64,
+    varWord,
+    varUInt32,
+    {$IFDEF HAS_VARUINT64} varUInt64 {$ENDIF}:
       Exit(not ((Self = 0) or (Self = 1) or (Self = -1)));
     else
       Exit(True);
@@ -3086,24 +3206,27 @@ begin
              'computer_call_output.output.image_url',
              'reasoning.encrypted_content',
              'code_interpreter_call.outputs',
-             'message.output_text.logprobs']);
+             'message.output_text.logprobs',
+             'web_search_call.action.sources']);
 end;
 
 function TOutputIncludingHelper.ToString: string;
 begin
   case self of
-    TOutputIncluding.file_search_result:
+    file_search_call_results:
       Exit('file_search_call.results');
-    TOutputIncluding.input_image_url:
+    message_input_image_image_url:
       Exit('message.input_image.image_url');
-    TOutputIncluding.computer_call_image_url:
+    computer_call_output_output_image_url:
       Exit('computer_call_output.output.image_url');
-    TOutputIncluding.reasoning_encrypted_content:
+    reasoning_encrypted_content:
       Exit('reasoning.encrypted_content');
-    TOutputIncluding.code_interpreter_call:
+    code_interpreter_call_outputs:
       Exit('code_interpreter_call.outputs');
-    TOutputIncluding.message_text_logprobs:
+    message_output_text_logprobs:
       Exit('message.output_text.logprobs');
+    web_search_call_action_sources:
+      Exit('web_search_call.action.sources');
   end;
 end;
 
@@ -3132,7 +3255,7 @@ end;
 constructor TInputItemTypeHelper.Create(const Value: string);
 begin
   Self := TEnumValueRecovery.TypeRetrieve<TInputItemType>(Value,
-            ['input_text', 'input_image', 'input_file']);
+            ['input_text', 'input_image', 'input_file', 'input_audio']);
 end;
 
 function TInputItemTypeHelper.ToString: string;
@@ -3144,6 +3267,8 @@ begin
       Exit('input_image');
     TInputItemType.input_file:
       Exit('input_file');
+    TInputItemType.input_audio:
+      Exit('input_audio');
   end;
 end;
 
@@ -3325,16 +3450,16 @@ end;
 constructor TWebSearchTypeHelper.Create(const Value: string);
 begin
   Self := TEnumValueRecovery.TypeRetrieve<TWebSearchType>(Value,
-            ['web_search_preview', 'web_search_preview_2025_03_11']);
+            ['web_search', 'web_search_2025_08_26']);
 end;
 
 function TWebSearchTypeHelper.ToString: string;
 begin
   case self of
-    TWebSearchType.web_search_preview:
-      Exit('web_search_preview');
-    TWebSearchType.web_search_preview_2025_03_11:
-      Exit('web_search_preview_2025_03_11');
+    TWebSearchType.web_search:
+      Exit('web_search');
+    TWebSearchType.web_search_2025_08_26:
+      Exit('web_search_2025_08_26');
   end;
 end;
 
@@ -3376,7 +3501,9 @@ begin
              'mcp_call',
              'mcp_list_tools',
              'mcp_approval_request',
-             'mcp_approval_response']);
+             'mcp_approval_response',
+             'custom_tool_call',
+             'custom_tool_call_output']);
 end;
 
 function TResponseTypesHelper.ToString: string;
@@ -3395,7 +3522,7 @@ begin
     TResponseTypes.reasoning:
       Exit('reasoning');
     TResponseTypes.computer_call_output:
-      Exit('computer_call_outpu');
+      Exit('computer_call_output');
     TResponseTypes.function_call_output:
       Exit('function_call_output');
     TResponseTypes.image_generation_call:
@@ -3414,6 +3541,10 @@ begin
       Exit('mcp_approval_request');
     TResponseTypes.mcp_approval_response:
       Exit('mcp_approval_response');
+    TResponseTypes.custom_tool_call:
+      Exit('custom_tool_call');
+    TResponseTypes.custom_tool_call_output:
+      Exit('custom_tool_call_output');
   end;
 end;
 
@@ -3680,6 +3811,18 @@ end;
 
 constructor TResponseItemContentTypeHelper.Create(const Value: string);
 begin
+  if SameText(Value, 'text_content') or SameText(Value, 'text') then
+    begin
+      Self := TResponseItemContentType.output_text;
+      Exit;
+    end;
+
+  if SameText(Value, 'summary_text') then
+    begin
+      Self := TResponseItemContentType.output_text;
+      Exit;
+    end;
+
   Self := TEnumValueRecovery.TypeRetrieve<TResponseItemContentType>(Value,
             ['input_text', 'input_image', 'input_file', 'output_text', 'refusal']);
 end;
@@ -4028,7 +4171,7 @@ end;
 constructor TToolParamsFormatTypeHelper.Create(const Value: string);
 begin
   Self := TEnumValueRecovery.TypeRetrieve<TToolParamsFormatType>(Value,
-            ['text', 'grammargrammar']);
+            ['text', 'grammar']);
 end;
 
 function TToolParamsFormatTypeHelper.ToString: string;
@@ -4056,6 +4199,24 @@ begin
       Exit('lark');
     TSyntaxFormatType.regex:
       Exit('regex');
+  end;
+end;
+
+{ TWebSearchPreviewTypeHelper }
+
+constructor TWebSearchPreviewTypeHelper.Create(const Value: string);
+begin
+  Self := TEnumValueRecovery.TypeRetrieve<TWebSearchPreviewType>(Value,
+            ['web_search_preview', 'web_search_preview_2025_03_11']);
+end;
+
+function TWebSearchPreviewTypeHelper.ToString: string;
+begin
+  case self of
+    TWebSearchPreviewType.web_search_preview:
+      Exit('web_search_preview');
+    TWebSearchPreviewType.web_search_preview_2025_03_11:
+      Exit('web_search_preview_2025_03_11');
   end;
 end;
 

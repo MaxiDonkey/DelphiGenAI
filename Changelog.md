@@ -1,3 +1,64 @@
+#### 2025, October 19 version 1.3.0
+
+**Deprecation of Assistants API units**
+
+OpenAI announced the deprecation of the Assistants API on August 26, 2025, with permanent removal scheduled for August 26, 2026.  
+The following units are now marked as deprecated within the wrapper:
+
+- `GenAI.Messages.pas`  
+- `GenAI.Threads.pas`  
+- `GenAI.Run.pas`  
+- `GenAI.RunSteps.pas`
+
+These remain functional for backward compatibility but should no longer be used for new developments. Migration to the `v1/conversations` and `v1/responses` endpoints is strongly recommended.  
+A dedicated Assistants-to-Conversations migration guide has been added to the documentation.
+
+<br>
+
+**New API endpoint: `v1/conversations`**
+
+- Implements the new Conversations API introduced by OpenAI in March 2025.
+- Enables persistent conversation management and structured context building for use with `v1/responses`.
+- New Delphi types (`TConversation`, `TConversationMessage`, etc.) for creating, updating and listing conversation threads.
+- Supports streamed responses, tool execution, system/developer messages, caching (`prompt_cache_key`) and safety identifiers.
+
+<br>
+
+**New API endpoint: `v1/containers` (Code Interpreter execution environment)**
+
+- Full support for creating and managing remote execution containers used by the Code Interpreter tool.
+- File upload, Python code execution, artifact retrieval and container lifecycle are now available through the `GenAI.Containers.*` namespace.
+- Provides low-level control over execution state and outputs.
+
+<br>
+
+**New API endpoint: `v1/video` (Sora video generation)**
+
+- Adds access to OpenAI’s Sora API for text-to-video and image-to-video generation with audio.
+- Task status tracking supported (`queued`, `in_progress`, `completed`, `failed`).
+- New `GenAI.Video.*` units cover request/response typing, metadata (resolution, duration, fps, audio inclusion, seed, safety information, etc.).
+
+<br>
+
+**Realtime API (separate module)**
+
+Although outside the core HTTP-based GenAI wrapper, a separate implementation has been introduced to support OpenAI’s Realtime API (WebRTC):
+
+- Real-time audio/text/vision streaming interactions with models.
+- Supports live reasoning, tool usage and code execution.
+- Documented in the project's *Realtime* section. This module is optional and not required for standard REST usage.
+
+<br>
+
+**Additional updates**
+
+- Documentation (README, TutorialHub) updated to reflect the Conversations + Responses workflow.
+- Compiler warnings added for deprecated Assistants API units.
+- `InputParams` and `OutputParams` updated to maintain compatibility with new endpoints.
+- Foundation prepared for the complete removal of Assistants API in a future release.
+
+<br>
+
 #### 2025, August 14 version 1.2.1
 - Fix the destructor `TResponseOutputComputer.Destroy;` method in `GenAI.Responses.OutputParams module`.
 

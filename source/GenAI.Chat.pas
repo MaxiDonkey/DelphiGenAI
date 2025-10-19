@@ -2917,30 +2917,319 @@ type
   /// software architectures.
   /// </remarks>
   TChatRoute = class(TGenAIRoute)
-
+    /// <summary>
+    /// Asynchronously creates a chat completion and returns a promise that resolves to the resulting <see cref="TChat"/>.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// This method executes a chat completion request in a non-blocking manner and wraps the result
+    /// in a <see cref="TPromise{TChat}"/>. It internally uses the callback-based asynchronous API and
+    /// exposes the result as a promise for easier integration with modern asynchronous workflows.
+    /// </para>
+    /// <para>
+    /// The <paramref name="ParamProc"/> parameter is used to configure the <see cref="TChatParams"/> for the request,
+    /// such as setting the model, messages, temperature, or other options.
+    /// </para>
+    /// <para>
+    /// If the optional <paramref name="CallBacks"/> parameter is provided, its lifecycle handlers
+    /// (such as OnStart, OnSuccess, OnError) are invoked at the appropriate stages of the request.
+    /// Regardless of whether callbacks are provided, the returned promise will be resolved with a
+    /// <see cref="TChat"/> instance on success or rejected with an <see cref="Exception"/> on failure.
+    /// </para>
+    /// <para>
+    /// This method does not provide explicit cancellation. For streamed or cancellable operations,
+    /// use the streaming equivalent instead.
+    /// </para>
+    /// </remarks>
+    /// <param name="ParamProc">
+    /// Procedure used to configure the parameters of the chat request.
+    /// </param>
+    /// <param name="CallBacks">
+    /// Optional factory returning a <see cref="TPromiseChat"/> instance with lifecycle callbacks.
+    /// If omitted, the operation still runs and completion is observed via the returned promise.
+    /// </param>
+    /// <returns>
+    /// A <see cref="TPromise{TChat}"/> that is fulfilled with the resulting chat completion
+    /// or rejected with an exception if an error occurs.
+    /// </returns>
     function AsyncAwaitCreate(const ParamProc: TProc<TChatParams>;
       const CallBacks: TFunc<TPromiseChat> = nil): TPromise<TChat>;
 
+    /// <summary>
+    /// Asynchronously creates a streamed chat completion and returns a promise
+    /// that resolves to the full concatenated response as a string.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// This method initiates a streaming chat completion request and wraps the process
+    /// in a <see cref="TPromise{string}"/>. As chunks of the response arrive, they are
+    /// collected and concatenated internally. Once the stream is completed successfully,
+    /// the promise is resolved with the full response text.
+    /// </para>
+    /// <para>
+    /// The <paramref name="ParamProc"/> parameter is used to configure the
+    /// <see cref="TChatParams"/> for the request, including model selection, messages,
+    /// temperature, or other options.
+    /// </para>
+    /// <para>
+    /// If <paramref name="CallBacks"/> is provided, its lifecycle handlers
+    /// (such as OnStart, OnProgress, OnSuccess, OnError, OnDoCancel, OnCancellation)
+    /// will be invoked during the streaming process. These callbacks allow real-time
+    /// handling of partial responses or errors while the promise aggregates the output.
+    /// </para>
+    /// <para>
+    /// If the stream completes normally, the returned promise resolves with the full
+    /// concatenated content. If an error occurs or if cancellation is triggered, the
+    /// promise is rejected with an exception.
+    /// </para>
+    /// </remarks>
+    /// <param name="ParamProc">
+    /// Procedure used to configure the parameters of the chat streaming request.
+    /// </param>
+    /// <param name="CallBacks">
+    /// Function returning a <see cref="TPromiseChatStream"/> with optional lifecycle
+    /// callbacks for handling streaming events. This parameter is mandatory.
+    /// </param>
+    /// <returns>
+    /// A <see cref="TPromise{string}"/> that resolves with the full streamed response text
+    /// or is rejected with an exception if an error or cancellation occurs.
+    /// </returns>
     function AsyncAwaitCreateStream(const ParamProc: TProc<TChatParams>;
       const CallBacks: TFunc<TPromiseChatStream>): TPromise<string>;
 
+    /// <summary>
+    /// Asynchronously retrieves a stored chat completion and returns a promise
+    /// that resolves to a <see cref="TChat"/> instance.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// This method performs a non-blocking request to fetch an existing chat completion
+    /// identified by <paramref name="CompletionID"/>. The operation is wrapped in a
+    /// <see cref="TPromise{TChat}"/>, which will be resolved once the data is successfully retrieved
+    /// or rejected if an error occurs.
+    /// </para>
+    /// <para>
+    /// If provided, <paramref name="CallBacks"/> allows handling lifecycle events such as
+    /// start, success, and error through a <see cref="TPromiseChat"/> callback structure.
+    /// These callbacks are optional and do not interfere with the returned promise.
+    /// </para>
+    /// <para>
+    /// The promise is fulfilled with a <see cref="TChat"/> object containing the retrieved completion data.
+    /// If the specified <paramref name="CompletionID"/> does not exist, access is denied,
+    /// or a network or API error occurs, the promise is rejected with an exception.
+    /// </para>
+    /// </remarks>
+    /// <param name="CompletionID">
+    /// The unique identifier of the stored chat completion to retrieve.
+    /// </param>
+    /// <param name="CallBacks">
+    /// Optional function returning a <see cref="TPromiseChat"/> that provides lifecycle
+    /// callbacks for the asynchronous operation. If omitted, only the returned promise
+    /// is used to observe the result.
+    /// </param>
+    /// <returns>
+    /// A <see cref="TPromise{TChat}"/> that resolves with the retrieved chat completion
+    /// or is rejected with an exception if the operation fails.
+    /// </returns>
     function AsyncAwaitGetCompletion(const CompletionID: string;
       const CallBacks: TFunc<TPromiseChat> = nil): TPromise<TChat>;
 
+    /// <summary>
+    /// Asynchronously retrieves the messages of a stored chat completion and returns a promise
+    /// that resolves to a <see cref="TChatMessages"/> instance.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// This method initiates a non-blocking request to fetch all messages associated with
+    /// a previously stored chat completion identified by <paramref name="CompletionID"/>.
+    /// The operation is wrapped in a <see cref="TPromise{TChatMessages}"/>, which will be
+    /// resolved upon successful retrieval or rejected if an error occurs.
+    /// </para>
+    /// <para>
+    /// If provided, <paramref name="CallBacks"/> supplies lifecycle handlers (such as OnStart,
+    /// OnSuccess, and OnError) via a <see cref="TPromiseChatMessages"/> structure. These callbacks
+    /// are optional and do not interfere with the final resolution of the returned promise.
+    /// </para>
+    /// <para>
+    /// The promise resolves with a <see cref="TChatMessages"/> object containing the list of messages.
+    /// If the specified <paramref name="CompletionID"/> does not exist, access is denied,
+    /// or a network or API error occurs, the promise is rejected with an exception.
+    /// </para>
+    /// </remarks>
+    /// <param name="CompletionID">
+    /// The unique identifier of the stored chat completion whose messages are to be retrieved.
+    /// </param>
+    /// <param name="CallBacks">
+    /// Optional function returning a <see cref="TPromiseChatMessages"/> instance that provides
+    /// lifecycle callbacks for the asynchronous operation. If omitted, only the returned promise
+    /// is used to observe the result.
+    /// </param>
+    /// <returns>
+    /// A <see cref="TPromise{TChatMessages}"/> that resolves with the retrieved messages or
+    /// is rejected with an exception if the operation fails.
+    /// </returns>
     function AsyncAwaitGetMessages(const CompletionID: string;
       const CallBacks: TFunc<TPromiseChatMessages> = nil): TPromise<TChatMessages>; overload;
 
+    /// <summary>
+    /// Asynchronously retrieves the messages of a stored chat completion using custom query parameters
+    /// and returns a promise that resolves to a <see cref="TChatMessages"/> instance.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// This method performs a non-blocking request to fetch messages associated with a stored
+    /// chat completion identified by <paramref name="CompletionID"/>. It allows customization of
+    /// the query through <paramref name="ParamProc"/>, which can specify pagination, ordering,
+    /// or filtering parameters.
+    /// </para>
+    /// <para>
+    /// The operation is wrapped in a <see cref="TPromise{TChatMessages}"/> that resolves upon
+    /// successful retrieval or is rejected with an exception if an error occurs. If provided,
+    /// <paramref name="CallBacks"/> offers lifecycle handlers such as OnStart, OnSuccess, and
+    /// OnError via a <see cref="TPromiseChatMessages"/> structure. These callbacks are optional
+    /// and do not affect the final promise resolution.
+    /// </para>
+    /// <para>
+    /// The promise resolves with a <see cref="TChatMessages"/> object containing the requested
+    /// messages. If the <paramref name="CompletionID"/> is invalid, access is denied, or a network
+    /// or API error occurs, the promise is rejected with an exception.
+    /// </para>
+    /// </remarks>
+    /// <param name="CompletionID">
+    /// The unique identifier of the stored chat completion whose messages are to be retrieved.
+    /// </param>
+    /// <param name="ParamProc">
+    /// Procedure used to configure <see cref="TUrlChatParams"/> for custom query options such as
+    /// pagination (<c>Limit</c>, <c>After</c>), sorting, or message filtering.
+    /// </param>
+    /// <param name="CallBacks">
+    /// Optional function returning a <see cref="TPromiseChatMessages"/> instance that defines
+    /// lifecycle callbacks for the asynchronous operation. If omitted, the operation proceeds
+    /// and only the returned promise is used to observe the result.
+    /// </param>
+    /// <returns>
+    /// A <see cref="TPromise{TChatMessages}"/> that resolves with the retrieved messages or
+    /// is rejected with an exception if the operation fails.
+    /// </returns>
     function AsyncAwaitGetMessages(const CompletionID: string;
       const ParamProc: TProc<TUrlChatParams>;
       const CallBacks: TFunc<TPromiseChatMessages> = nil): TPromise<TChatMessages>; overload;
 
+    /// <summary>
+    /// Asynchronously retrieves a paginated list of stored chat completions and returns a promise
+    /// that resolves to a <see cref="TChatCompletion"/> instance.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// This method performs a non-blocking request to list stored chat completions with optional
+    /// filtering, pagination, metadata selection, or model constraints configured via
+    /// <paramref name="ParamProc"/>. It wraps the operation in a <see cref="TPromise{TChatCompletion}"/>,
+    /// which is resolved when the data is successfully retrieved or rejected if an error occurs.
+    /// </para>
+    /// <para>
+    /// If provided, <paramref name="CallBacks"/> supplies lifecycle handlers (such as OnStart,
+    /// OnSuccess, and OnError) using a <see cref="TPromiseChatCompletion"/> structure. These
+    /// handlers are optional and do not affect the final resolution of the returned promise.
+    /// </para>
+    /// <para>
+    /// The promise resolves with a <see cref="TChatCompletion"/> instance that contains the list
+    /// of chat completions along with pagination cursors. If the request fails due to invalid
+    /// parameters, access issues, network errors, or API errors, the promise is rejected with an exception.
+    /// </para>
+    /// </remarks>
+    /// <param name="ParamProc">
+    /// Procedure used to configure <see cref="TUrlChatListParams"/>, allowing pagination
+    /// (<c>Limit</c>, <c>After</c>), filtering by metadata or model, and sort order.
+    /// </param>
+    /// <param name="CallBacks">
+    /// Optional function returning a <see cref="TPromiseChatCompletion"/> that provides lifecycle
+    /// callbacks for the asynchronous operation. If omitted, the returned promise alone is used
+    /// to observe completion or failure.
+    /// </param>
+    /// <returns>
+    /// A <see cref="TPromise{TChatCompletion}"/> that resolves with the retrieved list of chat
+    /// completions or is rejected with an exception if the operation fails.
+    /// </returns>
     function AsyncAwaitList(const ParamProc: TProc<TUrlChatListParams>;
       const CallBacks: TFunc<TPromiseChatCompletion> = nil): TPromise<TChatCompletion>;
 
+    /// <summary>
+    /// Asynchronously updates a stored chat completion and returns a promise
+    /// that resolves to the updated <see cref="TChat"/> instance.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// This method performs a non-blocking request to modify metadata or settings of
+    /// an existing stored chat completion identified by <paramref name="CompletionID"/>.
+    /// The update parameters are configured using <paramref name="ParamProc"/>, which provides
+    /// access to a <see cref="TChatUpdateParams"/> instance.
+    /// </para>
+    /// <para>
+    /// The operation is wrapped in a <see cref="TPromise{TChat}"/>. When the update
+    /// completes successfully, the promise is resolved with the updated chat object.
+    /// If the operation fails (e.g., due to invalid ID, denied access, or network error),
+    /// the promise is rejected with an exception.
+    /// </para>
+    /// <para>
+    /// If provided, <paramref name="CallBacks"/> supplies lifecycle handlers such as
+    /// OnStart, OnSuccess, and OnError via a <see cref="TPromiseChat"/> structure.
+    /// These callbacks are optional and do not affect the returned promise.
+    /// </para>
+    /// </remarks>
+    /// <param name="CompletionID">
+    /// The unique identifier of the stored chat completion to update.
+    /// </param>
+    /// <param name="ParamProc">
+    /// Procedure used to configure the <see cref="TChatUpdateParams"/> for the update request,
+    /// typically to modify metadata.
+    /// </param>
+    /// <param name="CallBacks">
+    /// Optional function returning a <see cref="TPromiseChat"/> that provides lifecycle callback
+    /// handlers for the asynchronous operation. If omitted, only the returned promise is used
+    /// to monitor success or failure.
+    /// </param>
+    /// <returns>
+    /// A <see cref="TPromise{TChat}"/> that resolves with the updated chat completion
+    /// or is rejected with an exception if the update fails.
+    /// </returns>
     function AsyncAwaitUpdate(const CompletionID: string;
       const ParamProc: TProc<TChatUpdateParams>;
       const CallBacks: TFunc<TPromiseChat> = nil): TPromise<TChat>;
 
+    /// <summary>
+    /// Asynchronously deletes a stored chat completion and returns a promise
+    /// that resolves to a <see cref="TChatDelete"/> instance indicating the result.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// This method performs a non-blocking request to delete a chat completion identified
+    /// by <paramref name="CompletionID"/>. The operation is wrapped in a
+    /// <see cref="TPromise{TChatDelete}"/>, which is resolved when the deletion is confirmed
+    /// or rejected if an error occurs.
+    /// </para>
+    /// <para>
+    /// If provided, <paramref name="CallBacks"/> supplies lifecycle handlers (such as OnStart,
+    /// OnSuccess, and OnError) via a <see cref="TPromiseChatDelete"/> structure. These callbacks
+    /// are optional and do not affect the final resolution of the returned promise.
+    /// </para>
+    /// <para>
+    /// The promise resolves with a <see cref="TChatDelete"/> object containing the deletion status.
+    /// If the specified identifier does not exist, access is denied, or a network or API error
+    /// occurs, the promise is rejected with an exception.
+    /// </para>
+    /// </remarks>
+    /// <param name="CompletionID">
+    /// The unique identifier of the stored chat completion to delete.
+    /// </param>
+    /// <param name="CallBacks">
+    /// Optional function returning a <see cref="TPromiseChatDelete"/> providing lifecycle
+    /// callbacks for the asynchronous operation. If omitted, only the returned promise is used
+    /// to monitor success or failure.
+    /// </param>
+    /// <returns>
+    /// A <see cref="TPromise{TChatDelete}"/> that resolves with the deletion result or is
+    /// rejected with an exception if the operation fails.
+    /// </returns>
     function AsyncAwaitDelete(const CompletionID: string;
       const CallBacks: TFunc<TPromiseChatDelete> = nil): TPromise<TChatDelete>;
 
