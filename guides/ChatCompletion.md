@@ -41,7 +41,7 @@ The Chat API can be used for both single-turn requests and multi-turn, stateless
 
 ### Non streamed
 
-```Delphi
+```pascal
 //uses GenAI, GenAI.Types, GenAI.Tutorial.VCL;
 
   TutorialHub.JSONRequestClear;
@@ -132,7 +132,7 @@ By using the GenAI.Tutorial.VCL unit along with the initialization described [ab
 
 ### Streamed
 
-```Delphi
+```pascal
 //uses GenAI, GenAI.Types, GenAI.Tutorial.VCL;
 
   TutorialHub.JSONRequestClear;
@@ -242,7 +242,7 @@ The `GenAI Chat API` enables the creation of interactive chat experiences tailor
 - **Educational tools**
 - **Customer support assistants**
 
-```Delphi
+```pascal
 //uses GenAI, GenAI.Types, GenAI.Tutorial.VCL;
 
   TutorialHub.JSONRequestClear;
@@ -306,7 +306,7 @@ This approach enables the simultaneous execution of multiple prompts, provided t
 
 #### Example 1 : Two prompts processed in parallel.
 
-```Delphi
+```pascal
 //uses GenAI, GenAI.Types, GenAI.Tutorial.VCL;
 
     Client.Chat.CreateParallel(
@@ -349,7 +349,7 @@ This approach enables the simultaneous execution of multiple prompts, provided t
 
 You can also use reasoning models in parallel processing: <br> 
 
-```Delphi
+```pascal
 ...
    Params.Prompts([
         'How many television channels were there in France in 1980?',
@@ -365,7 +365,7 @@ You can also use reasoning models in parallel processing: <br>
 
 #### Example 2 : Three web search processed in parallel.
 
-```Delphi
+```pascal
 //uses GenAI, GenAI.Types, GenAI.Tutorial.VCL;
 
     Client.Chat.CreateParallel(
@@ -428,7 +428,7 @@ You can also use reasoning models in parallel processing: <br>
 
 Get a stored chat completion. Only [Chat Completions](#text-generation) that have been created with the `store` parameter set to `true` will be returned. Refer to [official documentation.](https://platform.openai.com/docs/api-reference/chat/get)
 
-```Delphi
+```pascal
 //uses GenAI, GenAI.Types, GenAI.Tutorial.VCL;
 
   TutorialHub.JSONRequestClear;
@@ -474,7 +474,7 @@ Get a stored chat completion. Only [Chat Completions](#text-generation) that hav
 
 Get the messages in a stored chat completion. Only [Chat Completions](#text-generation) that have been created with the `store` parameter set to `true` will be returned. Refer to [official documentation.](https://platform.openai.com/docs/api-reference/chat/getMessages)
 
-```Delphi
+```pascal
 //uses GenAI, GenAI.Types, GenAI.Tutorial.VCL;
 
   TutorialHub.JSONRequestClear;
@@ -536,7 +536,7 @@ Get the messages in a stored chat completion. Only [Chat Completions](#text-gene
 
 List stored Chat Completions. Only [Chat Completions](#text-generation) that have been stored with the `store` parameter set to `true` will be returned. Refer to [official documentation.](https://platform.openai.com/docs/api-reference/chat/list)
 
-```Delphi
+```pascal
 //uses GenAI, GenAI.Types, GenAI.Tutorial.VCL;
 
   TutorialHub.JSONRequestClear;
@@ -595,7 +595,7 @@ List stored Chat Completions. Only [Chat Completions](#text-generation) that hav
 
 Modify a stored chat completion. Only [Chat Completions](#text-generation) that have been created with the `store` parameter set to `true` can be modified. Currently, the only supported modification is to update the `metadata` field. Refer to [official documentation.](https://platform.openai.com/docs/api-reference/chat/update)
 
-```Delphi
+```pascal
 //uses GenAI, GenAI.Types, GenAI.Tutorial.VCL;
 
   TutorialHub.JSONRequestClear;
@@ -658,7 +658,7 @@ Modify a stored chat completion. Only [Chat Completions](#text-generation) that 
 
 Delete a stored chat completion. Only [Chat Completions](#text-generation) that have been created with the `store` parameter set to `true` can be deleted. Refer to [official documentation.](https://platform.openai.com/docs/api-reference/chat/delete)
 
-```Delphi
+```pascal
 //uses GenAI, GenAI.Types, GenAI.Tutorial.VCL;
 
   TutorialHub.JSONRequestClear;
@@ -716,7 +716,7 @@ For example, the `GPT-4o-Audio-Preview` model can process audio both as input an
 
 Refer to official [documentation](https://platform.openai.com/docs/guides/audio?example=audio-out).
 
-```Delphi
+```pascal
 //uses GenAI, GenAI.Types, GenAI.Tutorial.VCL;
   
   TutorialHub.JSONRequestClear;
@@ -777,7 +777,7 @@ Refer to official [documentation](https://platform.openai.com/docs/guides/audio?
 
 Let’s take a closer look at how the `DisplayAudio` method handles output to understand how the model’s response is managed.
 
-```Delphi
+```pascal
 procedure DisplayAudio(Sender: TObject; Value: TChat);
 begin
   {--- Display the JSON response }
@@ -817,7 +817,7 @@ Refer to official [documentation](https://platform.openai.com/docs/guides/audio?
 
 ### Audio and Text to Text
 
-```Delphi
+```pascal
 //uses GenAI, GenAI.Types, GenAI.Tutorial.VCL;
 
   TutorialHub.JSONRequestClear;
@@ -864,7 +864,7 @@ Refer to official [documentation](https://platform.openai.com/docs/guides/audio?
 
 ### Audio to Audio
 
-```Delphi
+```pascal
 //uses GenAI, GenAI.Types, GenAI.Tutorial.VCL;
 
   TutorialHub.JSONRequestClear;
@@ -922,7 +922,7 @@ Refer to official [documentation](https://platform.openai.com/docs/guides/audio?
 
 TutorialHub retains the ID of the most recent audio response. To proceed, simply construct the message as follows:
 
-```Delphi
+```pascal
   ...
     procedure (Params: TChatParams)
     begin
@@ -956,7 +956,7 @@ Refer to the [official documentation](https://platform.openai.com/docs/guides/vi
 
 `GenAI` processes images from both web sources and local files uniformly. It manages the submission of the source to the API, thereby simplifying the developer's task. Therefore, in this example, we will handle sources in the form of a ***URL*** and ***base-64 encoded*** data.
 
-```Delphi
+```pascal
 //uses GenAI, GenAI.Types, GenAI.Tutorial.VCL;
 
   var Url := 'https://upload.wikimedia.org/wikipedia/commons/thumb/d/dd/Gfp-wisconsin-madison-the-nature-boardwalk.jpg/2560px-Gfp-wisconsin-madison-the-nature-boardwalk.jpg';
@@ -1011,7 +1011,7 @@ This example uses streaming. The non-streamed version is straightforward to impl
 
 ### Analyze multi-source
 
-```Delphi
+```pascal
 //uses GenAI, GenAI.Types, GenAI.Tutorial.VCL;
 
   var Url1 := 'https://tripfixers.com/wp-content/uploads/2019/11/eiffel-tower-with-snow.jpeg';
@@ -1071,7 +1071,7 @@ The detail parameter, which includes three options—**low**, **high**, and **au
 
 `GenAI` allows the addition of `detail=high` or `detail=low` directly in the URL, thereby simplifying the activation of the detail option as follows:
 
-```Delphi
+```pascal
   var Url1 := 'https://tripfixers.com/.../eiffel-tower-with-snow.jpeg detail=high';
   //or
   var Url1 := 'https://tripfixers.com/.../eiffel-tower-with-snow.jpeg detail=low';
@@ -1092,7 +1092,7 @@ Similar to GPT models, they offer two options: a smaller, faster, and more cost-
 
 Since these models can require response times ranging from a few seconds to several tens of seconds, it is more prudent and efficient to use asynchronous methods when using them.
 
-```Delphi
+```pascal
 //uses GenAI, GenAI.Types, GenAI.Tutorial.VCL;
 
   TutorialHub.JSONRequestClear;
@@ -1150,7 +1150,7 @@ These models incorporate web search to deliver more accurate and up-to-date resp
 
 ### Web search : code sample 1
 
-```Delphi
+```pascal
 //uses GenAI, GenAI.Types, GenAI.Tutorial.VCL;
 
   TutorialHub.JSONRequestClear;
@@ -1243,7 +1243,7 @@ To enhance search relevance based on geographic location, you can provide an app
 - **Country:** This follows the ISO 3166-1 alpha-2 standard, meaning it should be a two-letter country code like *FR* for France or *JP* for Japan.
 - **Timezone:** Uses the IANA format, such as *Europe/Paris* or *Asia/Tokyo*, to specify the user's local time zone.
 
-```Delphi
+```pascal
 //uses GenAI, GenAI.Types, GenAI.Tutorial.VCL;
   
   TutorialHub.JSONRequestClear;
@@ -1310,7 +1310,7 @@ Available Options:
 - ***medium*** (default) – Balanced cost, speed, and quality.
 - ***low*** – Fastest, cheapest, but may reduce accuracy.
 
-```Delphi
+```pascal
 //uses GenAI, GenAI.Types, GenAI.Tutorial.VCL;
 
   TutorialHub.JSONRequestClear;
@@ -1353,7 +1353,7 @@ Available Options:
 
 >[!NOTE]
 > Context size and localization can be used simultaneously :
-> ```Delphi
+> ```pascal
 >    Params.WebSearchOptions(
 >      'low',
 >      TUserLocationApproximate.Create
@@ -1414,7 +1414,7 @@ In this unit, this schema will be used for function calls.
 
 We will use the TWeatherReportFunction plugin defined in the `GenAI.Functions.Example` unit.
 
-```Delphi
+```pascal
   var Weather := TWeatherReportFunction.CreateInstance;
   //or
   var Weather := TWeatherReportFunction.CreateInstance(True);  //To activate `Strict` option
@@ -1431,7 +1431,7 @@ With this tutorial, a method is defined within TutorialHub. Let’s take a close
 
 ##### Display a stream text
 
-```Delphi
+```pascal
 procedure TVCLTutorialHub.DisplayWeatherStream(const Value: string);
 begin
   //Asynchronous example
@@ -1460,7 +1460,7 @@ end;
 
 ##### Use audio with response
 
-```Delphi
+```pascal
 procedure TVCLTutorialHub.DisplayWeatherAudio(const Value: string);
 begin
   FileName := 'AudioWeather.mp3';
@@ -1494,7 +1494,7 @@ end;
 
 Building the query using the Weather tool. (Simply copy/paste this last code to test the usage of the functions.)
 
-```Delphi
+```pascal
 //uses GenAI, GenAI.Types, GenAI.Tutorial.VCL, GenAI.Functions.Example;
 
   TutorialHub.JSONRequestClear;
@@ -1528,7 +1528,7 @@ Building the query using the Weather tool. (Simply copy/paste this last code to 
 
 Let's look at how the display method handles the function call.
 
-```Delphi
+```pascal
 procedure Display(Sender: TObject; Value: TChat);
 begin
   TutorialHub.JSONResponse := Value.JSONResponse;

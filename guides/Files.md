@@ -15,7 +15,7 @@ Files are used to upload documents that can be used with features like **Assista
 
 Example without parameters
 
-```Delphi
+```pascal
 //uses GenAI, GenAI.Types, GenAI.Tutorial.VCL;
 
   //Asynchronous example
@@ -57,7 +57,7 @@ Example without parameters
 
 Example using parameters
 
-```Delphi
+```pascal
 //uses GenAI, GenAI.Types, GenAI.Tutorial.VCL;
 
   //Asynchronous example
@@ -122,7 +122,7 @@ You can upload files for use across multiple endpoints. Each file can be as larg
 
 The Assistants API accommodates files containing up to 2 million tokens and accepts specific file formats. For more information, refer to the [Assistants Tools guide](https://platform.openai.com/docs/assistants/tools).
 
-```Delphi
+```pascal
 //uses GenAI, GenAI.Types, GenAI.Tutorial.VCL;
 
   //Asynchronous example
@@ -188,7 +188,7 @@ ___
 
 Returns information about a specific file.
 
-```Delphi
+```pascal
 //uses GenAI, GenAI.Types, GenAI.Tutorial.VCL;
 
   TutorialHub.Id := '...Id file to retrieve...';
@@ -242,7 +242,7 @@ ___
 
 Returns the contents of the specified file.
 
-```Delphi
+```pascal
 //uses GenAI, GenAI.Types, GenAI.Tutorial.VCL;
 
   TutorialHub.Id := '...Id of the file to retrieve content...';
@@ -274,7 +274,7 @@ ___
 
 Delete a file.
 
-```Delphi
+```pascal
 //uses GenAI, GenAI.Types, GenAI.Tutorial.VCL;
 
   TutorialHub.Id := '...Id file to delete...';

@@ -48,7 +48,7 @@ This interface represents OpenAI’s most advanced environment for driving model
 
 ### Non streamed
 
-```Delphi
+```pascal
 //uses GenAI, GenAI.Types, GenAI.Tutorial.VCL;
 
   TutorialHub.JSONRequestClear;
@@ -135,7 +135,7 @@ By using the GenAI.Tutorial.VCL unit along with the initialization described [ab
 
 When you create a Response with `stream` set to `true`, the server will emit server-sent events to the client as the Response is generated. This section contains the events that are emitted by the server. [Learn more.](https://platform.openai.com/docs/guides/streaming-responses?api-mode=responses)
 
-```Delphi
+```pascal
 //uses GenAI, GenAI.Types, GenAI.Tutorial.VCL;
 
   TutorialHub.JSONRequestClear;
@@ -250,7 +250,7 @@ Refer to the [official documentation](https://platform.openai.com/docs/guides/co
 
 In the example below, we assume that one of the previous requests (streamed or non‑streamed) was executed with `store` set to `True`. Once the call completes, the response ID is returned (for example: `resp_67ffb72044648191b4faddb8254c79cf002f1563a5487ec4`). You then simply assign this value to the `PreviousResponseId` field when preparing the next conversation turn, as shown in the following code snippet:
 
-```Delphi
+```pascal
 //uses GenAI, GenAI.Types, GenAI.Tutorial.VCL;
 
   //Asynchronous example
@@ -281,7 +281,7 @@ This approach enables the simultaneous execution of multiple prompts, provided t
 
 #### Example 1 : Two prompts processed in parallel.
 
-```Delphi
+```pascal
 //uses GenAI, GenAI.Types, GenAI.Tutorial.VCL;
 
   Client.Responses.CreateParallel(
@@ -325,7 +325,7 @@ This approach enables the simultaneous execution of multiple prompts, provided t
 
 You can also use reasoning models in parallel processing: <br> 
 
-```Delphi
+```pascal
 ...
    Params.Prompts([
         'How many television channels were there in France in 1980?',
@@ -341,7 +341,7 @@ You can also use reasoning models in parallel processing: <br>
 
 #### Example 2 : Three web search processed in parallel.
 
-```Delphi
+```pascal
 //uses GenAI, GenAI.Types, GenAI.Tutorial.VCL;
 
   Client.Chat.CreateParallel(
@@ -391,7 +391,7 @@ To perform a web search, use the `gpt-4.1` or `gpt-4.1-mini` models with the `re
 
 #### Example 3 : Parallel web search processed with asynchrone promise chaining.
 
-```Delphi
+```pascal
 //uses GenAI, GenAI.Types, GenAI.Tutorial.VCL;
 
   Display(TutorialHub, 'Start the parallel job' + sLineBreak);
@@ -476,7 +476,7 @@ To perform a web search, use the `gpt-4.1` or `gpt-4.1-mini` models with the `re
 
 Retrieves a model response with the given ID. Refer to the [official documentation.](https://platform.openai.com/docs/api-reference/responses/get)
 
-```Delphi
+```pascal
 //uses GenAI, GenAI.Types, GenAI.Tutorial.VCL;
 
   TutorialHub.JSONRequestClear;
@@ -522,7 +522,7 @@ Retrieves a model response with the given ID. Refer to the [official documentati
 
 Deletes a model response with the given ID. Refer to the [official documentation.](https://platform.openai.com/docs/api-reference/responses/delete)
 
-```Delphi
+```pascal
 //uses GenAI, GenAI.Types, GenAI.Tutorial.VCL;
 
   TutorialHub.JSONRequestClear;
@@ -567,7 +567,7 @@ Deletes a model response with the given ID. Refer to the [official documentation
 
 Returns a list of input items for a given response. Refer to the [official documentation.](https://platform.openai.com/docs/api-reference/responses/input-items)
 
-```Delphi
+```pascal
 //uses GenAI, GenAI.Types, GenAI.Tutorial.VCL;
 
   TutorialHub.JSONRequestClear;
@@ -694,7 +694,7 @@ Refer to the [official documentation](https://platform.openai.com/docs/guides/vi
 
 `GenAI` processes images from both web sources and local files uniformly. It manages the submission of the source to the API, thereby simplifying the developer's task. Therefore, in this example, we will handle sources in the form of a ***URL*** and ***base-64 encoded*** data.
 
-```Delphi
+```pascal
 //uses GenAI, GenAI.Types, GenAI.Tutorial.VCL;
 
   TutorialHub.JSONRequestClear;
@@ -783,7 +783,7 @@ This example uses streaming. The non-streamed version is straightforward to impl
 
 ### Analyze multi-source
 
-```Delphi
+```pascal
 //uses GenAI, GenAI.Types, GenAI.Tutorial.VCL;
 
   TutorialHub.JSONRequestClear;
@@ -877,7 +877,7 @@ The detail parameter, which includes three options—**low**, **high**, and **au
 
 `GenAI` allows the addition of `detail=high` or `detail=low` directly in the URL, thereby simplifying the activation of the detail option as follows:
 
-```Delphi
+```pascal
   var Url1 := 'https://tripfixers.com/.../eiffel-tower-with-snow.jpeg detail=high';
   //or
   var Url1 := 'https://tripfixers.com/.../eiffel-tower-with-snow.jpeg detail=low';
@@ -898,7 +898,7 @@ Refer to the [official documentation](https://platform.openai.com/docs/guides/pd
 
 However, with GenAI, it is possible to directly provide a local path or a URL pointing to the PDF files to be analyzed.
 
-```Delphi
+```pascal
 //uses GenAI, GenAI.Types, GenAI.Tutorial.VCL;
 
   TutorialHub.JSONRequestClear;
@@ -1020,7 +1020,7 @@ Before **GPT-5**, the default setting was medium. With **GPT-5**, you can now ex
 
 <br>
 
-```Delphi
+```pascal
 //uses GenAI, GenAI.Types, GenAI.Tutorial.VCL;
 
   TutorialHub.JSONRequestClear;
@@ -1136,7 +1136,7 @@ To enable this capability, you can configure the web search function within the 
 
 If you want to ensure the model uses the web search function, you can enforce this behavior by setting the tool_choice parameter to `{type: "web_search_preview"}`. This can help deliver faster and more predictable results.
 
-```Delphi
+```pascal
   procedure(Params: TResponsesParams)
     begin
       Params.Model('gpt-4.1-mini');
@@ -1154,7 +1154,7 @@ To fine‑tune search results by geography, you can supply an approximate locati
 - **Country:** a two‑letter ISO code such as US.
 - **Time zone:** an IANA identifier like America/Chicago.
 
-```Delphi
+```pascal
   procedure(Params: TResponsesParams)
     begin
       Params.Model('gpt-4.1-mini');
@@ -1167,7 +1167,7 @@ To fine‑tune search results by geography, you can supply an approximate locati
 
 ### Web_search code exemple
 
-```Delphi
+```pascal
 //uses GenAI, GenAI.Types, GenAI.Tutorial.VCL;
 
   TutorialHub.JSONRequestClear;
@@ -1325,7 +1325,7 @@ The file is named `File_Search_file.pdf`.
 
 [Supported file by Mime type](https://platform.openai.com/docs/assistants/tools/file-search#supported-files)
 
-```Delphi
+```pascal
 //uses GenAI, GenAI.Types, GenAI.Tutorial.VCL;
 
   var Value := Client.Files.Upload(
@@ -1367,7 +1367,7 @@ Result
 
 This step initializes a vector storage space, which will later be used to index the contents of the uploaded PDF file.
 
-```Delphi
+```pascal
 //uses GenAI, GenAI.Types, GenAI.Tutorial.VCL;
 
   var Value := Client.VectorStore.Create(
@@ -1417,7 +1417,7 @@ Result
 
 To complete the vector store setup, we will now attach the uploaded file to the vector store by providing both the `file ID` and the vector `store ID`.
 
-```Delphi
+```pascal
 //uses GenAI, GenAI.Types, GenAI.Tutorial.VCL;
 
   var Value := Client.VectorStoreFiles.Create('vs_6805e821210081919a4aabae08c63a14',
@@ -1472,7 +1472,7 @@ Result
 
 We will now leverage our vector store to allow the model to optionally use the information extracted from the PDF when generating its response.
 
-```Delphi
+```pascal
 //uses GenAI, GenAI.Types, GenAI.Tutorial.VCL;
 
   TutorialHub.JSONRequestClear;
@@ -1506,7 +1506,7 @@ We will now leverage our vector store to allow the model to optionally use the i
 
 #### Note 1 : Tool_choice
 
-```Delphi
+```pascal
    Params.ToolChoice(TToolChoice.auto); //none or required
 //or
    Params.ToolChoice(THostedToolParams.New('file_search'));  //web_search_preview or  computer_use_preview
@@ -1517,7 +1517,7 @@ Refer to the [official documentation](https://platform.openai.com/docs/api-refer
 
 #### Note 2 : Include search results in the response
 
-```Delphi
+```pascal
   Params.Include([TOutputIncluding.file_search_result]);
 ```
 
@@ -1582,7 +1582,7 @@ In this unit, this schema will be used for function calls.
 
 We will use the TWeatherReportFunction plugin defined in the `GenAI.Functions.Example` unit.
 
-```Delphi
+```pascal
   var Weather := TWeatherReportFunction.CreateInstance;
   //or
   var Weather := TWeatherReportFunction.CreateInstance(True);  //To activate `Strict` option
@@ -1605,7 +1605,7 @@ However, our primary focus will be on the method that triggers the function call
 
 Building the query using the Weather tool. (Simply copy/paste this last code to test the usage of the functions.)
 
-```Delphi
+```pascal
 //uses GenAI, GenAI.Types, GenAI.Tutorial.VCL, GenAI.Functions.Example;
   
   TutorialHub.JSONRequestClear;
@@ -1657,7 +1657,7 @@ Result
 
 It is important to review the `display(TutorialHub, Value);` method here, as it is responsible for handling the function call.
 
-```Delphi
+```pascal
 procedure Display(Sender: TObject; Value: TResponse);
 begin
   TutorialHub.JSONResponse := Value.JSONResponse;
@@ -1696,7 +1696,7 @@ We will demonstrate this concept in practice through several examples. Please no
 
 ### Non streamed example
 
-```Delphi
+```pascal
 //uses GenAI, GenAI.Types, GenAI.Tutorial.VCL, GenAI.Responses.ImageHelper;
 
   TutorialHub.JSONRequestClear;
@@ -1752,7 +1752,7 @@ The Model Context Protocol (MCP) is an open protocol that standardizes how appli
 
 Refer to [official documentation](https://platform.openai.com/docs/guides/tools-remote-mcp)
 
-```Delphi
+```pascal
 ...
     Params.Tools([   
         TResponseMCPToolParams.New //Use MCP tool 
@@ -1786,7 +1786,7 @@ The newest reasoning models (o3 and o4-mini) are also trained to use the Code In
 
 Refer to [official documentation](https://platform.openai.com/docs/guides/tools-code-interpreter)
 
-```Delphi
+```pascal
 ...
     Params.Tools([   
         TResponseCodeInterpreterParams.New //Use code interpreter tool 

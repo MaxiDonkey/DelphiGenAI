@@ -18,7 +18,7 @@ The presented framework is a comprehensive and extensible solution for Delphi de
 
 - **Unit testing with DUnitX (via the GenAI.API.Tests unit):** The framework integrates with **DUnitX** to allow developers to test various features, such as parameter handling, response deserialization, and error management. The `GenAI.API.Tests` unit provides predefined tests covering common scenarios like validating request parameters (`TUrlParam`), deserializing API objects, and managing errors using exceptions. <br/>
 For example:
-```Delphi
+```pascal
 [Test] procedure Test_TUrlParam_AddParameters;
 [Test] procedure Test_TGenAIConfiguration_BuildHeaders;
 [Test] procedure Test_TApiDeserializer_Deserialize;
@@ -29,7 +29,7 @@ This structure makes it easy to create additional tests tailored to specific dev
 
 - **Smooth JSON parameter configuration with chaining:** The framework introduces a flexible approach to configure JSON request parameters using method chaining. Developers can chain multiple calls to add successive parameters via methods like `Add()` in the `TJSONParam` class. <br/>
 Example:
-```Delphi
+```pascal
 JSONParam.Add('key1', 'value1').Add('key2', 42).Add('key3', True);
 ```
 This approach makes configuring request data more intuitive and fluid.

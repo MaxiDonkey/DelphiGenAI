@@ -13,7 +13,7 @@ An embedding is represented as a vector, or a list of floating-point numbers. Th
 
 Refer to [official documentation](https://platform.openai.com/docs/guides/embeddings).
 
-```Delphi
+```pascal
 //uses GenAI, GenAI.Types, GenAI.Tutorial.VCL;
 
   TutorialHub.JSONRequestClear;

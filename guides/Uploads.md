@@ -22,7 +22,7 @@ For certain `purposes`, specifying the correct `mime_type` is essential. Be sure
 Guidance for [Assistants](https://platform.openai.com/docs/assistants/tools/file-search#supported-files):
 For details on selecting the appropriate file extensions for different scenarios, refer to the documentation on [File creation](https://platform.openai.com/docs/api-reference/files/create).
 
-```Delphi
+```pascal
 //uses GenAI, GenAI.Types, GenAI.Tutorial.VCL;
 
   //Asynchronous example
@@ -87,7 +87,7 @@ For details on selecting the appropriate file extensions for different scenarios
 
 Cancels the Upload. No Parts may be added after an Upload is cancelled.
 
-```Delphi
+```pascal
 //uses GenAI, GenAI.Types, GenAI.Tutorial.VCL;
 
   TutorialHub.Id := 'upload_679207849ec8819086bc0e54f5c66d62';
@@ -137,7 +137,7 @@ Each Part can be at most 64 MB, and you can add Parts until you hit the Upload m
 
 It is possible to add multiple Parts in parallel. You can decide the intended order of the Parts when you [complete the Upload](https://platform.openai.com/docs/api-reference/uploads/complete).
 
-```Delphi
+```pascal
 //uses GenAI, GenAI.Types, GenAI.Tutorial.VCL;
 
   TutorialHub.Id := 'upload_679207849ec8819086bc0e54f5c66d62';
@@ -202,7 +202,7 @@ You can specify the order of the Parts by passing in an ordered list of the Part
 
 The number of bytes uploaded upon completion must match the number of bytes initially specified when creating the Upload object. No Parts may be added after an Upload is completed.
 
-```Delphi
+```pascal
 //uses GenAI, GenAI.Types, GenAI.Tutorial.VCL;
 
   TutorialHub.Id := 'upload_679207849ec8819086bc0e54f5c66d62';

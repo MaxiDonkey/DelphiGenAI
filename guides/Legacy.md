@@ -11,7 +11,7 @@ For practical purposes, **completion APIs** can be utilized through `GenAI`, ena
 
 ## Completion
 
-```Delphi
+```pascal
 //uses GenAI, GenAI.Types, GenAI.Tutorial.VCL;
 
   //Asynchronous example
@@ -54,7 +54,7 @@ ___
 
 ## Streamed completion
 
-```Delphi
+```pascal
 //uses GenAI, GenAI.Types, GenAI.Tutorial.VCL;
 
   //Asynchronous example

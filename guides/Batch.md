@@ -30,7 +30,7 @@ Use the [File upload](Files.md#file-upload) method and get the ID referring to t
 
 Now create the batch as follow :
 
-```Delphi
+```pascal
 //uses GenAI, GenAI.Types, GenAI.Tutorial.VCL;
 
   TutorialHub.Id := '...id of BatchExample.jsonl...';
@@ -86,7 +86,7 @@ Now create the batch as follow :
 
 List your organization's batches.
 
-```Delphi
+```pascal
 //uses GenAI, GenAI.Types, GenAI.Tutorial.VCL;
 
   //Asynchronous example
@@ -118,7 +118,7 @@ List your organization's batches.
 
 With out request parameters
 
-```Delphi
+```pascal
 //uses GenAI, GenAI.Types, GenAI.Tutorial.VCL;
 
   //Asynchronous example
@@ -148,7 +148,7 @@ Refer to [parameters documentation](https://platform.openai.com/docs/api-referen
 
 Retrieves a batch using its ID.
 
-```Delphi
+```pascal
 //uses GenAI, GenAI.Types, GenAI.Tutorial.VCL;
 
   TutorialHub.Id := '...Id of batch to retrieve...';
@@ -178,7 +178,7 @@ Retrieves a batch using its ID.
 
 Cancels an in-progress batch. The batch will be in status `cancelling` for up to 10 minutes, before changing to `cancelled`, where it will have partial results (if any) available in the output file.
 
-```Delphi
+```pascal
 //uses GenAI, GenAI.Types, GenAI.Tutorial.VCL;
 
   TutorialHub.Id := '...Id of batch to cancel...';
@@ -208,7 +208,7 @@ Cancels an in-progress batch. The batch will be in status `cancelling` for up to
 
 Open and view the results obtained after processing the batch.
 
-```Delphi
+```pascal
 //uses GenAI, GenAI.Types, GenAI.Tutorial.VCL;
 
   TutorialHub.Id := '...Id of batch...';

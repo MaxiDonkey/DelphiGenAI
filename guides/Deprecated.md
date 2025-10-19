@@ -49,7 +49,7 @@ The version of assistants integrated by `GenAI` is version 2, currently offered 
 
 #### Code interpreter
 
-```Delphi
+```pascal
 //uses GenAI, GenAI.Types, GenAI.Tutorial.VCL;
 
   TutorialHub.JSONRequestClear;
@@ -125,7 +125,7 @@ The JSON response:
 
 To fully utilize this feature offered by the `assistants`, you must be comfortable managing file stores. For further details, you can refer to the sections [vector store files](#Vector-store-files) outlined above.
 
-```Delphi
+```pascal
 //uses GenAI, GenAI.Types, GenAI.Tutorial.VCL;
 
   TutorialHub.JSONRequestClear;
@@ -205,7 +205,7 @@ Returns a list of assistants.
 
 Consult the [official documentation](https://platform.openai.com/docs/api-reference/assistants/listAssistants) for details on list parameters.
 
-```Delphi
+```pascal
 //uses GenAI, GenAI.Types, GenAI.Tutorial.VCL;
 
   TutorialHub.JSONRequestClear;
@@ -245,7 +245,7 @@ Consult the [official documentation](https://platform.openai.com/docs/api-refere
 
 Retrieves an assistant by its ID.
 
-```Delphi
+```pascal
 //uses GenAI, GenAI.Types, GenAI.Tutorial.VCL;
 
   TutorialHub.JSONRequestClear;
@@ -278,7 +278,7 @@ Retrieves an assistant by its ID.
 
 Modifies an assistant by its ID.
 
-```Delphi
+```pascal
 //uses GenAI, GenAI.Types, GenAI.Tutorial.VCL;
 
   TutorialHub.JSONRequestClear;
@@ -360,7 +360,7 @@ The JSON response
 
 Delete an assistant by its ID.
 
-```Delphi
+```pascal
 //uses GenAI, GenAI.Types, GenAI.Tutorial.VCL;
   
   TutorialHub.JSONRequestClear;
@@ -405,7 +405,7 @@ Related guide: [Assistants](https://platform.openai.com/docs/assistants/overview
 
 Create a thread.
 
-```Delphi
+```pascal
 //uses GenAI, GenAI.Types, GenAI.Tutorial.VCL;
 
   TutorialHub.JSONRequestClear;
@@ -437,7 +437,7 @@ Create a thread.
 
 Retrieves a thread by its ID.
 
-```Delphi
+```pascal
 //uses GenAI, GenAI.Types, GenAI.Tutorial.VCL;
 
   TutorialHub.Id := 'thread_xyz321';
@@ -469,7 +469,7 @@ Retrieves a thread by its ID.
 
 Modifies a thread by its ID.
 
-```Delphi
+```pascal
 //uses GenAI, GenAI.Types, GenAI.Tutorial.VCL;
 
   TutorialHub.Id := 'thread_xyz321';
@@ -528,7 +528,7 @@ The JSON response:
 
 Delete a thread by its ID.
 
-```Delphi
+```pascal
 //uses GenAI, GenAI.Types, GenAI.Tutorial.VCL;
 
   TutorialHub.Id := 'thread_xyz321';
@@ -572,7 +572,7 @@ Create a message.
 
 To take full advantage of this feature provided by Messages, it is essential to be proficient in managing Threads. For more information, please refer to the [Threads sections](#Threads) mentioned earlier.
 
-```Delphi
+```pascal
 //uses GenAI, GenAI.Types, GenAI.Tutorial.VCL;
 
   TutorialHub.JSONRequestClear;
@@ -642,7 +642,7 @@ The JSON response:
 
 Returns a list of messages for a given thread.
 
-```Delphi
+```pascal
 //uses GenAI, GenAI.Types, GenAI.Tutorial.VCL;
 
   TutorialHub.JSONRequestClear;
@@ -718,7 +718,7 @@ The JSON response:
 
 Retrieve a message by its ID.
 
-```Delphi
+```pascal
 //uses GenAI, GenAI.Types, GenAI.Tutorial.VCL;
 
   TutorialHub.JSONRequestClear;
@@ -779,7 +779,7 @@ The JSON response:
 
 Modifies a message by its ID.
 
-```Delphi
+```pascal
 //uses GenAI, GenAI.Types, GenAI.Tutorial.VCL;
 
   TutorialHub.JSONRequestClear;
@@ -854,7 +854,7 @@ The JSON response:
 
 Deletes a message by its ID.
 
-```Delphi
+```pascal
 //uses GenAI, GenAI.Types, GenAI.Tutorial.VCL;
 
   TutorialHub.JSONRequestClear;
@@ -909,7 +909,7 @@ Related guide: [Assistants](https://platform.openai.com/docs/assistants/overview
 
 Create a run.
 
-```Delphi
+```pascal
 //uses GenAI, GenAI.Types, GenAI.Tutorial.VCL;
 
   TutorialHub.JSONRequestClear;
@@ -989,7 +989,7 @@ Create a thread and run it in one request.
 
 ![deprecated](https://img.shields.io/badge/DEPRECATED-orange)
 
-```Delphi
+```pascal
 //uses GenAI, GenAI.Types, GenAI.Tutorial.VCL;
 
   TutorialHub.JSONRequestClear;
@@ -1068,7 +1068,7 @@ Create a thread and run it in one request.
 
 Returns a list of runs belonging to a thread.
 
-```Delphi
+```pascal
 //uses GenAI, GenAI.Types, GenAI.Tutorial.VCL;
 
   var ThreadId := 'thread_abc123';
@@ -1108,7 +1108,7 @@ Returns a list of runs belonging to a thread.
 
 Retrieves a run by its ID.
 
-```Delphi
+```pascal
 //uses GenAI, GenAI.Types, GenAI.Tutorial.VCL;
 
   TutorialHub.JSONRequestClear;
@@ -1184,7 +1184,7 @@ Retrieves a run by its ID.
 
 Modifies a run by its ID.
 
-```Delphi
+```pascal
 //uses GenAI, GenAI.Types, GenAI.Tutorial.VCL;
 
   TutorialHub.JSONRequestClear;
@@ -1283,7 +1283,7 @@ Modifies a run by its ID.
 
 When a run has the `status: "requires_action"` and `required_action.type` is `submit_tool_outputs`, this endpoint can be used to submit the outputs from the tool calls once they're all completed. All outputs must be submitted in a single request.
 
-```Delphi
+```pascal
 //uses GenAI, GenAI.Types, GenAI.Tutorial.VCL;
 
   TutorialHub.JSONRequestClear;
@@ -1386,7 +1386,7 @@ When a run has the `status: "requires_action"` and `required_action.type` is `su
 
 Cancels a run that is `in_progress`.
 
-```Delphi
+```pascal
 //uses GenAI, GenAI.Types, GenAI.Tutorial.VCL;
 
   TutorialHub.JSONRequestClear;
@@ -1468,7 +1468,7 @@ Related guide: [Assistants](https://platform.openai.com/docs/assistants/overview
 
 Returns a list of run steps belonging to a run.
 
-```Delphi
+```pascal
 //uses GenAI, GenAI.Types, GenAI.Tutorial.VCL;
 
   TutorialHub.JSONRequestClear;
@@ -1557,7 +1557,7 @@ Returns a list of run steps belonging to a run.
 
 Retrieves a run step.
 
-```Delphi
+```pascal
 //uses GenAI, GenAI.Types, GenAI.Tutorial.VCL;
 
   TutorialHub.JSONRequestClear;

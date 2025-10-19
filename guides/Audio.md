@@ -8,7 +8,7 @@ ___
 
 Convert a text into an audio file. Refer to [official documentation](https://platform.openai.com/docs/guides/text-to-speech)
 
-```Delphi
+````pascal
 //uses GenAI, GenAI.Types, GenAI.Tutorial.VCL;
 
   TutorialHub.JSONRequestClear;
@@ -75,7 +75,7 @@ Convert a text into an audio file. Refer to [official documentation](https://pla
 
 Let’s take a closer look at how the `Display` method handles output to understand how the model’s response is managed.
 
-```Delphi
+```pascal
 procedure Display(Sender: TObject; Value: TSpeechResult);
 begin
   {--- Display the JSON response }
@@ -103,7 +103,7 @@ ___
 
 Convert data audio into a text. Refer to [official documentation](https://platform.openai.com/docs/guides/speech-to-text) or this [page](https://platform.openai.com/docs/guides/audio).
 
-```Delphi
+```pascal
 //uses GenAI, GenAI.Types, GenAI.Tutorial.VCL;
 
   TutorialHub.JSONRequest := 'multipart';

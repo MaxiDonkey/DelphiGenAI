@@ -59,7 +59,7 @@ Once the training and test files have been created, they must be uploaded using 
 
 ### Create the fine-tuning job
 
-```Delphi
+```pascal
 //uses GenAI, GenAI.Types, GenAI.Tutorial.VCL;
 
   //Synchronous example
@@ -113,7 +113,7 @@ e.g. return values
 
 List your organization's fine-tuning jobs. Refer to [parameters documentation](https://platform.openai.com/docs/api-reference/fine-tuning/list).
 
-```Delphi
+```pascal
 //uses GenAI, GenAI.Types, GenAI.Tutorial.VCL;
 
   //Asynchronous example
@@ -159,7 +159,7 @@ List your organization's fine-tuning jobs. Refer to [parameters documentation](h
 
 Immediately cancel a fine-tune job.
 
-```Delphi
+```pascal
 //uses GenAI, GenAI.Types, GenAI.Tutorial.VCL;
 
   TutorialHub.Id := '...Id of fine-tuning job';
@@ -180,7 +180,7 @@ Immediately cancel a fine-tune job.
 
 Get status updates for a fine-tuning job.
 
-```Delphi
+```pascal
 //uses GenAI, GenAI.Types, GenAI.Tutorial.VCL;
 
   TutorialHub.Id := '...Id of fine-tuning job';
@@ -232,7 +232,7 @@ e.g. return values
 
 List checkpoints for a fine-tuning job.
 
-```Delphi
+```pascal
 //uses GenAI, GenAI.Types, GenAI.Tutorial.VCL;
 
   TutorialHub.Id := '...Id of fine-tuning job';
@@ -291,7 +291,7 @@ e.g. return values
 
 Get info about a fine-tuning job.
 
-```Delphi
+```pascal
 //uses GenAI, GenAI.Types, GenAI.Tutorial.VCL;
 
   TutorialHub.Id := '...Id of fine-tuning job';

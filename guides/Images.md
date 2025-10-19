@@ -12,7 +12,7 @@ Refer to [official documentation](https://platform.openai.com/docs/guides/images
 
 Generation of an image using `dall-e-3`.
 
-```Delphi
+```pascal
 //uses GenAI, GenAI.Types, GenAI.Tutorial.VCL;
 
   TutorialHub.FileName := 'Dalle3_01.png';
@@ -85,7 +85,7 @@ Generation of an image using `dall-e-3`.
 
 Let’s take a closer look at how the `Display` method handles output to understand how the model’s response is managed.
 
-```Delphi
+```pascal
 procedure Display(Sender: TObject; Value: TGeneratedImages);
 begin
   {--- Load image when url is not null. }
@@ -151,7 +151,7 @@ prompt: Allows up to 32,000 characters for `gpt-image-1` (versus 1,000 for `dall
 
 An example of image creation with gpt-image-1 (Asynchronous because response times are much longer):
 
-```Delphi
+```pascal
 //uses GenAI, GenAI.Types, GenAI.Tutorial.VCL;
 
   TutorialHub.FileName := 'GptImage1.png';
@@ -247,7 +247,7 @@ Below, you’ll find an example of the code to send to gpt-image-1 to initiate t
 
 <br>
 
-```Delphi
+```pascal
   TutorialHub.FileName := 'Image-gpt-edit.png';
 
   //Increased reception timeout (ms) as the model takes longer

@@ -27,7 +27,7 @@ Vector stores are used to store files for use by the [`file_search`](https://pla
 
 Create a vector store. [Refer to documentation](https://platform.openai.com/docs/api-reference/vector-stores/create)
 
-```Delphi
+```pascal
 //uses GenAI, GenAI.Types, GenAI.Tutorial.VCL;
   
   TutorialHub.JSONRequestClear;
@@ -106,7 +106,7 @@ The Json response.
 
 Returns a list of vector stores.  
 
-```Delphi
+```pascal
 //uses GenAI, GenAI.Types, GenAI.Tutorial.VCL;
 
   TutorialHub.JSONRequestClear;
@@ -148,7 +148,7 @@ Returns a list of vector stores.
 
 Example using [parameter](https://platform.openai.com/docs/api-reference/vector-stores/list).
 
-```Delphi
+```pascal
 //uses GenAI, GenAI.Types, GenAI.Tutorial.VCL;
 
   TutorialHub.JSONRequestClear;
@@ -206,7 +206,7 @@ Example using [parameter](https://platform.openai.com/docs/api-reference/vector-
 
 Retrieves a vector store by its ID.
 
-```Delphi
+```pascal
 //uses GenAI, GenAI.Types, GenAI.Tutorial.VCL;
 
   TutorialHub.Id := 'vs_abc123';
@@ -252,7 +252,7 @@ Retrieves a vector store by its ID.
 
 Modifies a vector store by its ID.
 
-```Delphi
+```pascal
 //uses GenAI, GenAI.Types, GenAI.Tutorial.VCL;
 
   TutorialHub.Id := 'vs_abc123';
@@ -321,7 +321,7 @@ Modifies a vector store by its ID.
 
 Delete a vector store by its ID.
 
-```Delphi
+```pascal
 //uses GenAI, GenAI.Types, GenAI.Tutorial.VCL;
 
   TutorialHub.Id := 'vs_abc123';
@@ -406,7 +406,7 @@ Let’s consider the upload of two files, ***file1*** and ***file2***, ensuring 
 
 To create the file store containing ***file1*** and ***file2***, the provided code will need to be executed twice, once for each identifier: ***fileId1*** and ***fileId2***. Upon completion of these operations, calling the file store will grant access to both associated files.
 
-```Delphi
+```pascal
 //uses GenAI, GenAI.Types, GenAI.Tutorial.VCL;
 
   TutorialHub.JSONRequestClear;
@@ -495,7 +495,7 @@ Returns a list of vector store files.
 
 ### Without parameters
 
-```Delphi
+```pascal
 //uses GenAI, GenAI.Types, GenAI.Tutorial.VCL;
  
   TutorialHub.JSONRequestClear;
@@ -542,7 +542,7 @@ Returns a list of vector store files.
 
 Refert to [parameters documentation](https://platform.openai.com/docs/api-reference/vector-stores-files/listFiles).
 
-```Delphi
+```pascal
 //uses GenAI, GenAI.Types, GenAI.Tutorial.VCL;
 
   TutorialHub.JSONRequestClear;
@@ -652,7 +652,7 @@ The JSON response:
 
 Retrieves a vector store file.
 
-```Delphi
+```pascal
 //uses GenAI, GenAI.Types, GenAI.Tutorial.VCL;
 
   TutorialHub.JSONRequestClear;
@@ -725,7 +725,7 @@ The JSON response:
 
 Remove a vector store file. This action will detach the file from the vector store without deleting the file itself. To permanently delete the file, use the [delete file](Files.md#file-deletion) endpoint.
 
-```Delphi
+```pascal
 //uses GenAI, GenAI.Types, GenAI.Tutorial.VCL;
 
   TutorialHub.JSONRequestClear;
@@ -814,7 +814,7 @@ Let’s consider the upload of two files, ***file1*** and ***file2***, ensuring 
 To create the batch store containing ***file1*** and ***file2***, uses example bellow.
 
 
-```Delphi
+```pascal
 //uses GenAI, GenAI.Types, GenAI.Tutorial.VCL;
 
   TutorialHub.JSONRequestClear;
@@ -877,7 +877,7 @@ Returns a list of vector store files in a batch.
 
 ### Without parameters
 
-```Delphi
+```pascal
 //uses GenAI, GenAI.Types, GenAI.Tutorial.VCL;
  
   TutorialHub.JSONRequestClear;
@@ -911,7 +911,7 @@ Returns a list of vector store files in a batch.
 
 Refert to [parameters documentation](https://platform.openai.com/docs/api-reference/vector-stores-files/listFiles).
 
-```Delphi
+```pascal
 //uses GenAI, GenAI.Types, GenAI.Tutorial.VCL;
 
   TutorialHub.JSONRequestClear;
@@ -983,7 +983,7 @@ The JSON response:
 
 Returns a list of vector store files in a batch.
 
-```Delphi
+```pascal
 //uses GenAI, GenAI.Types, GenAI.Tutorial.VCL;
 
   TutorialHub.JSONRequestClear;
@@ -1037,7 +1037,7 @@ The JSON response:
 
 Cancel a vector store file batch. This attempts to cancel the processing of files in this batch as soon as possible.
 
-```Delphi
+```pascal
 //uses GenAI, GenAI.Types, GenAI.Tutorial.VCL;
 
   TutorialHub.JSONRequestClear;

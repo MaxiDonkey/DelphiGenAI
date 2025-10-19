@@ -13,7 +13,7 @@ Refert to [official documentation](https://platform.openai.com/docs/models).
 
 The list of available models can be retrieved from the Models API response. The models are ordered by release date, with the most recently published appearing first.
 
-```Delphi
+```pascal
 //uses GenAI, GenAI.Types, GenAI.Tutorial.VCL;
 
   TutorialHub.JSONRequestClear;
@@ -59,7 +59,7 @@ The list of available models can be retrieved from the Models API response. The 
 
 Retrieve a model using its ID.
 
-```Delphi
+```pascal
 //uses GenAI, GenAI.Types, GenAI.Tutorial.VCL;
 
   TutorialHub.JSONRequestClear;
@@ -106,7 +106,7 @@ Retrieve a model using its ID.
 
 Deleting a model is only possible if the model is one of your fine-tuned models.
 
-```Delphi
+```pascal
 //uses GenAI, GenAI.Types, GenAI.Tutorial.VCL;
 
   TutorialHub.JSONRequestClear;
