@@ -1,4 +1,4 @@
-#### 2025, October 19 version 1.3.0 (**GetIt version**)
+### 2025, October 19 version 1.3.0 (**GetIt version**)
 
 **Deprecation of Assistants API units**
 
