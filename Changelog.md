@@ -1,4 +1,4 @@
-#### 2025, October 19 version 1.3.0
+#### 2025, October 19 version 1.3.0 (**GetIt version**)
 
 **Deprecation of Assistants API units**
 
@@ -64,7 +64,7 @@ Although outside the core HTTP-based GenAI wrapper, a separate implementation ha
 
 <br>
 
-### 2025, August 12 version 1.2.0 (**Getit version**)
+#### 2025, August 12 version 1.2.0 
 **Modifications to ensure full use of the gtp-5 model**
 
 - JSON Normalization Before Deserialization

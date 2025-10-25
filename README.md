@@ -10,7 +10,7 @@ ___
 <br>
 
 #### NEW: 
-- Getit current version: 1.2.0
+- GetIt current version: 1.3.0
 - [Changelog v1.3.0](Changelog.md)
 - [Videos using SORA](guides/Videos.md#videos)
 - [Conversations API](guides/Conversations.md#conversations)
