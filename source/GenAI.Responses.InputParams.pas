@@ -1873,6 +1873,37 @@ type
     class function New: TFunctionToolParams;
   end;
 
+  TMCPToolParams = class(TResponseToolChoiceParams)
+    /// <summary>
+    /// For MCP tools, the type is always mcp.
+    /// </summary>
+    function &Type(const Value: string = 'mcp'): TMCPToolParams;
+
+    /// <summary>
+    /// The name of the tool to call on the server.
+    /// </summary>
+    function Name(const Value: string): TMCPToolParams;
+
+    /// <summary>
+    /// The label of the MCP server to use.
+    /// </summary>
+    function ServerLabel(const Value: string): TMCPToolParams;
+
+    class function New: TMCPToolParams;
+  end;
+
+  TCustomToolChoiceParams = class(TResponseToolChoiceParams)
+    /// <summary>
+    /// For custom tool calling, the type is always custom.
+    /// </summary>
+    function &Type(const Value: string = 'custom'): TCustomToolChoiceParams;
+
+    /// <summary>
+    /// The name of the custom tool to call.
+    /// </summary>
+    function Name(const Value: string): TCustomToolChoiceParams;
+  end;
+
   {$ENDREGION}
 
   {$REGION 'tools'}
@@ -5809,5 +5840,41 @@ begin
   Result := TWebSearchPreviewParams(Add('search_context_size', TSearchWebOptions.Create(Value).ToString));
 end;
 
+
+{ TMCPToolParams }
+
+function TMCPToolParams.Name(const Value: string): TMCPToolParams;
+begin
+  Result := TMCPToolParams(Add('name', Value));
+end;
+
+class function TMCPToolParams.New: TMCPToolParams;
+begin
+  Result := TMCPToolParams.Create.&Type();
+end;
+
+function TMCPToolParams.ServerLabel(const Value: string): TMCPToolParams;
+begin
+  Result := TMCPToolParams(Add('server_label', Value));
+end;
+
+function TMCPToolParams.&Type(const Value: string): TMCPToolParams;
+begin
+  Result := TMCPToolParams(Add('type', Value));
+end;
+
+{ TCustomToolChoiceParams }
+
+function TCustomToolChoiceParams.Name(
+  const Value: string): TCustomToolChoiceParams;
+begin
+  Result := TCustomToolChoiceParams(Add('name', Value));
+end;
+
+function TCustomToolChoiceParams.&Type(
+  const Value: string): TCustomToolChoiceParams;
+begin
+  Result := TCustomToolChoiceParams(Add('type', Value));
+end;
 
 end.

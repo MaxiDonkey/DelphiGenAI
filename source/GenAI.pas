@@ -71,7 +71,7 @@ uses
   GenAI.Assistants, GenAI.Threads, GenAI.Messages, GenAI.Runs, GenAI.RunSteps;
 
 const
-  VERSION = 'GenAIv1.3.0';
+  VERSION = 'GenAIv1.3.1';
 
 type
   /// <summary>

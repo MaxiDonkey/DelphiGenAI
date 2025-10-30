@@ -1827,7 +1827,9 @@ type
     mcp,
     code_interpreter,
     image_generation,
-    local_shell
+    local_shell,
+    web_search_2025_08_26,
+    web_search
   );
 
   TResponseToolsTypeHelper = record Helper for TResponseToolsType
@@ -3721,7 +3723,7 @@ begin
   Self := TEnumValueRecovery.TypeRetrieve<TResponseToolsType>(Value,
             ['file_search', 'function', 'computer_use_preview', 'web_search_preview',
              'web_search_preview_2025_03_11', 'mcp', 'code_interpreter', 'image_generation',
-             'local_shell']);
+             'local_shell', 'web_search_2025_08_26', 'web_search']);
 end;
 
 function TResponseToolsTypeHelper.ToString: string;
@@ -3745,6 +3747,10 @@ begin
       Exit('image_generation');
     TResponseToolsType.local_shell:
       Exit('local_shell');
+    TResponseToolsType.web_search_2025_08_26:
+      Exit('web_search_2025_08_26');
+    TResponseToolsType.web_search:
+      Exit('web_search');
   end;
 end;
 

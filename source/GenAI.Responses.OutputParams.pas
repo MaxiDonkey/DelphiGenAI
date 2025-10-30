@@ -1686,6 +1686,7 @@ type
     /// IDs to make available to your code.
     /// </summary>
     property Container: TResponseToolContainer read FContainer write FContainer;
+    destructor Destroy; override;
   end;
 
   TInputImageMask = class
@@ -3553,6 +3554,15 @@ destructor TCustomTool.Destroy;
 begin
   if Assigned(FFormat) then
     FFormat.Free;
+  inherited;
+end;
+
+{ TResponseCodeInterpreter }
+
+destructor TResponseCodeInterpreter.Destroy;
+begin
+  if Assigned(FContainer) then
+    FContainer.Free;
   inherited;
 end;
 
