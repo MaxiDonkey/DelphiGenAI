@@ -1,3 +1,13 @@
+#### 2025, October 30 version 1.3.1
+
+- **Added the `web_search` enumeration value** to the `TResponseToolsType` enum *(unit: `GenAI.Types`, line 1832)*.
+
+- **Fixed memory management** by explicitly releasing the container in the `TResponseCodeInterpreter` class to prevent an error when freeing a `TResponse` instance that uses the Code Interpreter tool (unit: `GenAI.Responses.OutputParams`, line 1689).
+
+- **Extended tool choice system** by adding the `TMCPToolParams` and `TCustomToolChoiceParams` classes, both derived from `TResponseToolChoiceParams`.
+
+<br>
+
 ### 2025, October 19 version 1.3.0 (**GetIt version**)
 
 **Deprecation of Assistants API units**
