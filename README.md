@@ -10,8 +10,8 @@ ___
 <br>
 
 #### NEW: 
-- GetIt current version: 1.3.1
-- [Changelog v1.3.0](Changelog.md)
+- GetIt current version: 1.3.0
+- [Changelog v1.3.1](Changelog.md)
 - [Videos using SORA](guides/Videos.md#videos)
 - [Conversations API](guides/Conversations.md#conversations)
 - [Containers for code interpreter](guides/Containers.md#containers-managment)
