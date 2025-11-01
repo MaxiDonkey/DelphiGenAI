@@ -336,13 +336,13 @@ The **result** of the first promise (`Promise`, Stage 2) feeds into Stage 3:
 - Before this chain, the UI shows the reasoning bubble (`EdgeDisplayer.ShowReasoning`), and hides it right after Stage 2 completes:
 
   ```pascal
-    Promise
-      .&Then<string>(function (Value: string): string
-        begin
-          Result := Value;
-          EdgeDisplayer.HideReasoning;
-        end)
-      .&Catch(...);
+  Promise
+    .&Then<string>(function (Value: string): string
+      begin
+        Result := Value;
+        EdgeDisplayer.HideReasoning;
+      end)
+    .&Catch(...);
     ``` 
 
   <br>
