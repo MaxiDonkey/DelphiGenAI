@@ -77,7 +77,7 @@ Each stage corresponds to specific Delphi methods, as described below.
 The first step aims to **refine and complete the user’s request** before invoking a Deep Research model.
 It gathers all required details to ensure that the subsequent research prompt is well-structured and unambiguous.
 
-The engine uses asking\_clarifying\_questions.txt with a lightweight model (gpt-4.1) to guide this step.
+The engine uses asking_clarifying_questions.txt with a lightweight model (gpt-4.1) to guide this step.
 The rules defined in that file enforce the following behavior:
 
 - Ask only the **necessary questions** to fill missing details.
@@ -98,7 +98,7 @@ function ExecuteClarifying(const Prompt: string): TPromise<string>; // Provider.
 ### Stage 2 Building the Deep Research Instruction Prompt
 
 Once clarification is complete, the engine generates the instruction prompt for the Deep Research model.
-This step relies on the file `system\_prompt\_context\_deep\_research.txt`, which defines how complex research requests must be framed.
+This step relies on the file `system_prompt_context_deep_research.txt`, which defines how complex research requests must be framed.
 
 The file enforces several essential rules:
 
@@ -108,7 +108,7 @@ The file enforces several essential rules:
 - Specify the **expected output format** (report, summary, comparison table, etc.).
 - **Keep the response language** identical to the input unless otherwise requested.
 - Prefer primary, **reliable sources** (official sites, publications).
-- Personalize with `{{user\_name}}` if provided.
+- Personalize with `{{user_name}}` if provided.
 
 The result is a fully structured instruction string that is injected into the model’s parameters before execution.
 
@@ -169,7 +169,7 @@ Responsibilities:
 - Force `Reasoning.Effort('medium')`.
 - Enable Web Search Preview (`medium`) and the Code Interpreter.
 - Inject the instruction string from Stage 2.
-- Apply `DEEP\_RESEARCH\_NOT\_APPROPRIATE` if the query is too simple.
+- Apply `DEEP_RESEARCH_NOT_APPROPRIATE` if the query is too simple.
 
 <br>
 
@@ -298,7 +298,7 @@ Responsibilities:
   - Assigns it to `FDeepResearchPrompt`.
   - Executes only Stage 1:
     ```pascal
-    OpenAI.ExecuteClarifying(Prompt).\&Catch(...);
+    OpenAI.ExecuteClarifying(Prompt).&Catch(...);
     ```   
   - **No research yet:** only clarification.
 
@@ -313,7 +313,7 @@ Responsibilities:
         var Promise := OpenAI.ExecuteSilently('gpt-4.1-nano', FDeepResearchPrompt, Instructions);
         EdgeDisplayer.ShowReasoning;
         ```
-        Here, `ExecuteSilently('gpt-4.1-nano', …)` acts as an instruction composer, merging clarified data with `system\_prompt\_context\_deep\_research.txt` rules through `FSystemPromptBuilder`.
+        Here, `ExecuteSilently('gpt-4.1-nano', …)` acts as an instruction composer, merging clarified data with `system_prompt_context_deep_research.txt` rules through `FSystemPromptBuilder`.
 
   <br>
 
@@ -323,7 +323,7 @@ The **result** of the first promise (`Promise`, Stage 2) feeds into Stage 3:
 
   ```pascal
   Promise
-    .\&Then<string>(
+    .&Then<string>(
       function (Value: string): string
       begin
         // Value = final Deep Research instructions
@@ -337,12 +337,12 @@ The **result** of the first promise (`Promise`, Stage 2) feeds into Stage 3:
 
   ```pascal
     Promise
-      .\&Then<string>(function (Value: string): string
+      .&Then<string>(function (Value: string): string
         begin
           Result := Value;
           EdgeDisplayer.HideReasoning;
         end)
-      .\&Catch(...);
+      .&Catch(...);
     ``` 
 
   <br>
@@ -354,7 +354,7 @@ The **result** of the first promise (`Promise`, Stage 2) feeds into Stage 3:
 1. **Prepare the naming prompt from the Deep Research output:**
 
    ```pascal
-        .\&Then<string>(function (Value: string): string
+        .&Then<string>(function (Value: string): string
           begin
             Result := PrepareNamingPromt(Value, Text);
           end)
@@ -363,7 +363,7 @@ The **result** of the first promise (`Promise`, Stage 2) feeds into Stage 3:
 2. **Generate a title using a small model:**
 
    ```pascal
-        .\&Then(function (Value: string): TPromise<string>
+        .&Then(function (Value: string): TPromise<string>
           begin
             Result := OpenAI.ExecuteSilently('gpt-4.1-nano', Value, GetNamingInstructions);
           end)
@@ -372,7 +372,7 @@ The **result** of the first promise (`Promise`, Stage 2) feeds into Stage 3:
 3. **Apply and persist the title:**
 
    ```pascal
-        .\&Then<string>(function (Value: string): string
+        .&Then<string>(function (Value: string): string
           begin
             PersistentChat.CurrentChat.ApplyTitle(Value);
             PersistentChat.SaveToFile;
