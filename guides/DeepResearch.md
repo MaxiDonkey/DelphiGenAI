@@ -297,11 +297,9 @@ Responsibilities:
   - Retrieves and UTF-8 cleans the text from `FEditor.Lines.Text`.
   - Assigns it to `FDeepResearchPrompt`.
   - Executes only Stage 1:
-
-  ```pascal
-  OpenAI.ExecuteClarifying(Prompt).\&Catch(...);
-  ```   
-
+    ```pascal
+    OpenAI.ExecuteClarifying(Prompt).\&Catch(...);
+    ```   
   - **No research yet:** only clarification.
 
 <br>
