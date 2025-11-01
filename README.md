@@ -12,6 +12,7 @@ ___
 #### NEW: 
 - GetIt current version: 1.3.0
 - [Changelog v1.3.1](Changelog.md)
+- [Deep Research](guides/DeepResearch.md#deep-research)
 - [Videos using SORA](guides/Videos.md#videos)
 - [Conversations API](guides/Conversations.md#conversations)
 - [Containers for code interpreter](guides/Containers.md#containers-managment)
@@ -38,6 +39,7 @@ ___
     - [How to execute multiple background requests to process a batch of responses?](#how-to-execute-multiple-background-requests-to-process-a-batch-of-responses)
     - [How to structure a chain of thought and develop advanced processing with GenAI?](#how-to-structure-a-chain-of-thought-and-develop-advanced-processing-with-genai)
     - [How do you structure advanced reasoning using Promises and pipelines?](#how-do-you-structure-advanced-reasoning-using-promises-and-pipelines)
+    - [How to implement Deep Research?](#how-to-implement-deep-research-)
 - [Deprecated](#deprecated)
 - [Contributing](#contributing)
 - [License](#license)
@@ -326,7 +328,7 @@ ___
 
 Starting from version ***1.0.1 of GenAI***, the `GenAI.Monitoring` unit is **responsible for monitoring ongoing HTTP requests.**
 
-The `Monitoring` interface is accessible by including the `GenAI.Monitoring` unit in the `uses` clause. <br>
+The `Monitoring` interface is accessible by including the `GenAI.Monitoring` unit in the `uses` clause. 
 Alternatively, you can access it via the `HttpMonitoring` function, declared in the `GenAI` unit.
 
 **Usage Example**
@@ -410,6 +412,23 @@ To achieve this, it is recommended to use a Promise-based pattern to efficiently
 - #### How do you structure advanced reasoning using Promises and pipelines?
 
 Orchestrate AI thought chains elegantly and efficiently. By leveraging a dynamic pipeline model, a configurable sequential scheduler, and Promises, you can meet the complex requirements of working with modern AI models like OpenAI. Check out the [SynkFlow repository](https://github.com/MaxiDonkey/SynkFlowAI).
+
+<br>
+
+#### How to implement Deep Research ?
+
+This document details the implementation of the **Deep Research** function as integrated within the **File2Knowledge** project; a demonstration application designed to showcase the use of the **DelphiGenAI** wrapper.
+
+Although *File2Knowledge* is built using the **VCL** framework, all concepts and code components described here are **fully transferable to FMX**.  
+The project was designed with a strict **separation of concerns** between the user interface, application logic, and the OpenAI integration layer.  
+This ensures that the asynchronous execution workflow of **Deep Research** remains independent of the visual framework.
+
+Accordingly, this documentation should be regarded as a **best-practice reference** for implementing OpenAI’s *Deep Research* feature within modern Delphi applications.
+
+For additional information:
+- [Internal documentation](guides/DeepResearch.md#deep-research)
+- [Official OpenAI documentation](https://platform.openai.com/docs/guides/deep-research)
+- [*File2Knowledge* project repository](https://github.com/MaxiDonkey/file2knowledge) 
 
 <br>
 
