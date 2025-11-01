@@ -66,9 +66,9 @@ A Deep Research workflow consists of **three distinct stages**:
 
 Each stage corresponds to specific Delphi methods, as described below.
 
-[Stage 1 Clarification Phase](#stage-1-clarification-phase)
-[Stage 2 Building the Deep Research Instruction Prompt](#stage-2-building-the-deep-research-instruction-prompt)
-[Stage 3 Executing the Deep Research Request](#stage-3-executing-the-deep-research-request)
+- [Stage 1 Clarification Phase](#stage-1-clarification-phase)
+- [Stage 2 Building the Deep Research Instruction Prompt](#stage-2-building-the-deep-research-instruction-prompt)
+- [Stage 3 Executing the Deep Research Request](#stage-3-executing-the-deep-research-request)
 
 <br>
 
@@ -276,10 +276,10 @@ Responsibilities:
 
 ## Promise Orchestration for Stages 2 and 3
 
-  [Control Logic: First vs. Second Invocation](#control-logic-first-vs-second-invocation)
-  [Promise Chaining (Stage 2 → Stage 3)](#promise-chaining-stage-2--stage-3)
-  [Optional Post-Processing (Naming Branch)](#optional-post-processing-naming-branch)
-  [Error Handling and State Reset](#error-handling-and-state-reset)
+- [Control Logic: First vs. Second Invocation](#control-logic-first-vs-second-invocation)
+- [Promise Chaining (Stage 2 → Stage 3)](#promise-chaining-stage-2--stage-3)
+- [Optional Post-Processing (Naming Branch)](#optional-post-processing-naming-branch)
+- [Error Handling and State Reset](#error-handling-and-state-reset)
 
 <br>
 
