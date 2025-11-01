@@ -353,32 +353,32 @@ The **result** of the first promise (`Promise`, Stage 2) feeds into Stage 3:
 
 1. **Prepare the naming prompt from the Deep Research output:**
 
-   ```pascal
-        .&Then<string>(function (Value: string): string
-          begin
-            Result := PrepareNamingPromt(Value, Text);
-          end)
-        ```
+     ```pascal
+     .&Then<string>(function (Value: string): string
+       begin
+         Result := PrepareNamingPromt(Value, Text);
+       end)
+     ```
 
 2. **Generate a title using a small model:**
 
-   ```pascal
-        .&Then(function (Value: string): TPromise<string>
-          begin
-            Result := OpenAI.ExecuteSilently('gpt-4.1-nano', Value, GetNamingInstructions);
-          end)
-        ```
+     ```pascal
+     .&Then(function (Value: string): TPromise<string>
+       begin
+         Result := OpenAI.ExecuteSilently('gpt-4.1-nano', Value, GetNamingInstructions);
+       end)
+     ```
 
 3. **Apply and persist the title:**
 
-   ```pascal
-        .&Then<string>(function (Value: string): string
-          begin
-            PersistentChat.CurrentChat.ApplyTitle(Value);
-            PersistentChat.SaveToFile;
-            ChatSessionHistoryView.Refresh(nil);
-          end)
-        ```
+     ```pascal
+     .&Then<string>(function (Value: string): string
+       begin
+         PersistentChat.CurrentChat.ApplyTitle(Value);
+         PersistentChat.SaveToFile;
+         ChatSessionHistoryView.Refresh(nil);
+       end)
+     ```
 
 <br>
 
