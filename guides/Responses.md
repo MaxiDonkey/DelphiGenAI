@@ -1010,6 +1010,7 @@ Only models that can handle both text and image inputs—such as gpt-4o, gpt-4o-
 >It is possible to submit both image files and PDF documents simultaneously for a unified analysis.
 
 <br>
+
 ___
 
 ## Reasoning with o1, o3, o4 or gpt-5
