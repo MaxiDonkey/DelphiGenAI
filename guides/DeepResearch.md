@@ -427,75 +427,79 @@ begin
   if FileStoreManager.VectorStore.Trim.IsEmpty and not CanExecute then
     Exit;
 
+  {--- Update display }
   EdgeDisplayer.Show;
-  var Prompt := TUtf8Mapping.CleanTextAsUTF8(FEditor.Lines.Text);
-  if not string(Prompt).Trim.IsEmpty then
-    begin
-      if FDeepResearchPrompt.IsEmpty then
-        begin
-          FDeepResearchPrompt := Prompt;
 
-          {--- STEP 1 : Clarifying the request }
-          OpenAI.ExecuteClarifying(Prompt)
-            .&Catch(
-              procedure(E: Exception)
+  {--- Retrieve prompt }
+  var Prompt := TUtf8Mapping.CleanTextAsUTF8(FEditor.Lines.Text);
+  if string(Prompt).Trim.IsEmpty then
+    Exit;
+
+  if FDeepResearchPrompt.IsEmpty then
+    {--- First submission }
+    begin
+      FDeepResearchPrompt := Prompt;
+
+      {--- STEP 1 : Clarifying the request }
+      OpenAI.ExecuteClarifying(Prompt)
+        .&Catch(
+          procedure(E: Exception)
+            begin
+              AlertService.ShowError(E.Message);
+
+              {--- Clear the value of FDeepResearchPrompt to allow a future deep search. }
+              FDeepResearchPrompt := EmptyStr;
+            end);
+    end
+  else
+    {--- Second submission detected (accumulated prompt present) }
+    begin
+      {--- Update display }
+      Clear;
+      EdgeDisplayer.ShowReasoning;
+
+      {--- Priming the deep search process with accumulated input (append with newline to separate turns) }
+      FDeepResearchPrompt := FDeepResearchPrompt + sLineBreak + Prompt;
+
+      {--- Retrieve the appropriate instruction string }
+      var Instructions := FSystemPromptBuilder.GetDeepResearchInstructions;
+
+      {--- STEP 2 : Build the appropriate instruction sequence as requested }
+      var Promise := OpenAI.ExecuteSilently('gpt-4.1', FDeepResearchPrompt, Instructions);
+
+      Promise
+        .&Then<string>(
+          function (Value: string): string
+          begin
+            {--- Update display }
+            EdgeDisplayer.HideReasoning;
+
+            {--- STEP 3 : Perform deep research }
+            DeepPromise := OpenAI.Execute(FDeepResearchPrompt, Value)
+              .&Then<string>(
+                function (Value: string): string
                 begin
-                  AlertService.ShowError(E.Message);
+                  Result := Value;
 
                   {--- Clear the value of FDeepResearchPrompt to allow a future deep search. }
                   FDeepResearchPrompt := EmptyStr;
+
+                  {--- Naming Branch if needed }
+                  HandleWithRenaming(DeepPromise);
                 end);
-        end
-      else
-        {--- Second submission detected (accumulated prompt present). }
-        begin
-          {--- Update display }
-          Clear;
-          EdgeDisplayer.ShowReasoning;
+            Result := Value;
+          end)
+        .&Catch(
+          procedure(E: Exception)
+          begin
+            AlertService.ShowError(E.Message);
 
-          {--- Priming the deep search process with accumulated input (append with newline to separate turns). }
-          FDeepResearchPrompt := FDeepResearchPrompt + sLineBreak + Prompt;
+            {--- Clear the value of FDeepResearchPrompt to allow a future deep search. }
+            FDeepResearchPrompt := EmptyStr;
 
-          {--- Retrieve the appropriate instruction string }
-          var Instructions := FSystemPromptBuilder.GetDeepResearchInstructions;
-
-          {--- STEP 2 : Build the appropriate instruction sequence as requested }
-          var Promise := OpenAI.ExecuteSilently('gpt-4.1-nano', FDeepResearchPrompt, Instructions);
-
-          Promise
-            .&Then<string>(
-              function (Value: string): string
-              begin
-                {--- Update display }
-                EdgeDisplayer.HideReasoning;
-
-                {--- STEP 3 : Perform deep research }
-                DeepPromise := OpenAI.Execute(FDeepResearchPrompt, Value)
-                  .&Then<string>(
-                    function (Value: string): string
-                    begin
-                      Result := Value;
-
-                      {--- Clear the value of FDeepResearchPrompt to allow a future deep search. }
-                      FDeepResearchPrompt := EmptyStr;
-
-                      {--- Naming Branch if needed }
-                      HandleWithRenaming(DeepPromise);
-                    end);
-                Result := Value;
-              end)
-            .&Catch(
-              procedure(E: Exception)
-              begin
-                AlertService.ShowError(E.Message);
-
-                {--- Clear the value of FDeepResearchPrompt to allow a future deep search. }
-                FDeepResearchPrompt := EmptyStr;
-
-                {--- Update display }
-                EdgeDisplayer.HideReasoning;
-              end);
-        end;
+            {--- Update display }
+            EdgeDisplayer.HideReasoning;
+          end);
     end;
   SetFocus;
 end;
