@@ -1,3 +1,15 @@
+#### 2025, November 27 version 1.0.4
+- Added optional support for running models locally via ***LM Studio***.
+  You can now route all calls through an OpenAI-compatible ***LM Studio*** server by using:
+
+```pascal
+var Client := TGenAIFactory.CreateLMSInstance;               // default http://127.0.0.1:1234/v1
+// or:
+var Client := TGenAIFactory.CreateLMSInstance('http://...'); // "/v1" is appended automatically when missing
+```
+
+<br>
+
 #### 2025, October 30 version 1.3.1
 
 - **Added the `web_search` enumeration value** to the `TResponseToolsType` enum *(unit: `GenAI.Types`, line 1832)*.

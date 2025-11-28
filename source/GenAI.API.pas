@@ -71,11 +71,14 @@ type
     /// The default base URL for the GenAI API.
     /// </summary>
     URL_BASE = 'https://api.openai.com/v1';
+  strict private
+    class var FLocalUrlBase: string;
   private
     FAPIKey: string;
     FBaseUrl: string;
     FOrganization: string;
     FCustomHeaders: TNetHeaders;
+    FLMStudio: Boolean;
     procedure SetBaseUrl(const Value: string);
     procedure SetOrganization(const Value: string);
     procedure SetCustomHeaders(const Value: TNetHeaders);
@@ -132,8 +135,13 @@ type
     property APIKey: string read FAPIKey write SetAPIKey;
 
     /// <summary>
-    /// The base URL for API requests.
+    /// Gets or sets the base URL for all API requests.
     /// </summary>
+    /// <remarks>
+    /// This value defines the root endpoint used to build request URLs
+    /// (for example, <c>https://api.openai.com/v1</c>). It is combined with
+    /// relative paths by <c>BuildUrl</c> to form the final request URL.
+    /// </remarks>
     property BaseUrl: string read FBaseUrl write SetBaseUrl;
 
     /// <summary>
@@ -145,6 +153,16 @@ type
     /// Custom headers to include in API requests.
     /// </summary>
     property CustomHeaders: TNetHeaders read FCustomHeaders write SetCustomHeaders;
+
+    /// <summary>
+    /// Gets or sets the base URL used when connecting to a local LM Studio server.
+    /// </summary>
+    /// <remarks>
+    /// This value is shared across all API instances and is used whenever a
+    /// <c>TGenAIAPI</c> instance is created with <c>LocalLMS = True</c>.
+    /// By default, it points to <c>http://127.0.0.1:1234/v1</c>.
+    /// </remarks>
+    class property LocalUrlBase: string read FLocalUrlBase write FLocalUrlBase;
   end;
 
   /// <summary>
@@ -267,7 +285,7 @@ type
     /// <param name="AAPIKey">
     /// The API key used for authenticating requests to the GenAI API.
     /// </param>
-    constructor Create(const AAPIKey: string); overload;
+    constructor Create(const LocalLMS: Boolean = False); overload;
 
     /// <summary>
     /// Sends a GET request to the specified API endpoint and returns a strongly typed object.
@@ -724,10 +742,14 @@ uses
 
 {TGenAIAPI}
 
-constructor TGenAIAPI.Create(const AAPIKey: string);
+constructor TGenAIAPI.Create(const LocalLMS: Boolean);
 begin
-  Create;
-  APIKey := AAPIKey;
+  inherited Create;
+  FLMStudio := LocalLMS;
+  if FLMStudio then
+    begin
+      FBaseUrl := TGenAIAPI.LocalUrlBase;
+    end
 end;
 
 function TGenAIAPI.Post<TParams>(const Endpoint: string;
@@ -776,7 +798,8 @@ begin
       200..299:
         begin
           if RawByteFieldName.IsEmpty then
-            Result := Deserialize<TResult>(Code, Response.DataString) else
+            Result := Deserialize<TResult>(Code, Response.DataString)
+          else
             {--- When a raw byte file is sent as the sole response }
             Result := Deserialize<TResult>(Code, MockJsonResponse(RawByteFieldName, Response));
         end;
@@ -1152,6 +1175,13 @@ end;
 
 procedure TGenAIConfiguration.VerifyApiSettings;
 begin
+  if FLMStudio then
+    begin
+      if FBaseUrl.IsEmpty then
+        raise TGenAIAPIException.Create('Invalid LM Studio base URL.');
+      Exit;
+    end;
+
   if FAPIKey.IsEmpty or FBaseUrl.IsEmpty then
     raise TGenAIAPIException.Create('Invalid API key or base URL.');
 end;
@@ -1181,6 +1211,11 @@ end;
 
 function TGenAIConfiguration.BuildHeaders: TNetHeaders;
 begin
+  if FLMStudio then
+    begin
+      Exit(FCustomHeaders);
+    end;
+
   Result := [TNetHeader.Create('Authorization', 'Bearer ' + FAPIKey)];
   if not FOrganization.IsEmpty then
     Result := Result + [TNetHeader.Create('OpenAI-Organization', FOrganization)];
@@ -1320,5 +1355,7 @@ begin
   FHttpClient := THttpClientAPI.CreateInstance(VerifyApiSettings);
 end;
 
+initialization
+  TGenAIAPI.LocalUrlBase := 'http://127.0.0.1:1234/v1';
 end.
 

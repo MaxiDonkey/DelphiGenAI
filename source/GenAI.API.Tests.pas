@@ -184,7 +184,7 @@ end;
 procedure TGenAIAPITests.Test_TGenAIAPI_GetFileWithError;
 {--- Ensure that an appropriate exception is thrown when a file download fails. }
 begin
-  var API := TGenAIAPI.Create('dummy_api_key');
+  var API := TGenAIAPI.Create; //('dummy_api_key');
   var Stream := TMemoryStream.Create;
   try
     Assert.WillRaise(

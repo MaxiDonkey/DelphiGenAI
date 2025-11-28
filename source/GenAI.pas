@@ -71,7 +71,7 @@ uses
   GenAI.Assistants, GenAI.Threads, GenAI.Messages, GenAI.Runs, GenAI.RunSteps;
 
 const
-  VERSION = 'GenAIv1.3.1';
+  VERSION = 'GenAIv1.4';
 
 type
   /// <summary>
@@ -441,7 +441,50 @@ type
   end;
 
   TGenAIFactory = class
+    /// <summary>
+    /// Creates a GenAI instance configured to use the standard OpenAI API with the provided API key.
+    /// </summary>
+    /// <remarks>
+    /// This factory method initializes an <c>IGenAI</c> implementation backed by <c>TGenAIAPI</c>
+    /// in hosted-API mode. The provided <paramref name="AAPIKey"/> is applied to the underlying
+    /// API client and is required for authenticating all requests to <c>https://api.openai.com/v1</c>
+    /// (or any custom base URL subsequently configured).
+    /// <para>
+    /// Use this method for all interactions with OpenAI’s cloud services, including models,
+    /// chat completions, embeddings, file management, fine-tuning, vector stores, and other endpoints.
+    /// </para>
+    /// </remarks>
+    /// <param name="AAPIKey">
+    /// The OpenAI API key used to authenticate requests. This value must be a valid key; otherwise
+    /// API calls will fail with authentication errors.
+    /// </param>
+    /// <returns>
+    /// An <c>IGenAI</c> instance configured for authenticated communication with the OpenAI API.
+    /// </returns>
     class function CreateInstance(const AAPIKey: string): IGenAI;
+
+    /// <summary>
+    /// Creates a GenAI instance configured to use a local LM Studio server instead of the hosted API.
+    /// </summary>
+    /// <remarks>
+    /// This factory method initializes an <c>IGenAI</c> implementation with <c>TGenAIAPI</c>
+    /// running in "local LMS" mode. When <paramref name="URLBase"/> is empty, the instance
+    /// uses the global <c>TGenAIAPI.LocalUrlBase</c> value (which defaults to
+    /// <c>http://127.0.0.1:1234/v1</c>). When a non-empty URL is provided, it overrides the
+    /// global local base URL for LM Studio connections.
+    /// <para>
+    /// Use this helper when you want to work with models served by LM Studio or another
+    /// OpenAI-compatible local endpoint, without requiring an OpenAI API key.
+    /// </para>
+    /// </remarks>
+    /// <param name="URLBase">
+    /// Optional base URL of the local LM Studio (or compatible) server. If omitted or empty,
+    /// the current value of <c>TGenAIAPI.LocalUrlBase</c> is used.
+    /// </param>
+    /// <returns>
+    /// An <c>IGenAI</c> instance configured to send all requests to the specified local LM Studio server.
+    /// </returns>
+    class function CreateLMSInstance(const URLBase: string = ''): IGenAI;
   end;
 
   /// <summary>
@@ -548,8 +591,8 @@ type
     property BaseURL: string read GetBaseUrl write SetBaseUrl;
 
   public
-    constructor Create; overload;
-    constructor Create(const AAPIKey: string); overload;
+    constructor Create(const LocalLMS: Boolean = False); overload;
+    constructor Create(const AAPIKey: string; const LocalLMS: Boolean = False); overload;
     destructor Destroy; override;
   end;
 
@@ -4556,6 +4599,7 @@ function Vector_store(const FileIds: TArray<string>; const Metadata: TJSONObject
 begin
   if Length(FileIds) = 0 then
     raise Exception.Create('File Ids can''t be null');
+
   Result := TVectorStoresParams.Create.FileIds(FileIds);
   if Assigned(Metadata) then
     Result := Result.Metadata(Metadata);
@@ -4594,15 +4638,15 @@ end;
 
 { TGenAI }
 
-constructor TGenAI.Create;
+constructor TGenAI.Create(const LocalLMS: Boolean);
 begin
-  inherited;
-  FAPI := TGenAIAPI.Create;
+  inherited Create;
+  FAPI := TGenAIAPI.Create(LocalLMS);
 end;
 
-constructor TGenAI.Create(const AAPIKey: string);
+constructor TGenAI.Create(const AAPIKey: string; const LocalLMS: Boolean);
 begin
-  Create;
+  Create(LocalLMS);
   APIKey := AAPIKey;
 end;
 
@@ -4839,6 +4883,18 @@ end;
 class function TGenAIFactory.CreateInstance(const AAPIKey: string): IGenAI;
 begin
   Result := TGenAI.Create(AAPIKey);
+end;
+
+class function TGenAIFactory.CreateLMSInstance(const URLBase: string): IGenAI;
+begin
+  if not URLBase.Trim.IsEmpty then
+    begin
+      var Base := URLBase.TrimRight(['/']);
+      if not Base.EndsWith('/v1', True) then
+        Base := Base + '/v1';
+      TGenAIAPI.LocalUrlBase := Base;
+    end;
+  Result := TGenAI.Create('', True);
 end;
 
 initialization

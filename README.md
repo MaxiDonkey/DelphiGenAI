@@ -1,21 +1,20 @@
-# **Delphi GenAI - Optimized OpenAI Integration**
+# Delphi GenAI - Optimized OpenAI Integration
 
 ___
 ![Delphi async/await supported](https://img.shields.io/badge/Delphi%20async%2Fawait-supported-blue)
 ![GitHub](https://img.shields.io/badge/IDE%20Version-Delphi%2010.4/11/12-ffffba)
 [![GetIt – Available](https://img.shields.io/badge/GetIt-Available-baffc9?logo=delphi&logoColor=white)](https://getitnow.embarcadero.com/genai-optimized-openai-integration-wrapper/)
 ![GitHub](https://img.shields.io/badge/platform-all%20platforms-baffc9)
-![GitHub](https://img.shields.io/badge/Updated%20on%20October%2019,%202025-blue)
+![GitHub](https://img.shields.io/badge/Updated%20on%20November%2028,%202025-blue)
 
 <br>
 
 #### NEW: 
 - GetIt current version: 1.3.0
-- [Changelog v1.3.1](Changelog.md)
+- [Changelog v1.4](Changelog.md)
+- [Local model support via LM Studio (OpenAI-compatible server)](guides/LMStudio.md#run-models-locally-with-lm-studio)
 - [Deep Research](guides/DeepResearch.md#deep-research)
 - [Videos using SORA](guides/Videos.md#videos)
-- [Conversations API](guides/Conversations.md#conversations)
-- [Containers for code interpreter](guides/Containers.md#containers-managment)
 - [Realtime](guides/Realtime.md#realtime)
 ___
 
@@ -28,6 +27,7 @@ ___
     - [Code examples](#code-examples)
     - [Strategies for quickly using the code examples](#strategies-for-quickly-using-the-code-examples)
     - [Use file2knowledge](#use-file2knowledge)
+- [Local model support via LM Studio](guides/LMStudio.md#run-models-locally-with-lm-studio)
 - [GenAI functional coverage](#genai-functional-coverage)
 - [Quick Start Guide](#quick-start-guide)
     - [Responses vs. Chat Completions](#responses-vs-chat-completions)
@@ -94,8 +94,16 @@ Once you have a token, you can initialize IGenAI interface, which is an entry po
 >//Declare 
 >//  Client: IGenAI;
 >
+>  // Cloud clients
 >  Client := TGenAIFactory.CreateInstance(api_key);
->```
+>
+>
+>  // Local client (LM Studio – OpenAI compatible server)
+>  Client := TGenAIFactory.CreateLMSInstance; // default: http://127.0.0.1:1234/v1
+>
+>  // or
+>  //Client := TGenAIFactory.CreateLMSInstance('http://192.168.1.10:1234');
+> ```
 
 To streamline the use of the API wrapper, the process for declaring units has been simplified. Regardless of which methods you use, you only need to reference the following two core units:
 `GenAI` and `GenAI.Types`.
@@ -123,7 +131,7 @@ The **OpenAI API** lets you plug advanced models into your applications and prod
 //uses GenAI, GenAI.Types, GenAI.Tutorial.VCL;
 
   var API_Key := 'OPENAI_API_KEY';
-  var MyClient := TGenAIFactory.CreateInstance(API_KEY);
+  var Client := TGenAIFactory.CreateInstance(API_KEY);
 
   var Value := Client.Responses.Create(
     procedure (Params: TResponsesParams)
@@ -149,14 +157,14 @@ The **OpenAI API** lets you plug advanced models into your applications and prod
 ```pascal
 //uses GenAI, GenAI.Types, GenAI.Tutorial.VCL;
 
-var MyClient: IGenAI;
+var Client: IGenAI;
 
 procedure TForm1.Test;
 begin
   var API_Key := 'OPENAI_API_KEY';
-  MyClient := TGenAIFactory.CreateInstance(API_KEY);
+  Client := TGenAIFactory.CreateInstance(API_KEY);
 
-  MyClient.Responses.AsynCreate(
+  Client.Responses.AsynCreate(
     procedure (Params: TResponsesParams)
     begin
       Params
