@@ -4,7 +4,7 @@
 - [Using LM Studio as a local OpenAI-compatible backend](#using-lm-studio-as-a-local-openai-compatible-backend)
 - [Supported LM Studio endpoints](#supported-lm-studio-endpoints)
 - [GGUF Broad Adoption in the Local Ecosystem](#gguf-broad-adoption-in-the-local-ecosystem)
-- [Downloading models with LM Studio (HuggingFace integration)](#downloading-models-with-lm-studio-huggingface-integration)
+- [Downloading models with LM Studio (HuggingFace integration)](#downloading-models-with-lm-studio-huggingface-models-integration)
 - [Usage examples](#usage-examples)
 
 <br>
