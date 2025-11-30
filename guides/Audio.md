@@ -8,7 +8,7 @@ ___
 
 Convert a text into an audio file. Refer to [official documentation](https://platform.openai.com/docs/guides/text-to-speech)
 
-````pascal
+```pascal
 //uses GenAI, GenAI.Types, GenAI.Tutorial.VCL;
 
   TutorialHub.JSONRequestClear;
@@ -71,6 +71,7 @@ Convert a text into an audio file. Refer to [official documentation](https://pla
 //        Display(TutorialHub, E.Message);
 //      end);
 ```
+
 <br>
 
 Let’s take a closer look at how the `Display` method handles output to understand how the model’s response is managed.
