@@ -5,6 +5,7 @@
     - [Non streamed](#non-streamed) 
     - [Streamed](#streamed)
     - [Multi-turn conversations](#multi-turn-conversations) 
+    - [Structured input (roles + multimodal content)](#structured-input-roles--multimodal-content)
     - [Advanced Use Case](#advanced-use-case)
     - [Parallel method for generating text](#parallel-method-for-generating-text)
         - [Example 1 : Two prompts processed in parallel](#example-1--two-prompts-processed-in-parallel)
@@ -17,6 +18,7 @@
     - [Canceling Background Tasks](#canceling-background-tasks)
 - [Vision](#vision)
     - [Analyze single source](#analyze-single-source)
+       - [Data URIs and in-memory sources](#data-uris-and-in-memory-sources)
     - [Analyze multi-source](#analyze-multi-source)
     - [Low or high fidelity image understanding](#low-or-high-fidelity-image-understanding)
 - [PDF file inputs](#pdf-file-inputs)
@@ -281,6 +283,37 @@ In the example below, we assume that one of the previous requests (streamed or n
 ```
 
 Simply include the previous response’s ID with each turn. Thanks to CRUD operations, retrieving, processing, and deleting saved responses is straightforward. For more details, see the [CRUD operations on saved Responses](#crud-operations-on-saved-responses).
+
+<br>
+
+### Structured input (roles + multimodal content)
+
+For advanced scenarios (roles, multipart content, multimodal), build the input explicitly with `TInputMessage` + `TContent`.
+`TContent` implicitly casts to `TArray<TItemContent>`, so it plugs directly into `Content(...)`.
+
+```pascal
+var Response := Client.Responses.Create(
+  procedure(Params: TResponsesParams)
+  begin
+    Params.Model('gpt-4.1');
+    Params.Input([
+      TInputMessage.Create
+        .Role('user')
+        .Content(
+          TContent.Create
+            .AddPrompt('Describe this image and extract key details.')
+            .AddImage(ImageURI('c:\img.jpg', TSize.Create(1024,1024), TImageFormat.JPG))
+        )
+    ]);
+    Params.Store(False);
+  end
+);
+...
+```
+
+
+
+
 
 <br>
 
@@ -792,7 +825,49 @@ Refer to the [official documentation](https://platform.openai.com/docs/guides/vi
 //        Display(TutorialHub, E.Message);
 //      end);
 ```
+
 This example uses streaming. The non-streamed version is straightforward to implement, so it is not covered here.
+
+<br>
+
+#### Data URIs and in-memory sources
+
+You can pass a `data:` URI directly. When the input is already `data:...`, it is forwarded as-is (no re-encoding).
+
+```pascal
+var Img := 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUg...';
+
+Client.Responses.AsynCreateStream(
+  procedure (Params: TResponsesParams)
+  begin
+    Params.Model('gpt-4.1-mini');
+    Params.Input('What is in this image?', [Img]);
+    Params.Store(False);
+    Params.Stream;
+  end,
+  ...
+);
+```
+
+You can also generate data: URIs from in-memory data (TBytes / TStream) using TDataURI.
+
+```pascal
+uses
+  GenAI.NetEncoding.DataURI; // optional: TDataURI is also re-exported/aliased by the GenAI facade
+
+var ImgDataUri := TDataURI.Create(MyImageStream, 'image/png');
+
+Client.Responses.AsynCreateStream(
+  procedure (Params: TResponsesParams)
+  begin
+    Params.Model('gpt-4.1-mini');
+    Params.Input('Describe the image', [ImgDataUri]);
+    Params.Store(False);
+    Params.Stream;
+  end,
+  ...
+);
+```
 
 <br>
 
@@ -995,7 +1070,34 @@ However, with GenAI, it is possible to directly provide a local path or a URL po
 //        Display(TutorialHub, E.Message);
 //      end);
 ```
+
 You can also submit multiple PDF files at once to perform analysis across a group of documents.
+
+<br>
+
+>[!NOTE]
+> If your PDF is already in memory (stream/bytes), you can inline it as a `data:` URI.
+
+```pascal
+uses
+  GenAI.NetEncoding.DataURI; // optional: TDataURI is also re-exported/aliased by the GenAI facade
+
+var PdfDataUri := TDataURI.Create(MyPdfStream, 'application/pdf');
+
+Client.Responses.AsynCreateStream(
+  procedure (Params: TResponsesParams)
+  begin
+    Params.Model('gpt-4.1-mini');
+    Params.Input('Summarize the document', [PdfDataUri]);
+    Params.Store(False);
+    Params.Stream;
+  end,
+  ...
+);
+```
+
+
+<br>
 
 **File Size Limitations**
 The API allows up to 100 pages and a total of 32MB per request, even when multiple files are included.

@@ -1,4 +1,12 @@
-#### 2025, November 27 version 1.0.4
+#### 2025, December 1 version 1.4.1
+- Added `TContent` fluent builder to compose `TArray<TItemContent>`: .AddPrompt/.AddImage/.AddFile/.AddAudio + implicit cast to TArray<TItemContent>.
+- Improved data URI support: GetMimeType extracts MIME from data: and GetUrlOrEncodeBase64 now passes through data: inputs (no re-encoding).
+- Added `TDataURI` (GenAI.NetEncoding.DataURI) to build data: URIs from TBytes, TStream, and text (CreateText with charset, optional Encoding, optional BOM).
+- Hardened `GenAI.Httpx` helpers: stronger input validation and explicit rejection of data: in URL-only methods.
+
+<br>
+
+#### 2025, November 27 version 1.4.0
 - Added optional support for running models locally via ***LM Studio***.
   You can now route all calls through an OpenAI-compatible ***LM Studio*** server by using:
 

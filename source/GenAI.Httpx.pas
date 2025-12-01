@@ -32,6 +32,7 @@ type
     /// Raises an exception if the input stream is null.
     /// </exception>
     class function StreamToBytes(AStream: TStream): TBytes;
+
     /// <summary>
     /// Loads data from the specified URL, encodes it in Base64, and retrieves its MIME type.
     /// </summary>
@@ -45,6 +46,7 @@ type
     /// A Base64-encoded string representing the data fetched from the URL.
     /// </returns>
     class function LoadDataToBase64(const Url: string; var MimeType: string): string; overload;
+
     /// <summary>
     /// Loads data from the specified URL, encodes it in Base64.
     /// </summary>
@@ -55,6 +57,7 @@ type
     /// A Base64-encoded string representing the data fetched from the URL.
     /// </returns>
     class function LoadDataToBase64(const Url: string): string; overload;
+
     /// <summary>
     /// Retrieves the MIME type of the content at the specified URL.
     /// </summary>
@@ -65,6 +68,7 @@ type
     /// A string representing the MIME type of the content at the URL.
     /// </returns>
     class function GetMimeType(const Url: string): string;
+
     /// <summary>
     /// Validates the accessibility of a specified URL by performing an HTTP HEAD request.
     /// </summary>
@@ -80,6 +84,7 @@ type
     /// If the status code indicates success (e.g., 200-299), no exception is thrown.
     /// </remarks>
     class procedure UrlCheck(const Url: string);
+
     /// <summary>
     /// Extracts the file name from the path component of a given URI.
     /// </summary>
@@ -106,6 +111,9 @@ end;
 
 class function THttpx.GetMimeType(const Url: string): string;
 begin
+  if Url.StartsWith('data:', True) then
+    raise Exception.Create('URL expected (http/https), got data URI');
+
   var HttpClient := THTTPClient.Create;
   try
     Result := (HttpClient.Head(Url) as IHTTPResponse).MimeType.ToLower;
@@ -160,6 +168,9 @@ end;
 
 class procedure THttpx.UrlCheck(const Url: string);
 begin
+  if Url.StartsWith('data:', True) then
+    raise Exception.Create('URL expected (http/https), got data URI');
+
   var HttpClient := THTTPClient.Create;
   try
     case (HttpClient.Head(Url) as IHTTPResponse).StatusCode of

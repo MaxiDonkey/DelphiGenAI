@@ -120,6 +120,10 @@ type
     /// </summary>
     function FileName(const Value: string): TItemContent;
 
+    /// <summary>
+    /// The audio input to the model, provided as an input_audio object.
+    /// Use this to attach base64-encoded audio data and its format (mp3 or wav).
+    /// </summary>
     function InputAudio(const Value: TItemAudioContent): TItemContent;
 
     class function NewText: TItemContent;
@@ -129,6 +133,115 @@ type
     class function NewFileData(const FileLocation: string): TItemContent;
     class function NewAudio: TItemContent; overload;
     class function NewAudio(const FileLocation: string): TItemContent; overload;
+  end;
+
+  /// <summary>
+  /// Fluent builder for composing a <c>TArray&lt;TItemContent&gt;</c> to be passed to
+  /// <see cref="TInputMessage.Content(const Value: TArray{TItemContent})" />.
+  /// </summary>
+  /// <remarks>
+  /// <para><b>Thread-safety:</b> This builder is <b>not</b> thread-safe.</para>
+  /// <para>
+  /// Do not share a single <c>TContent</c> instance across threads. If you need to build content
+  /// concurrently, create one <c>TContent</c> per request/thread.
+  /// </para>
+  /// <para>
+  /// Internally, <c>TContent</c> maintains a growable buffer (dynamic array) and a count; concurrent
+  /// mutations can lead to races and memory corruption.
+  /// </para>
+  /// <para>
+  /// Also note that calling <c>TInputMessage.Content(...)</c> typically transfers ownership of the
+  /// contained <c>TItemContent</c> items to the message payload (via detaching/JSON materialization).
+  /// Avoid reusing the same <c>TContent</c> (or the same <c>TItemContent</c> instances) across requests.
+  /// </para>
+  /// </remarks>
+  TContent = record
+  private
+    FItems: TArray<TItemContent>;
+    FCount: Integer;
+    procedure Append(const Item: TItemContent); inline;
+  public
+    class function Create(const Capacity: Integer = 2): TContent; static;
+
+    /// <summary>
+    /// Ensures that the internal buffer has at least the specified capacity.
+    /// If the current capacity is smaller, the buffer is expanded; otherwise,
+    /// it is left unchanged. This is useful for reducing the number of internal
+    /// reallocations when the expected number of added items is known in advance.
+    /// </summary>
+    /// <param name="Capacity">
+    /// The minimum number of items that the internal buffer should be able to hold.
+    /// </param>
+    /// <returns>
+    /// The updated <c>TContent</c> instance, allowing fluent-style method chaining.
+    /// </returns>
+    function Reserve(const Capacity: Integer): TContent;
+
+    /// <summary>
+    /// Adds a text prompt to the content list. This creates a new text
+    /// <c>TItemContent</c> instance containing the specified string and appends it
+    /// to the internal buffer.
+    /// </summary>
+    /// <param name="AText">
+    /// The text to be added as a prompt item.
+    /// </param>
+    /// <returns>
+    /// The updated <c>TContent</c> instance, enabling fluent-style method chaining.
+    /// </returns>
+    function AddPrompt(const AText: string): TContent;
+
+    /// <summary>
+    /// Adds an image input to the content list. The path or URL is wrapped
+    /// into a <c>TItemContent</c> instance configured as an image input and
+    /// appended to the internal buffer.
+    /// </summary>
+    /// <param name="APathOrUrl">
+    /// A local file path or a fully qualified URL pointing to the image.
+    /// </param>
+    /// <returns>
+    /// The updated <c>TContent</c> instance, supporting fluent-style chaining.
+    /// </returns>
+    function AddImage(const APathOrUrl: string): TContent;
+
+    /// <summary>
+    /// Adds a file input to the content list. The specified file path is loaded
+    /// and wrapped into a <c>TItemContent</c> instance configured as file data,
+    /// then appended to the internal buffer.
+    /// </summary>
+    /// <param name="AFilePath">
+    /// The path to the file to include as input.
+    /// </param>
+    /// <returns>
+    /// The updated <c>TContent</c> instance, allowing fluent-style method chaining.
+    /// </returns>
+    function AddFile(const AFilePath: string): TContent;
+
+    /// <summary>
+    /// Adds an audio input to the content list. The specified audio file path
+    /// is wrapped into a <c>TItemContent</c> instance configured as an audio
+    /// input (base64-encoded with inferred format), and appended to the internal buffer.
+    /// </summary>
+    /// <param name="AAudioPath">
+    /// The path to the audio file to include as input (e.g., .mp3 or .wav).
+    /// </param>
+    /// <returns>
+    /// The updated <c>TContent</c> instance, enabling fluent-style chaining.
+    /// </returns>
+    function AddAudio(const AAudioPath: string): TContent;
+
+    /// <summary>
+    /// Implicitly converts a <c>TContent</c> instance into a dynamic array of
+    /// <c>TItemContent</c>. Only the populated portion of the internal buffer is
+    /// returned, excluding any unused preallocated capacity.
+    /// </summary>
+    /// <param name="Value">
+    /// The <c>TContent</c> instance to convert.
+    /// </param>
+    /// <returns>
+    /// A <c>TArray&lt;TItemContent&gt;</c> containing all items that were added
+    /// to the <c>TContent</c> builder.
+    /// </returns>
+    class operator Implicit(const Value: TContent): TArray<TItemContent>;
   end;
 
   /// <summary>
@@ -5875,6 +5988,70 @@ function TCustomToolChoiceParams.&Type(
   const Value: string): TCustomToolChoiceParams;
 begin
   Result := TCustomToolChoiceParams(Add('type', Value));
+end;
+
+{ TContent }
+
+class function TContent.Create(const Capacity: Integer): TContent;
+begin
+  Result.FItems := nil;
+  Result.FCount := 0;
+
+  if Capacity > 0 then
+    SetLength(Result.FItems, Capacity);
+end;
+
+function TContent.Reserve(const Capacity: Integer): TContent;
+begin
+  Result := Self;
+  if (Capacity > 0) and (Length(Result.FItems) < Capacity) then
+    SetLength(Result.FItems, Capacity);
+end;
+
+procedure TContent.Append(const Item: TItemContent);
+var
+  NewCap: Integer;
+begin
+  if FCount = Length(FItems) then
+  begin
+    if Length(FItems) = 0 then
+      NewCap := 4
+    else
+      NewCap := Length(FItems) * 2;
+    SetLength(FItems, NewCap);
+  end;
+
+  FItems[FCount] := Item;
+  Inc(FCount);
+end;
+
+function TContent.AddPrompt(const AText: string): TContent;
+begin
+  Result := Self;
+  Result.Append(TItemContent.NewText.Text(AText));
+end;
+
+function TContent.AddImage(const APathOrUrl: string): TContent;
+begin
+  Result := Self;
+  Result.Append(TItemContent.NewImage(APathOrUrl));
+end;
+
+function TContent.AddFile(const AFilePath: string): TContent;
+begin
+  Result := Self;
+  Result.Append(TItemContent.NewFileData(AFilePath));
+end;
+
+function TContent.AddAudio(const AAudioPath: string): TContent;
+begin
+  Result := Self;
+  Result.Append(TItemContent.NewAudio(AAudioPath));
+end;
+
+class operator TContent.Implicit(const Value: TContent): TArray<TItemContent>;
+begin
+  Result := Copy(Value.FItems, 0, Value.FCount);
 end;
 
 end.

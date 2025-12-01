@@ -66,12 +66,13 @@ uses
   GenAI.Responses, GenAI.Responses.InputParams, GenAI.Responses.InputItemList,
   GenAI.Responses.OutputParams, GenAI.Async.Promise, GenAI.Responses.Internal,
   GenAI.Conversations, GenAI.Video, GenAI.Containers, GenAI.ContainerFiles,
+  GenAI.NetEncoding.DataURI,
 
   {--- deprecated }
   GenAI.Assistants, GenAI.Threads, GenAI.Messages, GenAI.Runs, GenAI.RunSteps;
 
 const
-  VERSION = 'GenAIv1.4';
+  VERSION = 'GenAIv1.4.1';
 
 type
   /// <summary>
@@ -3404,9 +3405,17 @@ type
 
   {$ENDREGION}
 
+  {$REGION 'GenAI.NetEncoding.DataURI'}
+
+  TDataURI = GenAI.NetEncoding.DataURI.TDataURI;
+
+  {$ENDREGION}
+
   {$REGION 'GenAI.Responses.InputParams'}
 
   TItemContent = GenAI.Responses.InputParams.TItemContent;
+
+  TContent = GenAI.Responses.InputParams.TContent;
 
   TInputListItem = GenAI.Responses.InputParams.TInputListItem;
 

@@ -192,9 +192,65 @@ uses
   /// </remarks>
   function FileSize(const FileLocation: string): Int64;
 
+  /// <summary>
+  /// Saves a Base64-encoded string to a text file using UTF-8 encoding.
+  /// </summary>
+  /// <param name="FileLocation">
+  /// The full path (including file name) where the content will be written.
+  /// If the directory part of the path does not exist, it will be created.
+  /// </param>
+  /// <param name="Content">
+  /// The Base64-encoded string to persist to disk.
+  /// </param>
+  /// <exception cref="Exception">
+  /// Raised if the directory cannot be created or if the file cannot be written.
+  /// </exception>
+  /// <remarks>
+  /// The content is written as UTF-8 text. This routine does not validate that
+  /// the supplied content is a valid Base64 string.
+  /// </remarks>
   procedure SaveAsBase64(const FileLocation, Content: string);
 
+  /// <summary>
+  /// Loads and returns a Base64-encoded string from a UTF-8 text file.
+  /// </summary>
+  /// <param name="FileLocation">
+  /// The full path to the file to be read. The file must exist and contain
+  /// Base64-encoded text.
+  /// </param>
+  /// <returns>
+  /// A string containing the Base64-encoded content read from the file.
+  /// </returns>
+  /// <exception cref="Exception">
+  /// Thrown if the specified file does not exist or cannot be read.
+  /// </exception>
+  /// <remarks>
+  /// This routine reads the file using UTF-8 encoding and returns its full content.
+  /// No validation is performed to ensure that the retrieved text is valid Base64.
+  /// </remarks>
   function LoadAsBase64(const FileLocation: string): string;
+
+  /// <summary>
+  /// Attempts to extract the MIME type from a data URI.
+  /// </summary>
+  /// <param name="Value">
+  /// The input string expected to be a data URI in the format:
+  /// <c>data:[&lt;mediatype&gt;][;base64],&lt;data&gt;</c>.
+  /// </param>
+  /// <param name="MimeType">
+  /// Output parameter that will contain the extracted MIME type in lowercase
+  /// if the function succeeds; otherwise an empty string.
+  /// </param>
+  /// <returns>
+  /// <c>True</c> if a valid data URI is detected and the MIME type is successfully extracted;
+  /// otherwise <c>False</c>.
+  /// </returns>
+  /// <remarks>
+  /// The function checks whether the string starts with the <c>data:</c> prefix.
+  /// If the structure is valid, it extracts the substring between <c>data:</c> and
+  /// the first <c>';'</c> or <c>','</c>. No validation is performed on the extracted MIME type.
+  /// </remarks>
+  function TryGetDataUriMimeType(const Value: string; out MimeType: string): Boolean;
 
 implementation
 
@@ -231,6 +287,9 @@ end;
 
 function GetMimeType(const FileLocation: string): string;
 begin
+  if TryGetDataUriMimeType(FileLocation, Result) then
+    Exit;
+
   if not FileExists(FileLocation) then
     raise Exception.CreateFmt('File not found: %s', [FileLocation]);
 
@@ -245,6 +304,9 @@ end;
 
 function GetUrlOrEncodeBase64(const Value: string): string;
 begin
+   if Value.StartsWith('data:', True) then
+    Exit(Value);
+
   if Value.StartsWith('http') then
     Exit(Value);
 
@@ -255,7 +317,8 @@ begin
         (IndexStr(MimeType, AudioTypeAccepted) > -1);
 
   if not AcceptedMimeType then
-    raise Exception.Create('Unsupported mime type');
+    raise Exception.CreateFmt('Unsupported mime type: %s', [MimeType]);
+
   Result :=  Format('data:%s;base64,%s', [MimeType, EncodeBase64(Value)]);
 end;
 
@@ -364,6 +427,26 @@ begin
     Result := TFile.ReadAllText(FileLocation, TEncoding.UTF8)
   else
     raise Exception.CreateFmt('The template file was not found : %s', [FileLocation]);
+end;
+
+function TryGetDataUriMimeType(const Value: string; out MimeType: string): Boolean;
+begin
+  Result := False;
+  MimeType := '';
+
+  if not Value.StartsWith('data:', True) then
+    Exit;
+
+  // data:[<mediatype>][;base64],<data>
+  var P := Pos(';', Value);
+  var S := Pos(',', Value);
+
+  if (S = 0) then Exit; // invalid data URI
+  if (P = 0) or (P > S) then
+    P := S;
+
+  MimeType := Copy(Value, 6, P - 6).Trim.ToLower; // between 'data:' and ';' or ','
+  Result := MimeType <> '';
 end;
 
 end.
