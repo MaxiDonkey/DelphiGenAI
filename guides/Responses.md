@@ -302,7 +302,7 @@ var Response := Client.Responses.Create(
         .Content(
           TContent.Create
             .AddPrompt('Describe this image and extract key details.')
-            .AddImage(ImageURI('c:\img.jpg', TSize.Create(1024,1024), TImageFormat.JPG))
+            .AddImage('c:\img.png')
         )
     ]);
     Params.Store(False);
