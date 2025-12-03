@@ -10,7 +10,7 @@ ___
 <br>
 
 #### NEW: 
-- GetIt current version: 1.3.0
+- GetIt current version: 1.4.0
 - [Changelog v1.4.1](Changelog.md) updated on December 1, 2025
 - [Local model support via LM Studio (OpenAI-compatible server)](guides/LMStudio.md#run-models-locally-with-lm-studio)
 - [Deep Research](guides/DeepResearch.md#deep-research)
