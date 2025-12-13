@@ -47,7 +47,8 @@ uses
   REST.JsonReflect,
   GenAI.API.Params, GenAI.API, GenAI.Consts, GenAI.Schema, GenAI.Chat.StreamingOpenAI,
   GenAI.Types, GenAI.Chat.StreamingInterface, GenAI.Functions.Tools, GenAI.Functions.Core,
-  GenAI.Async.Params, GenAI.Async.Support, GenAI.Async.Promise, GenAI.Chat.Parallel;
+  GenAI.Async.Params, GenAI.Async.Support, GenAI.Async.Promise, GenAI.Chat.Parallel,
+  GenAI.Gemini.Extra_body;
 
 type
   /// <summary>
@@ -1724,6 +1725,8 @@ type
     /// Returns an instance of <c>TChatParams</c> with the configured web search options.
     /// </returns>
     function WebSearchOptions(const Value: string): TChatParams; overload;
+
+    function ExtraBody(const Value: TExtraBody): TChatParams;
   end;
 
   /// <summary>
@@ -3749,6 +3752,11 @@ end;
 function TChatParams.Audio(const Voice, Format: string): TChatParams;
 begin
   Result := Audio(TChatVoice.Create(Voice), TAudioFormat.Create(Format));
+end;
+
+function TChatParams.ExtraBody(const Value: TExtraBody): TChatParams;
+begin
+  Result := TChatParams(Add('extra_body', TJSONObject.Create.AddPair('google',Value.Detach)));
 end;
 
 function TChatParams.FrequencyPenalty(const Value: Double): TChatParams;

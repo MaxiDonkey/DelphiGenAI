@@ -1945,6 +1945,21 @@ type
 
   {$ENDREGION}
 
+  {$REGION 'GenAI.Gemini.Extra_body'}
+
+  ThinkingLevelType = (
+    THINKING_LEVEL_UNSPECIFIED,
+    LOW,
+    HIGH
+  );
+
+  ThinkingLevelTypeHelper = record Helper for ThinkingLevelType
+    constructor Create(const Value: string);
+    function ToString: string;
+  end;
+
+  {$ENDREGION}
+
 function TimestampToDateTime(const Value: Int64; const UTC: Boolean = False): TDateTime;
 function TimestampToString(const Value: Int64; const UTC: Boolean = False): string;
 
@@ -2003,16 +2018,34 @@ class function TEnumValueRecovery.TypeRetrieve<T>(const Value: string;
   const References: TArray<string>): T;
 var
   pInfo: PTypeInfo;
+  index: Integer;
 begin
   pInfo := TypeInfo(T);
   if pInfo.Kind <> tkEnumeration then
     raise Exception.Create('TRecovery.TypeRetrieve<T>: T is not an enumerated type');
 
-  var index := IndexStr(Value.ToLower, References);
+  index := -1;
+  for var k := 0 to High(References) do
+    if SameText(Value, References[k]) then
+    begin
+      index := k;
+      Break;
+    end;
+
   if index = -1 then
     raise Exception.CreateFmt('%s : Unable to retrieve enum value.', [Value]);
 
   Move(index, Result, SizeOf(Result));
+
+//  pInfo := TypeInfo(T);
+//  if pInfo.Kind <> tkEnumeration then
+//    raise Exception.Create('TRecovery.TypeRetrieve<T>: T is not an enumerated type');
+//
+//  var index := IndexStr(Value.ToLower, References);
+//  if index = -1 then
+//    raise Exception.CreateFmt('%s : Unable to retrieve enum value.', [Value]);
+//
+//  Move(index, Result, SizeOf(Result));
 end;
 
 { TRoleHelper }
@@ -4223,6 +4256,26 @@ begin
       Exit('web_search_preview');
     TWebSearchPreviewType.web_search_preview_2025_03_11:
       Exit('web_search_preview_2025_03_11');
+  end;
+end;
+
+{ ThinkingLevelTypeHelper }
+
+constructor ThinkingLevelTypeHelper.Create(const Value: string);
+begin
+  Self := TEnumValueRecovery.TypeRetrieve<ThinkingLevelType>(Value,
+            ['THINKING_LEVEL_UNSPECIFIED', 'LOW', 'HIGH']);
+end;
+
+function ThinkingLevelTypeHelper.ToString: string;
+begin
+  case Self of
+    ThinkingLevelType.THINKING_LEVEL_UNSPECIFIED:
+      Exit('THINKING_LEVEL_UNSPECIFIED');
+    ThinkingLevelType.LOW:
+      Exit('LOW');
+    ThinkingLevelType.HIGH:
+      Exit('HIGH');
   end;
 end;
 

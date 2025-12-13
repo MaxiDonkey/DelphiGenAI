@@ -66,13 +66,13 @@ uses
   GenAI.Responses, GenAI.Responses.InputParams, GenAI.Responses.InputItemList,
   GenAI.Responses.OutputParams, GenAI.Async.Promise, GenAI.Responses.Internal,
   GenAI.Conversations, GenAI.Video, GenAI.Containers, GenAI.ContainerFiles,
-  GenAI.NetEncoding.DataURI,
+  GenAI.NetEncoding.DataURI, GenAI.Gemini.Extra_body,
 
   {--- deprecated }
   GenAI.Assistants, GenAI.Threads, GenAI.Messages, GenAI.Runs, GenAI.RunSteps;
 
 const
-  VERSION = 'GenAIv1.4.1';
+  VERSION = 'GenAIv1.4.2';
 
 type
   /// <summary>
@@ -486,6 +486,34 @@ type
     /// An <c>IGenAI</c> instance configured to send all requests to the specified local LM Studio server.
     /// </returns>
     class function CreateLMSInstance(const URLBase: string = ''): IGenAI;
+
+    /// <summary>
+    /// Creates a <c>GenAI</c> instance configured to target Google's Gemini models through an
+    /// OpenAI-compatible API surface.
+    /// </summary>
+    /// <remarks>
+    /// Gemini models can be accessed using a subset of OpenAI-style API routes exposed by this
+    /// library by switching the <see cref="IGenAI.BaseURL"/> to the Gemini-compatible endpoint.
+    /// <para>
+    /// • <b>Compatibility note:</b> when using the Gemini base URL, only the following endpoints
+    /// are supported: <c>v1/chat/completions</c>, <c>v1/images/generations</c>,
+    /// <c>v1/embeddings</c>, and <c>v1/models</c>.
+    /// Other OpenAI endpoints (including <c>v1/responses</c>, audio, fine-tuning, files,
+    /// batches, vector stores, assistants, and related routes) are not supported by Gemini
+    /// and will fail if used against the Gemini base URL.
+    /// </para>
+    /// <para>
+    /// • This helper returns an authenticated instance (using <paramref name="AAPIKey"/>) with its
+    /// <see cref="IGenAI.BaseURL"/> set to <c>TGenAIConfiguration.URL_BASE_GEMINI</c>.
+    /// </para>
+    /// </remarks>
+    /// <param name="AAPIKey">
+    /// The API key used to authenticate requests to the Gemini-compatible endpoint.
+    /// </param>
+    /// <returns>
+    /// An <c>IGenAI</c> instance configured for Gemini access via the supported OpenAI-style routes.
+    /// </returns>
+    class function CreateGeminiInstance(const AAPIKey: string): IGenAI;
   end;
 
   /// <summary>
@@ -4484,6 +4512,13 @@ type
 
   {$ENDREGION}
 
+  {$REGION 'GenAI.Gemini.Extra_body'}
+
+  TThinkingConfig = GenAI.Gemini.Extra_body.TThinkingConfig;
+  TExtraBody = GenAI.Gemini.Extra_body.TExtraBody;
+
+  {$ENDREGION}
+
 function FromDeveloper(const Content: string; const Name: string = ''):TMessagePayload;
 function FromSystem(const Content: string; const Name: string = ''):TMessagePayload;
 function FromUser(const Content: string; const Name: string = ''):TMessagePayload; overload;
@@ -4889,6 +4924,13 @@ end;
 
 { TGenAIFactory }
 
+class function TGenAIFactory.CreateGeminiInstance(
+  const AAPIKey: string): IGenAI;
+begin
+  Result := TGenAI.Create(AAPIKey);
+  Result.BaseURL := TGenAIConfiguration.URL_BASE_GEMINI;
+end;
+
 class function TGenAIFactory.CreateInstance(const AAPIKey: string): IGenAI;
 begin
   Result := TGenAI.Create(AAPIKey);
@@ -4903,6 +4945,7 @@ begin
         Base := Base + '/v1';
       TGenAIAPI.LocalUrlBase := Base;
     end;
+
   Result := TGenAI.Create('', True);
 end;
 

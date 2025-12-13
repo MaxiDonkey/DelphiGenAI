@@ -50,7 +50,7 @@ type
     /// </summary>
     /// <param name="Text">Textual content.</param>
     /// <param name="MimeType">Text MIME type. Defaults to "text/plain".</param>
-    /// <param name="E">
+    /// <param name="Encoding">
     /// Optional encoding (defaults to UTF-8 when nil). The encoding name is exposed via charset=...
     /// </param>
     /// <param name="IncludeBOM">

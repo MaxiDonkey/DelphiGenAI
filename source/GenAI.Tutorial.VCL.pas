@@ -1156,7 +1156,7 @@ end;
 procedure TVCLTutorialHub.SetJSONResponse(const Value: string);
 begin
   Memo3.Lines.Text := Value;
-  Memo2.SelStart := 0;
+  Memo3.SelStart := 0;
   Application.ProcessMessages;
 end;
 

@@ -11,11 +11,12 @@ ___
 
 #### NEW: 
 - GetIt current version: 1.4.0
-- [Changelog v1.4.1](Changelog.md) updated on December 1, 2025
+- [Changelog v1.4.2](Changelog.md) updated on December 13, 2025
+- [Google Gemini compatibility](#google-gemini-compatibility)
 - [Local model support via LM Studio (OpenAI-compatible server)](guides/LMStudio.md#run-models-locally-with-lm-studio)
 - [Deep Research](guides/DeepResearch.md#deep-research)
 - [Videos using SORA](guides/Videos.md#videos)
-- [Realtime](guides/Realtime.md#realtime)
+
 ___
 
 <br>
@@ -29,10 +30,11 @@ ___
     - [Use file2knowledge](#use-file2knowledge)
 - [Local model support via LM Studio](guides/LMStudio.md#run-models-locally-with-lm-studio)
 - [GenAI functional coverage](#genai-functional-coverage)
+- [Google Gemini compatibility](#google-gemini-compatibility)
 - [Quick Start Guide](#quick-start-guide)
     - [Responses vs. Chat Completions](#responses-vs-chat-completions)
         - [Functional differences between the two endpoints](#functional-differences-between-the-two-endpoints)
-        - [Chat completion](#chat-completion)
+        - [Chat completions](#chat-completions)
         - [Responses](#responses)            
 - [Tips and tricks](#tips-and-tricks)
     - [How to prevent an error when closing an application while requests are still in progress?](#how-to-prevent-an-error-when-closing-an-application-while-requests-are-still-in-progress)
@@ -95,7 +97,7 @@ Once you have a token, you can initialize IGenAI interface, which is an entry po
 >//  Client: IGenAI;
 >
 >  // Cloud clients
->  Client := TGenAIFactory.CreateInstance(api_key);
+>  Client := TGenAIFactory.CreateInstance(openAI_api_key);
 >
 >
 >  // Local client (LM Studio – OpenAI compatible server)
@@ -103,6 +105,8 @@ Once you have a token, you can initialize IGenAI interface, which is an entry po
 >
 >  // or
 >  //Client := TGenAIFactory.CreateLMSInstance('http://192.168.1.10:1234');
+>
+>  Client := TGenAIFactory.CreateGeminiInstance(gemini_api_key);
 > ```
 
 To streamline the use of the API wrapper, the process for declaring units has been simplified. Regardless of which methods you use, you only need to reference the following two core units:
@@ -263,6 +267,48 @@ Below, the table succinctly summarizes all OpenAI endpoints supported by the Gen
 
 ___
 
+# Google Gemini compatibility
+
+Starting with version **1.4.2**, **DelphiGenAI** provides optional support for running **Google Gemini models** through an **OpenAI-compatible API surface**.
+If you haven't configured an API key yet, refer to [Obtain an API Key](#obtain-an-api-key).
+
+This integration allows Gemini models to be accessed using the same high-level abstractions and routing logic as OpenAI models, enabling seamless experimentation or hybrid deployments without changing application architecture.
+
+This compatibility layer enables access to **recent and current Google Gemini models**, including the **Gemini 3 family**, as they are exposed through Google’s OpenAI-compatible API surface.
+
+**DelphiGenAI** does not hardcode model versions and relies on the `/models` endpoint for discovery, allowing applications to automatically benefit from newly released Gemini models without requiring structural changes.
+
+> [!NOTE]
+> Gemini support is **partial**. Some OpenAI request properties are not supported by Gemini models and may be ignored or adapted internally.
+
+## Supported endpoints
+
+The following OpenAI-style endpoints are compatible with Gemini models when using `CreateGeminiInstance`:
+
+| Endpoint | Supported | Notes |
+|---|:---:|---|
+| `/chat/completions` | <div align="center"><span style="color: green;">●</span></div> | Text-based chat completion |
+| `/images/generations` | <div align="center"><span style="color: green;">●</span></div> | Image generation |
+| `/embeddings` | <div align="center"><span style="color: green;">●</span></div> | Vector embeddings |
+| `/models` | <div align="center"><span style="color: green;">●</span></div> | Model discovery |
+
+When targeting **Gemini models**, support is currently limited to the endpoints listed above.
+
+## Limitations and behavioral differences
+
+While **DelphiGenAI** preserves a unified API surface, **Gemini models do not implement the full OpenAI feature set**.  
+Certain request parameters, advanced capabilities, or response properties may be unavailable or behave differently.
+
+All supported features, ignored parameters, and model-specific constraints are documented in detail here:
+
+- [Google Gemini integration guide](guides/Gemini.md)
+
+This document should be considered the **authoritative reference** for understanding how **DelphiGenAI** maps OpenAI semantics onto Gemini models.
+
+<br>
+
+___
+
 # Quick Start Guide
 
 ## Responses vs. Chat Completions
@@ -280,7 +326,7 @@ With these integrated capabilities, you can build more autonomous, agent‑orien
 The `v1/responses` endpoint is intended to gradually replace `v1/chat/completions`, as it embodies a synthesis of current best practices in AI—especially for those looking to adopt an agentic approach.
 
 To help you get up to speed on both endpoints, the two following documents provide detailed documentation, complete with numerous request examples and use cases:
-- [v1/chat/completion](guides/ChatCompletion.md#chat-completion)
+- [v1/chat/completions](guides/ChatCompletion.md#chat-completion)
 - [v1/responses](guides/Responses.md#responses)
 
 >[!NOTE]
@@ -312,7 +358,7 @@ To help you get up to speed on both endpoints, the two following documents provi
 
 <br>
 
-### [Chat completion](guides/ChatCompletion.md#chat-completion)
+### [Chat completions](guides/ChatCompletion.md#chat-completion)
 
 Check out the full [documentation](guides/ChatCompletion.md#chat-completion)
 

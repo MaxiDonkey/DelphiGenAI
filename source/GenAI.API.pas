@@ -68,9 +68,15 @@ type
   TGenAIConfiguration = class
   const
     /// <summary>
-    /// The default base URL for the GenAI API.
+    /// The OpenAI default base URL.
     /// </summary>
     URL_BASE = 'https://api.openai.com/v1';
+
+    /// <summary>
+    /// The Gemini (Google) default base URL.
+    /// </summary>
+    URL_BASE_GEMINI = 'https://generativelanguage.googleapis.com/v1beta/openai';
+
   strict private
     class var FLocalUrlBase: string;
   private
@@ -83,7 +89,6 @@ type
     procedure SetOrganization(const Value: string);
     procedure SetCustomHeaders(const Value: TNetHeaders);
     procedure SetAPIKey(const Value: string);
-    procedure VerifyApiSettings;
     procedure ResetCustomHeader;
   protected
     /// <summary>
@@ -178,6 +183,28 @@ type
     /// The HTTP client interface used for making API calls.
     /// </summary>
     FHttpClient: IHttpClientAPI;
+
+  protected
+    /// <summary>
+    /// Validates that the API settings required to issue requests are present.
+    /// </summary>
+    /// <remarks>
+    /// This routine checks the configuration held by <see cref="TGenAIConfiguration"/> before performing
+    /// an HTTP request. It is typically invoked by the underlying HTTP client implementation prior to
+    /// sending a request.
+    /// <para>
+    /// Validation rule: <see cref="TGenAIConfiguration.APIKey"/> must be non-empty.
+    /// </para>
+    /// <para>
+    /// Validation rule: <see cref="TGenAIConfiguration.BaseUrl"/> must be non-empty.
+    /// </para>
+    /// </remarks>
+    /// <exception cref="GenAIExceptionAPI">
+    /// Raised when a required setting is missing or empty (for example, an empty token or base URL).
+    /// </exception>
+    procedure VerifyApiSettings;
+
+    function NewHttpClient: IHttpClientAPI; virtual;
   public
     constructor Create;
 
@@ -763,7 +790,10 @@ begin
   try
     if Assigned(ParamProc) then
       ParamProc(Params);
-    var Code := HttpClient.Post(BuildUrl(Endpoint), Params.JSON, Response, BuildJsonHeaders, Event);
+
+    var Http := NewHttpClient;
+    var Code := Http.Post(BuildUrl(Endpoint), Params.JSON, Response, BuildJsonHeaders, Event);
+
     Result := (Code > 200) and (Code < 299);
     case Code of
       200..299:
@@ -793,7 +823,10 @@ begin
   try
     if Assigned(ParamProc) then
       ParamProc(Params);
-    var Code := HttpClient.Post(BuildUrl(Endpoint), Params.JSON, Response, BuildJsonHeaders, nil);
+
+    var Http := NewHttpClient;
+    var Code := Http.Post(BuildUrl(Endpoint), Params.JSON, Response, BuildJsonHeaders, nil);
+
     case Code of
       200..299:
         begin
@@ -821,7 +854,10 @@ begin
   try
     if Assigned(ParamProc) then
       ParamProc(Params);
-    var Code := HttpClient.Post(BuildUrl(Endpoint), Params.JSON, Response, BuildJsonHeaders, Event);
+
+    var Http := NewHttpClient;
+    var Code := Http.Post(BuildUrl(Endpoint), Params.JSON, Response, BuildJsonHeaders, Event);
+
     case Code of
       200..299:
         Result := True;
@@ -854,7 +890,10 @@ begin
   try
     if Assigned(ParamProc) then
       ParamProc(Params);
-    var Code := HttpClient.Post(BuildUrl(Endpoint), Params.JSON, Response, BuildJsonHeaders, nil);
+
+    var Http := NewHttpClient;
+    var Code := Http.Post(BuildUrl(Endpoint), Params.JSON, Response, BuildJsonHeaders, nil);
+
     case Code of
       200..299:
         begin
@@ -891,7 +930,10 @@ begin
       UrlProc(UrlParams);
     if Assigned(ParamProc) then
       ParamProc(Params);
-    var Code := HttpClient.Post(BuildUrl(Endpoint, UrlParams.Value), Params.JSON, Response, BuildJsonHeaders, nil);
+
+    var Http := NewHttpClient;
+    var Code := Http.Post(BuildUrl(Endpoint, UrlParams.Value), Params.JSON, Response, BuildJsonHeaders, nil);
+
     case Code of
       200..299:
         begin
@@ -921,7 +963,8 @@ begin
   Monitoring.Inc;
   var Response := TStringStream.Create('', TEncoding.UTF8);
   try
-    var Code := HttpClient.Post(BuildUrl(Endpoint), Response, BuildHeaders);
+    var Http := NewHttpClient;
+    var Code := Http.Post(BuildUrl(Endpoint), Response, BuildHeaders);
     var S := TJSONNormalizer.Normalize(Response.DataString, Path);
     Result := Deserialize<TResult>(Code, S);
   finally
@@ -936,7 +979,8 @@ begin
   Monitoring.Inc;
   var Response := TStringStream.Create('', TEncoding.UTF8);
   try
-    var Code := HttpClient.Post(BuildUrl(Endpoint), Response, BuildHeaders);
+    var Http := NewHttpClient;
+    var Code := Http.Post(BuildUrl(Endpoint), Response, BuildHeaders);
     Result := Deserialize<TResult>(Code, Response.DataString);
   finally
     Response.Free;
@@ -950,7 +994,8 @@ begin
   Monitoring.Inc;
   var Response := TStringStream.Create('', TEncoding.UTF8);
   try
-    var Code := HttpClient.Delete(BuildUrl(Endpoint), Response, BuildHeaders);
+    var Http := NewHttpClient;
+    var Code := Http.Delete(BuildUrl(Endpoint), Response, BuildHeaders);
     Result := Deserialize<TResult>(Code, Response.DataString);
   finally
     Response.Free;
@@ -967,7 +1012,9 @@ begin
   try
     if Assigned(ParamProc) then
       ParamProc(Params);
-    var Code := HttpClient.Post(BuildUrl(Endpoint), Params, Response, BuildHeaders);
+
+    var Http := NewHttpClient;
+    var Code := Http.Post(BuildUrl(Endpoint), Params, Response, BuildHeaders);
     Result := Deserialize<TResult>(Code, Response.DataString);
   finally
     Params.Free;
@@ -986,7 +1033,9 @@ begin
   try
     if Assigned(ParamProc) then
       ParamProc(Params);
-    var Code := HttpClient.Get(BuildUrl(Endpoint, Params.Value), Response, BuildHeaders);
+
+    var Http := NewHttpClient;
+    var Code := Http.Get(BuildUrl(Endpoint, Params.Value), Response, BuildHeaders);
     Result := Deserialize<TResult>(Code, Response.DataString);
   finally
     Response.Free;
@@ -1005,7 +1054,9 @@ begin
   try
     if Assigned(ParamProc) then
       ParamProc(Params);
-    var Code := HttpClient.Get(BuildUrl(Endpoint, Params.Value), Response, BuildHeaders);
+
+    var Http := NewHttpClient;
+    var Code := Http.Get(BuildUrl(Endpoint, Params.Value), Response, BuildHeaders);
     var S := TJSONNormalizer.Normalize(Response.DataString, Path);
     Result := Deserialize<TResult>(Code, S);
   finally
@@ -1022,7 +1073,8 @@ begin
   Monitoring.Inc;
   var Response := TStringStream.Create('', TEncoding.UTF8);
   try
-    var Code := HttpClient.Get(BuildUrl(Endpoint), Response, BuildHeaders);
+    var Http := NewHttpClient;
+    var Code := Http.Get(BuildUrl(Endpoint), Response, BuildHeaders);
     var S := TJSONNormalizer.Normalize(Response.DataString, Path);
     Result := Deserialize<TResult>(Code, Response.DataString);
   finally
@@ -1043,7 +1095,8 @@ begin
     Url := BuildUrl(Endpoint);
     MemoryStream := TMemoryStream.Create;
     try
-      Code := HttpClient.GetFollowRedirect(Url, MemoryStream, BuildHeaders);
+      var Http := NewHttpClient;
+      Code := Http.GetFollowRedirect(Url, MemoryStream, BuildHeaders);
 
       if Code <> 200 then
         raise Exception.CreateFmt('Download failed: %d', [Code]);
@@ -1068,7 +1121,8 @@ begin
   Monitoring.Inc;
   var Response := TStringStream.Create('', TEncoding.UTF8);
   try
-    var Code := HttpClient.Get(BuildUrl(Endpoint), Response, BuildHeaders);
+    var Http := NewHttpClient;
+    var Code := Http.Get(BuildUrl(Endpoint), Response, BuildHeaders);
     Result := Deserialize<TResult>(Code, Response.DataString);
   finally
     Response.Free;
@@ -1095,7 +1149,8 @@ function TGenAIAPI.GetFile(const Endpoint: string; Response: TStream): Integer;
 begin
   var Headers := BuildHeaders;
   try
-    Result := HttpClient.Get(BuildUrl(Endpoint), Response, Headers);
+    var Http := NewHttpClient;
+    Result := Http.Get(BuildUrl(Endpoint), Response, Headers);
     case Result of
       200..299:
          {success};
@@ -1143,7 +1198,9 @@ begin
   try
     if Assigned(ParamProc) then
       ParamProc(Params);
-    var Code := HttpClient.Patch(BuildUrl(Endpoint), Params.JSON, Response, BuildJsonHeaders);
+
+    var Http := NewHttpClient;
+    var Code := Http.Patch(BuildUrl(Endpoint), Params.JSON, Response, BuildJsonHeaders);
     Result := Deserialize<TResult>(Code, Response.DataString);
   finally
     Params.Free;
@@ -1172,19 +1229,6 @@ begin
 end;
 
 { TGenAIConfiguration }
-
-procedure TGenAIConfiguration.VerifyApiSettings;
-begin
-  if FLMStudio then
-    begin
-      if FBaseUrl.IsEmpty then
-        raise TGenAIAPIException.Create('Invalid LM Studio base URL.');
-      Exit;
-    end;
-
-  if FAPIKey.IsEmpty or FBaseUrl.IsEmpty then
-    raise TGenAIAPIException.Create('Invalid API key or base URL.');
-end;
 
 function TGenAIConfiguration.BuildUrl(const Endpoint: string): string;
 begin
@@ -1217,8 +1261,10 @@ begin
     end;
 
   Result := [TNetHeader.Create('Authorization', 'Bearer ' + FAPIKey)];
+
   if not FOrganization.IsEmpty then
     Result := Result + [TNetHeader.Create('OpenAI-Organization', FOrganization)];
+
   Result := Result + FCustomHeaders;
 end;
 
@@ -1298,7 +1344,7 @@ begin
 end;
 
 class function TApiDeserializer.Parse<T>(const Value: string): T;
-begin
+{$REGION 'Dev note'}
   {--- NOTE
     - If Metadata are to be treated  as objects, a dedicated  TMetadata class is required, containing
     all the properties corresponding to the specified JSON fields.
@@ -1310,6 +1356,8 @@ begin
     By default, Metadata are  treated as strings rather  than objects to handle  cases where multiple
     classes to be deserialized may contain variable data structures.
     Refer to the global variable MetadataAsObject. }
+{$ENDREGION}
+begin
   case MetadataAsObject of
     True:
       Result := TJson.JsonToObject<T>(Value);
@@ -1352,7 +1400,35 @@ end;
 constructor TApiHttpHandler.Create;
 begin
   inherited Create;
+
+  {--- TEMPLATE de config, exposé via IGemini.HttpClient }
   FHttpClient := THttpClientAPI.CreateInstance(VerifyApiSettings);
+end;
+
+function TApiHttpHandler.NewHttpClient: IHttpClientAPI;
+begin
+  Result := THttpClientAPI.CreateInstance(VerifyApiSettings);
+
+  if Assigned(FHttpClient) then
+    begin
+      Result.SendTimeOut        := FHttpClient.SendTimeOut;
+      Result.ConnectionTimeout  := FHttpClient.ConnectionTimeout;
+      Result.ResponseTimeout    := FHttpClient.ResponseTimeout;
+      Result.ProxySettings      := FHttpClient.ProxySettings;
+    end;
+end;
+
+procedure TApiHttpHandler.VerifyApiSettings;
+begin
+  if FLMStudio then
+    begin
+      if FBaseUrl.IsEmpty then
+        raise TGenAIAPIException.Create('Invalid LM Studio base URL.');
+      Exit;
+    end;
+
+  if FAPIKey.IsEmpty or FBaseUrl.IsEmpty then
+    raise TGenAIAPIException.Create('Invalid API key or base URL.');
 end;
 
 initialization

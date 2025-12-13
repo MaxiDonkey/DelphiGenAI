@@ -1,3 +1,21 @@
+#### 2025, December 13 version 1.4.2
+- Added optional support for running Google Gemini models
+
+```pascal
+var GeminiKey := 'my_gemini_key';
+var Client := TGenAIFactory.CreateGeminiInstance(GeminiKey);              
+```
+Creates a **GenAI** instance configured to target Google's Gemini models through an OpenAI-compatible API surface. 
+Gemini models can be accessed using the OpenAI-style routes provided by this library.
+
+<br>
+
+- Internal HTTP access hardening (API unit)
+Replaced direct `HttpClient.Get/Post/...` calls with per-request clients created via `NewHttpClient`.
+This centralizes and enforces HTTP configuration/validation (timeouts, proxy settings, API settings checks), improves isolation between requests, and makes the transport layer easier to control and mock for tests. 
+
+<br>
+
 #### 2025, December 1 version 1.4.1
 - Added `TContent` fluent builder to compose `TArray<TItemContent>`: .AddPrompt/.AddImage/.AddFile/.AddAudio + implicit cast to TArray<TItemContent>.
 - Improved data URI support: GetMimeType extracts MIME from data: and GetUrlOrEncodeBase64 now passes through data: inputs (no re-encoding).
