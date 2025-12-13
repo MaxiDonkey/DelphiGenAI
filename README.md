@@ -37,11 +37,6 @@ ___
         - [Chat completions](#chat-completions)
         - [Responses](#responses)            
 - [Tips and tricks](#tips-and-tricks)
-    - [How to prevent an error when closing an application while requests are still in progress?](#how-to-prevent-an-error-when-closing-an-application-while-requests-are-still-in-progress)
-    - [How to execute multiple background requests to process a batch of responses?](#how-to-execute-multiple-background-requests-to-process-a-batch-of-responses)
-    - [How to structure a chain of thought and develop advanced processing with GenAI?](#how-to-structure-a-chain-of-thought-and-develop-advanced-processing-with-genai)
-    - [How do you structure advanced reasoning using Promises and pipelines?](#how-do-you-structure-advanced-reasoning-using-promises-and-pipelines)
-    - [How to implement Deep Research?](#how-to-implement-deep-research-)
 - [Deprecated](#deprecated)
 - [Contributing](#contributing)
 - [License](#license)
@@ -377,6 +372,14 @@ Text generation (Non streamed, Streamed, Multi-turn conversations), Vision (Anal
 ___
 
 # Tips and tricks
+
+- [How to prevent an error when closing an application while requests are still in progress?](#how-to-prevent-an-error-when-closing-an-application-while-requests-are-still-in-progress)
+- [How to execute multiple background requests to process a batch of responses?](#how-to-execute-multiple-background-requests-to-process-a-batch-of-responses)
+- [How to structure a chain of thought and develop advanced processing with GenAI?](#how-to-structure-a-chain-of-thought-and-develop-advanced-processing-with-genai)
+- [How do you structure advanced reasoning using Promises and pipelines?](#how-do-you-structure-advanced-reasoning-using-promises-and-pipelines)
+- [How to implement Deep Research?](#how-to-implement-deep-research-)
+
+<br>
 
 - #### How to prevent an error when closing an application while requests are still in progress?
 
