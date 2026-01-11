@@ -91,6 +91,7 @@ This document should be considered the **authoritative reference** for understan
   Client := TGenAIFactory.CreateGeminiInstance(api_Key);
 ```
 
+<br>
 
 ## Anthropic Claude compatibility
 
