@@ -1,3 +1,5 @@
+#### 2026, January 11 version 1.4.3
+
 Added explicit support for multiple **OpenAI-compatible third-party providers** through dedicated factory methods and a configurable external endpoint.
 
   GenAI remains a strict, one-to-one implementation of the OpenAI API.
