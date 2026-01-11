@@ -59,6 +59,8 @@ This compatibility layer enables access to **recent and current Google Gemini mo
 > [!NOTE]
 > Gemini support is **partial**. Some OpenAI request properties are not supported by Gemini models and may be ignored or adapted internally.
 
+<br>
+
 ### Supported endpoints
 
 The following OpenAI-style endpoints are compatible with Gemini models when using `CreateGeminiInstance`:
