@@ -72,6 +72,8 @@ The following OpenAI-style endpoints are compatible with Gemini models when usin
 
 When targeting **Gemini models**, support is currently limited to the endpoints listed above.
 
+<br>
+
 ### Limitations and behavioral differences
 
 While **DelphiGenAI** preserves a unified API surface, **Gemini models do not implement the full OpenAI feature set**.  
@@ -101,11 +103,15 @@ When used with GenAI, Claude support is therefore limited to this endpoint and d
 
 This compatibility layer is explicitly described by Anthropic as a convenience mechanism for evaluation and comparison purposes. For access to Claude’s full feature set (Structured Outputs, extended reasoning, PDF processing, citations, prompt caching, and other native capabilities), the official Anthropic API must be used.
 
+<br>
+
 ### Supported endpoints
 
 | Endpoint | Supported | Notes |
 |--------|-----------|------|
 | `/chat/completions` | ● | Text-based chat completion |
+
+<br>
 
 ### Notes and behavioral differences
 
@@ -133,11 +139,15 @@ DeepSeek exposes an API surface that closely mirrors the OpenAI `v1/chat/complet
 
 Because this compatibility is achieved through a request and response structure that is very aligned to OpenAI’s `v1/chat/completions`, DeepSeek models can be used with GenAI without requiring a dedicated provider-specific integration.
 
+<br>
+
 ### Supported endpoints
 
 | Endpoint | Supported | Notes |
 |--------|-----------|------|
 | `/chat/completions` | ● | Text-based chat completion |
+
+<br>
 
 ### Notes
 
@@ -164,12 +174,16 @@ The xAI Grok API exposes endpoints whose request and response structures are clo
 
 Based on direct validation, these endpoints can be used with GenAI without introducing any Grok-specific integration layer. Both streaming and non-streaming modes are supported for the tested endpoints.
 
+<br>
+
 ### Supported endpoints
 
 | Endpoint | Supported | Notes |
 |--------|-----------|------|
 | `/chat/completions` | ● | Text-based chat completion |
 | `/responses` | ● | Unified response endpoint |
+
+<br>
 
 ### Scope and limitations
 
