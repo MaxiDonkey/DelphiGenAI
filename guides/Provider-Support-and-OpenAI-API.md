@@ -27,7 +27,7 @@ ___
 
 ## Client instantiation overview
 
-GenAI provides explicit factory methods for creating API clients targeting specific providers or OpenAI-compatible endpoints. Each method onfigures the underlying client with the appropriate base URL and expected API surface.
+GenAI provides explicit factory methods for creating API clients targeting specific providers or OpenAI-compatible endpoints. Each method configures the underlying client with the appropriate base URL and expected API surface.
 
 The table below summarizes the available instantiation options.
 
