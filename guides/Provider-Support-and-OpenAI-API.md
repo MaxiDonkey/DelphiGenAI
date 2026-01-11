@@ -250,7 +250,7 @@ While only this model/endpoint combination has been explicitly tested, GroqCloud
   Client := TGenAIFactory.CreateExternalInstance(HuggingFaceUrl, HuggingFaceKey);
 ```
 
-This configuration has been validated using the OpenAI-style v1/chat/completions endpoint with the model:
+This configuration has been validated using the OpenAI-style `v1/chat/completions` endpoint with the model:
 - `google/gemma-3-27b-it:scaleway`
 
 Because Hugging Face exposes a very large and rapidly evolving catalog of models, it can serve as a valuable experimentation platform for testing recent architectures and capabilities, provided that the selected model is served through an OpenAI-compatible inference endpoint.
