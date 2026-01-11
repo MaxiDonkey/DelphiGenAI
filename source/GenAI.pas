@@ -72,7 +72,7 @@ uses
   GenAI.Assistants, GenAI.Threads, GenAI.Messages, GenAI.Runs, GenAI.RunSteps;
 
 const
-  VERSION = 'GenAIv1.4.2';
+  VERSION = 'GenAIv1.4.3';
 
 type
   /// <summary>
@@ -514,6 +514,108 @@ type
     /// An <c>IGenAI</c> instance configured for Gemini access via the supported OpenAI-style routes.
     /// </returns>
     class function CreateGeminiInstance(const AAPIKey: string): IGenAI;
+
+    /// <summary>
+    /// Creates a GenAI instance configured to target Anthropic's Claude API.
+    /// </summary>
+    /// <remarks>
+    /// This factory method initializes an <c>IGenAI</c> implementation backed by <c>TGenAIAPI</c>
+    /// and sets <see cref="IGenAI.BaseURL"/> to <c>TGenAIConfiguration.URL_BASE_CLAUDE</c>.
+    /// The provided <paramref name="AAPIKey"/> is applied to the underlying API client and is
+    /// required for authenticating requests to the Claude endpoint.
+    /// <para>
+    /// <b>Compatibility note:</b> Claude is not an OpenAI service. While this library exposes a common
+    /// surface area across providers, endpoint availability and request/response schemas may differ.
+    /// Some GenAI routes may not be supported by Claude and can fail when used against the Claude base URL.
+    /// </para>
+    /// </remarks>
+    /// <param name="AAPIKey">
+    /// The API key used to authenticate requests to the Claude endpoint.
+    /// </param>
+    /// <returns>
+    /// An <c>IGenAI</c> instance configured for authenticated communication with Anthropic's Claude API.
+    /// </returns>
+    class function CreateClaudeInstance(const AAPIKey: string): IGenAI;
+
+    /// <summary>
+    /// Creates a GenAI instance configured to target the DeepSeek API.
+    /// </summary>
+    /// <remarks>
+    /// This factory method initializes an <c>IGenAI</c> implementation backed by <c>TGenAIAPI</c>
+    /// and sets <see cref="IGenAI.BaseURL"/> to <c>TGenAIConfiguration.URL_BASE_DEEPSEEK</c>.
+    /// The provided <paramref name="AAPIKey"/> is applied to the underlying API client and is
+    /// required for authenticating requests to the DeepSeek endpoint.
+    /// <para>
+    /// <b>Compatibility note:</b> DeepSeek is not an OpenAI service. Although this library provides
+    /// a unified, OpenAI-style API surface, endpoint availability and request/response schemas
+    /// may differ. Some GenAI routes may not be supported by DeepSeek and can fail when used
+    /// against the DeepSeek base URL.
+    /// </para>
+    /// </remarks>
+    /// <param name="AAPIKey">
+    /// The API key used to authenticate requests to the DeepSeek endpoint.
+    /// </param>
+    /// <returns>
+    /// An <c>IGenAI</c> instance configured for authenticated communication with the DeepSeek API.
+    /// </returns>
+    class function CreateDeepSeekInstance(const AAPIKey: string): IGenAI;
+
+    /// <summary>
+    /// Creates a GenAI instance configured to target xAI's Grok API.
+    /// </summary>
+    /// <remarks>
+    /// This factory method initializes an <c>IGenAI</c> implementation backed by <c>TGenAIAPI</c>
+    /// and sets <see cref="IGenAI.BaseURL"/> to <c>TGenAIConfiguration.URL_BASE_GROK</c>.
+    /// The provided <paramref name="AAPIKey"/> is applied to the underlying API client and is
+    /// required for authenticating requests to the xAI endpoint.
+    /// <para>
+    /// <b>Compatibility note:</b> Grok (xAI) is not an OpenAI service. While this library exposes a
+    /// unified, OpenAI-style API surface, endpoint availability and request/response schemas may differ.
+    /// Some GenAI routes may not be supported by xAI and can fail when used against the Grok base URL.
+    /// </para>
+    /// </remarks>
+    /// <param name="AAPIKey">
+    /// The API key used to authenticate requests to the xAI endpoint.
+    /// </param>
+    /// <returns>
+    /// An <c>IGenAI</c> instance configured for authenticated communication with xAI's Grok API.
+    /// </returns>
+    class function CreateGrokInstance(const AAPIKey: string): IGenAI;
+
+    /// <summary>
+    /// Creates a GenAI instance configured to target a custom, external API endpoint.
+    /// </summary>
+    /// <remarks>
+    /// This factory method initializes an <c>IGenAI</c> implementation backed by <c>TGenAIAPI</c>
+    /// and sets <see cref="IGenAI.BaseURL"/> to the value provided in <paramref name="BaseUrl"/>.
+    /// The supplied <paramref name="AAPIKey"/> is applied to the underlying API client and is
+    /// used for authenticating requests to the external service.
+    /// <para>
+    /// This helper is intended for OpenAI-compatible or partially compatible APIs that expose
+    /// a similar HTTP and JSON contract. The caller is responsible for ensuring that
+    /// <paramref name="BaseUrl"/> points to a valid API root (typically ending with <c>/v1</c>)
+    /// and that the target service supports the routes being invoked.
+    /// </para>
+    /// <para>
+    /// <b>Compatibility note:</b> Because external endpoints may diverge from OpenAI semantics,
+    /// not all GenAI routes or features are guaranteed to work. Unsupported endpoints,
+    /// request fields, or response schemas may result in runtime API errors.
+    /// </para>
+    /// </remarks>
+    /// <param name="BaseUrl">
+    /// The base URL of the external API endpoint. This value is assigned directly to
+    /// <see cref="IGenAI.BaseURL"/> and should represent the root path for API requests.
+    /// </param>
+    /// <param name="AAPIKey">
+    /// The API key used to authenticate requests to the external endpoint.
+    /// </param>
+    /// <returns>
+    /// An <c>IGenAI</c> instance configured for authenticated communication with the specified
+    /// external API endpoint.
+    /// </returns>
+    class function CreateExternalInstance(
+      const BaseUrl: string;
+      const AAPIKey: string): IGenAI;
   end;
 
   /// <summary>
@@ -4924,11 +5026,38 @@ end;
 
 { TGenAIFactory }
 
+class function TGenAIFactory.CreateClaudeInstance(
+  const AAPIKey: string): IGenAI;
+begin
+  Result := TGenAI.Create(AAPIKey);
+  Result.BaseURL := TGenAIConfiguration.URL_BASE_CLAUDE;
+end;
+
+class function TGenAIFactory.CreateDeepSeekInstance(
+  const AAPIKey: string): IGenAI;
+begin
+  Result := TGenAI.Create(AAPIKey);
+  Result.BaseURL := TGenAIConfiguration.URL_BASE_DEEPSEEK;
+end;
+
+class function TGenAIFactory.CreateExternalInstance(const BaseUrl,
+  AAPIKey: string): IGenAI;
+begin
+  Result := TGenAI.Create(AAPIKey);
+  Result.BaseURL := BaseUrl;
+end;
+
 class function TGenAIFactory.CreateGeminiInstance(
   const AAPIKey: string): IGenAI;
 begin
   Result := TGenAI.Create(AAPIKey);
   Result.BaseURL := TGenAIConfiguration.URL_BASE_GEMINI;
+end;
+
+class function TGenAIFactory.CreateGrokInstance(const AAPIKey: string): IGenAI;
+begin
+  Result := TGenAI.Create(AAPIKey);
+  Result.BaseURL := TGenAIConfiguration.URL_BASE_GROK;
 end;
 
 class function TGenAIFactory.CreateInstance(const AAPIKey: string): IGenAI;

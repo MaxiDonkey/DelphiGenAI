@@ -374,6 +374,7 @@ type
   /// to generate responses. The reasoning effort impacts both the latency and the number of reasoning tokens generated.
   /// </remarks>
   TReasoningEffort = (
+    none,
     /// <summary>
     /// Low - Minimal reasoning effort.
     /// </summary>
@@ -2146,12 +2147,14 @@ end;
 
 constructor TReasoningEffortHelper.Create(const Value: string);
 begin
-  Self := TEnumValueRecovery.TypeRetrieve<TReasoningEffort>(Value, ['low', 'medium', 'high']);
+  Self := TEnumValueRecovery.TypeRetrieve<TReasoningEffort>(Value, ['none', 'low', 'medium', 'high']);
 end;
 
 function TReasoningEffortHelper.ToString: string;
 begin
   case Self of
+    TReasoningEffort.none:
+      Exit('none');
     TReasoningEffort.low:
       Exit('low');
     TReasoningEffort.medium:

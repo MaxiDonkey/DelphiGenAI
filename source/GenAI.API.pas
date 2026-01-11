@@ -77,6 +77,36 @@ type
     /// </summary>
     URL_BASE_GEMINI = 'https://generativelanguage.googleapis.com/v1beta/openai';
 
+    /// <summary>
+    /// The Clause (Anthropic) default base URL.
+    /// </summary>
+    URL_BASE_CLAUDE = 'https://api.anthropic.com/v1';
+
+    /// <summary>
+    /// The DeepSeek default base URL.
+    /// </summary>
+    /// <remarks>
+    /// This constant defines the root endpoint used to build request URLs when targeting the
+    /// DeepSeek API. It is combined with relative paths by <c>BuildUrl</c> to form the final
+    /// request URL.
+    /// <para>
+    /// Default value: <c>https://api.deepseek.com</c>.
+    /// </para>
+    /// </remarks>
+    URL_BASE_DEEPSEEK = 'https://api.deepseek.com';
+
+    /// <summary>
+    /// The Grok (xAI) default base URL.
+    /// </summary>
+    /// <remarks>
+    /// This constant defines the root endpoint used to build request URLs when targeting the
+    /// xAI API (Grok). It is combined with relative paths by <c>BuildUrl</c> to form the final
+    /// request URL.
+    /// <para>
+    /// Default value: <c>https://api.x.ai/v1</c>.
+    /// </para>
+    /// </remarks>
+    URL_BASE_GROK = 'https://api.x.ai/v1';
   strict private
     class var FLocalUrlBase: string;
   private
