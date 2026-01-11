@@ -11,8 +11,8 @@ ___
 
 #### NEW: 
 - GetIt current version: 1.4.0
-- [Changelog v1.4.2](Changelog.md) updated on December 13, 2025
-- [Google Gemini compatibility](#google-gemini-compatibility)
+- [Changelog v1.4.3](Changelog.md) updated on January 11, 2026
+- [Provider Support and OpenAI API Compatibility](guides/Provider-Support-and-OpenAI-API.md)
 - [Local model support via LM Studio (OpenAI-compatible server)](guides/LMStudio.md#run-models-locally-with-lm-studio)
 - [Deep Research](guides/DeepResearch.md#deep-research)
 - [Videos using SORA](guides/Videos.md#videos)
@@ -30,7 +30,7 @@ ___
     - [Use file2knowledge](#use-file2knowledge)
 - [Local model support via LM Studio](guides/LMStudio.md#run-models-locally-with-lm-studio)
 - [GenAI functional coverage](#genai-functional-coverage)
-- [Google Gemini compatibility](#google-gemini-compatibility)
+- [Provider Support and OpenAI API Compatibility](guides/Provider-Support-and-OpenAI-API.md)
 - [Quick Start Guide](#quick-start-guide)
     - [Responses vs. Chat Completions](#responses-vs-chat-completions)
         - [Functional differences between the two endpoints](#functional-differences-between-the-two-endpoints)
@@ -257,48 +257,6 @@ Below, the table succinctly summarizes all OpenAI endpoints supported by the Gen
 | [/uploads](guides/Uploads.md#uploads) | <div align="center"><span style="color: green;">●</span></div> | |
 | [/vector_stores](guides/VectorStore.md#vector-store-managment) | <div align="center"><span style="color: green;">●</span></div> | |
 | [/videos](guides/Videos.md#videos) | <div align="center"><span style="color: green;">●</span></div> | ![new](https://img.shields.io/badge/NEW-006400?style=flat) |
-
-<br>
-
-___
-
-# Google Gemini compatibility
-
-Starting with version **1.4.2**, **DelphiGenAI** provides optional support for running **Google Gemini models** through an **OpenAI-compatible API surface**.
-If you haven't configured an API key yet, refer to [Obtain an API Key](#obtain-an-api-key).
-
-This integration allows Gemini models to be accessed using the same high-level abstractions and routing logic as OpenAI models, enabling seamless experimentation or hybrid deployments without changing application architecture.
-
-This compatibility layer enables access to **recent and current Google Gemini models**, including the **Gemini 3 family**, as they are exposed through Google’s OpenAI-compatible API surface.
-
-**DelphiGenAI** does not hardcode model versions and relies on the `/models` endpoint for discovery, allowing applications to automatically benefit from newly released Gemini models without requiring structural changes.
-
-> [!NOTE]
-> Gemini support is **partial**. Some OpenAI request properties are not supported by Gemini models and may be ignored or adapted internally.
-
-## Supported endpoints
-
-The following OpenAI-style endpoints are compatible with Gemini models when using `CreateGeminiInstance`:
-
-| Endpoint | Supported | Notes |
-|---|:---:|---|
-| `/chat/completions` | <div align="center"><span style="color: green;">●</span></div> | Text-based chat completion |
-| `/images/generations` | <div align="center"><span style="color: green;">●</span></div> | Image generation |
-| `/embeddings` | <div align="center"><span style="color: green;">●</span></div> | Vector embeddings |
-| `/models` | <div align="center"><span style="color: green;">●</span></div> | Model discovery |
-
-When targeting **Gemini models**, support is currently limited to the endpoints listed above.
-
-## Limitations and behavioral differences
-
-While **DelphiGenAI** preserves a unified API surface, **Gemini models do not implement the full OpenAI feature set**.  
-Certain request parameters, advanced capabilities, or response properties may be unavailable or behave differently.
-
-All supported features, ignored parameters, and model-specific constraints are documented in detail here:
-
-- [Google Gemini integration guide](guides/Gemini.md)
-
-This document should be considered the **authoritative reference** for understanding how **DelphiGenAI** maps OpenAI semantics onto Gemini models.
 
 <br>
 
