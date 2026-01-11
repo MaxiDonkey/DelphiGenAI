@@ -1,3 +1,45 @@
+Added explicit support for multiple **OpenAI-compatible third-party providers** through dedicated factory methods and a configurable external endpoint.
+
+  GenAI remains a strict, one-to-one implementation of the OpenAI API.
+  Compatibility with non-OpenAI vendors depends entirely on the API surface they expose.
+
+  Newly documented provider integrations include:
+
+  - **Anthropic Claude**
+    ```pascal
+    Client := TGenAIFactory.CreateClaudeInstance(apiKey);
+    ```
+    Uses Anthropic’s OpenAI compatibility layer.
+    Support is limited to the `v1/chat/completions` endpoint.
+
+  - **DeepSeek**
+    ```pascal
+    Client := TGenAIFactory.CreateDeepSeekInstance(apiKey);
+    ```
+    Near-aligned with OpenAI’s `v1/chat/completions` endpoint.
+    No support for `v1/responses` at this time.
+
+  - **xAI Grok**
+    ```pascal
+    Client := TGenAIFactory.CreateGrokInstance(apiKey);
+    ```
+    Validated support for both `v1/chat/completions` and `v1/responses`
+    (streaming and non-streaming).
+
+  - **Generic OpenAI-compatible endpoints**
+    ```pascal
+    Client := TGenAIFactory.CreateExternalInstance(baseUrl, apiKey);
+    ```
+    Allows targeting third-party services exposing an OpenAI-style HTTP/JSON API
+    (e.g. GroqCloud, Hugging Face).
+
+- Added comprehensive documentation section:
+  **“Provider Support and OpenAI API Compatibility”** describing supported endpoints, limitations, and design boundaries.
+
+- Clarified design constraints: GenAI does not introduce provider-specific extensions, fallbacks, or behavioral adaptations. Unsupported fields or endpoints may result in runtime API errors.
+
+<br>
+
 #### 2025, December 13 version 1.4.2
 - Added optional support for running Google Gemini models
 
