@@ -13,17 +13,9 @@ uses
   System.SysUtils, System.Classes, System.Threading, System.JSON, REST.Json.Types,
   REST.JsonReflect, System.Net.URLClient,
   GenAI.API.Params, GenAI.API, GenAI.Consts, GenAI.Types, GenAI.Async.Support,
-  GenAI.Async.Promise, GenAI.API.Lists, GenAI.API.Deletion, GenAI.Assistants, GenAI.Runs;
+  GenAI.Async.Promise, GenAI.API.Lists, GenAI.API.Deletion, GenAI.Vector;
 
 type
-  /// <summary>
-  /// Represents URL parameters for configuring requests related to vector store files in the OpenAI API.
-  /// </summary>
-  /// <remarks>
-  /// The <c>TVectorStoreFilesUrlParams</c> class allows users to customize the URL query parameters
-  /// when listing or filtering files associated with a specific vector store.
-  /// This is useful when retrieving files with particular statuses or conditions.
-  /// </remarks>
   TVectorStoreFilesUrlParams = class(TUrlAdvancedParams)
   public
     /// <summary>
@@ -43,14 +35,6 @@ type
     function Filter(const Value: string): TVectorStoreFilesUrlParams;
   end;
 
-  /// <summary>
-  /// Represents parameters for creating vector store files in the OpenAI API.
-  /// </summary>
-  /// <remarks>
-  /// The <c>TVectorStoreFilesCreateParams</c> class allows users to specify key parameters such as
-  /// the file ID and chunking strategy when adding a file to a vector store. These parameters
-  /// determine how the file will be chunked and indexed within the vector store.
-  /// </remarks>
   TVectorStoreFilesCreateParams = class(TJSONParam)
   public
     /// <summary>
@@ -67,6 +51,7 @@ type
     /// when creating a new vector store entry.
     /// </remarks>
     function FileId(const Value: string): TVectorStoreFilesCreateParams;
+
     /// <summary>
     /// Specifies the chunking strategy to be used when processing the file.
     /// </summary>
@@ -82,16 +67,40 @@ type
     /// within the vector store. Users can define static or auto chunking depending on their use case.
     /// </remarks>
     function ChunkingStrategy(const Value: TChunkingStrategyParams): TVectorStoreFilesCreateParams;
+
+    /// <summary>
+    /// Sets a set of key-value pairs that can be attached to the file.
+    /// </summary>
+    /// <param name="Value">
+    /// A <c>TJSONObject</c> containing up to 16 key-value pairs. Keys are strings with a maximum length
+    /// of 64 characters; values are strings (max 512 chars), booleans, or numbers.
+    /// </param>
+    /// <returns>
+    /// Returns the current instance of <c>TVectorStoreFilesCreateParams</c>, enabling method chaining.
+    /// </returns>
+    /// <remarks>
+    /// This can be useful for storing additional information about the file in a structured format,
+    /// and querying for objects via the API or the dashboard. Used for filtering during vector store searches.
+    /// </remarks>
+    function Attributes(const Value: TJSONObject): TVectorStoreFilesCreateParams;
   end;
 
-  /// <summary>
-  /// Represents the static chunking strategy settings for dividing files into chunks in the OpenAI API.
-  /// </summary>
-  /// <remarks>
-  /// The <c>TChunkingStrategyStatic</c> class defines the static configuration for chunking a file
-  /// into smaller, overlapping segments. This strategy is used when users want precise control over
-  /// the size and overlap of the chunks.
-  /// </remarks>
+  TLastError = class
+  private
+    FCode: string;
+    FMessage: string;
+  public
+    /// <summary>
+    /// Gets or sets the code associated with the error.
+    /// </summary>
+    property Code: string read FCode write FCode;
+
+    /// <summary>
+    /// Gets or sets a human-readable message describing the error.
+    /// </summary>
+    property Message: string read FMessage write FMessage;
+  end;
+
   TChunkingStrategyStatic = class
   private
     [JsonNameAttribute('max_chunk_size_tokens')]
@@ -107,6 +116,7 @@ type
     /// value is 4096. This setting controls how large each chunk will be when splitting the file.
     /// </remarks>
     property MaxChunkSizeTokens: Int64 read FMaxChunkSizeTokens write FMaxChunkSizeTokens;
+
     /// <summary>
     /// Specifies the number of tokens that overlap between consecutive chunks.
     /// </summary>
@@ -118,13 +128,6 @@ type
     property ChunkOverlapTokens: Int64 read FChunkOverlapTokens write FChunkOverlapTokens;
   end;
 
-  /// <summary>
-  /// Represents the chunking strategy configuration used for splitting files into chunks in the OpenAI API.
-  /// </summary>
-  /// <remarks>
-  /// The <c>TChunkingStrategy</c> class defines how files are divided into chunks for indexing in a vector store.
-  /// It supports both static and dynamic chunking strategies, depending on the configuration.
-  /// </remarks>
   TChunkingStrategy = class
   private
     FType: string;
@@ -138,6 +141,7 @@ type
     /// or <c>auto</c>. This helps determine how the chunking process is handled.
     /// </remarks>
     property &Type: string read FType write FType;
+
     /// <summary>
     /// Specifies the static chunking configuration for the vector store file.
     /// </summary>
@@ -146,17 +150,10 @@ type
     /// and token overlap. It is used when the chunking strategy is explicitly defined as static.
     /// </remarks>
     property Static: TChunkingStrategyStatic read FStatic write FStatic;
+
     destructor Destroy; override;
   end;
 
-  /// <summary>
-  /// Represents a file attached to a vector store in the OpenAI API.
-  /// </summary>
-  /// <remarks>
-  /// The <c>TVectorStoreFile</c> class encapsulates details about a file added to a vector store,
-  /// including its ID, usage, creation timestamp, status, and chunking strategy. This information
-  /// is used to monitor file processing and storage within the vector store.
-  /// </remarks>
   TVectorStoreFile = class(TJSONFingerprint)
   private
     FId: string;
@@ -164,7 +161,7 @@ type
     [JsonNameAttribute('usage_bytes')]
     FUsageBytes: Int64;
     [JsonNameAttribute('created_at')]
-    FCreatedAt: TInt64OrNull;
+    FCreatedAt: Int64;
     [JsonNameAttribute('vector_store_id')]
     FVectorStoreId: string;
     [JsonReflectAttribute(ctString, rtString, TRunStatusInterceptor)]
@@ -173,6 +170,7 @@ type
     FLastError: TLastError;
     [JsonNameAttribute('chunking_strategy')]
     FChunkingStrategy: TChunkingStrategy;
+    FAttributes: string;
   private
     function GetCreatedAt: Int64;
     function GetCreatedAtAsString: string;
@@ -181,10 +179,12 @@ type
     /// Gets or sets the unique identifier of the vector store file.
     /// </summary>
     property Id: string read FId write FId;
+
     /// <summary>
     /// Gets or sets the object type, which is always <c>vector_store.file</c>.
     /// </summary>
     property &Object: string read FObject write FObject;
+
     /// <summary>
     /// Gets or sets the total usage of the file in bytes within the vector store.
     /// </summary>
@@ -192,18 +192,22 @@ type
     /// This value represents the amount of storage the file consumes after being chunked and indexed.
     /// </remarks>
     property UsageBytes: Int64 read FUsageBytes write FUsageBytes;
+
     /// <summary>
     /// Gets or sets the Unix timestamp (in seconds) indicating when the file was added to the vector store.
     /// </summary>
     property CreatedAt: Int64 read GetCreatedAt;
+
     /// <summary>
     /// Gets the human-readable representation of the creation timestamp.
     /// </summary>
     property CreatedAtAsString: string read GetCreatedAtAsString;
+
     /// <summary>
     /// Gets or sets the identifier of the vector store that the file belongs to.
     /// </summary>
     property VectorStoreId: string read FVectorStoreId write FVectorStoreId;
+
     /// <summary>
     /// Gets or sets the current processing status of the vector store file.
     /// </summary>
@@ -212,6 +216,7 @@ type
     /// or <c>cancelled</c>. This status helps in monitoring the file's processing progress.
     /// </remarks>
     property Status: TRunStatus read FStatus write FStatus;
+
     /// <summary>
     /// Gets or sets the details of the last error that occurred while processing the file.
     /// </summary>
@@ -220,6 +225,7 @@ type
     /// If no errors occurred, the value is <c>null</c>.
     /// </remarks>
     property LastError: TLastError read FLastError write FLastError;
+
     /// <summary>
     /// Gets or sets the chunking strategy used to split the file.
     /// </summary>
@@ -228,6 +234,16 @@ type
     /// for indexing and search efficiency within the vector store.
     /// </remarks>
     property ChunkingStrategy: TChunkingStrategy read FChunkingStrategy write FChunkingStrategy;
+
+    /// <summary>
+    /// Gets or sets the set of key-value pairs attached to the file, represented as a JSON string.
+    /// </summary>
+    /// <remarks>
+    /// Up to 16 key-value pairs can be attached to a file. Keys are strings with a maximum length of
+    /// 64 characters; values are strings (max 512 chars), booleans, or numbers. Useful for filtering during searches.
+    /// </remarks>
+    property Attributes: string read FAttributes write FAttributes;
+
     destructor Destroy; override;
   end;
 
@@ -293,14 +309,97 @@ type
   TPromiseVectorStoreFiles = TPromiseCallBack<TVectorStoreFiles>;
 
   /// <summary>
-  /// Provides methods to manage files within a vector store using the OpenAI API.
+  /// Represents a single content chunk returned when retrieving the parsed contents of a vector store file.
   /// </summary>
-  /// <remarks>
-  /// The <c>TVectorStoreFilesRoute</c> class allows users to create, retrieve, list, and delete
-  /// files associated with a vector store. It supports both synchronous and asynchronous
-  /// operations, enabling flexible interaction with the API for managing file storage and processing.
-  /// </remarks>
-  TVectorStoreFilesRoute = class(TGenAIRoute)
+  TVectorStoreFileContentData = class
+  private
+    FType: string;
+    FText: string;
+  public
+    /// <summary>
+    /// The content type, currently always <c>text</c>.
+    /// </summary>
+    property &Type: string read FType write FType;
+
+    /// <summary>
+    /// The text content.
+    /// </summary>
+    property Text: string read FText write FText;
+  end;
+
+  /// <summary>
+  /// Represents a page of parsed contents of a vector store file.
+  /// </summary>
+  TVectorStoreFileContent = class(TJSONFingerprint)
+  private
+    FObject: string;
+    FData: TArray<TVectorStoreFileContentData>;
+    [JsonNameAttribute('has_more')]
+    FHasMore: Boolean;
+    [JsonNameAttribute('next_page')]
+    FNextPage: string;
+  public
+    /// <summary>
+    /// The object type, which is always <c>vector_store.file_content.page</c>.
+    /// </summary>
+    property &Object: string read FObject write FObject;
+
+    /// <summary>
+    /// The parsed content chunks of the file.
+    /// </summary>
+    property Data: TArray<TVectorStoreFileContentData> read FData write FData;
+
+    /// <summary>
+    /// Indicates whether there are more content pages to fetch.
+    /// </summary>
+    property HasMore: Boolean read FHasMore write FHasMore;
+
+    /// <summary>
+    /// The token for the next page of content, if any.
+    /// </summary>
+    property NextPage: string read FNextPage write FNextPage;
+
+    destructor Destroy; override;
+  end;
+
+  /// <summary>
+  /// Manages asynchronous callBacks for a request using <c>TVectorStoreFileContent</c> as the response type.
+  /// </summary>
+  TAsynVectorStoreFileContent = TAsynCallBack<TVectorStoreFileContent>;
+
+  /// <summary>
+  /// Defines a promise-based callback type for operations returning the parsed contents of a vector store file.
+  /// </summary>
+  TPromiseVectorStoreFileContent = TPromiseCallBack<TVectorStoreFileContent>;
+
+  TVectorStoreFilesAbstractSupport = class(TGenAIRoute)
+  protected
+    function Create(const VectorStoreId: string; const ParamProc: TProc<TVectorStoreFilesCreateParams>): TVectorStoreFile; virtual; abstract;
+    function List(const VectorStoreId: string): TVectorStoreFiles; overload; virtual; abstract;
+    function List(const VectorStoreId: string; const ParamProc: TProc<TVectorStoreFilesUrlParams>): TVectorStoreFiles; overload; virtual; abstract;
+    function Retrieve(const VectorStoreId: string; const FileId: string): TVectorStoreFile; virtual; abstract;
+    function RetrieveContent(const VectorStoreId: string; const FileId: string): TVectorStoreFileContent; virtual; abstract;
+    function Delete(const VectorStoreId: string; const FileId: string): TDeletion; virtual; abstract;
+  end;
+
+  TVectorStoreFilesAsynchronousSupport = class(TVectorStoreFilesAbstractSupport)
+  public
+    procedure AsynCreate(const VectorStoreId: string; const ParamProc: TProc<TVectorStoreFilesCreateParams>;
+      const CallBacks: TFunc<TAsynVectorStoreFile>);
+    procedure AsynList(const VectorStoreId: string;
+      const CallBacks: TFunc<TAsynVectorStoreFiles>); overload;
+    procedure AsynList(const VectorStoreId: string;
+      const ParamProc: TProc<TVectorStoreFilesUrlParams>;
+      const CallBacks: TFunc<TAsynVectorStoreFiles>); overload;
+    procedure AsynRetrieve(const VectorStoreId: string; const FileId: string;
+      const CallBacks: TFunc<TAsynVectorStoreFile>);
+    procedure AsynRetrieveContent(const VectorStoreId: string; const FileId: string;
+      const CallBacks: TFunc<TAsynVectorStoreFileContent>);
+    procedure AsynDelete(const VectorStoreId: string; const FileId: string;
+      const CallBacks: TFunc<TAsynDeletion>);
+  end;
+
+  TVectorStoreFilesRoute = class(TVectorStoreFilesAsynchronousSupport)
   protected
     /// <summary>
     /// Customizes headers for API requests related to vector store files.
@@ -351,7 +450,7 @@ type
     /// The unique identifier of the vector store whose files you want to list.
     /// </param>
     /// <param name="ParamProc">
-    /// A procedure that configures URL parameters—such as status filters—via a <see cref="TVectorStoreFilesUrlParams"/> instance.
+    /// A procedure that configures URL parametersï¿½such as status filtersï¿½via a <see cref="TVectorStoreFilesUrlParams"/> instance.
     /// </param>
     /// <param name="CallBacks">
     /// Optional callbacks wrapped in a <see cref="TPromiseVectorStoreFiles"/> for handling start,
@@ -382,6 +481,25 @@ type
     /// </returns>
     function AsyncAwaitRetrieve(const VectorStoreId: string; const FileId: string;
       const CallBacks: TFunc<TPromiseVectorStoreFile> = nil): TPromise<TVectorStoreFile>;
+
+    /// <summary>
+    /// Initiates an asynchronous request to retrieve the parsed contents of a specific file from the specified vector store and returns a promise.
+    /// </summary>
+    /// <param name="VectorStoreId">
+    /// The unique identifier of the vector store containing the file.
+    /// </param>
+    /// <param name="FileId">
+    /// The unique identifier of the file whose contents will be retrieved.
+    /// </param>
+    /// <param name="CallBacks">
+    /// Optional callbacks wrapped in a <see cref="TPromiseVectorStoreFileContent"/> for handling start,
+    /// success, or error events before the promise resolves.
+    /// </param>
+    /// <returns>
+    /// A <see cref="TPromise&lt;TVectorStoreFileContent&gt;"/> that resolves with the parsed contents of the file.
+    /// </returns>
+    function AsyncAwaitRetrieveContent(const VectorStoreId: string; const FileId: string;
+      const CallBacks: TFunc<TPromiseVectorStoreFileContent> = nil): TPromise<TVectorStoreFileContent>;
 
     /// <summary>
     /// Initiates an asynchronous request to delete a specific file from the specified vector store and returns a promise.
@@ -415,7 +533,7 @@ type
     /// <returns>
     /// A <c>TVectorStoreFile</c> object representing the created file.
     /// </returns>
-    function Create(const VectorStoreId: string; const ParamProc: TProc<TVectorStoreFilesCreateParams>): TVectorStoreFile;
+    function Create(const VectorStoreId: string; const ParamProc: TProc<TVectorStoreFilesCreateParams>): TVectorStoreFile; override;
 
     /// <summary>
     /// Synchronously retrieves a list of files from a specified vector store.
@@ -426,7 +544,7 @@ type
     /// <returns>
     /// A <c>TVectorStoreFiles</c> list containing information about the files.
     /// </returns>
-    function List(const VectorStoreId: string): TVectorStoreFiles; overload;
+    function List(const VectorStoreId: string): TVectorStoreFiles; overload; override;
 
     /// <summary>
     /// Synchronously retrieves a filtered list of files from a specified vector store.
@@ -440,7 +558,7 @@ type
     /// <returns>
     /// A <c>TVectorStoreFiles</c> list containing information about the filtered files.
     /// </returns>
-    function List(const VectorStoreId: string; const ParamProc: TProc<TVectorStoreFilesUrlParams>): TVectorStoreFiles; overload;
+    function List(const VectorStoreId: string; const ParamProc: TProc<TVectorStoreFilesUrlParams>): TVectorStoreFiles; overload; override;
 
     /// <summary>
     /// Synchronously retrieves details of a specific file within a vector store.
@@ -454,7 +572,21 @@ type
     /// <returns>
     /// A <c>TVectorStoreFile</c> object containing the details of the specified file.
     /// </returns>
-    function Retrieve(const VectorStoreId: string; const FileId: string): TVectorStoreFile;
+    function Retrieve(const VectorStoreId: string; const FileId: string): TVectorStoreFile; override;
+
+    /// <summary>
+    /// Synchronously retrieves the parsed contents of a specific file within a vector store.
+    /// </summary>
+    /// <param name="VectorStoreId">
+    /// The unique identifier of the vector store containing the file.
+    /// </param>
+    /// <param name="FileId">
+    /// The unique identifier of the file whose contents are to be retrieved.
+    /// </param>
+    /// <returns>
+    /// A <c>TVectorStoreFileContent</c> object containing the parsed content chunks of the specified file.
+    /// </returns>
+    function RetrieveContent(const VectorStoreId: string; const FileId: string): TVectorStoreFileContent; override;
 
     /// <summary>
     /// Synchronously deletes a file from the specified vector store.
@@ -468,84 +600,20 @@ type
     /// <returns>
     /// A <c>TDeletion</c> object indicating the status of the deletion.
     /// </returns>
-    function Delete(const VectorStoreId: string; const FileId: string): TDeletion;
-
-    /// <summary>
-    /// Asynchronously creates a new file in the specified vector store.
-    /// </summary>
-    /// <param name="VectorStoreId">
-    /// The unique identifier of the vector store where the file will be added.
-    /// </param>
-    /// <param name="ParamProc">
-    /// A procedure that configures the parameters for creating the file, such as the file ID
-    /// and chunking strategy.
-    /// </param>
-    /// <param name="CallBacks">
-    /// The callback functions to handle asynchronous execution and results.
-    /// </param>
-    procedure AsynCreate(const VectorStoreId: string; const ParamProc: TProc<TVectorStoreFilesCreateParams>;
-      const CallBacks: TFunc<TAsynVectorStoreFile>);
-
-    /// <summary>
-    /// Asynchronously retrieves a list of files from a specified vector store.
-    /// </summary>
-    /// <param name="VectorStoreId">
-    /// The unique identifier of the vector store from which to retrieve the files.
-    /// </param>
-    /// <param name="CallBacks">
-    /// The callback functions to handle asynchronous execution and results.
-    /// </param>
-    procedure AsynList(const VectorStoreId: string;
-      const CallBacks: TFunc<TAsynVectorStoreFiles>); overload;
-
-    /// <summary>
-    /// Asynchronously retrieves a filtered list of files from a specified vector store.
-    /// </summary>
-    /// <param name="VectorStoreId">
-    /// The unique identifier of the vector store from which to retrieve the files.
-    /// </param>
-    /// <param name="ParamProc">
-    /// A procedure to configure filtering parameters for the list request, such as file status.
-    /// </param>
-    /// <param name="CallBacks">
-    /// The callback functions to handle asynchronous execution and results.
-    /// </param>
-    procedure AsynList(const VectorStoreId: string;
-      const ParamProc: TProc<TVectorStoreFilesUrlParams>;
-      const CallBacks: TFunc<TAsynVectorStoreFiles>); overload;
-
-    /// <summary>
-    /// Asynchronously retrieves details of a specific file within a vector store.
-    /// </summary>
-    /// <param name="VectorStoreId">
-    /// The unique identifier of the vector store containing the file.
-    /// </param>
-    /// <param name="FileId">
-    /// The unique identifier of the file to be retrieved.
-    /// </param>
-    /// <param name="CallBacks">
-    /// The callback functions to handle asynchronous execution and results.
-    /// </param>
-    procedure AsynRetrieve(const VectorStoreId: string; const FileId: string;
-      const CallBacks: TFunc<TAsynVectorStoreFile>);
-
-    /// <summary>
-    /// Asynchronously deletes a file from the specified vector store.
-    /// </summary>
-    /// <param name="VectorStoreId">
-    /// The unique identifier of the vector store from which to delete the file.
-    /// </param>
-    /// <param name="FileId">
-    /// The unique identifier of the file to be deleted.
-    /// </param>
-    /// <param name="CallBacks">
-    /// The callback functions to handle asynchronous execution and results.
-    /// </param>
-    procedure AsynDelete(const VectorStoreId: string; const FileId: string;
-      const CallBacks: TFunc<TAsynDeletion>);
+    function Delete(const VectorStoreId: string; const FileId: string): TDeletion; override;
   end;
 
 implementation
+
+uses
+  System.DateUtils;
+
+function VectorFilesUnixToUtc(const Value: Int64): string;
+begin
+  if Value <= 0 then
+    Exit(EmptyStr);
+  Result := FormatDateTime('yyyy-mm-dd"T"hh:nn:ss"Z"', UnixToDateTime(Value, True));
+end;
 
 { TVectorStoreFilesCreateParams }
 
@@ -561,6 +629,12 @@ begin
   Result := TVectorStoreFilesCreateParams(Add('file_id', Value));
 end;
 
+function TVectorStoreFilesCreateParams.Attributes(
+  const Value: TJSONObject): TVectorStoreFilesCreateParams;
+begin
+  Result := TVectorStoreFilesCreateParams(Add('attributes', Value));
+end;
+
 { TVectorStoreFile }
 
 destructor TVectorStoreFile.Destroy;
@@ -574,12 +648,12 @@ end;
 
 function TVectorStoreFile.GetCreatedAt: Int64;
 begin
-  Result := TInt64OrNull(FCreatedAt).ToInteger;
+  Result := FCreatedAt;
 end;
 
 function TVectorStoreFile.GetCreatedAtAsString: string;
 begin
-  Result := TInt64OrNull(FCreatedAt).ToUtcDateString;
+  Result := VectorFilesUnixToUtc(FCreatedAt);
 end;
 
 { TChunkingStrategy }
@@ -589,6 +663,133 @@ begin
   if Assigned(FStatic) then
     FStatic.Free;
   inherited;
+end;
+
+{ TVectorStoreFileContent }
+
+destructor TVectorStoreFileContent.Destroy;
+begin
+  for var Item in FData do
+    Item.Free;
+  inherited;
+end;
+
+{ TVectorStoreFilesAsynchronousSupport }
+
+procedure TVectorStoreFilesAsynchronousSupport.AsynCreate(const VectorStoreId: string;
+  const ParamProc: TProc<TVectorStoreFilesCreateParams>;
+  const CallBacks: TFunc<TAsynVectorStoreFile>);
+begin
+  with TAsynCallBackExec<TAsynVectorStoreFile, TVectorStoreFile>.Create(CallBacks) do
+  try
+    Sender := Use.Param.Sender;
+    OnStart := Use.Param.OnStart;
+    OnSuccess := Use.Param.OnSuccess;
+    OnError := Use.Param.OnError;
+    Run(
+      function: TVectorStoreFile
+      begin
+        Result := Self.Create(VectorStoreId, ParamProc);
+      end);
+  finally
+    Free;
+  end;
+end;
+
+procedure TVectorStoreFilesAsynchronousSupport.AsynDelete(const VectorStoreId, FileId: string;
+  const CallBacks: TFunc<TAsynDeletion>);
+begin
+  with TAsynCallBackExec<TAsynDeletion, TDeletion>.Create(CallBacks) do
+  try
+    Sender := Use.Param.Sender;
+    OnStart := Use.Param.OnStart;
+    OnSuccess := Use.Param.OnSuccess;
+    OnError := Use.Param.OnError;
+    Run(
+      function: TDeletion
+      begin
+        Result := Self.Delete(VectorStoreId, FileId);
+      end);
+  finally
+    Free;
+  end;
+end;
+
+procedure TVectorStoreFilesAsynchronousSupport.AsynList(const VectorStoreId: string;
+  const CallBacks: TFunc<TAsynVectorStoreFiles>);
+begin
+  with TAsynCallBackExec<TAsynVectorStoreFiles, TVectorStoreFiles>.Create(CallBacks) do
+  try
+    Sender := Use.Param.Sender;
+    OnStart := Use.Param.OnStart;
+    OnSuccess := Use.Param.OnSuccess;
+    OnError := Use.Param.OnError;
+    Run(
+      function: TVectorStoreFiles
+      begin
+        Result := Self.List(VectorStoreId);
+      end);
+  finally
+    Free;
+  end;
+end;
+
+procedure TVectorStoreFilesAsynchronousSupport.AsynList(const VectorStoreId: string;
+  const ParamProc: TProc<TVectorStoreFilesUrlParams>;
+  const CallBacks: TFunc<TAsynVectorStoreFiles>);
+begin
+  with TAsynCallBackExec<TAsynVectorStoreFiles, TVectorStoreFiles>.Create(CallBacks) do
+  try
+    Sender := Use.Param.Sender;
+    OnStart := Use.Param.OnStart;
+    OnSuccess := Use.Param.OnSuccess;
+    OnError := Use.Param.OnError;
+    Run(
+      function: TVectorStoreFiles
+      begin
+        Result := Self.List(VectorStoreId, ParamProc);
+      end);
+  finally
+    Free;
+  end;
+end;
+
+procedure TVectorStoreFilesAsynchronousSupport.AsynRetrieve(const VectorStoreId,
+  FileId: string; const CallBacks: TFunc<TAsynVectorStoreFile>);
+begin
+  with TAsynCallBackExec<TAsynVectorStoreFile, TVectorStoreFile>.Create(CallBacks) do
+  try
+    Sender := Use.Param.Sender;
+    OnStart := Use.Param.OnStart;
+    OnSuccess := Use.Param.OnSuccess;
+    OnError := Use.Param.OnError;
+    Run(
+      function: TVectorStoreFile
+      begin
+        Result := Self.Retrieve(VectorStoreId, FileId);
+      end);
+  finally
+    Free;
+  end;
+end;
+
+procedure TVectorStoreFilesAsynchronousSupport.AsynRetrieveContent(const VectorStoreId,
+  FileId: string; const CallBacks: TFunc<TAsynVectorStoreFileContent>);
+begin
+  with TAsynCallBackExec<TAsynVectorStoreFileContent, TVectorStoreFileContent>.Create(CallBacks) do
+  try
+    Sender := Use.Param.Sender;
+    OnStart := Use.Param.OnStart;
+    OnSuccess := Use.Param.OnSuccess;
+    OnError := Use.Param.OnError;
+    Run(
+      function: TVectorStoreFileContent
+      begin
+        Result := Self.RetrieveContent(VectorStoreId, FileId);
+      end);
+  finally
+    Free;
+  end;
 end;
 
 { TVectorStoreFilesRoute }
@@ -652,101 +853,16 @@ begin
     CallBacks);
 end;
 
-procedure TVectorStoreFilesRoute.AsynCreate(const VectorStoreId: string;
-  const ParamProc: TProc<TVectorStoreFilesCreateParams>;
-  const CallBacks: TFunc<TAsynVectorStoreFile>);
+function TVectorStoreFilesRoute.AsyncAwaitRetrieveContent(const VectorStoreId,
+  FileId: string;
+  const CallBacks: TFunc<TPromiseVectorStoreFileContent>): TPromise<TVectorStoreFileContent>;
 begin
-  with TAsynCallBackExec<TAsynVectorStoreFile, TVectorStoreFile>.Create(CallBacks) do
-  try
-    Sender := Use.Param.Sender;
-    OnStart := Use.Param.OnStart;
-    OnSuccess := Use.Param.OnSuccess;
-    OnError := Use.Param.OnError;
-    Run(
-      function: TVectorStoreFile
-      begin
-        Result := Self.Create(VectorStoreId, ParamProc);
-      end);
-  finally
-    Free;
-  end;
-end;
-
-procedure TVectorStoreFilesRoute.AsynDelete(const VectorStoreId, FileId: string;
-  const CallBacks: TFunc<TAsynDeletion>);
-begin
-  with TAsynCallBackExec<TAsynDeletion, TDeletion>.Create(CallBacks) do
-  try
-    Sender := Use.Param.Sender;
-    OnStart := Use.Param.OnStart;
-    OnSuccess := Use.Param.OnSuccess;
-    OnError := Use.Param.OnError;
-    Run(
-      function: TDeletion
-      begin
-        Result := Self.Delete(VectorStoreId, FileId);
-      end);
-  finally
-    Free;
-  end;
-end;
-
-procedure TVectorStoreFilesRoute.AsynList(const VectorStoreId: string;
-  const CallBacks: TFunc<TAsynVectorStoreFiles>);
-begin
-  with TAsynCallBackExec<TAsynVectorStoreFiles, TVectorStoreFiles>.Create(CallBacks) do
-  try
-    Sender := Use.Param.Sender;
-    OnStart := Use.Param.OnStart;
-    OnSuccess := Use.Param.OnSuccess;
-    OnError := Use.Param.OnError;
-    Run(
-      function: TVectorStoreFiles
-      begin
-        Result := Self.List(VectorStoreId);
-      end);
-  finally
-    Free;
-  end;
-end;
-
-procedure TVectorStoreFilesRoute.AsynList(const VectorStoreId: string;
-  const ParamProc: TProc<TVectorStoreFilesUrlParams>;
-  const CallBacks: TFunc<TAsynVectorStoreFiles>);
-begin
-  with TAsynCallBackExec<TAsynVectorStoreFiles, TVectorStoreFiles>.Create(CallBacks) do
-  try
-    Sender := Use.Param.Sender;
-    OnStart := Use.Param.OnStart;
-    OnSuccess := Use.Param.OnSuccess;
-    OnError := Use.Param.OnError;
-    Run(
-      function: TVectorStoreFiles
-      begin
-        Result := Self.List(VectorStoreId, ParamProc);
-      end);
-  finally
-    Free;
-  end;
-end;
-
-procedure TVectorStoreFilesRoute.AsynRetrieve(const VectorStoreId,
-  FileId: string; const CallBacks: TFunc<TAsynVectorStoreFile>);
-begin
-  with TAsynCallBackExec<TAsynVectorStoreFile, TVectorStoreFile>.Create(CallBacks) do
-  try
-    Sender := Use.Param.Sender;
-    OnStart := Use.Param.OnStart;
-    OnSuccess := Use.Param.OnSuccess;
-    OnError := Use.Param.OnError;
-    Run(
-      function: TVectorStoreFile
-      begin
-        Result := Self.Retrieve(VectorStoreId, FileId);
-      end);
-  finally
-    Free;
-  end;
+  Result := TAsyncAwaitHelper.WrapAsyncAwait<TVectorStoreFileContent>(
+    procedure(const CallBackParams: TFunc<TAsynVectorStoreFileContent>)
+    begin
+      AsynRetrieveContent(VectorStoreId, FileId, CallBackParams);
+    end,
+    CallBacks);
 end;
 
 function TVectorStoreFilesRoute.Create(const VectorStoreId: string;
@@ -788,6 +904,13 @@ function TVectorStoreFilesRoute.Retrieve(const VectorStoreId,
 begin
   HeaderCustomize;
   Result := API.Get<TVectorStoreFile>('vector_stores/' + VectorStoreId + '/files/' + FileId);
+end;
+
+function TVectorStoreFilesRoute.RetrieveContent(const VectorStoreId,
+  FileId: string): TVectorStoreFileContent;
+begin
+  HeaderCustomize;
+  Result := API.Get<TVectorStoreFileContent>('vector_stores/' + VectorStoreId + '/files/' + FileId + '/content');
 end;
 
 { TVectorStoreFilesUrlParams }

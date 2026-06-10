@@ -1,4 +1,4 @@
-unit GenAI.Moderation;
+﻿unit GenAI.Moderation;
 
 {-------------------------------------------------------------------------------
 
@@ -16,15 +16,6 @@ uses
   GenAI.Async.Promise;
 
 type
-  /// <summary>
-  /// Represents a text moderation parameter for a JSON object, enabling the configuration
-  /// of text inputs to be classified for moderation purposes.
-  /// </summary>
-  /// <remarks>
-  /// This class provides methods to define the type and content of text data to be
-  /// analyzed for potentially harmful content. It is specifically designed for use
-  /// in moderation APIs to assess textual content.
-  /// </remarks>
   TTextModerationParams = class(TJSONParam)
   public
     /// <summary>
@@ -65,15 +56,6 @@ type
     class function New(const Value: string): TTextModerationParams;
   end;
 
-  /// <summary>
-  /// Represents a URL moderation parameter for a JSON object, enabling the configuration
-  /// of URLs to be classified for moderation purposes.
-  /// </summary>
-  /// <remarks>
-  /// This class provides methods to define and handle URLs as input for moderation.
-  /// It supports both direct web URLs and local file paths that can be encoded into
-  /// base64 format for evaluation by the moderation API.
-  /// </remarks>
   TUrlModerationParams = class(TJSONParam)
   public
     /// <summary>
@@ -101,15 +83,6 @@ type
     class function New(const Value: string): TUrlModerationParams;
   end;
 
-  /// <summary>
-  /// Represents an image moderation parameter for a JSON object, enabling the configuration
-  /// of image inputs to be classified for moderation purposes.
-  /// </summary>
-  /// <remarks>
-  /// This class provides methods to define the type and content of image data, either
-  /// via direct URLs or base64-encoded strings, to be analyzed for potentially harmful content.
-  /// It is specifically designed for use in moderation APIs to assess image content.
-  /// </remarks>
   TImageModerationParams = class(TJSONParam)
   public
     /// <summary>
@@ -151,15 +124,6 @@ type
     class function New(const Value: string): TImageModerationParams;
   end;
 
-  /// <summary>
-  /// Represents the parameters for moderation requests, enabling configuration
-  /// for input data and model selection to classify content for moderation purposes.
-  /// </summary>
-  /// <remarks>
-  /// This class provides methods to configure and handle inputs for moderation,
-  /// such as text, image URLs, or an array of mixed inputs. It also allows
-  /// specifying the moderation model to use.
-  /// </remarks>
   TModerationParams = class(TJSONParam)
   public
     /// <summary>
@@ -199,16 +163,6 @@ type
     function Model(const Value: string): TModerationParams;
   end;
 
-  /// <summary>
-  /// Represents the moderation categories used to classify content as potentially harmful.
-  /// Each category indicates a specific type of harmful content, such as harassment,
-  /// violence, or hate speech.
-  /// </summary>
-  /// <remarks>
-  /// This class provides properties for each moderation category. These properties
-  /// are boolean values indicating whether the corresponding category is flagged
-  /// for the given input.
-  /// </remarks>
   TModerationCategories = class
   private
     FHate: Boolean;
@@ -230,7 +184,7 @@ type
     [JsonNameAttribute('sexual/minors')]
     FSexualMinors: Boolean;
     FViolence: Boolean;
-    [JsonNameAttribute('violence/graphics')]
+    [JsonNameAttribute('violence/graphic')]
     FViolenceGraphic: Boolean;
   public
     /// <summary>
@@ -306,17 +260,6 @@ type
     property ViolenceGraphic: Boolean read FViolenceGraphic write FViolenceGraphic;
   end;
 
-  /// <summary>
-  /// Represents the scores for various moderation categories, providing numerical
-  /// values that indicate the likelihood of content falling into specific harmful
-  /// categories.
-  /// </summary>
-  /// <remarks>
-  /// This class defines properties to store scores for multiple categories, such as
-  /// hate, harassment, violence, and others. The scores range from 0 to 1, where
-  /// higher values indicate a stronger likelihood of the content being flagged for
-  /// the respective category.
-  /// </remarks>
   TModerationCategoryScores = class
   private
     FHate: Double;
@@ -338,7 +281,7 @@ type
     [JsonNameAttribute('sexual/minors')]
     FSexualMinors: Double;
     FViolence: Double;
-    [JsonNameAttribute('violence/graphics')]
+    [JsonNameAttribute('violence/graphic')]
     FViolenceGraphic: Double;
   public
     /// <summary>
@@ -419,15 +362,6 @@ type
     property ViolenceGraphic: Double read FViolenceGraphic write FViolenceGraphic;
   end;
 
-  /// <summary>
-  /// Represents a moderation category applied to various input types, providing
-  /// details on how different moderation categories are assigned based on input.
-  /// </summary>
-  /// <remarks>
-  /// This class provides properties to retrieve the specific input types (e.g., text or image)
-  /// that are associated with each moderation category. It is useful for identifying
-  /// the sources of flagged content within a moderation request.
-  /// </remarks>
   TModerationCategoryApplied = class
   private
     FHate: TArray<string>;
@@ -449,7 +383,7 @@ type
     [JsonNameAttribute('sexual/minors')]
     FSexualMinors: TArray<string>;
     FViolence: TArray<string>;
-    [JsonNameAttribute('violence/graphics')]
+    [JsonNameAttribute('violence/graphic')]
     FViolenceGraphic: TArray<string>;
   public
     /// <summary>
@@ -518,15 +452,6 @@ type
     property ViolenceGraphic: TArray<string> read FViolenceGraphic write FViolenceGraphic;
   end;
 
-  /// <summary>
-  /// Represents a flagged item that contains information about a harmful content category
-  /// and its associated score as determined by a moderation model.
-  /// </summary>
-  /// <remarks>
-  /// This record is used to store details about content that has been flagged during
-  /// moderation, including the category of harm and its confidence score. It is
-  /// typically part of a collection of flagged items in moderation results.
-  /// </remarks>
   TFlaggedItem = record
   private
     FCategory: THarmCategories;
@@ -555,15 +480,6 @@ type
     constructor Create(const ACategory: THarmCategories; const AScore: Double);
   end;
 
-  /// <summary>
-  /// Represents the result of a moderation process, including information about
-  /// flagged categories, their confidence scores, and the associated input types.
-  /// </summary>
-  /// <remarks>
-  /// This class provides a detailed overview of the moderation analysis, including
-  /// which categories were flagged, the confidence scores for each category, and
-  /// the types of inputs (e.g., text or image) associated with flagged categories.
-  /// </remarks>
   TModerationResult = class
   strict private
     function GetFlaggedDetail: TArray<TFlaggedItem>;
@@ -604,14 +520,6 @@ type
     destructor Destroy; override;
   end;
 
-  /// <summary>
-  /// Represents the overall moderation response, including results, model information,
-  /// and a unique identifier for the moderation request.
-  /// </summary>
-  /// <remarks>
-  /// This class serves as the main container for moderation data, encapsulating
-  /// results from the moderation process, the model used, and the unique request ID.
-  /// </remarks>
   TModeration = class(TJSONFingerprint)
   private
     FId: string;
@@ -655,17 +563,19 @@ type
   /// </remarks>
   TPromiseModeration = TPromiseCallBack<TModeration>;
 
-  /// <summary>
-  /// Represents a route for handling moderation requests in the GenAI framework.
-  /// This class provides methods for evaluating moderation parameters both
-  /// synchronously and asynchronously.
-  /// </summary>
-  /// <remarks>
-  /// This class is designed to manage moderation requests by interfacing with
-  /// the GenAI API. It supports both synchronous and asynchronous operations
-  /// for evaluating content against moderation models.
-  /// </remarks>
-  TModerationRoute = class(TGenAIRoute)
+  TModerationAbstractSupport = class(TGenAIRoute)
+  protected
+    function Evaluate(const ParamProc: TProc<TModerationParams>): TModeration; virtual; abstract;
+  end;
+
+  TModerationAsynchronousSupport = class(TModerationAbstractSupport)
+  public
+    procedure AsynEvaluate(const ParamProc: TProc<TModerationParams>;
+      const CallBacks: TFunc<TAsynModeration>);
+  end;
+
+  TModerationRoute = class(TModerationAsynchronousSupport)
+  public
     /// <summary>
     /// Asynchronously evaluates the given moderation parameters and returns a promise that resolves with the moderation result.
     /// </summary>
@@ -695,21 +605,7 @@ type
     /// <returns>
     /// Returns a TModeration object containing the results of the moderation process.
     /// </returns>
-    function Evaluate(const ParamProc: TProc<TModerationParams>): TModeration;
-
-    /// <summary>
-    /// Asynchronously evaluates the given moderation parameters and triggers
-    /// the specified callback functions upon completion.
-    /// </summary>
-    /// <param name="ParamProc">
-    /// A procedure to configure the moderation parameters.
-    /// </param>
-    /// <param name="CallBacks">
-    /// A function that defines the asynchronous callbacks for success, error,
-    /// and other states during the operation.
-    /// </param>
-    procedure AsynEvaluate(const ParamProc: TProc<TModerationParams>;
-      const CallBacks: TFunc<TAsynModeration>);
+    function Evaluate(const ParamProc: TProc<TModerationParams>): TModeration; override;
   end;
 
 implementation
@@ -849,21 +745,9 @@ begin
     Result := Result + [TFlaggedItem.Create(THarmCategories.violenceGraphic, CategoryScores.ViolenceGraphic)];
 end;
 
-{ TModerationRoute }
+{ TModerationAsynchronousSupport }
 
-function TModerationRoute.AsyncAwaitEvaluate(
-  const ParamProc: TProc<TModerationParams>;
-  const CallBacks: TFunc<TPromiseModeration>): TPromise<TModeration>;
-begin
-  Result := TAsyncAwaitHelper.WrapAsyncAwait<TModeration>(
-    procedure(const CallBackParams: TFunc<TAsynModeration>)
-    begin
-      AsynEvaluate(ParamProc, CallBackParams);
-    end,
-    CallBacks);
-end;
-
-procedure TModerationRoute.AsynEvaluate(
+procedure TModerationAsynchronousSupport.AsynEvaluate(
   const ParamProc: TProc<TModerationParams>; const CallBacks: TFunc<TAsynModeration>);
 begin
   with TAsynCallBackExec<TAsynModeration, TModeration>.Create(CallBacks) do
@@ -880,6 +764,20 @@ begin
   finally
     Free;
   end;
+end;
+
+{ TModerationRoute }
+
+function TModerationRoute.AsyncAwaitEvaluate(
+  const ParamProc: TProc<TModerationParams>;
+  const CallBacks: TFunc<TPromiseModeration>): TPromise<TModeration>;
+begin
+  Result := TAsyncAwaitHelper.WrapAsyncAwait<TModeration>(
+    procedure(const CallBackParams: TFunc<TAsynModeration>)
+    begin
+      AsynEvaluate(ParamProc, CallBackParams);
+    end,
+    CallBacks);
 end;
 
 function TModerationRoute.Evaluate(

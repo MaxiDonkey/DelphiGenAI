@@ -1,4 +1,4 @@
-unit GenAI.Async.Promise;
+ï»¿unit GenAI.Async.Promise;
 
 {-------------------------------------------------------------------------------
 
@@ -9,7 +9,7 @@ unit GenAI.Async.Promise;
 
 interface
 
-{$REGION  'Dev notes : GenAI.Async.Promise'}
+{$REGION  'Dev notes'}
 
 (*
       Unit providing a generic implementation of Promises for handling
@@ -124,7 +124,7 @@ type
     function GetState: TPromiseState; virtual; abstract;
   public
     /// <summary>
-    /// Read-only property exposing the promise’s current state.
+    /// Read-only property exposing the promise's current state.
     /// </summary>
     /// <value>
     /// The <see cref="TPromiseState"/> of the promise.
@@ -221,7 +221,7 @@ type
     /// <summary>
     /// Attaches a fulfillment callback that returns another promise of a different type.
     /// </summary>
-    /// <typeparam name="TResult">The type of the new promise’s result.</typeparam>
+    /// <typeparam name="TResult">The type of the new promise's result.</typeparam>
     /// <param name="AOnFulfill">A function that returns a new promise.</param>
     /// <returns>A new promise that resolves with the value of the returned promise.</returns>
     function &Then<TResult>(AOnFulfill: TFunc<T, TPromise<TResult>>): TPromise<TResult>; overload;
@@ -393,7 +393,7 @@ begin
         Self.Resolve(AValue);
       end,
 
-      {--- OnReject — clone then free the original }
+      {--- OnReject - clone then free the original }
       procedure(E: Exception)
       begin
         var Cloned := CloneException(E);
@@ -467,7 +467,7 @@ begin
     TMonitor.Exit(FHandlerLock);
   end;
 
-  {--- Asynchronously call all “then” callbacks }
+  {--- Asynchronously call all "then" callbacks }
   for Handler in Handlers do
     TThread.Queue(nil,
       procedure
@@ -531,7 +531,7 @@ begin
     TMonitor.Exit(FHandlerLock);
   end;
 
-  {--- Call all “catch” callbacks }
+  {--- Call all "catch" callbacks }
   for Handler in Handlers do
     TThread.Queue(nil,
       procedure
@@ -962,4 +962,5 @@ finalization
   {--- Delete pending promises }
   TPromiseRegistry.Clear;
 end.
+
 

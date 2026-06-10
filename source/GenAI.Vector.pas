@@ -1,4 +1,4 @@
-unit GenAI.Vector;
+﻿unit GenAI.Vector;
 
 {-------------------------------------------------------------------------------
 
@@ -13,7 +13,7 @@ uses
   System.SysUtils, System.Classes, System.Threading, System.JSON, REST.Json.Types,
   REST.JsonReflect, System.Net.URLClient,
   GenAI.API.Params, GenAI.API, GenAI.Consts, GenAI.Types, GenAI.Async.Support,
-  GenAI.Async.Promise, GenAI.API.Lists, GenAI.API.Deletion, GenAI.Assistants;
+  GenAI.Async.Promise, GenAI.API.Lists, GenAI.API.Deletion;
 
 type
   /// <summary>
@@ -27,14 +27,89 @@ type
   TVectorStoreUrlParam = class(TUrlAdvancedParams);
 
   /// <summary>
+  /// Represents static chunking parameters used when processing files for vector stores.
+  /// </summary>
+  /// <remarks>
+  /// <c>TChunkStaticParams</c> configures the maximum token size of chunks and the overlap
+  /// between consecutive chunks. It is used by <see cref="TChunkingStrategyParams"/>.
+  /// </remarks>
+  TChunkStaticParams = class(TJSONParam)
+  public
+    /// <summary>
+    /// Sets the maximum size of each chunk in tokens.
+    /// </summary>
+    /// <param name="Value">
+    /// The maximum number of tokens allowed per chunk.
+    /// </param>
+    /// <returns>
+    /// The current <c>TChunkStaticParams</c> instance for method chaining.
+    /// </returns>
+    function MaxChunkSizeTokens(const Value: Integer): TChunkStaticParams;
+
+    /// <summary>
+    /// Sets the overlap size between consecutive chunks in tokens.
+    /// </summary>
+    /// <param name="Value">
+    /// The number of tokens that should overlap between consecutive chunks.
+    /// </param>
+    /// <returns>
+    /// The current <c>TChunkStaticParams</c> instance for method chaining.
+    /// </returns>
+    function ChunkOverlapTokens(const Value: Integer): TChunkStaticParams;
+  end;
+
+  /// <summary>
+  /// Represents parameters used to configure the chunking strategy for file processing.
+  /// </summary>
+  /// <remarks>
+  /// <c>TChunkingStrategyParams</c> defines the strategy type and optional static chunking
+  /// settings for vector-store file processing.
+  /// </remarks>
+  TChunkingStrategyParams = class(TJSONParam)
+  public
+    /// <summary>
+    /// Sets the chunking strategy type using its wire value.
+    /// </summary>
+    /// <param name="Value">
+    /// A string such as <c>auto</c> or <c>static</c>.
+    /// </param>
+    /// <returns>
+    /// The current <c>TChunkingStrategyParams</c> instance for method chaining.
+    /// </returns>
+    function &Type(const Value: string): TChunkingStrategyParams; overload;
+
+    /// <summary>
+    /// Sets the chunking strategy type.
+    /// </summary>
+    /// <param name="Value">
+    /// A <see cref="TChunkingStrategyType"/> value.
+    /// </param>
+    /// <returns>
+    /// The current <c>TChunkingStrategyParams</c> instance for method chaining.
+    /// </returns>
+    function &Type(const Value: TChunkingStrategyType): TChunkingStrategyParams; overload;
+
+    /// <summary>
+    /// Configures static chunking parameters.
+    /// </summary>
+    /// <param name="Value">
+    /// Static chunking details such as maximum chunk size and overlap size.
+    /// </param>
+    /// <returns>
+    /// The current <c>TChunkingStrategyParams</c> instance for method chaining.
+    /// </returns>
+    function Static(const Value: TChunkStaticParams): TChunkingStrategyParams;
+  end;
+
+  /// <summary>
   /// Represents parameters for specifying the expiration policy of a vector store in the OpenAI API.
   /// </summary>
   /// <remarks>
-  /// The <c>TExpiresAfterParams</c> class is used to configure when a vector store should expire
+  /// The <c>TVectorStoreExpiresAfterParams</c> class is used to configure when a vector store should expire
   /// based on a specified anchor timestamp and the number of days after the anchor.
   /// This helps in automatically managing the lifecycle of vector stores.
   /// </remarks>
-  TExpiresAfterParams = class(TJSONParam)
+  TVectorStoreExpiresAfterParams = class(TJSONParam)
   public
     /// <summary>
     /// Specifies the anchor timestamp that determines when the expiration countdown starts.
@@ -43,9 +118,9 @@ type
     /// A string representing the anchor, typically set to values like <c>last_active_at</c>.
     /// </param>
     /// <returns>
-    /// Returns the current instance of <c>TExpiresAfterParams</c>, enabling method chaining.
+    /// Returns the current instance of <c>TVectorStoreExpiresAfterParams</c>, enabling method chaining.
     /// </returns>
-    function Anchor(const Value: string): TExpiresAfterParams;
+    function Anchor(const Value: string): TVectorStoreExpiresAfterParams;
 
     /// <summary>
     /// Specifies the number of days after the anchor timestamp when the vector store should expire.
@@ -54,9 +129,9 @@ type
     /// An integer representing the number of days to wait after the anchor time before expiration.
     /// </param>
     /// <returns>
-    /// Returns the current instance of <c>TExpiresAfterParams</c>, enabling method chaining.
+    /// Returns the current instance of <c>TVectorStoreExpiresAfterParams</c>, enabling method chaining.
     /// </returns>
-    function Days(const Value: Integer): TExpiresAfterParams;
+    function Days(const Value: Integer): TVectorStoreExpiresAfterParams;
   end;
 
   /// <summary>
@@ -95,13 +170,13 @@ type
     /// Configures the expiration policy for the vector store.
     /// </summary>
     /// <param name="Value">
-    /// An instance of <c>TExpiresAfterParams</c> specifying the expiration conditions,
+    /// An instance of <c>TVectorStoreExpiresAfterParams</c> specifying the expiration conditions,
     /// such as the anchor timestamp and number of days before expiration.
     /// </param>
     /// <returns>
     /// Returns the current instance of <c>TVectorStoreCreateParams</c>, enabling method chaining.
     /// </returns>
-    function ExpiresAfter(const Value: TExpiresAfterParams): TVectorStoreCreateParams;
+    function ExpiresAfter(const Value: TVectorStoreExpiresAfterParams): TVectorStoreCreateParams;
 
     /// <summary>
     /// Defines the chunking strategy to be used for processing the files in the vector store.
@@ -151,13 +226,13 @@ type
     /// Updates the expiration policy of the vector store.
     /// </summary>
     /// <param name="Value">
-    /// An instance of <c>TExpiresAfterParams</c> specifying the new expiration conditions,
+    /// An instance of <c>TVectorStoreExpiresAfterParams</c> specifying the new expiration conditions,
     /// including the anchor timestamp and number of days before expiration.
     /// </param>
     /// <returns>
     /// Returns the current instance of <c>TVectorStoreUpdateParams</c>, enabling method chaining.
     /// </returns>
-    function ExpiresAfter(const Value: TExpiresAfterParams): TVectorStoreUpdateParams;
+    function ExpiresAfter(const Value: TVectorStoreExpiresAfterParams): TVectorStoreUpdateParams;
 
     /// <summary>
     /// Updates the metadata associated with the vector store.
@@ -170,6 +245,73 @@ type
     /// Returns the current instance of <c>TVectorStoreUpdateParams</c>, enabling method chaining.
     /// </returns>
     function Metadata(const Value: TJSONObject): TVectorStoreUpdateParams;
+  end;
+
+  /// <summary>
+  /// Ranking options used to tune the results of a vector store search.
+  /// </summary>
+  TVectorStoreSearchRankingOptions = class(TJSONParam)
+  public
+    /// <summary>
+    /// The ranker to use for the file search.
+    /// </summary>
+    /// <param name="Value">
+    /// A string such as <c>auto</c> or <c>default-2024-11-15</c>.
+    /// </param>
+    function Ranker(const Value: string): TVectorStoreSearchRankingOptions;
+
+    /// <summary>
+    /// The score threshold for the file search, a number between 0 and 1.
+    /// </summary>
+    /// <param name="Value">
+    /// A value between 0 and 1; numbers closer to 1 will attempt to return only the most relevant results,
+    /// but may return fewer results.
+    /// </param>
+    function ScoreThreshold(const Value: Double): TVectorStoreSearchRankingOptions;
+  end;
+
+  /// <summary>
+  /// Represents the parameters used to search a vector store in the OpenAI API.
+  /// </summary>
+  /// <remarks>
+  /// The <c>TVectorStoreSearchParams</c> class configures the search query, optional attribute filters,
+  /// the maximum number of results, ranking options, and whether to rewrite the natural-language query
+  /// for the search.
+  /// </remarks>
+  TVectorStoreSearchParams = class(TJSONParam)
+  public
+    /// <summary>
+    /// A query string for the search.
+    /// </summary>
+    function Query(const Value: string): TVectorStoreSearchParams; overload;
+
+    /// <summary>
+    /// An array of query strings for the search.
+    /// </summary>
+    function Query(const Value: TArray<string>): TVectorStoreSearchParams; overload;
+
+    /// <summary>
+    /// A filter to apply based on file attributes.
+    /// </summary>
+    /// <param name="Value">
+    /// A <c>TJSONObject</c> describing a comparison filter (type/key/value) or a compound filter (type/filters).
+    /// </param>
+    function Filters(const Value: TJSONObject): TVectorStoreSearchParams;
+
+    /// <summary>
+    /// The maximum number of results to return. This number should be between 1 and 50 inclusive.
+    /// </summary>
+    function MaxNumResults(const Value: Integer): TVectorStoreSearchParams;
+
+    /// <summary>
+    /// Ranking options for the search.
+    /// </summary>
+    function RankingOptions(const Value: TVectorStoreSearchRankingOptions): TVectorStoreSearchParams;
+
+    /// <summary>
+    /// Whether to rewrite the natural language query for vector search. Defaults to false.
+    /// </summary>
+    function RewriteQuery(const Value: Boolean): TVectorStoreSearchParams;
   end;
 
   /// <summary>
@@ -219,11 +361,11 @@ type
   /// Represents the expiration policy for a vector store in the OpenAI API.
   /// </summary>
   /// <remarks>
-  /// The <c>TExpiresAfter</c> class defines when a vector store will expire based on an anchor timestamp
+  /// The <c>TVectorStoreExpiresAfter</c> class defines when a vector store will expire based on an anchor timestamp
   /// and the number of days after the anchor. This class is useful for managing the automatic cleanup
   /// or deactivation of vector stores.
   /// </remarks>
-  TExpiresAfter = class
+  TVectorStoreExpiresAfter = class
   private
     FAnchor: string;
     FDays: Int64;
@@ -247,7 +389,7 @@ type
     property Days: Int64 read FDays write FDays;
   end;
 
-  TVectorStoreTimestamp = class(TJSONFingerprint)
+  TVectorStoreTimestamp = class abstract(TJSONFingerprint)
   protected
     function GetCreatedAtAsString: string; virtual; abstract;
     function GetExpiresAtAsString: string; virtual; abstract;
@@ -271,8 +413,8 @@ type
     FId: string;
     FObject: string;
     [JsonNameAttribute('created_at')]
-    FCreatedAt: TInt64OrNull;
-    FName: TStringOrNull;
+    FCreatedAt: Int64;
+    FName: string;
     [JsonNameAttribute('usage_bytes')]
     FUsageBytes: Int64;
     [JsonNameAttribute('file_counts')]
@@ -280,12 +422,11 @@ type
     [JsonReflectAttribute(ctString, rtString, TRunStatusInterceptor)]
     FStatus: TRunStatus;
     [JsonNameAttribute('expires_after')]
-    FExpiresAfter: TExpiresAfter;
+    FExpiresAfter: TVectorStoreExpiresAfter;
     [JsonNameAttribute('expires_at')]
-    FExpiresAt: TInt64OrNull;
+    FExpiresAt: Int64;
     [JsonNameAttribute('last_active_at')]
-    FLastActiveAt: TInt64OrNull;
-    [JsonReflectAttribute(ctString, rtString, TMetadataInterceptor)]
+    FLastActiveAt: Int64;
     FMetadata: string;
   private
     function GetName: string;
@@ -338,7 +479,7 @@ type
     /// <summary>
     /// Gets or sets the expiration policy for the vector store.
     /// </summary>
-    property ExpiresAfter: TExpiresAfter read FExpiresAfter write FExpiresAfter;
+    property ExpiresAfter: TVectorStoreExpiresAfter read FExpiresAfter write FExpiresAfter;
 
     /// <summary>
     /// Gets the Unix timestamp (in seconds) for when the vector store will expire.
@@ -413,6 +554,149 @@ type
   TPromiseVectorStores = TPromiseCallBack<TVectorStores>;
 
   /// <summary>
+  /// Represents a single content chunk returned by a vector store search result.
+  /// </summary>
+  TVectorStoreSearchContent = class
+  private
+    FType: string;
+    FText: string;
+  public
+    /// <summary>
+    /// The type of content, currently always <c>text</c>.
+    /// </summary>
+    property &Type: string read FType write FType;
+
+    /// <summary>
+    /// The text content returned from the search.
+    /// </summary>
+    property Text: string read FText write FText;
+  end;
+
+  /// <summary>
+  /// Represents a single result (a matching file) returned by a vector store search.
+  /// </summary>
+  TVectorStoreSearchResultItem = class
+  private
+    [JsonNameAttribute('file_id')]
+    FFileId: string;
+    FFilename: string;
+    FScore: Double;
+    FAttributes: string;
+    FContent: TArray<TVectorStoreSearchContent>;
+  public
+    /// <summary>
+    /// The ID of the vector store file.
+    /// </summary>
+    property FileId: string read FFileId write FFileId;
+
+    /// <summary>
+    /// The name of the vector store file.
+    /// </summary>
+    property Filename: string read FFilename write FFilename;
+
+    /// <summary>
+    /// The similarity score for the result, between 0 and 1.
+    /// </summary>
+    property Score: Double read FScore write FScore;
+
+    /// <summary>
+    /// The key-value attributes attached to the file, represented as a JSON string.
+    /// </summary>
+    property Attributes: string read FAttributes write FAttributes;
+
+    /// <summary>
+    /// The content chunks of the matching file.
+    /// </summary>
+    property Content: TArray<TVectorStoreSearchContent> read FContent write FContent;
+
+    destructor Destroy; override;
+  end;
+
+  /// <summary>
+  /// Represents a page of results returned by a vector store search request.
+  /// </summary>
+  TVectorStoreSearchResult = class(TJSONFingerprint)
+  private
+    FObject: string;
+    [JsonNameAttribute('search_query')]
+    FSearchQuery: TArray<string>;
+    FData: TArray<TVectorStoreSearchResultItem>;
+    [JsonNameAttribute('has_more')]
+    FHasMore: Boolean;
+    [JsonNameAttribute('next_page')]
+    FNextPage: string;
+  public
+    /// <summary>
+    /// The object type, which is always <c>vector_store.search_results.page</c>.
+    /// </summary>
+    property &Object: string read FObject write FObject;
+
+    /// <summary>
+    /// The query used for this search.
+    /// </summary>
+    property SearchQuery: TArray<string> read FSearchQuery write FSearchQuery;
+
+    /// <summary>
+    /// The list of search result items.
+    /// </summary>
+    property Data: TArray<TVectorStoreSearchResultItem> read FData write FData;
+
+    /// <summary>
+    /// Indicates whether there are more results to fetch.
+    /// </summary>
+    property HasMore: Boolean read FHasMore write FHasMore;
+
+    /// <summary>
+    /// The token for the next page of results, if any.
+    /// </summary>
+    property NextPage: string read FNextPage write FNextPage;
+
+    destructor Destroy; override;
+  end;
+
+  /// <summary>
+  /// Manages asynchronous callBacks for a request using <c>TVectorStoreSearchResult</c> as the response type.
+  /// </summary>
+  TAsynVectorStoreSearchResult = TAsynCallBack<TVectorStoreSearchResult>;
+
+  /// <summary>
+  /// Represents a promise-based callback for asynchronous operations returning a <see cref="TVectorStoreSearchResult"/> instance.
+  /// </summary>
+  TPromiseVectorStoreSearchResult = TPromiseCallBack<TVectorStoreSearchResult>;
+
+  TVectorStoreAbstractSupport = class(TGenAIRoute)
+  protected
+    function Create(const ParamProc: TProc<TVectorStoreCreateParams>): TVectorStore; virtual; abstract;
+    function List: TVectorStores; overload; virtual; abstract;
+    function List(const ParamProc: TProc<TVectorStoreUrlParam>): TVectorStores; overload; virtual; abstract;
+    function Retrieve(const VectorStoreId: string): TVectorStore; virtual; abstract;
+    function Update(const VectorStoreId: string;
+      const ParamProc: TProc<TVectorStoreUpdateParams>): TVectorStore; virtual; abstract;
+    function Delete(const VectorStoreId: string): TDeletion; virtual; abstract;
+    function Search(const VectorStoreId: string;
+      const ParamProc: TProc<TVectorStoreSearchParams>): TVectorStoreSearchResult; virtual; abstract;
+  end;
+
+  TVectorStoreAsynchronousSupport = class(TVectorStoreAbstractSupport)
+  public
+    procedure AsynCreate(const ParamProc: TProc<TVectorStoreCreateParams>;
+      const CallBacks: TFunc<TAsynVectorStore>);
+    procedure AsynList(const CallBacks: TFunc<TAsynVectorStores>); overload;
+    procedure AsynList(const ParamProc: TProc<TVectorStoreUrlParam>;
+      const CallBacks: TFunc<TAsynVectorStores>); overload;
+    procedure AsynRetrieve(const VectorStoreId: string;
+      const CallBacks: TFunc<TAsynVectorStore>);
+    procedure AsynUpdate(const VectorStoreId: string;
+      const ParamProc: TProc<TVectorStoreUpdateParams>;
+      const CallBacks: TFunc<TAsynVectorStore>);
+    procedure AsynDelete(const VectorStoreId: string;
+      const CallBacks: TFunc<TAsynDeletion>);
+    procedure AsynSearch(const VectorStoreId: string;
+      const ParamProc: TProc<TVectorStoreSearchParams>;
+      const CallBacks: TFunc<TAsynVectorStoreSearchResult>);
+  end;
+
+  /// <summary>
   /// Provides methods to manage vector stores in the OpenAI API.
   /// </summary>
   /// <remarks>
@@ -420,7 +704,7 @@ type
   /// vector stores through various API endpoints. It supports both synchronous and asynchronous
   /// operations, making it flexible for different application needs.
   /// </remarks>
-  TVectorStoreRoute = class(TGenAIRoute)
+  TVectorStoreRoute = class(TVectorStoreAsynchronousSupport)
   protected
     /// <summary>
     /// Customizes headers for API requests related to vector stores.
@@ -542,6 +826,25 @@ type
       const CallBacks: TFunc<TPromiseDeletion> = nil): TPromise<TDeletion>;
 
     /// <summary>
+    /// Searches a vector store asynchronously and returns a promise that resolves with the search result page.
+    /// </summary>
+    /// <param name="VectorStoreId">
+    /// The unique identifier of the vector store to search.
+    /// </param>
+    /// <param name="ParamProc">
+    /// A procedure to configure the search parameters via a <see cref="TVectorStoreSearchParams"/> instance.
+    /// </param>
+    /// <param name="CallBacks">
+    /// An optional function providing <see cref="TPromiseVectorStoreSearchResult"/> callbacks for start, success, and error handling.
+    /// </param>
+    /// <returns>
+    /// A <c>TPromise&lt;TVectorStoreSearchResult&gt;</c> that completes when the search succeeds or fails.
+    /// </returns>
+    function AsyncAwaitSearch(const VectorStoreId: string;
+      const ParamProc: TProc<TVectorStoreSearchParams>;
+      const CallBacks: TFunc<TPromiseVectorStoreSearchResult> = nil): TPromise<TVectorStoreSearchResult>;
+
+    /// <summary>
     /// Synchronously creates a new vector store.
     /// </summary>
     /// <param name="ParamProc">
@@ -550,7 +853,7 @@ type
     /// <returns>
     /// A <c>TVectorStore</c> object representing the created vector store.
     /// </returns>
-    function Create(const ParamProc: TProc<TVectorStoreCreateParams>): TVectorStore;
+    function Create(const ParamProc: TProc<TVectorStoreCreateParams>): TVectorStore; override;
 
     /// <summary>
     /// Synchronously retrieves a list of vector stores.
@@ -558,7 +861,7 @@ type
     /// <returns>
     /// A list of <c>TVectorStore</c> objects representing the vector stores.
     /// </returns>
-    function List: TVectorStores; overload;
+    function List: TVectorStores; overload; override;
 
     /// <summary>
     /// Synchronously retrieves a filtered list of vector stores.
@@ -569,7 +872,7 @@ type
     /// <returns>
     /// A list of <c>TVectorStore</c> objects that match the specified criteria.
     /// </returns>
-    function List(const ParamProc: TProc<TVectorStoreUrlParam>): TVectorStores; overload;
+    function List(const ParamProc: TProc<TVectorStoreUrlParam>): TVectorStores; overload; override;
 
     /// <summary>
     /// Synchronously retrieves details of a specific vector store.
@@ -580,7 +883,7 @@ type
     /// <returns>
     /// A <c>TVectorStore</c> object containing the details of the specified vector store.
     /// </returns>
-    function Retrieve(const VectorStoreId: string): TVectorStore;
+    function Retrieve(const VectorStoreId: string): TVectorStore; override;
 
     /// <summary>
     /// Synchronously updates an existing vector store.
@@ -595,7 +898,7 @@ type
     /// A <c>TVectorStore</c> object representing the updated vector store.
     /// </returns>
     function Update(const VectorStoreId: string;
-      const ParamProc: TProc<TVectorStoreUpdateParams>): TVectorStore;
+      const ParamProc: TProc<TVectorStoreUpdateParams>): TVectorStore; override;
 
     /// <summary>
     /// Synchronously deletes a vector store.
@@ -606,82 +909,69 @@ type
     /// <returns>
     /// A <c>TDeletion</c> object indicating the status of the deletion.
     /// </returns>
-    function Delete(const VectorStoreId: string): TDeletion;
+    function Delete(const VectorStoreId: string): TDeletion; override;
 
     /// <summary>
-    /// Asynchronously creates a new vector store.
-    /// </summary>
-    /// <param name="ParamProc">
-    /// A procedure for setting the parameters for the vector store, such as file IDs and expiration policy.
-    /// </param>
-    /// <param name="CallBacks">
-    /// The callback functions to handle asynchronous execution and results.
-    /// </param>
-    procedure AsynCreate(const ParamProc: TProc<TVectorStoreCreateParams>;
-      const CallBacks: TFunc<TAsynVectorStore>);
-
-    /// <summary>
-    /// Asynchronously retrieves a list of vector stores.
-    /// </summary>
-    /// <param name="CallBacks">
-    /// The callback functions to handle asynchronous execution and results.
-    /// </param>
-    procedure AsynList(const CallBacks: TFunc<TAsynVectorStores>); overload;
-
-    /// <summary>
-    /// Asynchronously retrieves a filtered list of vector stores.
-    /// </summary>
-    /// <param name="ParamProc">
-    /// A procedure to configure filtering parameters for the vector store listing.
-    /// </param>
-    /// <param name="CallBacks">
-    /// The callback functions to handle asynchronous execution and results.
-    /// </param>
-    procedure AsynList(const ParamProc: TProc<TVectorStoreUrlParam>;
-      const CallBacks: TFunc<TAsynVectorStores>); overload;
-
-    /// <summary>
-    /// Asynchronously retrieves details of a specific vector store.
+    /// Synchronously searches a vector store for relevant chunks based on a query and file attributes filter.
     /// </summary>
     /// <param name="VectorStoreId">
-    /// The unique identifier of the vector store to retrieve.
-    /// </param>
-    /// <param name="CallBacks">
-    /// The callback functions to handle asynchronous execution and results.
-    /// </param>
-    procedure AsynRetrieve(const VectorStoreId: string;
-      const CallBacks: TFunc<TAsynVectorStore>);
-
-    /// <summary>
-    /// Asynchronously updates an existing vector store.
-    /// </summary>
-    /// <param name="VectorStoreId">
-    /// The unique identifier of the vector store to update.
+    /// The unique identifier of the vector store to search.
     /// </param>
     /// <param name="ParamProc">
-    /// A procedure for setting the update parameters, such as name, expiration policy, or metadata.
+    /// A procedure to configure the search parameters, such as the query, filters, and ranking options.
     /// </param>
-    /// <param name="CallBacks">
-    /// The callback functions to handle asynchronous execution and results.
-    /// </param>
-    procedure AsynUpdate(const VectorStoreId: string;
-      const ParamProc: TProc<TVectorStoreUpdateParams>;
-      const CallBacks: TFunc<TAsynVectorStore>);
-
-    /// <summary>
-    /// Asynchronously deletes an existing vector store.
-    /// </summary>
-    /// <param name="VectorStoreId">
-    /// The unique identifier of the vector store to delete.
-    /// </param>
-    /// <param name="CallBacks">
-    /// The callback functions to handle asynchronous execution and results.
-    /// </param>
-    procedure AsynDelete(const VectorStoreId: string;
-      const CallBacks: TFunc<TAsynDeletion>);
+    /// <returns>
+    /// A <c>TVectorStoreSearchResult</c> page containing the matching results.
+    /// </returns>
+    function Search(const VectorStoreId: string;
+      const ParamProc: TProc<TVectorStoreSearchParams>): TVectorStoreSearchResult; override;
   end;
 
 implementation
+
+uses
+  System.DateUtils;
+
+function VectorStoreUnixToUtc(const Value: Int64): string;
+begin
+  if Value <= 0 then
+    Exit(EmptyStr);
+  Result := FormatDateTime('yyyy-mm-dd"T"hh:nn:ss"Z"', UnixToDateTime(Value, True));
+end;
+
+{ TChunkStaticParams }
+
+function TChunkStaticParams.ChunkOverlapTokens(
+  const Value: Integer): TChunkStaticParams;
+begin
+  Result := TChunkStaticParams(Add('chunk_overlap_tokens', Value));
+end;
+
+function TChunkStaticParams.MaxChunkSizeTokens(
+  const Value: Integer): TChunkStaticParams;
+begin
+  Result := TChunkStaticParams(Add('max_chunk_size_tokens', Value));
+end;
+
+{ TChunkingStrategyParams }
+
+function TChunkingStrategyParams.Static(
+  const Value: TChunkStaticParams): TChunkingStrategyParams;
+begin
+  Result := TChunkingStrategyParams(Add('static', Value.Detach));
+end;
+
+function TChunkingStrategyParams.&Type(
+  const Value: TChunkingStrategyType): TChunkingStrategyParams;
+begin
+  Result := &Type(Value.ToString);
+end;
+
+function TChunkingStrategyParams.&Type(
+  const Value: string): TChunkingStrategyParams;
+begin
+  Result := TChunkingStrategyParams(Add('type', TChunkingStrategyType.Create(Value).ToString));
+end;
 
 { TVectorStoreCreateParams }
 
@@ -692,7 +982,7 @@ begin
 end;
 
 function TVectorStoreCreateParams.ExpiresAfter(
-  const Value: TExpiresAfterParams): TVectorStoreCreateParams;
+  const Value: TVectorStoreExpiresAfterParams): TVectorStoreCreateParams;
 begin
   Result := TVectorStoreCreateParams(Add('expires_after', Value.Detach));
 end;
@@ -713,16 +1003,83 @@ begin
   Result := TVectorStoreCreateParams(Add('name', Value));
 end;
 
-{ TExpiresAfterParams }
+{ TVectorStoreExpiresAfterParams }
 
-function TExpiresAfterParams.Anchor(const Value: string): TExpiresAfterParams;
+function TVectorStoreExpiresAfterParams.Anchor(
+  const Value: string): TVectorStoreExpiresAfterParams;
 begin
-  Result := TExpiresAfterParams(Add('anchor', Value));
+  Result := TVectorStoreExpiresAfterParams(Add('anchor', Value));
 end;
 
-function TExpiresAfterParams.Days(const Value: Integer): TExpiresAfterParams;
+function TVectorStoreExpiresAfterParams.Days(
+  const Value: Integer): TVectorStoreExpiresAfterParams;
 begin
-  Result := TExpiresAfterParams(Add('days', Value));
+  Result := TVectorStoreExpiresAfterParams(Add('days', Value));
+end;
+
+{ TVectorStoreSearchRankingOptions }
+
+function TVectorStoreSearchRankingOptions.Ranker(
+  const Value: string): TVectorStoreSearchRankingOptions;
+begin
+  Result := TVectorStoreSearchRankingOptions(Add('ranker', Value));
+end;
+
+function TVectorStoreSearchRankingOptions.ScoreThreshold(
+  const Value: Double): TVectorStoreSearchRankingOptions;
+begin
+  Result := TVectorStoreSearchRankingOptions(Add('score_threshold', Value));
+end;
+
+{ TVectorStoreSearchParams }
+
+function TVectorStoreSearchParams.Query(const Value: string): TVectorStoreSearchParams;
+begin
+  Result := TVectorStoreSearchParams(Add('query', Value));
+end;
+
+function TVectorStoreSearchParams.Query(const Value: TArray<string>): TVectorStoreSearchParams;
+begin
+  Result := TVectorStoreSearchParams(Add('query', Value));
+end;
+
+function TVectorStoreSearchParams.Filters(const Value: TJSONObject): TVectorStoreSearchParams;
+begin
+  Result := TVectorStoreSearchParams(Add('filters', Value));
+end;
+
+function TVectorStoreSearchParams.MaxNumResults(const Value: Integer): TVectorStoreSearchParams;
+begin
+  Result := TVectorStoreSearchParams(Add('max_num_results', Value));
+end;
+
+function TVectorStoreSearchParams.RankingOptions(
+  const Value: TVectorStoreSearchRankingOptions): TVectorStoreSearchParams;
+begin
+  Result := TVectorStoreSearchParams(Add('ranking_options', Value.Detach));
+end;
+
+function TVectorStoreSearchParams.RewriteQuery(const Value: Boolean): TVectorStoreSearchParams;
+begin
+  Result := TVectorStoreSearchParams(Add('rewrite_query', Value));
+end;
+
+{ TVectorStoreSearchResultItem }
+
+destructor TVectorStoreSearchResultItem.Destroy;
+begin
+  for var Item in FContent do
+    Item.Free;
+  inherited;
+end;
+
+{ TVectorStoreSearchResult }
+
+destructor TVectorStoreSearchResult.Destroy;
+begin
+  for var Item in FData do
+    Item.Free;
+  inherited;
 end;
 
 { TVectorStore }
@@ -738,37 +1095,37 @@ end;
 
 function TVectorStore.GetCreatedAt: Int64;
 begin
-  Result := TInt64OrNull(FCreatedAt).ToInteger;
+  Result := FCreatedAt;
 end;
 
 function TVectorStore.GetCreatedAtAsString: string;
 begin
-  Result := TInt64OrNull(FCreatedAt).ToUtcDateString;
+  Result := VectorStoreUnixToUtc(FCreatedAt);
 end;
 
 function TVectorStore.GetExpiresAt: Int64;
 begin
-  Result := TInt64OrNull(FExpiresAt).ToInteger;
+  Result := FExpiresAt;
 end;
 
 function TVectorStore.GetExpiresAtAsString: string;
 begin
-  Result := TInt64OrNull(FExpiresAt).ToUtcDateString;
+  Result := VectorStoreUnixToUtc(FExpiresAt);
 end;
 
 function TVectorStore.GetLastActiveAt: Int64;
 begin
-  Result := TInt64OrNull(FLastActiveAt).ToInteger;
+  Result := FLastActiveAt;
 end;
 
 function TVectorStore.GetLastActiveAtAsString: string;
 begin
-  Result := TInt64OrNull(FLastActiveAt).ToUtcDateString;
+  Result := VectorStoreUnixToUtc(FLastActiveAt);
 end;
 
 function TVectorStore.GetName: string;
 begin
-  Result := TStringOrNull(FName).ToString;
+  Result := FName;
 end;
 
 { TVectorStoreRoute }
@@ -803,7 +1160,7 @@ begin
   Result := TAsyncAwaitHelper.WrapAsyncAwait<TVectorStores>(
     procedure(const CallBackParams: TFunc<TAsynVectorStores>)
     begin
-      ASynList(ParamProc, CallBackParams);
+      AsynList(ParamProc, CallBackParams);
     end,
     CallBacks);
 end;
@@ -814,7 +1171,7 @@ begin
   Result := TAsyncAwaitHelper.WrapAsyncAwait<TVectorStores>(
     procedure(const CallBackParams: TFunc<TAsynVectorStores>)
     begin
-      ASynList(CallBackParams);
+      AsynList(CallBackParams);
     end,
     CallBacks);
 end;
@@ -826,6 +1183,18 @@ begin
     procedure(const CallBackParams: TFunc<TAsynVectorStore>)
     begin
       AsynRetrieve(VectorStoreId, CallBackParams);
+    end,
+    CallBacks);
+end;
+
+function TVectorStoreRoute.AsyncAwaitSearch(const VectorStoreId: string;
+  const ParamProc: TProc<TVectorStoreSearchParams>;
+  const CallBacks: TFunc<TPromiseVectorStoreSearchResult>): TPromise<TVectorStoreSearchResult>;
+begin
+  Result := TAsyncAwaitHelper.WrapAsyncAwait<TVectorStoreSearchResult>(
+    procedure(const CallBackParams: TFunc<TAsynVectorStoreSearchResult>)
+    begin
+      AsynSearch(VectorStoreId, ParamProc, CallBackParams);
     end,
     CallBacks);
 end;
@@ -842,7 +1211,9 @@ begin
     CallBacks);
 end;
 
-procedure TVectorStoreRoute.AsynCreate(
+{ TVectorStoreAsynchronousSupport }
+
+procedure TVectorStoreAsynchronousSupport.AsynCreate(
   const ParamProc: TProc<TVectorStoreCreateParams>;
   const CallBacks: TFunc<TAsynVectorStore>);
 begin
@@ -862,7 +1233,27 @@ begin
   end;
 end;
 
-procedure TVectorStoreRoute.AsynDelete(const VectorStoreId: string;
+procedure TVectorStoreAsynchronousSupport.AsynSearch(const VectorStoreId: string;
+  const ParamProc: TProc<TVectorStoreSearchParams>;
+  const CallBacks: TFunc<TAsynVectorStoreSearchResult>);
+begin
+  with TAsynCallBackExec<TAsynVectorStoreSearchResult, TVectorStoreSearchResult>.Create(CallBacks) do
+  try
+    Sender := Use.Param.Sender;
+    OnStart := Use.Param.OnStart;
+    OnSuccess := Use.Param.OnSuccess;
+    OnError := Use.Param.OnError;
+    Run(
+      function: TVectorStoreSearchResult
+      begin
+        Result := Self.Search(VectorStoreId, ParamProc);
+      end);
+  finally
+    Free;
+  end;
+end;
+
+procedure TVectorStoreAsynchronousSupport.AsynDelete(const VectorStoreId: string;
   const CallBacks: TFunc<TAsynDeletion>);
 begin
   with TAsynCallBackExec<TAsynDeletion, TDeletion>.Create(CallBacks) do
@@ -881,7 +1272,7 @@ begin
   end;
 end;
 
-procedure TVectorStoreRoute.AsynList(const CallBacks: TFunc<TAsynVectorStores>);
+procedure TVectorStoreAsynchronousSupport.AsynList(const CallBacks: TFunc<TAsynVectorStores>);
 begin
   with TAsynCallBackExec<TAsynVectorStores, TVectorStores>.Create(CallBacks) do
   try
@@ -899,7 +1290,7 @@ begin
   end;
 end;
 
-procedure TVectorStoreRoute.AsynList(
+procedure TVectorStoreAsynchronousSupport.AsynList(
   const ParamProc: TProc<TVectorStoreUrlParam>;
   const CallBacks: TFunc<TAsynVectorStores>);
 begin
@@ -919,7 +1310,7 @@ begin
   end;
 end;
 
-procedure TVectorStoreRoute.AsynRetrieve(const VectorStoreId: string;
+procedure TVectorStoreAsynchronousSupport.AsynRetrieve(const VectorStoreId: string;
   const CallBacks: TFunc<TAsynVectorStore>);
 begin
   with TAsynCallBackExec<TAsynVectorStore, TVectorStore>.Create(CallBacks) do
@@ -938,7 +1329,7 @@ begin
   end;
 end;
 
-procedure TVectorStoreRoute.AsynUpdate(const VectorStoreId: string;
+procedure TVectorStoreAsynchronousSupport.AsynUpdate(const VectorStoreId: string;
   const ParamProc: TProc<TVectorStoreUpdateParams>;
   const CallBacks: TFunc<TAsynVectorStore>);
 begin
@@ -957,6 +1348,8 @@ begin
     Free;
   end;
 end;
+
+{ TVectorStoreRoute }
 
 function TVectorStoreRoute.Create(
   const ParamProc: TProc<TVectorStoreCreateParams>): TVectorStore;
@@ -997,6 +1390,13 @@ begin
   Result := API.Get<TVectorStore>('vector_stores/' + VectorStoreId);
 end;
 
+function TVectorStoreRoute.Search(const VectorStoreId: string;
+  const ParamProc: TProc<TVectorStoreSearchParams>): TVectorStoreSearchResult;
+begin
+  HeaderCustomize;
+  Result := API.Post<TVectorStoreSearchResult, TVectorStoreSearchParams>('vector_stores/' + VectorStoreId + '/search', ParamProc);
+end;
+
 function TVectorStoreRoute.Update(const VectorStoreId: string;
   const ParamProc: TProc<TVectorStoreUpdateParams>): TVectorStore;
 begin
@@ -1007,7 +1407,7 @@ end;
 { TVectorStoreUpdateParams }
 
 function TVectorStoreUpdateParams.ExpiresAfter(
-  const Value: TExpiresAfterParams): TVectorStoreUpdateParams;
+  const Value: TVectorStoreExpiresAfterParams): TVectorStoreUpdateParams;
 begin
   Result := TVectorStoreUpdateParams(Add('expires_after', Value.Detach));
 end;

@@ -1,4 +1,4 @@
-unit GenAI.Gemini.Extra_body;
+﻿unit GenAI.Gemini.Extra_body;
 
 {-------------------------------------------------------------------------------
 
@@ -17,7 +17,7 @@ type
   TThinkingConfig = class(TJSONParam)
     function IncludeThoughts(const Value: Boolean): TThinkingConfig;
     function ThinkingBudget(const Value: Integer): TThinkingConfig;
-    function ThinkingLevel(const Value: ThinkingLevelType): TThinkingConfig; overload;
+    function ThinkingLevel(const Value: TThinkingLevelType): TThinkingConfig; overload;
     function ThinkingLevel(const Value: string): TThinkingConfig; overload;
   end;
 
@@ -42,11 +42,11 @@ end;
 
 function TThinkingConfig.ThinkingLevel(const Value: string): TThinkingConfig;
 begin
-  Result := TThinkingConfig(Add('thinkingLevel', ThinkingLevelType.Create(Value).ToString));
+  Result := TThinkingConfig(Add('thinkingLevel', TThinkingLevelType.Create(Value).ToString));
 end;
 
 function TThinkingConfig.ThinkingLevel(
-  const Value: ThinkingLevelType): TThinkingConfig;
+  const Value: TThinkingLevelType): TThinkingConfig;
 begin
   Result := TThinkingConfig(Add('thinkingLevel', Value.ToString));
 end;

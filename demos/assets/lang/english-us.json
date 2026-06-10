@@ -1,0 +1,466 @@
+﻿{
+  "lang": "en-US",
+  "input": {
+    "placeholder": {
+      "askQuestion": "Ask a question..."
+    },
+    "menu": {
+      "endpoint": "Endpoint",
+      "webResearch": "Web research",
+      "thinking": "Reasoning",
+      "attachFiles": "Attach files",
+      "knowledgeSearch": "Knowledge search",
+      "vision": "Vision",
+      "deepResearch": "Deep research",
+      "integration": "Integration",
+      "media": "Media",
+      "custom": "Custom",
+      "settings": "Settings",
+      "model": "Model",
+      "project": "Project"
+    },
+    "thinking": {
+      "low": "Low",
+      "medium": "Medium",
+      "high": "High"
+    },
+    "endpoint": {
+      "chatCompletion": "v1/chat/completions",
+      "chatResponse": "v1/chat/responses",
+      "message": "v1/message",
+      "generateContent": ":generateContent",
+      "interactions": "v1/interactions",
+      "conversation": "v1/conversation",
+      "provider": {
+        "chatCompletion": "OpenAI, DeepSeek, MistralAI",
+        "chatResponse": "OpenAI",
+        "message": "Claude",
+        "generateContent": "Gemini",
+        "interactions": "Gemini",
+        "conversation": "MistralAI"
+      }
+    },
+    "integration": {
+      "function": "Function",
+      "mcp": "MCP",
+      "jsCodeSandbox": "JS Sandbox",
+      "skills": "Skills",
+      "agents": "Agents"
+    },
+    "media": {
+      "createImage": "Create an image",
+      "createVideo": "Create a video",
+      "createAudio": "Create audio",
+      "speechToText": "Speech to text",
+      "textToSpeech": "Text to speech"
+    },
+    "project": {
+      "add": "Add project",
+      "none": "none",
+      "noneUsed": "No project used",
+      "delete": "Delete"
+    },
+    "chips": {
+      "endpoint": "Endpoint: {title}",
+      "webResearch": "Web research",
+      "thinking": "Reasoning: {title}",
+      "knowledgeSearch": "Knowledge search ({count})",
+      "deepResearch": "Deep research",
+      "filesAttached": "Attached files ({count})",
+      "vision": "Vision ({count})",
+      "integrationFunction": "Integration: Function ({count})",
+      "integrationMcp": "Integration: MCP ({count})",
+      "integrationJsCodeSandbox": "Integration: JS Sandbox ({count})",
+      "integrationSkills": "Integration: Skills ({count})",
+      "integrationAgents": "Integration: Agents ({count})",
+      "mediaCreateImage": "Media: Create an image",
+      "mediaCreateVideo": "Media: Create a video",
+      "mediaCreateAudio": "Media: Create audio",
+      "speechToText": "Speech to text ({count})",
+      "mediaTextToSpeech": "Media: Text to speech",
+      "custom": "Custom ({count})"
+    }
+  },
+  "requestParams": {
+    "panel": {
+      "title": "Settings",
+      "close": "Close",
+      "theme": {
+        "light": "Light",
+        "dark": "Dark"
+      }
+    },
+    "summary": {
+      "alwaysAvailable": "Always available",
+      "enabled": "Enabled",
+      "disabled": "Disabled",
+      "enabledDisabled": "{enabled} enabled / {disabled} disabled"
+    },
+    "categories": {
+      "appSettings": {
+        "title": "Application settings",
+        "subtitle": "General",
+        "panelSubtitle": ""
+      },
+      "systemPrompt": {
+        "title": "System prompt"
+      },
+      "settings": {
+        "title": "General settings"
+      },
+      "sampling": {
+        "title": "Sampling"
+      },
+      "structuredOutput": {
+        "title": "Structured output"
+      },
+      "vendorSettings": {
+        "title": "Vendor options"
+      }
+    },
+    "items": {
+      "appSettings": {
+        "lookAndFeel": {
+          "label": "Appearance"
+        },
+        "language": {
+          "label": "Language",
+          "placeholder": "Select a language"
+        },
+        "scrollButtons": {
+          "label": "Scroll buttons"
+        }
+      },
+      "systemPrompt": {
+        "systemPrompt": {
+          "label": "System prompt",
+          "labelWhenDisabled": "Disabled",
+          "labelWhenEnabled": "Enabled",
+          "placeholder": "Enter the system prompt"
+        }
+      },
+      "settings": {
+        "temperature": {
+          "label": "Temperature"
+        },
+        "maxTokens": {
+          "label": "Max tokens"
+        },
+        "stopStrings": {
+          "label": "Stop strings",
+          "placeholder": "One stop string per line"
+        }
+      },
+      "sampling": {
+        "topK": {
+          "label": "Top-k"
+        },
+        "topP": {
+          "label": "Top-p"
+        },
+        "presencePenalty": {
+          "label": "Presence penalty"
+        },
+        "randomSeed": {
+          "label": "Random seed"
+        }
+      },
+      "structuredOutput": {
+        "jsonSchema": {
+          "label": "JSON schema",
+          "labelWhenDisabled": "Disabled",
+          "labelWhenEnabled": "Enabled",
+          "placeholder": "Enter the JSON schema",
+          "invalidJsonMessage": "Invalid JSON"
+        }
+      },
+      "vendorSettings": {
+        "parallelToolCalls": {
+          "label": "Parallel tool calls"
+        },
+        "backgroundResponse": {
+          "label": "Background response"
+        },
+        "usingPreviousId": {
+          "label": "Use previous ID"
+        },
+        "store": {
+          "label": "Store"
+        }
+      }
+    }
+  },
+  "filesDrawer": {
+    "aria": {
+      "leftPanel": "Left side panel"
+    },
+    "actions": {
+      "openPanel": "Open panel",
+      "newSession": "New session",
+      "closePanel": "Close panel",
+      "nextPage": "Next page",
+      "more": "More",
+      "rename": "Rename",
+      "delete": "Delete"
+    }
+  },
+  "scroll": {
+    "top": "Scroll to top",
+    "bottom": "Scroll to bottom"
+  },
+  "selector": {
+    "branchAfterMessage": "Create a branch after this message",
+    "copyMessage": "Copy message",
+    "deleteMessage": "Delete message"
+  },
+  "confirmation": {
+    "title": "Confirmation",
+    "question": "Please confirm.",
+    "yes": "Yes",
+    "no": "No"
+  },
+  "inputString": {
+    "title": "Input",
+    "message": "Please enter a value.",
+    "ok": "OK",
+    "cancel": "Cancel"
+  },
+  "webDecisionDlg": {
+    "title": "Confirmation",
+    "message": "Please confirm.",
+    "ok": "OK",
+    "cancel": "Cancel",
+    "close": "Close"
+  },
+  "displayFile": {
+    "fallbackName": "File {index}",
+    "badge": {
+      "pdf": "PDF",
+      "sheet": "XLS",
+      "doc": "DOC",
+      "slide": "PPT",
+      "text": "TXT",
+      "pascal": "PAS",
+      "code": "</>",
+      "file": "FILE"
+    },
+    "status": {
+      "file": "FILE"
+    },
+    "debug": {
+      "error": "DisplayFile error: {error}"
+    }
+  },
+  "displayImage": {
+    "action": {
+      "close": "Close"
+    },
+    "error": {
+      "unavailable": "Image unavailable"
+    },
+    "alt": {
+      "imageIndex": "Image {index}"
+    },
+    "debug": {
+      "error": "DisplayImages error: {error}"
+    }
+  },
+  "display": {
+    "reasoning": {
+      "title": "Reasoning"
+    },
+    "toolGroup": {
+      "label": "Tools used"
+    },
+    "code": {
+      "copy": "Copy",
+      "copied": "Copied",
+      "copyToClipboard": "Copy to clipboard"
+    }
+  },
+  "errors": {
+    "aria": {
+      "systemMessages": "System messages"
+    },
+    "action": {
+      "close": "Close"
+    }
+  },
+  "promptFile": {
+    "debug": {
+      "error": "PromptFile error: {error}"
+    }
+  },
+  "displayVideo": {
+    "fallbackName": "Video {index}",
+    "fallbackNameWithExtension": "Video {index}.{ext}",
+    "action": {
+      "open": "Open",
+      "close": "Close"
+    },
+    "debug": {
+      "error": "DisplayVideo error: {error}"
+    }
+  },
+  "displayAudio": {
+    "fallbackName": "Audio {index}",
+    "fallbackNameWithExtension": "Audio {index}.{ext}",
+    "status": {
+      "stop": "Stop",
+      "loading": "Loading",
+      "unavailable": "Unavailable",
+      "pause": "Pause",
+      "playing": "Playing"
+    },
+    "debug": {
+      "error": "DisplayAudio error: {error}"
+    }
+  },
+  "modelSelector": {
+    "panel": {
+      "title": "Select default models",
+      "aria": {
+        "dialog": "Select default models"
+      }
+    },
+    "actions": {
+      "close": "Close"
+    },
+    "defaults": {
+      "title": "Default model",
+      "empty": "No default model for this category."
+    },
+    "status": {
+      "notAssigned": "Not assigned",
+      "noDefaultModel": "No default model"
+    },
+    "categories": {
+      "allModels": {
+        "label": "Model list"
+      },
+      "textGeneration": {
+        "label": "Text generation"
+      },
+      "imageCreation": {
+        "label": "Image creation"
+      },
+      "videoCreation": {
+        "label": "Video creation"
+      },
+      "audioCreation": {
+        "label": "Audio creation"
+      },
+      "textToSpeech": {
+        "label": "Text to speech"
+      },
+      "deepResearch": {
+        "label": "Deep research"
+      }
+    },
+    "features": {
+      "webResearch": "Web research",
+      "thinking": "Reasoning",
+      "attachFiles": "Attach files",
+      "vision": "Vision",
+      "createImage": "Create an image",
+      "createVideo": "Create a video",
+      "createAudio": "Create audio",
+      "speechToText": "Speech to text",
+      "textToSpeech": "Text to speech",
+      "deepResearch": "Deep research"
+    }
+  },
+  "cardSelector": {
+    "panel": {
+      "title": "Select an item",
+      "ariaLabel": "Select an item",
+      "selectDialogTitle": "{selectPrefix} {dialogLabel}"
+    },
+    "actions": {
+      "selectPrefix": "Select",
+      "close": "Close",
+      "edit": "Edit",
+      "settings": "Settings",
+      "cancel": "Cancel",
+      "select": "Select"
+    },
+    "messages": {
+      "empty": "No items available.",
+      "noComment": ""
+    },
+    "dialogs": {
+      "function": {
+        "label": "Function"
+      },
+      "mcp": {
+        "label": "MCP"
+      },
+      "skills": {
+        "label": "Skills"
+      },
+      "agents": {
+        "label": "Agents"
+      },
+      "custom": {
+        "label": "Custom"
+      }
+    }
+  },
+  "prompt": {
+    "toggleCollapse": "Collapse or expand prompt",
+    "summary": {
+      "open": "Open the prompt summary",
+      "close": "Close the prompt summary"
+    }
+  },
+  "more": {
+    "delete_qa": "Please confirm deletion of the current question and answer, as well as all following entries.",
+    "delete_chat_session": "Are you sure? #10#10This action is irreversible and will delete all messages in this conversation.",
+    "aborted": "Operation aborted...",
+    "aborted_operation": "Operation aborted",
+    "model_file_not_found": "%s : file created. #10Please open this file and instruct the list of available models.",
+    "batch_begin_error": "Failed to enable batch display rendering.",
+    "batch_end_error": "Failed to release batch rendering.",
+    "focus_error": "The input bubble could not receive focus.",
+    "stop_audio_media_error": "Failed to stop audio media.",
+    "stop_video_media_error": "Failed to stop video media.",
+    "internal_theme_error": "Unable to update the page theme.",
+    "deserialization_error": "Deserialization error: invalid JSON input %s",
+    "welcome": "Welcome to your workspace",
+    "structured_output_error": "Structured output is invalid: please edit its value in settings.",
+    "card_json_file_not_found": "No JSON file supports %s",
+    "models_categories_count_error": "Please define categories for default models",
+    "invalid_categories_file_error": "Invalid JSON file for Categories",
+    "text_generation_cant_handled_error": "No default model: text generation cannot be processed",
+    "image_creation_aborted_error": "No default model configured: Image creation aborted",
+    "video_creation_aborted_error": "No default model configured: Video creation aborted",
+    "audio_creation_aborted_error": "No default model configured: Audio creation aborted",
+    "stt_operation_aborted_error": "No default model configured: STT operation aborted",
+    "tts_operation_aborted_error": "No default model configured: TTS operation aborted",
+    "deep_research_operation_aborted_error": "No default model configured: Deep Reasearch operation aborted",
+    "missing_default_models_error": "Missing default models for some categories. #10 Check Model Settings",
+    "api_key_empty_name_error": "The key name cannot be empty.",
+    "api_key_enter_dialog_prompt": "Please enter the API key value for %s",
+    "api_key_not_found": "%s: Api Key not found",
+    "api_key_deleted": "%s: Api Key has been deleted",
+    "api_key_exists": "%s: Api Key exists",
+    "api_key_modified": "%s: Api Key has been modified.",
+    "api_key_inserted": "%s: Api Key has been inserted",
+    "web_decision_dlg_title": "Confirmation",
+    "web_decision_dlg_message": "Please confirm.",
+    "web_decision_dlg_ok": "OK",
+    "web_decision_dlg_cancel": "Cancel",
+    "web_decision_dlg_close": "Close",
+    "demo_anthropic_tool_confirmation_title": "Confirmation",
+    "demo_anthropic_tool_allow": "Allow",
+    "demo_anthropic_tool_deny": "Deny",
+    "demo_anthropic_tool_allow_call": "Allow this tool call?",
+    "demo_anthropic_interrupted_by_user": "Interrupted by the user.",
+    "command_plugin_not_be_null": "Plugin cannot be nil",
+    "command_unknown": "Unknown command : /%s",
+    "command_action_unknown": "Action unknown : /%s %s",
+    "command_missing_action": "Missing action for /%s",
+    "command_incorrect_number_of_arguments": "Incorrect number of arguments for /%s %s (received %d)",
+    "command_no_plugin_for": "No plugin for /%s"
+  }
+}

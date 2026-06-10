@@ -1,4 +1,4 @@
-unit GenAI.API.Lists;
+﻿unit GenAI.API.Lists;
 
 {-------------------------------------------------------------------------------
 
@@ -39,22 +39,27 @@ type
     /// Represents the type of object contained in the list.
     /// </summary>
     property &Object: string read FObject write FObject;
+
     /// <summary>
     /// Stores the list of retrieved objects.
     /// </summary>
     property Data: TArray<T> read FData write FData;
+
     /// <summary>
     /// Indicates whether there are more results available in the API pagination.
     /// </summary>
     property HasMore: Boolean read FHasMore write FHasMore;
+
     /// <summary>
     /// The ID of the first object in the current result set.
     /// </summary>
     property FirstId: string read FFirstId write FFirstId;
+
     /// <summary>
     /// The ID of the last object in the current result set.
     /// </summary>
     property LastId: string read FLastId write FLastId;
+
     destructor Destroy; override;
   end;
 
@@ -76,19 +81,18 @@ type
     /// Gets or sets the object type. This usually describes the nature of the list (e.g., "fine_tuning.jobs").
     /// </summary>
     property &Object: string read FObject write FObject;
+
     /// <summary>
     /// Gets or sets the array of objects stored in the list.
     /// Each element is of type <c>T</c>.
     /// </summary>
     property Data: TArray<T> read FData write FData;
+
     /// <summary>
     /// Gets or sets a boolean value indicating whether there are more results to fetch.
     /// </summary>
     property HasMore: Boolean read FHasMore write FHasMore;
-    /// <summary>
-    /// Destructor for the <c>TPaginatedList</c> class.
-    /// Frees all objects stored in the <c>Data</c> property to release memory.
-    /// </summary>
+
     destructor Destroy; override;
   end;
 

@@ -13,28 +13,19 @@ uses
   System.SysUtils, System.Classes, System.Threading, System.JSON, REST.Json.Types,
   REST.JsonReflect, System.Net.URLClient,
   GenAI.API.Params, GenAI.API, GenAI.Consts, GenAI.Types, GenAI.Async.Support,
-  GenAI.Async.Promise, GenAI.API.Lists, GenAI.Assistants, GenAI.Runs, GenAI.Vector,
-  GenAI.VectorFiles;
+  GenAI.Async.Promise, GenAI.API.Lists, GenAI.Vector;
 
 type
   /// <summary>
   /// Represents URL parameters for configuring requests related to file batches in a vector store using the OpenAI API.
   /// </summary>
   /// <remarks>
-  /// This class extends <c>TVectorStoreFilesUrlParams</c> and provides the ability to customize the URL query parameters
+  /// This class extends <c>TUrlAdvancedParams</c> and provides the ability to customize the URL query parameters
   /// when listing or filtering batches of files associated with a specific vector store.
   /// It is useful for narrowing down results or retrieving batches with particular statuses.
   /// </remarks>
-  TVectorStoreBatchUrlParams = TVectorStoreFilesUrlParams;
+  TVectorStoreBatchUrlParams = class(TUrlAdvancedParams);
 
-  /// <summary>
-  /// Represents the parameters for creating file batches in a vector store using the OpenAI API.
-  /// </summary>
-  /// <remarks>
-  /// This class extends <c>TVectorStoreFilesCreateParams</c> and allows users to define key parameters
-  /// when creating a new batch of files in a vector store, including the file IDs and chunking strategy.
-  /// These settings control how files are processed and chunked before being stored.
-  /// </remarks>
   TVectorStoreBatchCreateParams = class(TJSONParam)
   public
     /// <summary>
@@ -67,22 +58,30 @@ type
     /// within the vector store. Users can define static or auto chunking depending on their use case.
     /// </remarks>
     function ChunkingStrategy(const Value: TChunkingStrategyParams): TVectorStoreBatchCreateParams;
+
+    /// <summary>
+    /// Sets a set of key-value pairs that can be attached to every file in the batch.
+    /// </summary>
+    /// <param name="Value">
+    /// A <c>TJSONObject</c> containing up to 16 key-value pairs. Keys are strings with a maximum length
+    /// of 64 characters; values are strings (max 512 chars), booleans, or numbers.
+    /// </param>
+    /// <returns>
+    /// Returns the current instance of <c>TVectorStoreBatchCreateParams</c>, enabling method chaining.
+    /// </returns>
+    /// <remarks>
+    /// This can be useful for storing additional information about the files in a structured format,
+    /// and querying for objects via the API or the dashboard. Used for filtering during vector store searches.
+    /// </remarks>
+    function Attributes(const Value: TJSONObject): TVectorStoreBatchCreateParams;
   end;
 
-  /// <summary>
-  /// Represents a batch of files attached to a vector store in the OpenAI API.
-  /// </summary>
-  /// <remarks>
-  /// This class provides details about a file batch within a vector store, including its creation timestamp,
-  /// status, and the number of files processed. It is used to monitor and manage the batch processing of files
-  /// for indexing and retrieval in the vector store.
-  /// </remarks>
   TVectorStoreBatch = class(TJSONFingerprint)
   private
     FId: string;
     FObject: string;
     [JsonNameAttribute('created_at')]
-    FCreatedAt: TInt64OrNull;
+    FCreatedAt: Int64;
     [JsonNameAttribute('vector_store_id')]
     FVectorStoreId: string;
     [JsonReflectAttribute(ctString, rtString, TRunStatusInterceptor)]
@@ -204,15 +203,38 @@ type
   /// </remarks>
   TPromiseVectorStoreBatches = TPromiseCallBack<TVectorStoreBatches>;
 
-  /// <summary>
-  /// Provides methods to manage file batches within a vector store using the OpenAI API.
-  /// </summary>
-  /// <remarks>
-  /// This class allows users to create, retrieve, cancel, and list file batches associated
-  /// with a specific vector store. It supports both synchronous and asynchronous operations,
-  /// enabling flexible interaction with the API for managing batch processing.
-  /// </remarks>
-  TVectorStoreBatchRoute = class(TGenAIRoute)
+  TVectorStoreBatchAbstractSupport = class(TGenAIRoute)
+  protected
+    function Create(const VectorStoreId: string;
+      const ParamProc: TProc<TVectorStoreBatchCreateParams>): TVectorStoreBatch; virtual; abstract;
+    function Retrieve(const VectorStoreId: string; const BatchId: string): TVectorStoreBatch; virtual; abstract;
+    function Cancel(const VectorStoreId: string; const BatchId: string): TVectorStoreBatch; virtual; abstract;
+    function List(const VectorStoreId: string; const BatchId: string): TVectorStoreBatches; overload; virtual; abstract;
+    function List(const VectorStoreId: string; const BatchId: string;
+      const ParamProc: TProc<TVectorStoreBatchUrlParams>): TVectorStoreBatches; overload; virtual; abstract;
+  end;
+
+  TVectorStoreBatchAsynchronousSupport = class(TVectorStoreBatchAbstractSupport)
+  public
+    procedure AsynCreate(const VectorStoreId: string;
+      const ParamProc: TProc<TVectorStoreBatchCreateParams>;
+      const CallBacks: TFunc<TAsynVectorStoreBatch>);
+    procedure AsynRetrieve(const VectorStoreId: string;
+      const BatchId: string;
+      const CallBacks: TFunc<TAsynVectorStoreBatch>);
+    procedure AsynCancel(const VectorStoreId: string;
+      const BatchId: string;
+      const CallBacks: TFunc<TAsynVectorStoreBatch>);
+    procedure AsynList(const VectorStoreId: string;
+      const BatchId: string;
+      const CallBacks: TFunc<TAsynVectorStoreBatches>); overload;
+    procedure AsynList(const VectorStoreId: string;
+      const BatchId: string;
+      const ParamProc: TProc<TVectorStoreBatchUrlParams>;
+      const CallBacks: TFunc<TAsynVectorStoreBatches>); overload;
+  end;
+
+  TVectorStoreBatchRoute = class(TVectorStoreBatchAsynchronousSupport)
   protected
     /// <summary>
     /// Customizes headers for API requests related to vector store batches.
@@ -236,7 +258,7 @@ type
     /// </returns>
     function AsyncAwaitCreate(const VectorStoreId: string;
       const ParamProc: TProc<TVectorStoreBatchCreateParams>;
-      const CallBacks: TFunc<TPromiseVectorStoreBatch>): TPromise<TVectorStoreBatch>;
+      const CallBacks: TFunc<TPromiseVectorStoreBatch> = nil): TPromise<TVectorStoreBatch>;
 
     /// <summary>
     /// Initiates an asynchronous request to retrieve details of a specific file batch from the specified vector store and returns a promise.
@@ -255,7 +277,7 @@ type
     /// </returns>
     function AsyncAwaitRetrieve(const VectorStoreId: string;
       const BatchId: string;
-      const CallBacks: TFunc<TPromiseVectorStoreBatch>): TPromise<TVectorStoreBatch>;
+      const CallBacks: TFunc<TPromiseVectorStoreBatch> = nil): TPromise<TVectorStoreBatch>;
 
     /// <summary>
     /// Initiates an asynchronous request to cancel a file batch in the specified vector store and returns a promise.
@@ -274,7 +296,7 @@ type
     /// </returns>
     function AsyncAwaitCancel(const VectorStoreId: string;
       const BatchId: string;
-      const CallBacks: TFunc<TPromiseVectorStoreBatch>): TPromise<TVectorStoreBatch>;
+      const CallBacks: TFunc<TPromiseVectorStoreBatch> = nil): TPromise<TVectorStoreBatch>;
 
     /// <summary>
     /// Initiates an asynchronous request to retrieve all file batches from the specified vector store and returns a promise.
@@ -293,7 +315,7 @@ type
     /// </returns>
     function AsyncAwaitList(const VectorStoreId: string;
       const BatchId: string;
-      const CallBacks: TFunc<TPromiseVectorStoreBatches>): TPromise<TVectorStoreBatches>; overload;
+      const CallBacks: TFunc<TPromiseVectorStoreBatches> = nil): TPromise<TVectorStoreBatches>; overload;
 
     /// <summary>
     /// Initiates an asynchronous request to retrieve a filtered list of file batches from the specified vector store and returns a promise.
@@ -305,7 +327,7 @@ type
     /// The unique identifier of the file batch context for which to list files.
     /// </param>
     /// <param name="ParamProc">
-    /// A procedure to configure URL parameters—such as status filters or pagination—via a <see cref="TVectorStoreBatchUrlParams"/> instance.
+    /// A procedure to configure URL parametersï¿½such as status filters or paginationï¿½via a <see cref="TVectorStoreBatchUrlParams"/> instance.
     /// </param>
     /// <param name="CallBacks">
     /// Optional promise-style callbacks for handling start, success, or error events before the promise resolves.
@@ -316,7 +338,7 @@ type
     function AsyncAwaitList(const VectorStoreId: string;
       const BatchId: string;
       const ParamProc: TProc<TVectorStoreBatchUrlParams>;
-      const CallBacks: TFunc<TPromiseVectorStoreBatches>): TPromise<TVectorStoreBatches>; overload;
+      const CallBacks: TFunc<TPromiseVectorStoreBatches> = nil): TPromise<TVectorStoreBatches>; overload;
 
     /// <summary>
     /// Synchronously creates a new file batch in the specified vector store.
@@ -332,7 +354,7 @@ type
     /// A <c>TVectorStoreBatch</c> object representing the created batch.
     /// </returns>
     function Create(const VectorStoreId: string;
-      const ParamProc: TProc<TVectorStoreBatchCreateParams>): TVectorStoreBatch;
+      const ParamProc: TProc<TVectorStoreBatchCreateParams>): TVectorStoreBatch; override;
 
     /// <summary>
     /// Synchronously retrieves details of a specific file batch within a vector store.
@@ -346,7 +368,7 @@ type
     /// <returns>
     /// A <c>TVectorStoreBatch</c> object containing details about the specified batch.
     /// </returns>
-    function Retrieve(const VectorStoreId: string; const BatchId: string): TVectorStoreBatch;
+    function Retrieve(const VectorStoreId: string; const BatchId: string): TVectorStoreBatch; override;
 
     /// <summary>
     /// Synchronously cancels a file batch that is currently being processed.
@@ -360,7 +382,7 @@ type
     /// <returns>
     /// A <c>TVectorStoreBatch</c> object representing the batch after cancellation.
     /// </returns>
-    function Cancel(const VectorStoreId: string; const BatchId: string): TVectorStoreBatch;
+    function Cancel(const VectorStoreId: string; const BatchId: string): TVectorStoreBatch; override;
 
     /// <summary>
     /// Synchronously lists all files within a specific batch of the vector store.
@@ -374,7 +396,7 @@ type
     /// <returns>
     /// A list of file batches as a <c>TVectorStoreBatches</c> object.
     /// </returns>
-    function List(const VectorStoreId: string; const BatchId: string): TVectorStoreBatches; overload;
+    function List(const VectorStoreId: string; const BatchId: string): TVectorStoreBatches; overload; override;
 
     /// <summary>
     /// Synchronously lists files in the specified file batch using filters and URL parameters.
@@ -392,98 +414,20 @@ type
     /// A list of file batches as a <c>TVectorStoreBatches</c> object.
     /// </returns>
     function List(const VectorStoreId: string; const BatchId: string;
-      const ParamProc: TProc<TVectorStoreBatchUrlParams>): TVectorStoreBatches; overload;
-
-    /// <summary>
-    /// Asynchronously creates a new file batch in the specified vector store.
-    /// </summary>
-    /// <param name="VectorStoreId">
-    /// The unique identifier of the vector store where the file batch will be created.
-    /// </param>
-    /// <param name="ParamProc">
-    /// A procedure to configure the parameters for creating the batch, such as the list of file IDs
-    /// and chunking strategy.
-    /// </param>
-    /// <param name="CallBacks">
-    /// The callback functions to handle asynchronous execution and results.
-    /// </param>
-    procedure AsynCreate(const VectorStoreId: string;
-      const ParamProc: TProc<TVectorStoreBatchCreateParams>;
-      const CallBacks: TFunc<TAsynVectorStoreBatch>);
-
-    /// <summary>
-    /// Asynchronously retrieves details of a specific file batch within a vector store.
-    /// </summary>
-    /// <param name="VectorStoreId">
-    /// The unique identifier of the vector store containing the batch.
-    /// </param>
-    /// <param name="BatchId">
-    /// The unique identifier of the file batch to be retrieved.
-    /// </param>
-    /// <param name="CallBacks">
-    /// The callback functions to handle asynchronous execution and results.
-    /// </param>
-    procedure AsynRetrieve(const VectorStoreId: string;
-      const BatchId: string;
-      const CallBacks: TFunc<TAsynVectorStoreBatch>);
-
-    /// <summary>
-    /// Asynchronously cancels a file batch that is currently being processed.
-    /// </summary>
-    /// <param name="VectorStoreId">
-    /// The unique identifier of the vector store containing the batch.
-    /// </param>
-    /// <param name="BatchId">
-    /// The unique identifier of the file batch to be canceled.
-    /// </param>
-    /// <param name="CallBacks">
-    /// The callback functions to handle asynchronous execution and results.
-    /// </param>
-    /// <remarks>
-    /// Cancelling a batch stops the processing of any files in progress as soon as possible.
-    /// </remarks>
-    procedure AsynCancel(const VectorStoreId: string;
-      const BatchId: string;
-      const CallBacks: TFunc<TAsynVectorStoreBatch>);
-
-    /// <summary>
-    /// Asynchronously lists all files within a specific batch of the vector store.
-    /// </summary>
-    /// <param name="VectorStoreId">
-    /// The unique identifier of the vector store containing the file batch.
-    /// </param>
-    /// <param name="BatchId">
-    /// The unique identifier of the file batch.
-    /// </param>
-    /// <param name="CallBacks">
-    /// The callback functions to handle asynchronous execution and results.
-    /// </param>
-    procedure AsynList(const VectorStoreId: string;
-      const BatchId: string;
-      const CallBacks: TFunc<TAsynVectorStoreBatches>); overload;
-
-    /// <summary>
-    /// Asynchronously lists files in the specified file batch using filters and URL parameters.
-    /// </summary>
-    /// <param name="VectorStoreId">
-    /// The unique identifier of the vector store containing the file batch.
-    /// </param>
-    /// <param name="BatchId">
-    /// The unique identifier of the file batch.
-    /// </param>
-    /// <param name="ParamProc">
-    /// A procedure to configure filters or pagination options for the file listing.
-    /// </param>
-    /// <param name="CallBacks">
-    /// The callback functions to handle asynchronous execution and results.
-    /// </param>
-    procedure AsynList(const VectorStoreId: string;
-      const BatchId: string;
-      const ParamProc: TProc<TVectorStoreBatchUrlParams>;
-      const CallBacks: TFunc<TAsynVectorStoreBatches>); overload;
+      const ParamProc: TProc<TVectorStoreBatchUrlParams>): TVectorStoreBatches; overload; override;
   end;
 
 implementation
+
+uses
+  System.DateUtils;
+
+function VectorBatchUnixToUtc(const Value: Int64): string;
+begin
+  if Value <= 0 then
+    Exit(EmptyStr);
+  Result := FormatDateTime('yyyy-mm-dd"T"hh:nn:ss"Z"', UnixToDateTime(Value, True));
+end;
 
 { TVectorStoreBatch }
 
@@ -496,12 +440,12 @@ end;
 
 function TVectorStoreBatch.GetCreatedAt: Int64;
 begin
-  Result := TInt64OrNull(FCreatedAt).ToInteger;
+  Result := FCreatedAt;
 end;
 
 function TVectorStoreBatch.GetCreatedAtAsString: string;
 begin
-  Result := TInt64OrNull(FCreatedAt).ToUtcDateString;
+  Result := VectorBatchUnixToUtc(FCreatedAt);
 end;
 
 { TVectorStoreBatchCreateParams }
@@ -518,9 +462,15 @@ begin
   Result := TVectorStoreBatchCreateParams(Add('file_ids', Value));
 end;
 
-{ TVectorStoreBatchRoute }
+function TVectorStoreBatchCreateParams.Attributes(
+  const Value: TJSONObject): TVectorStoreBatchCreateParams;
+begin
+  Result := TVectorStoreBatchCreateParams(Add('attributes', Value));
+end;
 
-procedure TVectorStoreBatchRoute.AsynCancel(const VectorStoreId,
+{ TVectorStoreBatchAsynchronousSupport }
+
+procedure TVectorStoreBatchAsynchronousSupport.AsynCancel(const VectorStoreId,
   BatchId: string; const CallBacks: TFunc<TAsynVectorStoreBatch>);
 begin
   with TAsynCallBackExec<TAsynVectorStoreBatch, TVectorStoreBatch>.Create(CallBacks) do
@@ -538,6 +488,86 @@ begin
     Free;
   end;
 end;
+
+procedure TVectorStoreBatchAsynchronousSupport.AsynCreate(const VectorStoreId: string;
+  const ParamProc: TProc<TVectorStoreBatchCreateParams>;
+  const CallBacks: TFunc<TAsynVectorStoreBatch>);
+begin
+  with TAsynCallBackExec<TAsynVectorStoreBatch, TVectorStoreBatch>.Create(CallBacks) do
+  try
+    Sender := Use.Param.Sender;
+    OnStart := Use.Param.OnStart;
+    OnSuccess := Use.Param.OnSuccess;
+    OnError := Use.Param.OnError;
+    Run(
+      function: TVectorStoreBatch
+      begin
+        Result := Self.Create(VectorStoreId, ParamProc);
+      end);
+  finally
+    Free;
+  end;
+end;
+
+procedure TVectorStoreBatchAsynchronousSupport.AsynList(const VectorStoreId, BatchId: string;
+  const ParamProc: TProc<TVectorStoreBatchUrlParams>;
+  const CallBacks: TFunc<TAsynVectorStoreBatches>);
+begin
+  with TAsynCallBackExec<TAsynVectorStoreBatches, TVectorStoreBatches>.Create(CallBacks) do
+  try
+    Sender := Use.Param.Sender;
+    OnStart := Use.Param.OnStart;
+    OnSuccess := Use.Param.OnSuccess;
+    OnError := Use.Param.OnError;
+    Run(
+      function: TVectorStoreBatches
+      begin
+        Result := Self.List(VectorStoreId, BatchId, ParamProc);
+      end);
+  finally
+    Free;
+  end;
+end;
+
+procedure TVectorStoreBatchAsynchronousSupport.AsynList(const VectorStoreId, BatchId: string;
+  const CallBacks: TFunc<TAsynVectorStoreBatches>);
+begin
+  with TAsynCallBackExec<TAsynVectorStoreBatches, TVectorStoreBatches>.Create(CallBacks) do
+  try
+    Sender := Use.Param.Sender;
+    OnStart := Use.Param.OnStart;
+    OnSuccess := Use.Param.OnSuccess;
+    OnError := Use.Param.OnError;
+    Run(
+      function: TVectorStoreBatches
+      begin
+        Result := Self.List(VectorStoreId, BatchId);
+      end);
+  finally
+    Free;
+  end;
+end;
+
+procedure TVectorStoreBatchAsynchronousSupport.AsynRetrieve(const VectorStoreId,
+  BatchId: string; const CallBacks: TFunc<TAsynVectorStoreBatch>);
+begin
+  with TAsynCallBackExec<TAsynVectorStoreBatch, TVectorStoreBatch>.Create(CallBacks) do
+  try
+    Sender := Use.Param.Sender;
+    OnStart := Use.Param.OnStart;
+    OnSuccess := Use.Param.OnSuccess;
+    OnError := Use.Param.OnError;
+    Run(
+      function: TVectorStoreBatch
+      begin
+        Result := Self.Retrieve(VectorStoreId, BatchId);
+      end);
+  finally
+    Free;
+  end;
+end;
+
+{ TVectorStoreBatchRoute }
 
 function TVectorStoreBatchRoute.AsyncAwaitCancel(const VectorStoreId,
   BatchId: string;
@@ -597,84 +627,6 @@ begin
       AsynRetrieve(VectorStoreId, BatchId, CallBackParams);
     end,
     CallBacks);
-end;
-
-procedure TVectorStoreBatchRoute.AsynCreate(const VectorStoreId: string;
-  const ParamProc: TProc<TVectorStoreBatchCreateParams>;
-  const CallBacks: TFunc<TAsynVectorStoreBatch>);
-begin
-  with TAsynCallBackExec<TAsynVectorStoreBatch, TVectorStoreBatch>.Create(CallBacks) do
-  try
-    Sender := Use.Param.Sender;
-    OnStart := Use.Param.OnStart;
-    OnSuccess := Use.Param.OnSuccess;
-    OnError := Use.Param.OnError;
-    Run(
-      function: TVectorStoreBatch
-      begin
-        Result := Self.Create(VectorStoreId, ParamProc);
-      end);
-  finally
-    Free;
-  end;
-end;
-
-procedure TVectorStoreBatchRoute.AsynList(const VectorStoreId, BatchId: string;
-  const ParamProc: TProc<TVectorStoreBatchUrlParams>;
-  const CallBacks: TFunc<TAsynVectorStoreBatches>);
-begin
-  with TAsynCallBackExec<TAsynVectorStoreBatches, TVectorStoreBatches>.Create(CallBacks) do
-  try
-    Sender := Use.Param.Sender;
-    OnStart := Use.Param.OnStart;
-    OnSuccess := Use.Param.OnSuccess;
-    OnError := Use.Param.OnError;
-    Run(
-      function: TVectorStoreBatches
-      begin
-        Result := Self.List(VectorStoreId, BatchId, ParamProc);
-      end);
-  finally
-    Free;
-  end;
-end;
-
-procedure TVectorStoreBatchRoute.AsynList(const VectorStoreId, BatchId: string;
-  const CallBacks: TFunc<TAsynVectorStoreBatches>);
-begin
-  with TAsynCallBackExec<TAsynVectorStoreBatches, TVectorStoreBatches>.Create(CallBacks) do
-  try
-    Sender := Use.Param.Sender;
-    OnStart := Use.Param.OnStart;
-    OnSuccess := Use.Param.OnSuccess;
-    OnError := Use.Param.OnError;
-    Run(
-      function: TVectorStoreBatches
-      begin
-        Result := Self.List(VectorStoreId, BatchId);
-      end);
-  finally
-    Free;
-  end;
-end;
-
-procedure TVectorStoreBatchRoute.AsynRetrieve(const VectorStoreId,
-  BatchId: string; const CallBacks: TFunc<TAsynVectorStoreBatch>);
-begin
-  with TAsynCallBackExec<TAsynVectorStoreBatch, TVectorStoreBatch>.Create(CallBacks) do
-  try
-    Sender := Use.Param.Sender;
-    OnStart := Use.Param.OnStart;
-    OnSuccess := Use.Param.OnSuccess;
-    OnError := Use.Param.OnError;
-    Run(
-      function: TVectorStoreBatch
-      begin
-        Result := Self.Retrieve(VectorStoreId, BatchId);
-      end);
-  finally
-    Free;
-  end;
 end;
 
 function TVectorStoreBatchRoute.Cancel(const VectorStoreId,

@@ -1,4 +1,4 @@
-unit GenAI.Embeddings;
+﻿unit GenAI.Embeddings;
 
 {-------------------------------------------------------------------------------
 
@@ -14,16 +14,6 @@ uses
   GenAI.API.Params, GenAI.API, GenAI.Types, GenAI.Async.Support, GenAI.Async.Promise;
 
 type
-  /// <summary>
-  /// Represents the parameters required to create embeddings using the OpenAI API.
-  /// </summary>
-  /// <remarks>
-  /// This class provides methods to specify different parameters for generating embeddings.
-  /// The input can be a single string or an array of strings. You can also specify the model,
-  /// encoding format, dimensions, and a user identifier. These parameters are used to configure
-  /// the request to the OpenAI API to obtain embeddings that can be consumed by machine learning
-  /// models and algorithms.
-  /// </remarks>
   TEmbeddingsParams = class(TJSONParam)
   public
     /// <summary>
@@ -76,14 +66,6 @@ type
     function User(const Value: string): TEmbeddingsParams;
   end;
 
-  /// <summary>
-  /// Represents a single embedding vector returned by the OpenAI API.
-  /// </summary>
-  /// <remarks>
-  /// This class encapsulates the details of an embedding, including its index in the list of returned embeddings,
-  /// the embedding vector itself, and the object type. It inherits from TJSONFingerprint to utilize JSON serialization
-  /// capabilities.
-  /// </remarks>
   TEmbedding = class(TJSONFingerprint)
   private
     FIndex: Int64;
@@ -115,14 +97,6 @@ type
     property &Object: string read FObject write FObject;
   end;
 
-  /// <summary>
-  /// Represents a collection of embedding vectors returned by the OpenAI API.
-  /// </summary>
-  /// <remarks>
-  /// This class holds a list of TEmbedding objects, each representing an individual embedding vector.
-  /// It includes methods for managing the lifecycle of these objects, including destruction. The class
-  /// also inherits from TJSONFingerprint to leverage JSON serialization capabilities.
-  /// </remarks>
   TEmbeddings = class(TJSONFingerprint)
   private
     FObject: string;
@@ -169,14 +143,18 @@ type
   /// </remarks>
   TPromiseEmbeddings = TPromiseCallBack<TEmbeddings>;
 
-  /// <summary>
-  /// Provides routes for creating embeddings via the OpenAI API.
-  /// </summary>
-  /// <remarks>
-  /// This class offers methods to asynchronously or synchronously create embeddings based on the parameters
-  /// provided by the caller. It utilizes TGenAIRoute as a base to inherit API communication capabilities.
-  /// </remarks>
-  TEmbeddingsRoute = class(TGenAIRoute)
+  TEmbeddingsAbstractSupport = class(TGenAIRoute)
+  protected
+    function Create(const ParamProc: TProc<TEmbeddingsParams>): TEmbeddings; virtual; abstract;
+  end;
+
+  TEmbeddingsAsynchronousSupport = class(TEmbeddingsAbstractSupport)
+  public
+    procedure AsynCreate(const ParamProc: TProc<TEmbeddingsParams>; const CallBacks: TFunc<TAsynEmbeddings>);
+  end;
+
+  TEmbeddingsRoute = class(TEmbeddingsAsynchronousSupport)
+  public
     /// <summary>
     /// Asynchronously creates embeddings and returns a promise that resolves with the result.
     /// </summary>
@@ -207,19 +185,7 @@ type
     /// This method sends a synchronous request to the OpenAI API to generate embeddings based on the parameters
     /// specified by ParamProc. The response is returned directly to the caller.
     /// </remarks>
-    function Create(const ParamProc: TProc<TEmbeddingsParams>): TEmbeddings;
-
-    /// <summary>
-    /// Asynchronously creates embeddings based on the provided parameters.
-    /// </summary>
-    /// <param name="ParamProc">A procedure that configures the parameters necessary for the embeddings request.</param>
-    /// <param name="CallBacks">A callback function to handle the response asynchronously, which accepts a TAsynEmbeddings object.</param>
-    /// <remarks>
-    /// This method prepares and sends an asynchronous request to the OpenAI API to generate embeddings.
-    /// The results are processed in the callback provided by the caller.
-    /// </remarks>
-    procedure AsynCreate(const ParamProc: TProc<TEmbeddingsParams>; const CallBacks: TFunc<TAsynEmbeddings>);
-
+    function Create(const ParamProc: TProc<TEmbeddingsParams>): TEmbeddings; override;
   end;
 
 implementation
@@ -273,21 +239,9 @@ begin
   inherited;
 end;
 
-{ TEmbeddingsRoute }
+{ TEmbeddingsAsynchronousSupport }
 
-function TEmbeddingsRoute.AsyncAwaitCreate(
-  const ParamProc: TProc<TEmbeddingsParams>;
-  const CallBacks: TFunc<TPromiseEmbeddings>): TPromise<TEmbeddings>;
-begin
-  Result := TAsyncAwaitHelper.WrapAsyncAwait<TEmbeddings>(
-    procedure(const CallBackParams: TFunc<TAsynEmbeddings>)
-    begin
-      AsynCreate(ParamProc, CallBackParams);
-    end,
-    CallBacks);
-end;
-
-procedure TEmbeddingsRoute.AsynCreate(const ParamProc: TProc<TEmbeddingsParams>;
+procedure TEmbeddingsAsynchronousSupport.AsynCreate(const ParamProc: TProc<TEmbeddingsParams>;
   const CallBacks: TFunc<TAsynEmbeddings>);
 begin
   with TAsynCallBackExec<TAsynEmbeddings, TEmbeddings>.Create(CallBacks) do
@@ -304,6 +258,20 @@ begin
   finally
     Free;
   end;
+end;
+
+{ TEmbeddingsRoute }
+
+function TEmbeddingsRoute.AsyncAwaitCreate(
+  const ParamProc: TProc<TEmbeddingsParams>;
+  const CallBacks: TFunc<TPromiseEmbeddings>): TPromise<TEmbeddings>;
+begin
+  Result := TAsyncAwaitHelper.WrapAsyncAwait<TEmbeddings>(
+    procedure(const CallBackParams: TFunc<TAsynEmbeddings>)
+    begin
+      AsynCreate(ParamProc, CallBackParams);
+    end,
+    CallBacks);
 end;
 
 function TEmbeddingsRoute.Create(

@@ -1,0 +1,466 @@
+﻿{
+  "lang": "de-DE",
+  "input": {
+    "placeholder": {
+      "askQuestion": "Eine Frage stellen..."
+    },
+    "menu": {
+      "endpoint": "Endpunkt",
+      "webResearch": "Websuche",
+      "thinking": "Argumentation",
+      "attachFiles": "Dateien anhängen",
+      "knowledgeSearch": "Wissenssuche",
+      "vision": "Vision",
+      "deepResearch": "Tiefenrecherche",
+      "integration": "Integration",
+      "media": "Medien",
+      "custom": "Benutzerdefiniert",
+      "settings": "Einstellungen",
+      "model": "Modell",
+      "project": "Projekt"
+    },
+    "thinking": {
+      "low": "Niedrig",
+      "medium": "Mittel",
+      "high": "Hoch"
+    },
+    "endpoint": {
+      "chatCompletion": "v1/chat/completions",
+      "chatResponse": "v1/chat/responses",
+      "message": "v1/message",
+      "generateContent": ":generateContent",
+      "interactions": "v1/interactions",
+      "conversation": "v1/conversation",
+      "provider": {
+        "chatCompletion": "OpenAI, DeepSeek, MistralAI",
+        "chatResponse": "OpenAI",
+        "message": "Claude",
+        "generateContent": "Gemini",
+        "interactions": "Gemini",
+        "conversation": "MistralAI"
+      }
+    },
+    "integration": {
+      "function": "Funktion",
+      "mcp": "MCP",
+      "jsCodeSandbox": "JS-Sandbox",
+      "skills": "Fähigkeiten",
+      "agents": "Agenten"
+    },
+    "media": {
+      "createImage": "Bild erstellen",
+      "createVideo": "Video erstellen",
+      "createAudio": "Audio erstellen",
+      "speechToText": "Sprache zu Text",
+      "textToSpeech": "Text zu Sprache"
+    },
+    "project": {
+      "add": "Projekt hinzufügen",
+      "none": "keines",
+      "noneUsed": "Kein Projekt verwendet",
+      "delete": "Löschen"
+    },
+    "chips": {
+      "endpoint": "Endpunkt: {title}",
+      "webResearch": "Websuche",
+      "thinking": "Argumentation: {title}",
+      "knowledgeSearch": "Wissenssuche ({count})",
+      "deepResearch": "Tiefenrecherche",
+      "filesAttached": "Angehängte Dateien ({count})",
+      "vision": "Vision ({count})",
+      "integrationFunction": "Integration: Funktion ({count})",
+      "integrationMcp": "Integration: MCP ({count})",
+      "integrationJsCodeSandbox": "Integration: JS-Sandbox ({count})",
+      "integrationSkills": "Integration: Fähigkeiten ({count})",
+      "integrationAgents": "Integration: Agenten ({count})",
+      "mediaCreateImage": "Medien: Bild erstellen",
+      "mediaCreateVideo": "Medien: Video erstellen",
+      "mediaCreateAudio": "Medien: Audio erstellen",
+      "speechToText": "Sprache zu Text ({count})",
+      "mediaTextToSpeech": "Medien: Text zu Sprache",
+      "custom": "Benutzerdefiniert ({count})"
+    }
+  },
+  "requestParams": {
+    "panel": {
+      "title": "Einstellungen",
+      "close": "Schließen",
+      "theme": {
+        "light": "Hell",
+        "dark": "Dunkel"
+      }
+    },
+    "summary": {
+      "alwaysAvailable": "Immer verfügbar",
+      "enabled": "Aktiviert",
+      "disabled": "Deaktiviert",
+      "enabledDisabled": "{enabled} aktiviert / {disabled} deaktiviert"
+    },
+    "categories": {
+      "appSettings": {
+        "title": "Anwendungseinstellungen",
+        "subtitle": "Allgemein",
+        "panelSubtitle": ""
+      },
+      "systemPrompt": {
+        "title": "System-Prompt"
+      },
+      "settings": {
+        "title": "Allgemeine Einstellungen"
+      },
+      "sampling": {
+        "title": "Sampling"
+      },
+      "structuredOutput": {
+        "title": "Strukturierte Ausgabe"
+      },
+      "vendorSettings": {
+        "title": "Anbieteroptionen"
+      }
+    },
+    "items": {
+      "appSettings": {
+        "lookAndFeel": {
+          "label": "Erscheinungsbild"
+        },
+        "language": {
+          "label": "Sprache",
+          "placeholder": "Sprache auswählen"
+        },
+        "scrollButtons": {
+          "label": "Bildlaufschaltflächen"
+        }
+      },
+      "systemPrompt": {
+        "systemPrompt": {
+          "label": "System-Prompt",
+          "labelWhenDisabled": "Deaktiviert",
+          "labelWhenEnabled": "Aktiviert",
+          "placeholder": "System-Prompt eingeben"
+        }
+      },
+      "settings": {
+        "temperature": {
+          "label": "Temperatur"
+        },
+        "maxTokens": {
+          "label": "Max. Tokens"
+        },
+        "stopStrings": {
+          "label": "Stoppzeichenfolgen",
+          "placeholder": "Eine Stoppzeichenfolge pro Zeile"
+        }
+      },
+      "sampling": {
+        "topK": {
+          "label": "Top-k"
+        },
+        "topP": {
+          "label": "Top-p"
+        },
+        "presencePenalty": {
+          "label": "Anwesenheitsstrafe"
+        },
+        "randomSeed": {
+          "label": "Zufalls-Seed"
+        }
+      },
+      "structuredOutput": {
+        "jsonSchema": {
+          "label": "JSON-Schema",
+          "labelWhenDisabled": "Deaktiviert",
+          "labelWhenEnabled": "Aktiviert",
+          "placeholder": "JSON-Schema eingeben",
+          "invalidJsonMessage": "Ungültiges JSON"
+        }
+      },
+      "vendorSettings": {
+        "parallelToolCalls": {
+          "label": "Parallele Tool-Aufrufe"
+        },
+        "backgroundResponse": {
+          "label": "Hintergrundantwort"
+        },
+        "usingPreviousId": {
+          "label": "Vorherige ID verwenden"
+        },
+        "store": {
+          "label": "Speichern"
+        }
+      }
+    }
+  },
+  "filesDrawer": {
+    "aria": {
+      "leftPanel": "Linkes Seitenfenster"
+    },
+    "actions": {
+      "openPanel": "Fenster öffnen",
+      "newSession": "Neue Sitzung",
+      "closePanel": "Fenster schließen",
+      "nextPage": "Nächste Seite",
+      "more": "Mehr",
+      "rename": "Umbenennen",
+      "delete": "Löschen"
+    }
+  },
+  "scroll": {
+    "top": "Nach oben scrollen",
+    "bottom": "Nach unten scrollen"
+  },
+  "selector": {
+    "branchAfterMessage": "Verzweigung nach dieser Nachricht erstellen",
+    "copyMessage": "Nachricht kopieren",
+    "deleteMessage": "Nachricht löschen"
+  },
+  "confirmation": {
+    "title": "Bestätigung",
+    "question": "Bitte bestätigen.",
+    "yes": "Ja",
+    "no": "Nein"
+  },
+  "inputString": {
+    "title": "Eingabe",
+    "message": "Bitte einen Wert eingeben.",
+    "ok": "OK",
+    "cancel": "Abbrechen"
+  },
+  "webDecisionDlg": {
+    "title": "Bestätigung",
+    "message": "Bitte bestätigen.",
+    "ok": "OK",
+    "cancel": "Abbrechen",
+    "close": "Schließen"
+  },
+  "displayFile": {
+    "fallbackName": "Datei {index}",
+    "badge": {
+      "pdf": "PDF",
+      "sheet": "XLS",
+      "doc": "DOC",
+      "slide": "PPT",
+      "text": "TXT",
+      "pascal": "PAS",
+      "code": "</>",
+      "file": "DATEI"
+    },
+    "status": {
+      "file": "DATEI"
+    },
+    "debug": {
+      "error": "DisplayFile-Fehler: {error}"
+    }
+  },
+  "displayImage": {
+    "action": {
+      "close": "Schließen"
+    },
+    "error": {
+      "unavailable": "Bild nicht verfügbar"
+    },
+    "alt": {
+      "imageIndex": "Bild {index}"
+    },
+    "debug": {
+      "error": "DisplayImages-Fehler: {error}"
+    }
+  },
+  "display": {
+    "reasoning": {
+      "title": "Argumentation"
+    },
+    "toolGroup": {
+      "label": "Verwendete Tools"
+    },
+    "code": {
+      "copy": "Kopieren",
+      "copied": "Kopiert",
+      "copyToClipboard": "In die Zwischenablage kopieren"
+    }
+  },
+  "errors": {
+    "aria": {
+      "systemMessages": "Systemmeldungen"
+    },
+    "action": {
+      "close": "Schließen"
+    }
+  },
+  "promptFile": {
+    "debug": {
+      "error": "PromptFile-Fehler: {error}"
+    }
+  },
+  "displayVideo": {
+    "fallbackName": "Video {index}",
+    "fallbackNameWithExtension": "Video {index}.{ext}",
+    "action": {
+      "open": "Öffnen",
+      "close": "Schließen"
+    },
+    "debug": {
+      "error": "DisplayVideo-Fehler: {error}"
+    }
+  },
+  "displayAudio": {
+    "fallbackName": "Audio {index}",
+    "fallbackNameWithExtension": "Audio {index}.{ext}",
+    "status": {
+      "stop": "Stopp",
+      "loading": "Wird geladen",
+      "unavailable": "Nicht verfügbar",
+      "pause": "Pause",
+      "playing": "Wiedergabe"
+    },
+    "debug": {
+      "error": "DisplayAudio-Fehler: {error}"
+    }
+  },
+  "modelSelector": {
+    "panel": {
+      "title": "Standardmodelle auswählen",
+      "aria": {
+        "dialog": "Standardmodelle auswählen"
+      }
+    },
+    "actions": {
+      "close": "Schließen"
+    },
+    "defaults": {
+      "title": "Standardmodell",
+      "empty": "Kein Standardmodell für diese Kategorie."
+    },
+    "status": {
+      "notAssigned": "Nicht zugewiesen",
+      "noDefaultModel": "Kein Standardmodell"
+    },
+    "categories": {
+      "allModels": {
+        "label": "Modellliste"
+      },
+      "textGeneration": {
+        "label": "Textgenerierung"
+      },
+      "imageCreation": {
+        "label": "Bilderstellung"
+      },
+      "videoCreation": {
+        "label": "Videoerstellung"
+      },
+      "audioCreation": {
+        "label": "Audioerstellung"
+      },
+      "textToSpeech": {
+        "label": "Text zu Sprache"
+      },
+      "deepResearch": {
+        "label": "Tiefenrecherche"
+      }
+    },
+    "features": {
+      "webResearch": "Websuche",
+      "thinking": "Argumentation",
+      "attachFiles": "Dateien anhängen",
+      "vision": "Vision",
+      "createImage": "Bild erstellen",
+      "createVideo": "Video erstellen",
+      "createAudio": "Audio erstellen",
+      "speechToText": "Sprache zu Text",
+      "textToSpeech": "Text zu Sprache",
+      "deepResearch": "Tiefenrecherche"
+    }
+  },
+  "cardSelector": {
+    "panel": {
+      "title": "Element auswählen",
+      "ariaLabel": "Element auswählen",
+      "selectDialogTitle": "{selectPrefix} {dialogLabel}"
+    },
+    "actions": {
+      "selectPrefix": "Auswählen",
+      "close": "Schließen",
+      "edit": "Bearbeiten",
+      "settings": "Einstellungen",
+      "cancel": "Abbrechen",
+      "select": "Auswählen"
+    },
+    "messages": {
+      "empty": "Keine Elemente verfügbar.",
+      "noComment": ""
+    },
+    "dialogs": {
+      "function": {
+        "label": "Funktion"
+      },
+      "mcp": {
+        "label": "MCP"
+      },
+      "skills": {
+        "label": "Fähigkeiten"
+      },
+      "agents": {
+        "label": "Agenten"
+      },
+      "custom": {
+        "label": "Benutzerdefiniert"
+      }
+    }
+  },
+  "prompt": {
+    "toggleCollapse": "Prompt einklappen oder ausklappen",
+    "summary": {
+      "open": "Prompt-Zusammenfassung öffnen",
+      "close": "Prompt-Zusammenfassung schließen"
+    }
+  },
+  "more": {
+    "delete_qa": "Bitte bestätigen Sie die Löschung der aktuellen Frage und Antwort sowie aller folgenden Einträge.",
+    "delete_chat_session": "Sind Sie sicher? #10#10Diese Aktion ist unwiderruflich und löscht alle Nachrichten dieser Unterhaltung.",
+    "aborted": "Vorgang abgebrochen...",
+    "aborted_operation": "Vorgang abgebrochen",
+    "model_file_not_found": "%s: Datei erstellt. #10Bitte öffnen Sie diese Datei und geben Sie die Liste der verfügbaren Modelle an.",
+    "batch_begin_error": "Aktivierung der Stapelanzeige fehlgeschlagen.",
+    "batch_end_error": "Freigabe der Stapelanzeige fehlgeschlagen.",
+    "focus_error": "Die Eingabeblase konnte den Fokus nicht erhalten.",
+    "stop_audio_media_error": "Audio-Medium konnte nicht gestoppt werden.",
+    "stop_video_media_error": "Video-Medium konnte nicht gestoppt werden.",
+    "internal_theme_error": "Seitendesign konnte nicht aktualisiert werden.",
+    "deserialization_error": "Deserialisierungsfehler: ungültige JSON-Eingabe %s",
+    "welcome": "Willkommen in Ihrem Arbeitsbereich",
+    "structured_output_error": "Die strukturierte Ausgabe ist ungültig: Bitte bearbeiten Sie deren Wert in den Einstellungen.",
+    "card_json_file_not_found": "Keine JSON-Datei unterstützt %s",
+    "models_categories_count_error": "Bitte definieren Sie Kategorien für Standardmodelle",
+    "invalid_categories_file_error": "Ungültige JSON-Datei für Kategorien",
+    "text_generation_cant_handled_error": "Kein Standardmodell: Textgenerierung kann nicht verarbeitet werden",
+    "image_creation_aborted_error": "Kein Standardmodell konfiguriert: Bilderstellung abgebrochen",
+    "video_creation_aborted_error": "Kein Standardmodell konfiguriert: Videoerstellung abgebrochen",
+    "audio_creation_aborted_error": "Kein Standardmodell konfiguriert: Audioerstellung abgebrochen",
+    "stt_operation_aborted_error": "Kein Standardmodell konfiguriert: STT-Vorgang abgebrochen",
+    "tts_operation_aborted_error": "Kein Standardmodell konfiguriert: TTS-Vorgang abgebrochen",
+    "deep_research_operation_aborted_error": "Kein Standardmodell konfiguriert: Tiefenrecherche abgebrochen",
+    "missing_default_models_error": "Fehlende Standardmodelle für einige Kategorien. #10 Überprüfen Sie die Modelleinstellungen",
+    "api_key_empty_name_error": "Der Schlüsselname darf nicht leer sein.",
+    "api_key_enter_dialog_prompt": "Bitte geben Sie den API-Schlüsselwert für %s ein",
+    "api_key_not_found": "%s: API-Schlüssel nicht gefunden",
+    "api_key_deleted": "%s: API-Schlüssel wurde gelöscht",
+    "api_key_exists": "%s: API-Schlüssel existiert",
+    "api_key_modified": "%s: API-Schlüssel wurde geändert.",
+    "api_key_inserted": "%s: API-Schlüssel wurde eingefügt",
+    "web_decision_dlg_title": "Bestätigung",
+    "web_decision_dlg_message": "Bitte bestätigen.",
+    "web_decision_dlg_ok": "OK",
+    "web_decision_dlg_cancel": "Abbrechen",
+    "web_decision_dlg_close": "Schließen",
+    "demo_anthropic_tool_confirmation_title": "Bestätigung",
+    "demo_anthropic_tool_allow": "Zulassen",
+    "demo_anthropic_tool_deny": "Ablehnen",
+    "demo_anthropic_tool_allow_call": "Diesen Tool-Aufruf zulassen?",
+    "demo_anthropic_interrupted_by_user": "Vom Benutzer unterbrochen.",
+    "command_plugin_not_be_null": "Plug-in darf nicht null sein",
+    "command_unknown": "Unbekannter Befehl: /%s",
+    "command_action_unknown": "Unbekannte Aktion: /%s %s",
+    "command_missing_action": "Fehlende Aktion für /%s",
+    "command_incorrect_number_of_arguments": "Falsche Anzahl von Argumenten für /%s %s (erhalten %d)",
+    "command_no_plugin_for": "Kein Plug-in für /%s"
+  }
+}

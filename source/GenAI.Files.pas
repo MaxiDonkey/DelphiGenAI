@@ -1,4 +1,4 @@
-unit GenAI.Files;
+﻿unit GenAI.Files;
 
 {-------------------------------------------------------------------------------
 
@@ -10,19 +10,12 @@ unit GenAI.Files;
 interface
 
 uses
-  System.SysUtils, System.Classes, System.Threading, System.JSON, REST.Json.Types,
-  REST.JsonReflect, System.Net.Mime,
+  System.SysUtils, System.Classes, System.Threading, System.JSON, System.IOUtils,
+  System.NetEncoding, REST.Json.Types, REST.JsonReflect, System.Net.Mime,
   GenAI.API.Params, GenAI.API, GenAI.Consts, GenAI.Types, GenAI.Async.Support,
   GenAI.Async.Promise, GenAI.API.Lists, GenAI.API.Deletion;
 
 type
-  /// <summary>
-  /// Represents a class for constructing URL parameters specifically for file-related operations in the API.
-  /// </summary>
-  /// <remarks>
-  /// This class provides methods to configure URL parameters such as purpose, limit, order, and pagination.
-  /// It is designed to simplify the creation of query strings for file operations like listing files or filtering them by specific criteria.
-  /// </remarks>
   TFileUrlParams = class(TUrlParam)
   public
     /// <summary>
@@ -81,14 +74,6 @@ type
     function After(const Value: string): TFileUrlParams;
   end;
 
-  /// <summary>
-  /// Represents a class for constructing parameters for uploading files to the API.
-  /// </summary>
-  /// <remarks>
-  /// This class provides methods to configure multipart form data for file uploads,
-  /// including setting the file path and specifying its purpose.
-  /// It is designed to facilitate file uploads for various use cases such as fine-tuning, batch processing, or assistants.
-  /// </remarks>
   TFileUploadParams = class(TMultipartFormData)
   public
     constructor Create; reintroduce;
@@ -139,28 +124,55 @@ type
     /// Returns an instance of TFileUploadParams, allowing for method chaining.
     /// </returns>
     function Purpose(const Value: TFilesPurpose): TFileUploadParams; overload;
+
+    /// <summary>
+    /// Sets the expiration policy for the uploaded file using the default anchor ("created_at").
+    /// </summary>
+    /// <param name="Seconds">
+    /// The number of seconds after the anchor time that the file will expire. Must be between 3600 (1 hour)
+    /// and 2592000 (30 days).
+    /// </param>
+    /// <returns>
+    /// Returns an instance of TFileUploadParams, allowing for method chaining.
+    /// </returns>
+    function ExpiresAfter(const Seconds: Integer): TFileUploadParams; overload;
+
+    /// <summary>
+    /// Sets the expiration policy for the uploaded file.
+    /// </summary>
+    /// <param name="Anchor">
+    /// The anchor timestamp after which the expiration policy applies. Currently only "created_at" is supported.
+    /// </param>
+    /// <param name="Seconds">
+    /// The number of seconds after the anchor time that the file will expire. Must be between 3600 (1 hour)
+    /// and 2592000 (30 days).
+    /// </param>
+    /// <returns>
+    /// Returns an instance of TFileUploadParams, allowing for method chaining.
+    /// </returns>
+    function ExpiresAfter(const Anchor: string; const Seconds: Integer): TFileUploadParams; overload;
   end;
 
-  /// <summary>
-  /// Represents a file object in the API, containing metadata and attributes of the uploaded file.
-  /// </summary>
-  /// <remarks>
-  /// This class provides properties to access file metadata such as ID, size, creation timestamp, filename,
-  /// purpose, and type. It is used for operations that involve file management within the API.
-  /// </remarks>
   TFile = class(TJSONFingerprint)
   private
     FId: string;
     FBytes: Int64;
     [JsonNameAttribute('created_at')]
-    FCreatedAt: TInt64OrNull;
+    FCreatedAt: Int64;
+    [JsonNameAttribute('expires_at')]
+    FExpiresAt: Int64;
     FFilename: string;
     FObject: string;
     [JsonReflectAttribute(ctString, rtString, TFilesPurposeInterceptor)]
     FPurpose: TFilesPurpose;
+    FStatus: string;
+    [JsonNameAttribute('status_details')]
+    FStatusDetails: string;
   private
     function GetCreatedAtAsString: string;
     function GetCreatedAt: Int64;
+    function GetExpiresAtAsString: string;
+    function GetExpiresAt: Int64;
   public
     /// <summary>
     /// Gets or sets the unique identifier of the file.
@@ -183,6 +195,16 @@ type
     property CreatedAtAsString: string read GetCreatedAtAsString;
 
     /// <summary>
+    /// Gets the Unix timestamp (in seconds) for when the file will expire.
+    /// </summary>
+    property ExpiresAt: Int64 read GetExpiresAt;
+
+    /// <summary>
+    /// Gets the expiration timestamp of the file as string.
+    /// </summary>
+    property ExpiresAtAsString: string read GetExpiresAtAsString;
+
+    /// <summary>
     /// Gets or sets the name of the file.
     /// </summary>
     property Filename: string read FFilename write FFilename;
@@ -196,16 +218,19 @@ type
     /// Gets or sets the purpose of the file, indicating its intended use.
     /// </summary>
     property Purpose: TFilesPurpose read FPurpose write FPurpose;
+
+    /// <summary>
+    /// Deprecated. The current status of the file, which can be either uploaded, processed, or error.
+    /// </summary>
+    property Status: string read FStatus write FStatus;
+
+    /// <summary>
+    /// Deprecated. For details on why a fine-tuning training file failed validation, see the error field
+    /// on fine_tuning.job.
+    /// </summary>
+    property StatusDetails: string read FStatusDetails write FStatusDetails;
   end;
 
-  /// <summary>
-  /// Represents the content of a file retrieved from the API.
-  /// </summary>
-  /// <remarks>
-  /// This class provides properties to access the base64-encoded content of a file
-  /// and a method to decode it into a readable string. It is used for operations that involve
-  /// retrieving and processing the actual content of files.
-  /// </remarks>
   TFileContent = class(TJSONFingerprint)
   private
     FBase64: string;
@@ -222,6 +247,11 @@ type
     /// Gets the decoded content of the file as a string.
     /// </summary>
     property Content: string read GetContent;
+
+    /// <summary>
+    /// Saves the decoded file bytes without passing through a text encoding.
+    /// </summary>
+    procedure SaveToFile(const FileName: string);
   end;
 
   /// <summary>
@@ -284,15 +314,28 @@ type
   /// </remarks>
   TAsynFileContent = TAsynCallBack<TFileContent>;
 
-  /// <summary>
-  /// Represents a route for managing file operations in the API.
-  /// </summary>
-  /// <remarks>
-  /// This class provides methods for performing file-related operations, including uploading files,
-  /// listing files, retrieving specific file details or content, and deleting files.
-  /// It supports both synchronous and asynchronous operations for efficient file management.
-  /// </remarks>
-  TFilesRoute = class(TGenAIRoute)
+  TFilesAbstractSupport = class(TGenAIRoute)
+  protected
+    function Upload(const ParamProc: TProc<TFileUploadParams>): TFile; virtual; abstract;
+    function List: TFiles; overload; virtual; abstract;
+    function List(const ParamProc: TProc<TFileUrlParams>): TFiles; overload; virtual; abstract;
+    function Retrieve(const FileId: string): TFile; virtual; abstract;
+    function RetrieveContent(const FileId: string): TFileContent; virtual; abstract;
+    function Delete(const FileId: string): TDeletion; virtual; abstract;
+  end;
+
+  TFilesAsynchronousSupport = class(TFilesAbstractSupport)
+  public
+    procedure AsynUpload(const ParamProc: TProc<TFileUploadParams>; const CallBacks: TFunc<TAsynFile>);
+    procedure AsynList(const CallBacks: TFunc<TAsynFiles>); overload;
+    procedure AsynList(const ParamProc: TProc<TFileUrlParams>; const CallBacks: TFunc<TAsynFiles>); overload;
+    procedure AsynRetrieve(const FileId: string; const CallBacks: TFunc<TAsynFile>);
+    procedure AsynRetrieveContent(const FileId: string; const CallBacks: TFunc<TAsynFileContent>);
+    procedure AsynDelete(const FileId: string; const CallBacks: TFunc<TAsynDeletion>);
+  end;
+
+  TFilesRoute = class(TFilesAsynchronousSupport)
+  public
     /// <summary>
     /// Initiates an asynchronous file upload and returns a promise for the uploaded file.
     /// </summary>
@@ -412,7 +455,7 @@ type
     /// <returns>
     /// Returns an instance of TFile representing the uploaded file.
     /// </returns>
-    function Upload(const ParamProc: TProc<TFileUploadParams>): TFile;
+    function Upload(const ParamProc: TProc<TFileUploadParams>): TFile; override;
 
     /// <summary>
     /// Lists all files in the API synchronously.
@@ -420,7 +463,7 @@ type
     /// <returns>
     /// Returns an instance of TFiles containing the list of files.
     /// </returns>
-    function List: TFiles; overload;
+    function List: TFiles; overload; override;
 
     /// <summary>
     /// Lists files with specified URL parameters synchronously.
@@ -431,7 +474,7 @@ type
     /// <returns>
     /// Returns an instance of TFiles containing the filtered list of files.
     /// </returns>
-    function List(const ParamProc: TProc<TFileUrlParams>): TFiles; overload;
+    function List(const ParamProc: TProc<TFileUrlParams>): TFiles; overload; override;
 
     /// <summary>
     /// Retrieves details of a specific file synchronously.
@@ -442,7 +485,7 @@ type
     /// <returns>
     /// Returns an instance of TFile containing the file's metadata.
     /// </returns>
-    function Retrieve(const FileId: string): TFile;
+    function Retrieve(const FileId: string): TFile; override;
 
     /// <summary>
     /// Retrieves the content of a specific file synchronously.
@@ -453,7 +496,7 @@ type
     /// <returns>
     /// Returns an instance of TFileContent containing the file's content.
     /// </returns>
-    function RetrieveContent(const FileId: string): TFileContent;
+    function RetrieveContent(const FileId: string): TFileContent; override;
 
     /// <summary>
     /// Deletes a specific file synchronously.
@@ -464,76 +507,13 @@ type
     /// <returns>
     /// Returns an instance of TFileDeletion representing the deleted file.
     /// </returns>
-    function Delete(const FileId: string): TDeletion;
-
-    /// <summary>
-    /// Performs an asynchronous file upload operation.
-    /// </summary>
-    /// <param name="ParamProc">
-    /// A procedure that configures the parameters for the file upload, including the file path and purpose.
-    /// </param>
-    /// <param name="CallBacks">
-    /// A function that defines callbacks to handle events like success, failure, or progress during the upload process.
-    /// </param>
-    procedure AsynUpload(const ParamProc: TProc<TFileUploadParams>; const CallBacks: TFunc<TAsynFile>);
-
-    /// <summary>
-    /// Performs an asynchronous operation to list all files.
-    /// </summary>
-    /// <param name="CallBacks">
-    /// A function that defines callbacks to handle events like success, failure, or progress during the listing process.
-    /// </param>
-    procedure AsynList(const CallBacks: TFunc<TAsynFiles>); overload;
-
-    /// <summary>
-    /// Performs an asynchronous operation to list files with specified URL parameters.
-    /// </summary>
-    /// <param name="ParamProc">
-    /// A procedure that configures the URL parameters for filtering the file list.
-    /// </param>
-    /// <param name="CallBacks">
-    /// A function that defines callbacks to handle events like success, failure, or progress during the listing process.
-    /// </param>
-    procedure AsynList(const ParamProc: TProc<TFileUrlParams>; const CallBacks: TFunc<TAsynFiles>); overload;
-
-    /// <summary>
-    /// Performs an asynchronous operation to retrieve details of a specific file.
-    /// </summary>
-    /// <param name="FileId">
-    /// The unique identifier of the file to retrieve.
-    /// </param>
-    /// <param name="CallBacks">
-    /// A function that defines callbacks to handle events like success, failure, or progress during the retrieval process.
-    /// </param>
-    procedure AsynRetrieve(const FileId: string; const CallBacks: TFunc<TAsynFile>);
-
-    /// <summary>
-    /// Performs an asynchronous operation to retrieve the content of a specific file.
-    /// </summary>
-    /// <param name="FileId">
-    /// The unique identifier of the file whose content is to be retrieved.
-    /// </param>
-    /// <param name="CallBacks">
-    /// A function that defines callbacks to handle events like success, failure, or progress during the retrieval process.
-    /// </param>
-    procedure AsynRetrieveContent(const FileId: string; const CallBacks: TFunc<TAsynFileContent>);
-
-    /// <summary>
-    /// Performs an asynchronous operation to delete a specific file.
-    /// </summary>
-    /// <param name="FileId">
-    /// The unique identifier of the file to delete.
-    /// </param>
-    /// <param name="CallBacks">
-    /// A function that defines callbacks to handle events like success, failure, or progress during the deletion process.
-    /// </param>
-    procedure AsynDelete(const FileId: string; const CallBacks: TFunc<TAsynDeletion>);
+    function Delete(const FileId: string): TDeletion; override;
   end;
 
 implementation
 
 uses
-  System.NetEncoding;
+  System.DateUtils;
 
 { TFileUploadParams }
 
@@ -564,6 +544,19 @@ end;
 function TFileUploadParams.Purpose(const Value: string): TFileUploadParams;
 begin
   AddField('purpose', TFilesPurpose.Create(Value).ToString);
+  Result := Self;
+end;
+
+function TFileUploadParams.ExpiresAfter(const Seconds: Integer): TFileUploadParams;
+begin
+  Result := ExpiresAfter('created_at', Seconds);
+end;
+
+function TFileUploadParams.ExpiresAfter(const Anchor: string;
+  const Seconds: Integer): TFileUploadParams;
+begin
+  AddField('expires_after[anchor]', Anchor);
+  AddField('expires_after[seconds]', Seconds.ToString);
   Result := Self;
 end;
 
@@ -656,7 +649,9 @@ begin
     CallBacks);
 end;
 
-procedure TFilesRoute.AsynDelete(const FileId: string;
+{ TFilesAsynchronousSupport }
+
+procedure TFilesAsynchronousSupport.AsynDelete(const FileId: string;
   const CallBacks: TFunc<TAsynDeletion>);
 begin
   with TAsynCallBackExec<TAsynDeletion, TDeletion>.Create(CallBacks) do
@@ -675,7 +670,7 @@ begin
   end;
 end;
 
-procedure TFilesRoute.AsynList(const CallBacks: TFunc<TAsynFiles>);
+procedure TFilesAsynchronousSupport.AsynList(const CallBacks: TFunc<TAsynFiles>);
 begin
   with TAsynCallBackExec<TAsynFiles, TFiles>.Create(CallBacks) do
   try
@@ -693,7 +688,7 @@ begin
   end;
 end;
 
-procedure TFilesRoute.AsynList(const ParamProc: TProc<TFileUrlParams>;
+procedure TFilesAsynchronousSupport.AsynList(const ParamProc: TProc<TFileUrlParams>;
   const CallBacks: TFunc<TAsynFiles>);
 begin
   with TAsynCallBackExec<TAsynFiles, TFiles>.Create(CallBacks) do
@@ -712,7 +707,7 @@ begin
   end;
 end;
 
-procedure TFilesRoute.AsynRetrieve(const FileId: string;
+procedure TFilesAsynchronousSupport.AsynRetrieve(const FileId: string;
   const CallBacks: TFunc<TAsynFile>);
 begin
   with TAsynCallBackExec<TAsynFile, TFile>.Create(CallBacks) do
@@ -731,7 +726,7 @@ begin
   end;
 end;
 
-procedure TFilesRoute.AsynRetrieveContent(const FileId: string;
+procedure TFilesAsynchronousSupport.AsynRetrieveContent(const FileId: string;
   const CallBacks: TFunc<TAsynFileContent>);
 begin
   with TAsynCallBackExec<TAsynFileContent, TFileContent>.Create(CallBacks) do
@@ -750,7 +745,7 @@ begin
   end;
 end;
 
-procedure TFilesRoute.AsynUpload(const ParamProc: TProc<TFileUploadParams>;
+procedure TFilesAsynchronousSupport.AsynUpload(const ParamProc: TProc<TFileUploadParams>;
   const CallBacks: TFunc<TAsynFile>);
 begin
   with TAsynCallBackExec<TAsynFile, TFile>.Create(CallBacks) do
@@ -768,6 +763,8 @@ begin
     Free;
   end;
 end;
+
+{ TFilesRoute }
 
 function TFilesRoute.Delete(const FileId: string): TDeletion;
 begin
@@ -806,16 +803,37 @@ begin
   Result :=  TNetEncoding.Base64.Decode(Base64);
 end;
 
+procedure TFileContent.SaveToFile(const FileName: string);
+begin
+  System.IOUtils.TFile.WriteAllBytes(
+    FileName,
+    TNetEncoding.Base64.DecodeStringToBytes(Base64));
+end;
+
 { TFile }
 
 function TFile.GetCreatedAt: Int64;
 begin
-  Result := TInt64OrNull(FCreatedAt).ToInteger;
+  Result := FCreatedAt;
 end;
 
 function TFile.GetCreatedAtAsString: string;
 begin
-  Result := TInt64OrNull(FCreatedAt).ToUtcDateString;
+  if FCreatedAt <= 0 then
+    Exit(EmptyStr);
+  Result := FormatDateTime('yyyy-mm-dd"T"hh:nn:ss"Z"', UnixToDateTime(FCreatedAt, True));
+end;
+
+function TFile.GetExpiresAt: Int64;
+begin
+  Result := FExpiresAt;
+end;
+
+function TFile.GetExpiresAtAsString: string;
+begin
+  if FExpiresAt <= 0 then
+    Exit(EmptyStr);
+  Result := FormatDateTime('yyyy-mm-dd"T"hh:nn:ss"Z"', UnixToDateTime(FExpiresAt, True));
 end;
 
 end.

@@ -13,7 +13,7 @@ uses
   System.SysUtils, System.Classes, System.Threading, System.JSON, REST.Json.Types,
   REST.JsonReflect,
   GenAI.API.Params, GenAI.API, GenAI.Consts, GenAI.Schema, GenAI.Types,
-  GenAI.Async.Params, GenAI.Async.Support, GenAI.Assistants;
+  GenAI.Async.Params, GenAI.Async.Support;
 
 type
   {$REGION 'log probs'}
@@ -201,7 +201,6 @@ type
   TToolCallAction = class(TComputerAction)
   private
     FCommand           : TArray<string>;
-    [JsonReflectAttribute(ctString, rtString, TMetadataInterceptor)]
     FEnv               : string;
     [JsonNameAttribute('timeout_ms')]
     FTimeout           : Int64;
@@ -290,7 +289,8 @@ type
     FType : TResponseAnnotationType;
   public
     /// <summary>
-    /// The type of the file citation. One of file_citation, url_citation or file_path
+    /// The annotation type. One of file_citation, url_citation, file_path or
+    /// container_file_citation.
     /// </summary>
     property &Type: TResponseAnnotationType read FType write FType;
   end;
@@ -367,6 +367,7 @@ type
      TResponseMessageAnnotationCommon,
      TAnnotationFileCitation,
      TAnnotationUrlCitation,
+     TAnnotationContainerFileCitation,
      TAnnotationFilePath }
   {$ENDREGION}
   TResponseMessageAnnotation = class(TAnnotationFilePath);
@@ -605,7 +606,6 @@ type
   /// </remarks>
   TFileSearchResult = class(TCodeInterpreterResult)
   private
-    [JsonReflectAttribute(ctString, rtString, TMetadataInterceptor)]
     FAttributes : string;
     [JsonNameAttribute('file_id')]
     FFileId     : string;
@@ -647,7 +647,6 @@ type
 
   TMCPListTool = class
   private
-    [JsonReflectAttribute(ctString, rtString, TMetadataInterceptor)]
     [JsonNameAttribute('input_schema')]
     FInputSchema : string;
     FName        : string;
@@ -776,9 +775,13 @@ type
   TResponseItemCommon = class(TJSONFingerprint)
   private
     [JsonReflectAttribute(ctString, rtString, TResponseTypesInterceptor)]
-    FType    : TResponseTypes;
-    FStatus  : string;
-    FId      : string;
+    FType             : TResponseTypes;
+    FStatus           : string;
+    FId               : string;
+    [JsonNameAttribute('created_by')]
+    FCreatedBy        : string;
+    [JsonNameAttribute('encrypted_content')]
+    FEncryptedContent : string;
   public
     /// <summary>
     /// The unique ID of the object.
@@ -794,6 +797,17 @@ type
     /// The type of the object input.
     /// </summary>
     property &Type: TResponseTypes read FType write FType;
+
+    /// <summary>
+    /// The identifier of the actor that created the item, when supplied by the API.
+    /// </summary>
+    property CreatedBy: string read FCreatedBy write FCreatedBy;
+
+    /// <summary>
+    /// Opaque encrypted content returned for a compaction item.
+    /// Preserve it unchanged when replaying a compacted context.
+    /// </summary>
+    property EncryptedContent: string read FEncryptedContent write FEncryptedContent;
   end;
 
   TResponseItemInputMessage = class(TResponseItemCommon)

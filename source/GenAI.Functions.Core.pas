@@ -1,4 +1,4 @@
-unit GenAI.Functions.Core;
+﻿unit GenAI.Functions.Core;
 
 {-------------------------------------------------------------------------------
 
@@ -25,58 +25,71 @@ type
     /// Retrieves the description of the function.
     /// </summary>
     function GetDescription: string;
+
     /// <summary>
     /// Retrieves the name of the function.
     /// </summary>
     function GetName: string;
+
     /// <summary>
     /// Retrieves the parameters required by the function, represented as a JSON schema.
     /// </summary>
     function GetParameters: string;
+
     /// <summary>
     /// Retrieves the strict schema adherence switch value.
     /// </summary>
     function GetStrict: Boolean;
+
     /// <summary>
     /// Set value to the strict schema adherence switch.
     /// </summary>
     procedure SetStrict(const Value: Boolean);
+
     /// <summary>
     /// Retrieves the type of the function, typically "function".
     /// </summary>
     function GetType: string;
+
     /// <summary>
     /// Executes the function with the provided arguments and returns the result as a string.
     /// </summary>
     /// <param name="Arguments">The arguments passed to the function in JSON format.</param>
     /// <returns>The result of the function execution as a string.</returns>
     function Execute(const Arguments: string): string;
+
      /// <summary>
     /// Converts the TFunctionCore instance to a JSON object that contains its type and representation.
     /// </summary>
     /// <returns>A JSON object representing the function instance.</returns>
     function ToJson: TJSONObject;
+
     /// <summary>
     /// Creates a string representation of the TFunctionCore instance in JSON format, including its description, name, and parameters.
     /// </summary>
     /// <returns>A string representation of the function in JSON format.</returns>
     function ToString: string;
+
     /// <summary>
     /// A brief description of the function's purpose, used by the model to determine when and how to call the function.
     /// </summary>
     property Description: string read GetDescription;
+
     /// <summary>
     /// The unique identifier of the function that will be called. It must only contain characters from a-z, A-Z, 0-9, underscores, or dashes, and should not exceed 64 characters in length.
     /// </summary>
     property Name: string read GetName;
+
     //// <summary>
     /// The parameters required by the function, specified as a JSON schema. If no parameters are required, use the schema: {"type": "object", "properties": {}}.
     /// </summary>
     property Parameters: string read GetParameters;
+
     /// <summary>
     /// The type of the tool. Currently, only "function" is supported.
     /// </summary>
     property &Type: string read GetType;
+
     /// <summary>
     /// Retrieves the strict schema adherence switch value.
     /// </summary>
@@ -92,64 +105,79 @@ type
   TFunctionCore = class abstract(TinterfacedObject, IFunctionCore)
   protected
     FStrict: Boolean;
+
     /// <summary>
     /// Retrieves the description of the function. Derived classes must implement this method.
     /// </summary>
     function GetDescription: string; virtual; abstract;
+
      /// <summary>
     /// Retrieves the name of the function. Derived classes must implement this method.
     /// </summary>
     function GetName: string; virtual; abstract;
+
     /// <summary>
     /// Retrieves the parameters required by the function, represented as a JSON schema. Derived classes must implement this method.
     /// </summary>
     function GetParameters: string; virtual; abstract;
+
     /// <summary>
     /// Retrieves the type of the function, which is "function" by default.
     /// </summary>
     function GetType: string; virtual;
+
     /// <summary>
     /// Retrieves the strict schema adherence switch value.
     /// </summary>
     function GetStrict: Boolean; virtual;
+
     /// <summary>
     /// Set value to the strict schema adherence switch.
     /// </summary>
     procedure SetStrict(const Value: Boolean); virtual;
+
   public
     constructor Create(const IsStrict: Boolean = False);
+
     /// <summary>
     /// Executes the function with the provided arguments and returns the result as a string. Derived classes must implement this method.
     /// </summary>
     /// <param name="Arguments">The arguments passed to the function in JSON format.</param>
     /// <returns>The result of the function execution as a string.</returns>
     function Execute(const Arguments: string): string; virtual; abstract;
+
     /// <summary>
     /// Converts the TFunctionCore instance to a JSON object that contains its type and representation.
     /// </summary>
     /// <returns>A JSON object representing the function instance.</returns>
     function ToJson: TJSONObject;
+
     /// <summary>
     /// Creates a string representation of the TFunctionCore instance in JSON format, including its description, name, and parameters.
     /// </summary>
     /// <returns>A string representation of the function in JSON format.</returns>
     function ToString: string; override;
+
     /// <summary>
     /// A brief description of the function's purpose, used by the model to determine when and how to call the function.
     /// </summary>
     property Description: string read GetDescription;
+
     /// <summary>
     /// The unique identifier of the function that will be called. It must only contain characters from a-z, A-Z, 0-9, underscores, or dashes, and should not exceed 64 characters in length.
     /// </summary>
     property Name: string read GetName;
+
     /// <summary>
     /// The parameters required by the function, specified as a JSON schema. If no parameters are required, use the schema: {"type": "object", "properties": {}}.
     /// </summary>
     property Parameters: string read GetParameters;
+
     /// <summary>
     /// The type of the tool. Currently, only "function" is supported.
     /// </summary>
     property &Type: string read GetType;
+
     /// <summary>
     /// Retrieves the strict schema adherence switch value.
     /// </summary>

@@ -234,11 +234,10 @@ type
   TConversations = class(TJSONFingerprint)
   private
     [JsonNameAttribute('created_at')]
-    FCreatedAt                : Int64;
-    FId                       : string;
-    [JsonReflectAttribute(ctString, rtString, TMetadataInterceptor)]
-    FMetadata                 : string;
-    FObject                   : string;
+    FCreatedAt : Int64;
+    FId : string;
+    FMetadata : string;
+    FObject : string;
   public
     /// <summary>
     /// Unix timestamp (in seconds) when the conversation was created.
@@ -593,6 +592,60 @@ type
   /// </remarks>
   TPromiseConversationsItem = TPromiseCallBack<TConversationsItem>;
 
+  TConversationsAbstractSupport = class(TGenAIRoute)
+  protected
+    function Create(const ParamProc: TProc<TConversationsParams>): TConversations; virtual; abstract;
+    function Delete(const ConversationId: string): TConversationsDeleted; virtual; abstract;
+    function Retrieve(const ConversationId: string): TConversations; virtual; abstract;
+    function Update(const ConversationId: string; const ParamProc: TProc<TUpdateConversationsParams>): TConversations; virtual; abstract;
+    function List(const ConversationId: string; const ParamProc: TProc<TUrlListItemsParams>): TConversationList; virtual; abstract;
+    function CreateItem(const ConversationId: string;
+      const ParamProc: TProc<TConversationsItemParams>): TConversationList; overload; virtual; abstract;
+    function CreateItem(const ConversationId: string;
+      const Include: TArray<TOutputIncluding>;
+      const ParamProc: TProc<TConversationsItemParams>): TConversationList; overload; virtual; abstract;
+    function RetrieveItem(const ConversationId: string;
+      const MessageId: string): TConversationsItem; overload; virtual; abstract;
+    function RetrieveItem(const ConversationId: string;
+      const MessageId: string;
+      const UrlParamProc: TProc<TUrlConversationsItemParams>): TConversationsItem; overload; virtual; abstract;
+    function DeleteItem(const ConversationId: string;
+      const MessageId: string): TConversations; overload; virtual; abstract;
+  end;
+
+  TConversationsAsynchronousSupport = class(TConversationsAbstractSupport)
+  public
+    procedure AsynCreate(const ParamProc: TProc<TConversationsParams>;
+      const CallBacks: TFunc<TAsynConversations>);
+    procedure AsynDelete(const ConversationId: string;
+      const CallBacks: TFunc<TAsynConversationsDeleted>);
+    procedure AsynRetrieve(const ConversationId: string;
+      const CallBacks: TFunc<TAsynConversations>);
+    procedure AsynUpdate(const ConversationId: string;
+      const ParamProc: TProc<TUpdateConversationsParams>;
+      const CallBacks: TFunc<TAsynConversations>);
+    procedure AsynList(const ConversationId: string;
+      const ParamProc: TProc<TUrlListItemsParams>;
+      const CallBacks: TFunc<TAsynConversationList>);
+    procedure AsynCreateItem(const ConversationId: string;
+      const ParamProc: TProc<TConversationsItemParams>;
+      const CallBacks: TFunc<TAsynConversationList>); overload;
+    procedure AsynCreateItem(const ConversationId: string;
+      const Include: TArray<TOutputIncluding>;
+      const ParamProc: TProc<TConversationsItemParams>;
+      const CallBacks: TFunc<TAsynConversationList>); overload;
+    procedure AsynRetrieveItem(const ConversationId: string;
+      const MessageId: string;
+      const CallBacks: TFunc<TAsynConversationsItem>); overload;
+    procedure AsynRetrieveItem(const ConversationId: string;
+      const MessageId: string;
+      const UrlParamProc: TProc<TUrlConversationsItemParams>;
+      const CallBacks: TFunc<TAsynConversationsItem>); overload;
+    procedure AsynDeleteItem(const ConversationId: string;
+      const MessageId: string;
+      const CallBacks: TFunc<TAsynConversations>);
+  end;
+
   /// <summary>
   /// Provides the full routing interface for all operations related to Conversations and their items.
   /// </summary>
@@ -642,7 +695,7 @@ type
   /// while preserving transparency of all request parameters and response structures.
   /// </para>
   /// </remarks>
-  TConversationsRoute = class(TGenAIRoute)
+  TConversationsRoute = class(TConversationsAsynchronousSupport)
   private
     function CreateItem(const ConversationId: string;
       const UrlParamProc: TProc<TUrlConversationsItemParams>;
@@ -1122,7 +1175,7 @@ type
     /// <c>TJSONFingerprint</c> inheritance chain.
     /// </para>
     /// </remarks>
-    function Create(const ParamProc: TProc<TConversationsParams>): TConversations;
+    function Create(const ParamProc: TProc<TConversationsParams>): TConversations; override;
 
     /// <summary>
     /// Deletes a conversation synchronously and returns a <c>TConversationsDeleted</c> acknowledgment object.
@@ -1158,7 +1211,7 @@ type
     /// via <c>TJSONFingerprint.JSONResponse</c>.
     /// </para>
     /// </remarks>
-    function Delete(const ConversationId: string): TConversationsDeleted;
+    function Delete(const ConversationId: string): TConversationsDeleted; override;
 
     /// <summary>
     /// Retrieves a specific conversation synchronously and returns a <c>TConversations</c> instance.
@@ -1195,7 +1248,7 @@ type
     /// <c>TJSONFingerprint.JSONResponse</c>.
     /// </para>
     /// </remarks>
-    function Retrieve(const ConversationId: string): TConversations;
+    function Retrieve(const ConversationId: string): TConversations; override;
 
     /// <summary>
     /// Updates an existing conversation synchronously and returns the updated <c>TConversations</c> instance.
@@ -1240,7 +1293,7 @@ type
     /// through <c>TJSONFingerprint.JSONResponse</c>.
     /// </para>
     /// </remarks>
-    function Update(const ConversationId: string; const ParamProc: TProc<TUpdateConversationsParams>): TConversations;
+    function Update(const ConversationId: string; const ParamProc: TProc<TUpdateConversationsParams>): TConversations; override;
 
     /// <summary>
     /// Retrieves a paginated list of items (messages, tool calls, etc.) belonging to a specific conversation
@@ -1290,7 +1343,7 @@ type
     /// <c>TJSONFingerprint.JSONResponse</c>.
     /// </para>
     /// </remarks>
-    function List(const ConversationId: string; const ParamProc: TProc<TUrlListItemsParams>): TConversationList;
+    function List(const ConversationId: string; const ParamProc: TProc<TUrlListItemsParams>): TConversationList; override;
 
     /// <summary>
     /// Adds one or more new items to an existing conversation synchronously
@@ -1337,7 +1390,7 @@ type
     /// </para>
     /// </remarks>
     function CreateItem(const ConversationId: string;
-      const ParamProc: TProc<TConversationsItemParams>): TConversationList; overload;
+      const ParamProc: TProc<TConversationsItemParams>): TConversationList; overload; override;
 
     /// <summary>
     /// Adds one or more new items to an existing conversation synchronously,
@@ -1396,7 +1449,7 @@ type
     /// </remarks>
     function CreateItem(const ConversationId: string;
       const Include: TArray<TOutputIncluding>;
-      const ParamProc: TProc<TConversationsItemParams>): TConversationList; overload;
+      const ParamProc: TProc<TConversationsItemParams>): TConversationList; overload; override;
 
     /// <summary>
     /// Retrieves a specific item (message, tool call, or output) from a conversation synchronously
@@ -1442,7 +1495,7 @@ type
     /// </para>
     /// </remarks>
     function RetrieveItem(const ConversationId: string;
-      const MessageId: string): TConversationsItem; overload;
+      const MessageId: string): TConversationsItem; overload; override;
 
     /// <summary>
     /// Retrieves a specific item (message, tool call, or output) from a conversation synchronously,
@@ -1500,7 +1553,7 @@ type
     /// </remarks>
     function RetrieveItem(const ConversationId: string;
       const MessageId: string;
-      const UrlParamProc: TProc<TUrlConversationsItemParams>): TConversationsItem; overload;
+      const UrlParamProc: TProc<TUrlConversationsItemParams>): TConversationsItem; overload; override;
 
     /// <summary>
     /// Deletes a specific item (message, tool call, or output) from a conversation synchronously
@@ -1547,497 +1600,8 @@ type
     /// </para>
     /// </remarks>
     function DeleteItem(const ConversationId: string;
-      const MessageId: string): TConversations; overload;
+      const MessageId: string): TConversations; overload; override;
 
-    /// <summary>
-    /// Asynchronously creates a new conversation and executes the provided callback chain
-    /// using a <c>TAsynConversations</c> handler.
-    /// </summary>
-    /// <param name="ParamProc">
-    /// A configuration procedure used to initialize the request body via a <c>TConversationsParams</c> instance.
-    /// Use this callback to define the conversation’s initial parameters, such as input items or metadata.
-    /// </param>
-    /// <param name="CallBacks">
-    /// A callback factory returning a <c>TAsynConversations</c> instance.
-    /// This allows you to attach asynchronous lifecycle handlers such as <c>OnStart</c>, <c>OnSuccess</c>,
-    /// and <c>OnError</c> for fine-grained control of the asynchronous workflow.
-    /// </param>
-    /// <remarks>
-    /// <para>
-    /// • This method performs a non-blocking POST request to the <c>/conversations</c> endpoint of the API,
-    /// creating a new conversation asynchronously. The asynchronous control flow is managed through the
-    /// <c>TAsynConversations</c> callback structure.
-    /// </para>
-    /// <para>
-    /// • The <c>ParamProc</c> procedure configures a <c>TConversationsParams</c> object used to define
-    /// the conversation’s initialization parameters. Typical fields include:
-    /// </para>
-    /// <para>
-    /// • <c>Items</c> — An array of initial input items (up to 20).
-    /// <c>Metadata</c> — Optional structured data to tag the conversation with key-value pairs.
-    /// </para>
-    /// <para>
-    /// • When the API responds successfully, the <c>OnSuccess</c> event of the callback chain is triggered
-    /// with a fully populated <c>TConversations</c> object containing the new conversation’s details
-    /// (<c>Id</c>, <c>CreatedAt</c>, <c>Metadata</c>, etc.).
-    /// </para>
-    /// <para>
-    /// • Because this method is asynchronous, it does not block the main thread.
-    /// The request runs in the background, and your callback handlers determine what happens
-    /// at each stage of the execution.
-    /// </para>
-    /// <para>
-    /// • Internally, this method delegates to <c>API.PostAsyn&lt;TConversations, TConversationsParams&gt;</c>
-    /// and encapsulates the callback logic through a <c>TAsynCallBack</c> specialization for <c>TConversations</c>.
-    /// </para>
-    /// </remarks>
-    procedure AsynCreate(const ParamProc: TProc<TConversationsParams>;
-      const CallBacks: TFunc<TAsynConversations>);
-
-    /// <summary>
-    /// Asynchronously deletes a conversation and executes the provided callback chain
-    /// using a <c>TAsynConversationsDeleted</c> handler.
-    /// </summary>
-    /// <param name="ConversationId">
-    /// The unique identifier of the conversation to delete.
-    /// This corresponds to the <c>Id</c> property of the <c>TConversations</c> object (for example, “conv_123”).
-    /// </param>
-    /// <param name="CallBacks">
-    /// A callback factory returning a <c>TAsynConversationsDeleted</c> instance.
-    /// This allows you to attach asynchronous lifecycle handlers such as <c>OnStart</c>, <c>OnSuccess</c>,
-    /// and <c>OnError</c> for fine-grained control of the asynchronous deletion workflow.
-    /// </param>
-    /// <remarks>
-    /// <para>
-    /// • This method performs a non-blocking DELETE request to the
-    /// <c>/conversations/{conversation_id}</c> endpoint of the API, removing the specified conversation
-    /// asynchronously. The operation’s execution and result handling are delegated to the
-    /// <c>TAsynConversationsDeleted</c> callback structure.
-    /// </para>
-    /// <para>
-    /// • Upon successful completion, the <c>OnSuccess</c> event of the callback chain is triggered
-    /// with a <c>TConversationsDeleted</c> object (alias of <c>TResponseDelete</c>) containing:
-    /// </para>
-    /// <para>
-    /// • <c>Id</c> — The unique identifier of the deleted conversation.
-    /// <c>&amp;Object</c> — A discriminator string, typically “conversation.deleted”.
-    /// <c>Deleted</c> — A boolean flag confirming the success (<c>true</c>) or failure (<c>false</c>) of the operation.
-    /// </para>
-    /// <para>
-    /// • Because this method runs asynchronously, it does not block the main thread.
-    /// The deletion request executes in the background, and each phase of the process
-    /// (<c>OnStart</c>, <c>OnSuccess</c>, <c>OnError</c>) is handled through the callback sequence
-    /// defined in <c>CallBacks</c>.
-    /// </para>
-    /// <para>
-    /// • Internally, this method delegates to
-    /// <c>API.DeleteAsyn&lt;TConversationsDeleted&gt;</c>,
-    /// which performs type-safe deserialization of the API response and wraps the result
-    /// in the asynchronous callback abstraction <c>TAsynCallBack&lt;TConversationsDeleted&gt;</c>.
-    /// </para>
-    /// </remarks>
-    procedure AsynDelete(const ConversationId: string;
-      const CallBacks: TFunc<TAsynConversationsDeleted>);
-
-    /// <summary>
-    /// Asynchronously retrieves a specific conversation and executes the provided callback chain
-    /// using a <c>TAsynConversations</c> handler.
-    /// </summary>
-    /// <param name="ConversationId">
-    /// The unique identifier of the conversation to retrieve.
-    /// This corresponds to the <c>Id</c> property of the <c>TConversations</c> object (for example, “conv_123”).
-    /// </param>
-    /// <param name="CallBacks">
-    /// A callback factory returning a <c>TAsynConversations</c> instance.
-    /// This allows the attachment of asynchronous lifecycle handlers such as <c>OnStart</c>, <c>OnSuccess</c>,
-    /// and <c>OnError</c> for precise control of the asynchronous retrieval process.
-    /// </param>
-    /// <remarks>
-    /// <para>
-    /// • This method performs a non-blocking GET request to the
-    /// <c>/conversations/{conversation_id}</c> endpoint of the API, retrieving the full details
-    /// of the specified conversation asynchronously. The asynchronous control flow is managed
-    /// through the <c>TAsynConversations</c> callback structure.
-    /// </para>
-    /// <para>
-    /// • When the retrieval completes successfully, the <c>OnSuccess</c> event of the callback chain
-    /// is triggered with a <c>TConversations</c> instance containing the conversation’s details, such as:
-    /// </para>
-    /// <para>
-    /// • <c>Id</c> — The conversation’s unique identifier.
-    /// <c>CreatedAt</c> — The Unix timestamp (in seconds) of creation.
-    /// <c>Metadata</c> — Structured key-value data associated with the conversation.
-    /// <c>&amp;Object</c> — A discriminator string, typically “conversation”.
-    /// </para>
-    /// <para>
-    /// • Because this method executes asynchronously, it does not block the main thread.
-    /// The retrieval request runs in the background, and your callback handlers determine
-    /// the behavior at each stage (start, success, or error).
-    /// </para>
-    /// <para>
-    /// • Internally, this method delegates to
-    /// <c>API.GetAsyn&lt;TConversations&gt;</c>, performing type-safe deserialization of the JSON response
-    /// and encapsulating the asynchronous flow using <c>TAsynCallBack&lt;TConversations&gt;</c>.
-    /// The raw JSON returned by the API is also preserved and accessible through
-    /// <c>TJSONFingerprint.JSONResponse</c>.
-    /// </para>
-    /// </remarks>
-    procedure AsynRetrieve(const ConversationId: string;
-      const CallBacks: TFunc<TAsynConversations>);
-
-    /// <summary>
-    /// Asynchronously updates the metadata of a conversation and executes the provided callback chain
-    /// using a <c>TAsynConversations</c> handler.
-    /// </summary>
-    /// <param name="ConversationId">
-    /// The unique identifier of the conversation to update.
-    /// This corresponds to the <c>Id</c> property of the <c>TConversations</c> object (for example, “conv_123”).
-    /// </param>
-    /// <param name="ParamProc">
-    /// A configuration procedure used to initialize the request body via a <c>TUpdateConversationsParams</c> instance.
-    /// Use this callback to specify updated fields, such as conversation metadata.
-    /// </param>
-    /// <param name="CallBacks">
-    /// A callback factory returning a <c>TAsynConversations</c> instance.
-    /// This allows you to attach asynchronous lifecycle handlers such as <c>OnStart</c>, <c>OnSuccess</c>,
-    /// and <c>OnError</c> to control the asynchronous update flow.
-    /// </param>
-    /// <remarks>
-    /// <para>
-    /// • This method performs a non-blocking POST request to the
-    /// <c>/conversations/{conversation_id}</c> endpoint of the API, updating the target conversation
-    /// asynchronously. The asynchronous control flow is managed through a
-    /// <c>TAsynConversations</c> callback structure.
-    /// </para>
-    /// <para>
-    /// • The <c>ParamProc</c> parameter configures a <c>TUpdateConversationsParams</c> instance
-    /// used to define the conversation updates. Typical fields include:
-    /// </para>
-    /// <para>
-    /// • <c>Metadata</c> — A JSON object containing up to 16 key-value pairs used to store additional
-    /// structured data about the conversation (such as custom tags or identifiers).
-    /// </para>
-    /// <para>
-    /// • Upon successful completion, the <c>OnSuccess</c> event of the callback chain is triggered
-    /// with a <c>TConversations</c> instance representing the updated conversation resource.
-    /// The returned object contains both the modified and persistent fields as reported by the API.
-    /// </para>
-    /// <para>
-    /// • Because this operation is asynchronous, it does not block the main thread.
-    /// The request executes in the background, with <c>OnStart</c>, <c>OnSuccess</c>, and <c>OnError</c>
-    /// events triggered at each lifecycle stage.
-    /// </para>
-    /// <para>
-    /// • Internally, this method wraps a call to
-    /// <c>API.PostAsyn&lt;TConversations, TUpdateConversationsParams&gt;</c>,
-    /// ensuring type-safe serialization of update parameters and deserialization of the resulting
-    /// conversation object. The raw JSON returned by the API remains available via
-    /// <c>TJSONFingerprint.JSONResponse</c> for debugging or auditing.
-    /// </para>
-    /// </remarks>
-    procedure AsynUpdate(const ConversationId: string;
-      const ParamProc: TProc<TUpdateConversationsParams>;
-      const CallBacks: TFunc<TAsynConversations>);
-
-    /// <summary>
-    /// Asynchronously retrieves the list of items for a conversation and executes the provided callback chain
-    /// using a <c>TAsynConversationList</c> handler.
-    /// </summary>
-    /// <param name="ConversationId">
-    /// The unique identifier of the conversation whose items are to be listed.
-    /// This corresponds to the <c>Id</c> property of the <c>TConversations</c> object (for example, “conv_123”).
-    /// </param>
-    /// <param name="ParamProc">
-    /// A configuration procedure used to define URL query parameters via a <c>TUrlListItemsParams</c> instance.
-    /// Use it to control pagination (<c>After</c>, <c>Limit</c>), sort order (<c>Order</c>), and optional inclusions (<c>Include</c>).
-    /// </param>
-    /// <param name="CallBacks">
-    /// A callback factory returning a <c>TAsynConversationList</c> instance.
-    /// This allows you to attach asynchronous lifecycle handlers such as <c>OnStart</c>, <c>OnSuccess</c>, and <c>OnError</c>.
-    /// </param>
-    /// <remarks>
-    /// <para>
-    /// • This method performs a non-blocking GET request to the <c>/conversations/{conversation_id}/items</c> endpoint,
-    /// returning a paginated collection of conversation entries (messages, tool calls, generated outputs, etc.).
-    /// The asynchronous control flow is driven by the <c>TAsynConversationList</c> callback sequence.
-    /// </para>
-    /// <para>
-    /// • Upon successful completion, the <c>OnSuccess</c> event receives a <c>TConversationList</c> (alias of <c>TResponses</c>)
-    /// that contains an ordered array of <c>TResponse</c> elements representing the conversation items.
-    /// </para>
-    /// <para>
-    /// • Because the operation is asynchronous, it does not block the main thread. The request executes in the background,
-    /// and handlers supplied via <c>CallBacks</c> determine behavior at each lifecycle stage.
-    /// </para>
-    /// <para>
-    /// • Internally, this method delegates to <c>API.GetAsyn&lt;TConversationList, TUrlListItemsParams&gt;</c>, performing
-    /// type-safe parameter serialization and automatic deserialization of the response payload. The raw JSON returned
-    /// by the API is preserved through <c>TJSONFingerprint.JSONResponse</c> on each contained item.
-    /// </para>
-    /// </remarks>
-    procedure AsynList(const ConversationId: string;
-      const ParamProc: TProc<TUrlListItemsParams>;
-      const CallBacks: TFunc<TAsynConversationList>);
-
-    /// <summary>
-    /// Asynchronously adds one or more items to an existing conversation and executes the provided callback chain
-    /// using a <c>TAsynConversationList</c> handler.
-    /// </summary>
-    /// <param name="ConversationId">
-    /// The unique identifier of the target conversation to which new items will be added.
-    /// This corresponds to the <c>Id</c> property of the <c>TConversations</c> object (for example, “conv_123”).
-    /// </param>
-    /// <param name="ParamProc">
-    /// A configuration procedure used to define the items to append to the conversation via a <c>TConversationsItemParams</c> instance.
-    /// Use this parameter to specify an array of <c>TInputListItem</c> objects through the <c>Items</c> method.
-    /// The API accepts up to 20 items per request.
-    /// </param>
-    /// <param name="CallBacks">
-    /// A callback factory returning a <c>TAsynConversationList</c> instance.
-    /// This allows you to attach asynchronous lifecycle handlers such as <c>OnStart</c>, <c>OnSuccess</c>,
-    /// and <c>OnError</c> for managing the asynchronous execution flow.
-    /// </param>
-    /// <remarks>
-    /// <para>
-    /// • This method performs a non-blocking POST request to the
-    /// <c>/conversations/{conversation_id}/items</c> endpoint of the API, asynchronously adding the provided items
-    /// to the specified conversation.
-    /// The asynchronous execution and event lifecycle are managed through a <c>TAsynConversationList</c> callback structure.
-    /// </para>
-    /// <para>
-    /// • When the request completes successfully, the <c>OnSuccess</c> event is triggered with a <c>TConversationList</c>
-    /// (alias of <c>TResponses</c>) that contains the newly created conversation items.
-    /// Each item may include model-generated outputs, intermediate tool calls, or metadata depending on the request.
-    /// </para>
-    /// <para>
-    /// • Because this operation is asynchronous, it does not block the main thread.
-    /// The background task runs independently, with <c>OnStart</c>, <c>OnSuccess</c>, and <c>OnError</c>
-    /// events indicating the various lifecycle phases.
-    /// </para>
-    /// <para>
-    /// • Internally, this method wraps a call to
-    /// <c>API.PostAsyn&lt;TConversationList, TConversationsItemParams&gt;</c>,
-    /// performing type-safe serialization of input parameters and automatic deserialization of the API response.
-    /// Each resulting object inherits from <c>TJSONFingerprint</c>, preserving the raw JSON payload for auditing or debugging.
-    /// </para>
-    /// </remarks>
-    procedure AsynCreateItem(const ConversationId: string;
-      const ParamProc: TProc<TConversationsItemParams>;
-      const CallBacks: TFunc<TAsynConversationList>); overload;
-
-    /// <summary>
-    /// Asynchronously adds one or more items to a conversation with optional output inclusion filters
-    /// and executes the provided callback chain using a <c>TAsynConversationList</c> handler.
-    /// </summary>
-    /// <param name="ConversationId">
-    /// The unique identifier of the target conversation to which new items will be added.
-    /// This corresponds to the <c>Id</c> property of the <c>TConversations</c> object (for example, “conv_123”).
-    /// </param>
-    /// <param name="Include">
-    /// An array of <c>TOutputIncluding</c> enumeration values specifying additional model output data
-    /// to include in the API response.
-    /// These options allow fine-grained control over the returned fields — for instance:
-    /// <para>• <c>web_search_call_action_sources</c></para>
-    /// <para>• <c>code_interpreter_call_outputs</c></para>
-    /// <para>• <c>computer_call_output_output_image_url</c></para>
-    /// <para>• <c>file_search_call_results</c></para>
-    /// <para>• <c>message_input_image_image_url</c></para>
-    /// <para>• <c>message_output_text_logprobs</c></para>
-    /// <para>• <c>reasoning_encrypted_content</c></para>
-    /// </param>
-    /// <param name="ParamProc">
-    /// A configuration procedure used to define the conversation items via a <c>TConversationsItemParams</c> instance.
-    /// Use the <c>Items</c> method within this procedure to specify up to 20 <c>TInputListItem</c> entries to append.
-    /// </param>
-    /// <param name="CallBacks">
-    /// A callback factory returning a <c>TAsynConversationList</c> instance.
-    /// This structure enables attaching asynchronous lifecycle handlers such as <c>OnStart</c>, <c>OnSuccess</c>,
-    /// and <c>OnError</c> for controlling the asynchronous workflow.
-    /// </param>
-    /// <remarks>
-    /// <para>
-    /// • This method performs a non-blocking POST request to the
-    /// <c>/conversations/{conversation_id}/items</c> endpoint of the API,
-    /// asynchronously creating and appending new conversation items while applying any
-    /// output inclusion filters specified in <paramref name="Include"/>.
-    /// </para>
-    /// <para>
-    /// • Upon successful completion, the <c>OnSuccess</c> event is triggered with a <c>TConversationList</c>
-    /// (alias of <c>TResponses</c>) containing the updated conversation items.
-    /// Each entry reflects the API’s response structure, including additional fields based on
-    /// the provided <c>Include</c> parameters.
-    /// </para>
-    /// <para>
-    /// • This method executes asynchronously and does not block the main thread.
-    /// The asynchronous lifecycle (<c>OnStart</c>, <c>OnSuccess</c>, <c>OnError</c>)
-    /// is managed through the callback sequence defined by <paramref name="CallBacks"/>.
-    /// </para>
-    /// <para>
-    /// • Internally, the implementation wraps a call to
-    /// <c>API.PostAsyn&lt;TConversationList, TUrlConversationsItemParams, TConversationsItemParams&gt;</c>,
-    /// ensuring type-safe serialization of both URL and JSON parameters.
-    /// All returned objects derive from <c>TJSONFingerprint</c>, preserving the raw JSON payload
-    /// for diagnostic or analytical purposes.
-    /// </para>
-    /// </remarks>
-    procedure AsynCreateItem(const ConversationId: string;
-      const Include: TArray<TOutputIncluding>;
-      const ParamProc: TProc<TConversationsItemParams>;
-      const CallBacks: TFunc<TAsynConversationList>); overload;
-
-    /// <summary>
-    /// Asynchronously retrieves a specific item from a conversation and executes the provided callback chain
-    /// using a <c>TAsynConversationsItem</c> handler.
-    /// </summary>
-    /// <param name="ConversationId">
-    /// The unique identifier of the conversation that contains the requested item.
-    /// This corresponds to the <c>Id</c> property of a <c>TConversations</c> instance (for example, “conv_123”).
-    /// </param>
-    /// <param name="MessageId">
-    /// The unique identifier of the message (or conversation item) to retrieve.
-    /// This value matches the <c>Id</c> field of the <c>TConversationsItem</c> object.
-    /// </param>
-    /// <param name="CallBacks">
-    /// A callback factory returning a <c>TAsynConversationsItem</c> instance.
-    /// Use it to attach asynchronous lifecycle handlers such as <c>OnStart</c>, <c>OnSuccess</c>, and <c>OnError</c>
-    /// for full control over the asynchronous retrieval flow.
-    /// </param>
-    /// <remarks>
-    /// <para>
-    /// • This method performs a non-blocking GET request to the
-    /// <c>/conversations/{conversation_id}/items/{message_id}</c> endpoint of the API,
-    /// asynchronously fetching the specified item within a conversation.
-    /// The asynchronous execution sequence is managed via a <c>TAsynConversationsItem</c> callback structure.
-    /// </para>
-    /// <para>
-    /// • When the request completes successfully, the <c>OnSuccess</c> event is triggered with a
-    /// <c>TConversationsItem</c> (alias of <c>TResponseItem</c>), which represents the retrieved item.
-    /// This object may contain data such as message content, tool call results,
-    /// or output metadata depending on the item type and the conversation context.
-    /// </para>
-    /// <para>
-    /// • This operation executes asynchronously and does not block the main thread.
-    /// The request runs in the background, while the <c>OnStart</c>, <c>OnSuccess</c>, and <c>OnError</c>
-    /// events provide granular lifecycle notifications through the supplied callback factory.
-    /// </para>
-    /// <para>
-    /// • Internally, this method wraps a call to
-    /// <c>API.GetAsyn&lt;TConversationsItem&gt;</c>,
-    /// ensuring type-safe deserialization of the returned JSON payload into a strongly-typed item instance.
-    /// The raw JSON representation remains available via <c>TJSONFingerprint.JSONResponse</c>
-    /// for debugging or auditing purposes.
-    /// </para>
-    /// </remarks>
-    procedure AsynRetrieveItem(const ConversationId: string;
-      const MessageId: string;
-      const CallBacks: TFunc<TAsynConversationsItem>); overload;
-
-    /// <summary>
-    /// Asynchronously retrieves a specific item from a conversation with customizable URL parameters
-    /// and executes the provided callback chain using a <c>TAsynConversationsItem</c> handler.
-    /// </summary>
-    /// <param name="ConversationId">
-    /// The unique identifier of the conversation that contains the requested item.
-    /// This corresponds to the <c>Id</c> property of a <c>TConversations</c> instance (for example, “conv_123”).
-    /// </param>
-    /// <param name="MessageId">
-    /// The unique identifier of the message (or item) to retrieve.
-    /// This value matches the <c>Id</c> field of the <c>TConversationsItem</c> object.
-    /// </param>
-    /// <param name="UrlParamProc">
-    /// A configuration procedure used to define URL query parameters through a <c>TUrlConversationsItemParams</c> instance.
-    /// Use this parameter to include additional output data fields in the response via the <c>Include</c> method.
-    /// Supported include values include, for example:
-    /// <para>• <c>web_search_call_action_sources</c> — Include web search tool sources.</para>
-    /// <para>• <c>code_interpreter_call_outputs</c> — Include code interpreter outputs.</para>
-    /// <para>• <c>computer_call_output_output_image_url</c> — Include computer tool image URLs.</para>
-    /// <para>• <c>file_search_call_results</c> — Include file search results.</para>
-    /// <para>• <c>message_output_text_logprobs</c> — Include message log probabilities.</para>
-    /// <para>• <c>reasoning_encrypted_content</c> — Include encrypted reasoning content.</para>
-    /// </param>
-    /// <param name="CallBacks">
-    /// A callback factory returning a <c>TAsynConversationsItem</c> instance.
-    /// This enables the attachment of asynchronous lifecycle handlers such as <c>OnStart</c>, <c>OnSuccess</c>,
-    /// and <c>OnError</c> to control the asynchronous retrieval process.
-    /// </param>
-    /// <remarks>
-    /// <para>
-    /// • This method performs a non-blocking GET request to the
-    /// <c>/conversations/{conversation_id}/items/{message_id}</c> endpoint of the API,
-    /// asynchronously retrieving the specified conversation item with any custom inclusion parameters
-    /// defined via <paramref name="UrlParamProc"/>.
-    /// </para>
-    /// <para>
-    /// • Upon successful completion, the <c>OnSuccess</c> event of the callback chain is triggered
-    /// with a <c>TConversationsItem</c> (alias of <c>TResponseItem</c>) instance containing the item’s data.
-    /// Depending on the <c>Include</c> values, this object may contain enriched content
-    /// such as reasoning traces, image URLs, log probabilities, or tool call outputs.
-    /// </para>
-    /// <para>
-    /// • This method is fully asynchronous and does not block the main thread.
-    /// The API call executes in the background while <c>OnStart</c>, <c>OnSuccess</c>, and <c>OnError</c>
-    /// provide event-driven feedback via the callback factory.
-    /// </para>
-    /// <para>
-    /// • Internally, this function delegates to
-    /// <c>API.GetAsyn&lt;TConversationsItem, TUrlConversationsItemParams&gt;</c>,
-    /// performing type-safe serialization of query parameters and deserialization of the JSON response.
-    /// The resulting <c>TConversationsItem</c> inherits from <c>TJSONFingerprint</c>,
-    /// preserving the raw JSON payload in <c>JSONResponse</c> for traceability and inspection.
-    /// </para>
-    /// </remarks>
-    procedure AsynRetrieveItem(const ConversationId: string;
-      const MessageId: string;
-      const UrlParamProc: TProc<TUrlConversationsItemParams>;
-      const CallBacks: TFunc<TAsynConversationsItem>); overload;
-
-    /// <summary>
-    /// Asynchronously deletes a specific item from a conversation and executes the provided callback chain
-    /// using a <c>TAsynConversations</c> handler.
-    /// </summary>
-    /// <param name="ConversationId">
-    /// The unique identifier of the conversation that contains the item to delete.
-    /// This corresponds to the <c>Id</c> property of a <c>TConversations</c> instance (for example, “conv_123”).
-    /// </param>
-    /// <param name="MessageId">
-    /// The unique identifier of the message (or conversation item) to delete.
-    /// This value matches the <c>Id</c> property of the <c>TConversationsItem</c> object.
-    /// </param>
-    /// <param name="CallBacks">
-    /// A callback factory returning a <c>TAsynConversations</c> instance.
-    /// Use it to attach asynchronous lifecycle handlers such as <c>OnStart</c>, <c>OnSuccess</c>, and <c>OnError</c>
-    /// to monitor and control the asynchronous deletion process.
-    /// </param>
-    /// <remarks>
-    /// <para>
-    /// • This method performs a non-blocking DELETE request to the
-    /// <c>/conversations/{conversation_id}/items/{message_id}</c> endpoint of the API,
-    /// asynchronously removing the specified item from the given conversation.
-    /// The operation’s execution flow and lifecycle management are handled through the
-    /// <c>TAsynConversations</c> callback structure.
-    /// </para>
-    /// <para>
-    /// • Upon successful completion, the <c>OnSuccess</c> event is triggered with a
-    /// <c>TConversations</c> object representing the updated state of the conversation
-    /// after the item’s deletion. This object may include metadata such as
-    /// the conversation ID, creation timestamp, and current object type.
-    /// </para>
-    /// <para>
-    /// • This operation is fully asynchronous and does not block the main thread.
-    /// The API request executes in the background, while your callback handlers determine
-    /// the behavior at each stage of the process (<c>OnStart</c>, <c>OnSuccess</c>, <c>OnError</c>).
-    /// </para>
-    /// <para>
-    /// • Internally, this method wraps a call to
-    /// <c>API.DeleteAsyn&lt;TConversations&gt;</c>,
-    /// performing type-safe deserialization of the API’s JSON response into a <c>TConversations</c> instance.
-    /// The raw JSON payload returned by the server is preserved and accessible via
-    /// <c>TJSONFingerprint.JSONResponse</c> for logging or post-processing purposes.
-    /// </para>
-    /// </remarks>
-    procedure AsynDeleteItem(const ConversationId: string;
-      const MessageId: string;
-      const CallBacks: TFunc<TAsynConversations>);
   end;
 
 implementation
@@ -2186,7 +1750,9 @@ begin
     CallBacks);
 end;
 
-procedure TConversationsRoute.AsynCreate(
+{ TConversationsAsynchronousSupport }
+
+procedure TConversationsAsynchronousSupport.AsynCreate(
   const ParamProc: TProc<TConversationsParams>;
   const CallBacks: TFunc<TAsynConversations>);
 begin
@@ -2206,7 +1772,7 @@ begin
   end;
 end;
 
-procedure TConversationsRoute.AsynCreateItem(const ConversationId: string;
+procedure TConversationsAsynchronousSupport.AsynCreateItem(const ConversationId: string;
   const ParamProc: TProc<TConversationsItemParams>;
   const CallBacks: TFunc<TAsynConversationList>);
 begin
@@ -2226,7 +1792,7 @@ begin
   end;
 end;
 
-procedure TConversationsRoute.AsynCreateItem(const ConversationId: string;
+procedure TConversationsAsynchronousSupport.AsynCreateItem(const ConversationId: string;
   const Include: TArray<TOutputIncluding>;
   const ParamProc: TProc<TConversationsItemParams>;
   const CallBacks: TFunc<TAsynConversationList>);
@@ -2247,7 +1813,7 @@ begin
   end;
 end;
 
-procedure TConversationsRoute.AsynDelete(const ConversationId: string;
+procedure TConversationsAsynchronousSupport.AsynDelete(const ConversationId: string;
   const CallBacks: TFunc<TAsynConversationsDeleted>);
 begin
   with TAsynCallBackExec<TAsynConversationsDeleted, TConversationsDeleted>.Create(CallBacks) do
@@ -2266,7 +1832,7 @@ begin
   end;
 end;
 
-procedure TConversationsRoute.AsynDeleteItem(const ConversationId,
+procedure TConversationsAsynchronousSupport.AsynDeleteItem(const ConversationId,
   MessageId: string; const CallBacks: TFunc<TAsynConversations>);
 begin
   with TAsynCallBackExec<TAsynConversations, TConversations>.Create(CallBacks) do
@@ -2285,7 +1851,7 @@ begin
   end;
 end;
 
-procedure TConversationsRoute.AsynList(const ConversationId: string;
+procedure TConversationsAsynchronousSupport.AsynList(const ConversationId: string;
   const ParamProc: TProc<TUrlListItemsParams>;
   const CallBacks: TFunc<TAsynConversationList>);
 begin
@@ -2305,7 +1871,7 @@ begin
   end;
 end;
 
-procedure TConversationsRoute.AsynRetrieve(const ConversationId: string;
+procedure TConversationsAsynchronousSupport.AsynRetrieve(const ConversationId: string;
   const CallBacks: TFunc<TAsynConversations>);
 begin
   with TAsynCallBackExec<TAsynConversations, TConversations>.Create(CallBacks) do
@@ -2324,7 +1890,7 @@ begin
   end;
 end;
 
-procedure TConversationsRoute.AsynRetrieveItem(
+procedure TConversationsAsynchronousSupport.AsynRetrieveItem(
   const ConversationId, MessageId: string;
   const UrlParamProc: TProc<TUrlConversationsItemParams>;
   const CallBacks: TFunc<TAsynConversationsItem>);
@@ -2345,7 +1911,7 @@ begin
   end;
 end;
 
-procedure TConversationsRoute.AsynRetrieveItem(const ConversationId,
+procedure TConversationsAsynchronousSupport.AsynRetrieveItem(const ConversationId,
   MessageId: string; const CallBacks: TFunc<TAsynConversationsItem>);
 begin
   with TAsynCallBackExec<TAsynConversationsItem, TConversationsItem>.Create(CallBacks) do
@@ -2364,7 +1930,7 @@ begin
   end;
 end;
 
-procedure TConversationsRoute.AsynUpdate(const ConversationId: string;
+procedure TConversationsAsynchronousSupport.AsynUpdate(const ConversationId: string;
   const ParamProc: TProc<TUpdateConversationsParams>;
   const CallBacks: TFunc<TAsynConversations>);
 begin
@@ -2384,6 +1950,8 @@ begin
   end;
 end;
 
+{ TConversationsRoute }
+
 function TConversationsRoute.Create(
   const ParamProc: TProc<TConversationsParams>): TConversations;
 begin
@@ -2393,14 +1961,18 @@ end;
 function TConversationsRoute.CreateItem(const ConversationId: string;
   const UrlParamProc: TProc<TUrlConversationsItemParams>;
   const ParamProc: TProc<TConversationsItemParams>): TConversationList;
+var
+  UrlParams: TUrlConversationsItemParams;
 begin
-  Result := API.Post<TConversationList, TUrlConversationsItemParams, TConversationsItemParams>(
-    'conversations/' + ConversationId + '/items',
-    UrlParamProc,
-    ParamProc,
-    [
-      ['data', '*', 'output', '[]']
-    ]);
+  UrlParams := TUrlConversationsItemParams.Create;
+  try
+    if Assigned(UrlParamProc) then
+      UrlParamProc(UrlParams);
+    Result := API.Post<TConversationList, TConversationsItemParams>(
+      'conversations/' + ConversationId + '/items' + UrlParams.Value, ParamProc);
+  finally
+    UrlParams.Free;
+  end;
 end;
 
 function TConversationsRoute.CreateItem(const ConversationId: string;
@@ -2408,10 +1980,7 @@ function TConversationsRoute.CreateItem(const ConversationId: string;
 begin
   Result := API.Post<TConversationList, TConversationsItemParams>(
     'conversations/' + ConversationId + '/items',
-    ParamProc,
-    [
-      ['data', '*', 'output', '[]']
-    ]);
+    ParamProc);
 end;
 
 function TConversationsRoute.CreateItem(const ConversationId: string;
@@ -2442,10 +2011,7 @@ function TConversationsRoute.List(const ConversationId: string;
   const ParamProc: TProc<TUrlListItemsParams>): TConversationList;
 begin
   Result := API.Get<TConversationList, TUrlListItemsParams>(
-    'conversations/' + ConversationId + '/items', ParamProc,
-    [
-      ['data', '*', 'output', '{}']
-    ]);
+    'conversations/' + ConversationId + '/items', ParamProc);
 end;
 
 function TConversationsRoute.Retrieve(
@@ -2459,20 +2025,14 @@ function TConversationsRoute.RetrieveItem(const ConversationId, MessageId: strin
 begin
   Result := API.Get<TConversationsItem, TUrlConversationsItemParams>(
     'conversations/' + ConversationId + '/items/' + MessageId,
-    UrlParamProc,
-    [
-      ['output', '{}']
-    ]);
+    UrlParamProc);
 end;
 
 function TConversationsRoute.RetrieveItem(const ConversationId,
   MessageId: string): TConversationsItem;
 begin
   Result := API.Get<TConversationsItem>(
-    'conversations/' + ConversationId + '/items/' + MessageId,
-    [
-      ['output', '{}']
-    ]);
+    'conversations/' + ConversationId + '/items/' + MessageId);
 end;
 
 function TConversationsRoute.Update(const ConversationId: string;

@@ -1,4 +1,4 @@
-unit GenAI.Batch;
+﻿unit GenAI.Batch;
 
 {-------------------------------------------------------------------------------
 
@@ -25,15 +25,9 @@ uses
   System.SysUtils, System.Classes, System.Threading, System.JSON, REST.Json.Types,
   REST.JsonReflect,
   GenAI.API.Params, GenAI.API, GenAI.Consts, GenAI.Types, GenAI.Async.Support,
-  GenAI.API.Lists;
+  GenAI.Async.Promise, GenAI.API.Lists;
 
 type
-  /// <summary>
-  /// Represents the parameters required to create a batch operation within the OpenAI API.
-  /// This class encapsulates the settings and metadata necessary to initiate a batch process, including the
-  /// input file, endpoint specification, completion window, and any optional metadata associated with the
-  /// batch.
-  /// </summary>
   TBatchCreateParams = class(TJSONParam)
   public
     /// <summary>
@@ -75,11 +69,6 @@ type
     function Metadata(const Value: TJSONObject): TBatchCreateParams;
   end;
 
-  /// <summary>
-  /// Represents the error details associated with a specific request within a batch operation.
-  /// This class holds detailed information about an error, including a machine-readable code, a human-readable message,
-  /// and the specific parameter or line that caused the error. This facilitates debugging and error handling in batch processing.
-  /// </summary>
   TBatchErrorsData = class
   private
     FCode: string;
@@ -115,11 +104,6 @@ type
     property Line: Int64 read FLine write FLine;
   end;
 
-  /// <summary>
-  /// Represents a collection of errors associated with a batch operation.
-  /// This class aggregates all errors that occurred during the execution of a batch, facilitating centralized error management
-  /// and analysis. Each error is detailed by an instance of TBatchErrorsData, which provides specific error information.
-  /// </summary>
   TBatchErrors = class
   private
     FObject: string;
@@ -141,11 +125,6 @@ type
     destructor Destroy; override;
   end;
 
-  /// <summary>
-  /// Provides a base class for handling timestamps associated with various stages of a batch's lifecycle.
-  /// This class is designed to abstract the common functionality needed to convert timestamp data from Unix time format to human-readable strings.
-  /// These timestamps reflect key events in the batch processing timeline, such as creation, processing, and expiration.
-  /// </summary>
   TBatchTimeStamp = class abstract(TJSONFingerprint)
   protected
     function GetCreatedAtAsString: string; virtual; abstract;
@@ -214,11 +193,6 @@ type
     property CancelledAtAsString: string read GetCancelledAtAsString;
   end;
 
-  /// <summary>
-  /// Provides a count of requests at various stages of processing within a batch operation.
-  /// This class includes properties for tracking the total number of requests, the number of requests that have been completed successfully,
-  /// and the number of requests that have failed. This information is crucial for monitoring and managing the progress of batch operations.
-  /// </summary>
   TBatchRequestCounts = class
   private
     FTotal: Int64;
@@ -246,11 +220,6 @@ type
     property Failed: Int64 read FFailed write FFailed;
   end;
 
-  /// <summary>
-  /// Represents a batch operation as managed by the OpenAI API, encapsulating comprehensive details
-  /// necessary for managing batch processing tasks. This class includes functionalities such as tracking
-  /// the batch's progress, its inputs and outputs, handling errors, and managing lifecycle timestamps.
-  /// </summary>
   TBatch = class(TBatchTimeStamp)
   private
     FId: string;
@@ -268,26 +237,25 @@ type
     [JsonNameAttribute('error_file_id')]
     FErrorFileId: string;
     [JsonNameAttribute('created_at')]
-    FCreatedAt: TInt64OrNull;
+    FCreatedAt: Int64;
     [JsonNameAttribute('in_progress_at')]
-    FInProgressAt: TInt64OrNull;
+    FInProgressAt: Int64;
     [JsonNameAttribute('expires_at')]
-    FExpiresAt: TInt64OrNull;
+    FExpiresAt: Int64;
     [JsonNameAttribute('finalizing_at')]
-    FFinalizingAt: TInt64OrNull;
+    FFinalizingAt: Int64;
     [JsonNameAttribute('completed_at')]
-    FCompletedAt: TInt64OrNull;
+    FCompletedAt: Int64;
     [JsonNameAttribute('failed_at')]
-    FFailedAt: TInt64OrNull;
+    FFailedAt: Int64;
     [JsonNameAttribute('expired_at')]
-    FExpiredAt: TInt64OrNull;
+    FExpiredAt: Int64;
     [JsonNameAttribute('cancelling_at')]
-    FCancellingAt: TInt64OrNull;
+    FCancellingAt: Int64;
     [JsonNameAttribute('cancelled_at')]
-    FCancelledAt: TInt64OrNull;
+    FCancelledAt: Int64;
     [JsonNameAttribute('request_counts')]
     FRequestCounts: TBatchRequestCounts;
-    [JsonReflectAttribute(ctString, rtString, TMetadataInterceptor)]
     FMetadata: string;
     function GetCancelledAt: Int64;
     function GetCancellingAt: Int64;
@@ -464,98 +432,130 @@ type
   TAsynBatches = TAsynCallBack<TBatches>;
 
   /// <summary>
-  /// Provides routes for managing batches within the OpenAI API.
-  /// This class offers methods to create, retrieve, cancel, and list batches, facilitating the orchestration of batch operations.
-  /// It is designed to support both synchronous and asynchronous execution of these operations, enhancing flexibility and efficiency
-  /// in application workflows.
+  /// Promise callback record for a single batch response.
   /// </summary>
-  TBatchRoute = class(TGenAIRoute)
+  TPromiseBatch = TPromiseCallBack<TBatch>;
+
+  /// <summary>
+  /// Promise callback record for a batch list response.
+  /// </summary>
+  TPromiseBatches = TPromiseCallBack<TBatches>;
+
+  TBatchAbstractSupport = class(TGenAIRoute)
+  protected
+    function Create(const ParamProc: TProc<TBatchCreateParams>): TBatch; virtual; abstract;
+    function Retrieve(const BatchId: string): TBatch; virtual; abstract;
+    function Cancel(const BatchId: string): TBatch; virtual; abstract;
+    function List: TBatches; overload; virtual; abstract;
+    function List(const ParamProc: TProc<TUrlPaginationParams>): TBatches; overload; virtual; abstract;
+  end;
+
+  TBatchAsynchronousSupport = class(TBatchAbstractSupport)
+  public
+    procedure AsynCreate(const ParamProc: TProc<TBatchCreateParams>; const CallBacks: TFunc<TAsynBatch>);
+    procedure AsynRetrieve(const BatchId: string; const CallBacks: TFunc<TAsynBatch>);
+    procedure AsynCancel(const BatchId: string; const CallBacks: TFunc<TAsynBatch>);
+    procedure AsynList(const CallBacks: TFunc<TAsynBatches>); overload;
+    procedure AsynList(const ParamProc: TProc<TUrlPaginationParams>; const CallBacks: TFunc<TAsynBatches>); overload;
+  end;
+
+  /// <summary>
+  /// Provides routes for managing batches within the OpenAI API.
+  /// This class provides the concrete synchronous implementations along with their promise-based
+  /// (<c>AsyncAwait*</c>) variants, inheriting the callback-based (<c>Asyn*</c>) variants from
+  /// <see cref="TBatchAsynchronousSupport"/>. It can create, retrieve, cancel, and list batches.
+  /// </summary>
+  TBatchRoute = class(TBatchAsynchronousSupport)
+  public
     /// <summary>
-    /// Asynchronously creates a batch with the specified parameters.
-    /// This method uses a callback mechanism to manage the lifecycle of the batch creation operation,
-    /// allowing for non-blocking operations within applications.
+    /// Asynchronously creates a batch and returns a promise that resolves with the created batch.
     /// </summary>
     /// <param name="ParamProc">A procedure that configures the parameters for the batch creation.</param>
-    /// <param name="CallBacks">A function that returns an instance of TAsynBatch for handling callback events.</param>
-    procedure AsynCreate(const ParamProc: TProc<TBatchCreateParams>; const CallBacks: TFunc<TAsynBatch>);
+    /// <param name="CallBacks">An optional function providing <see cref="TPromiseBatch"/> lifecycle callbacks.</param>
+    /// <returns>A <c>TPromise&lt;TBatch&gt;</c> that completes when the creation request succeeds or fails.</returns>
+    function AsyncAwaitCreate(const ParamProc: TProc<TBatchCreateParams>;
+      const CallBacks: TFunc<TPromiseBatch> = nil): TPromise<TBatch>;
 
     /// <summary>
-    /// Asynchronously retrieves a batch by its ID.
-    /// This method uses a callback mechanism to handle the lifecycle of the batch retrieval operation,
-    /// facilitating non-blocking retrieval within applications.
+    /// Asynchronously retrieves a batch by its ID and returns a promise that resolves with the batch.
     /// </summary>
     /// <param name="BatchId">The unique identifier of the batch to retrieve.</param>
-    /// <param name="CallBacks">A function that returns an instance of TAsynBatch for handling callback events.</param>
-    procedure AsynRetrieve(const BatchId: string; const CallBacks: TFunc<TAsynBatch>);
+    /// <param name="CallBacks">An optional function providing <see cref="TPromiseBatch"/> lifecycle callbacks.</param>
+    /// <returns>A <c>TPromise&lt;TBatch&gt;</c> that completes when the retrieval request succeeds or fails.</returns>
+    function AsyncAwaitRetrieve(const BatchId: string;
+      const CallBacks: TFunc<TPromiseBatch> = nil): TPromise<TBatch>;
 
     /// <summary>
-    /// Asynchronously cancels an in-progress batch.
-    /// This method provides a non-blocking way to send a cancellation request for a batch,
-    /// using callbacks to manage the operation's lifecycle.
+    /// Asynchronously cancels an in-progress batch and returns a promise that resolves with the cancelled batch.
     /// </summary>
     /// <param name="BatchId">The unique identifier of the batch to cancel.</param>
-    /// <param name="CallBacks">A function that returns an instance of TAsynBatch for handling callback events.</param>
-    procedure AsynCancel(const BatchId: string; const CallBacks: TFunc<TAsynBatch>);
+    /// <param name="CallBacks">An optional function providing <see cref="TPromiseBatch"/> lifecycle callbacks.</param>
+    /// <returns>A <c>TPromise&lt;TBatch&gt;</c> that completes when the cancellation request succeeds or fails.</returns>
+    function AsyncAwaitCancel(const BatchId: string;
+      const CallBacks: TFunc<TPromiseBatch> = nil): TPromise<TBatch>;
 
     /// <summary>
-    /// Asynchronously lists all batches.
-    /// This method uses a callback mechanism to enable non-blocking operations for listing batches,
-    /// facilitating efficient data management and retrieval.
+    /// Asynchronously lists all batches and returns a promise that resolves with the batch list.
     /// </summary>
-    /// <param name="CallBacks">A function that returns an instance of TAsynBatches for handling callback events.</param>
-    procedure AsynList(const CallBacks: TFunc<TAsynBatches>); overload;
+    /// <param name="CallBacks">An optional function providing <see cref="TPromiseBatches"/> lifecycle callbacks.</param>
+    /// <returns>A <c>TPromise&lt;TBatches&gt;</c> that completes when the listing request succeeds or fails.</returns>
+    function AsyncAwaitList(const CallBacks: TFunc<TPromiseBatches> = nil): TPromise<TBatches>; overload;
 
     /// <summary>
-    /// Asynchronously lists batches with optional parameters for pagination.
-    /// This method allows for non-blocking batch listing operations, using callbacks to handle the lifecycle of the listing request.
+    /// Asynchronously lists batches with pagination and returns a promise that resolves with the batch list.
     /// </summary>
-    /// <param name="ParamProc">An optional procedure to configure listing parameters such as pagination.</param>
-    /// <param name="CallBacks">A function that returns an instance of TAsynBatches for handling callback events.</param>
-    procedure AsynList(const ParamProc: TProc<TUrlPaginationParams>; const CallBacks: TFunc<TAsynBatches>); overload;
+    /// <param name="ParamProc">A procedure to configure listing parameters such as pagination.</param>
+    /// <param name="CallBacks">An optional function providing <see cref="TPromiseBatches"/> lifecycle callbacks.</param>
+    /// <returns>A <c>TPromise&lt;TBatches&gt;</c> that completes when the listing request succeeds or fails.</returns>
+    function AsyncAwaitList(const ParamProc: TProc<TUrlPaginationParams>;
+      const CallBacks: TFunc<TPromiseBatches> = nil): TPromise<TBatches>; overload;
 
     /// <summary>
     /// Synchronously creates a batch with the specified parameters.
-    /// This method provides a direct way to create a batch, blocking until the operation is complete.
     /// </summary>
     /// <param name="ParamProc">A procedure that configures the parameters for the batch creation.</param>
     /// <returns>An instance of TBatch representing the newly created batch.</returns>
-    function Create(const ParamProc: TProc<TBatchCreateParams>): TBatch;
+    function Create(const ParamProc: TProc<TBatchCreateParams>): TBatch; override;
 
     /// <summary>
     /// Synchronously retrieves a batch by its ID.
-    /// This method provides a direct way to retrieve a batch, blocking until the operation is complete.
     /// </summary>
     /// <param name="BatchId">The unique identifier of the batch to retrieve.</param>
     /// <returns>An instance of TBatch representing the retrieved batch.</returns>
-    function Retrieve(const BatchId: string): TBatch;
+    function Retrieve(const BatchId: string): TBatch; override;
 
     /// <summary>
     /// Synchronously cancels an in-progress batch.
-    /// This method provides a direct way to send a cancellation request for a batch,
-    /// blocking until the operation is confirmed.
     /// </summary>
     /// <param name="BatchId">The unique identifier of the batch to cancel.</param>
     /// <returns>An instance of TBatch representing the cancelled batch.</returns>
-    function Cancel(const BatchId: string): TBatch;
+    function Cancel(const BatchId: string): TBatch; override;
 
     /// <summary>
     /// Synchronously lists all batches.
-    /// This method provides a direct way to list batches, blocking until the operation is complete.
     /// </summary>
     /// <returns>An instance of TBatches containing the list of batches.</returns>
-    function List: TBatches; overload;
+    function List: TBatches; overload; override;
 
     /// <summary>
     /// Synchronously lists batches with specified parameters for pagination.
-    /// This method provides a direct way to list batches with additional control over the retrieval scope,
-    /// blocking until the operation is complete.
     /// </summary>
     /// <param name="ParamProc">A procedure to configure listing parameters such as pagination.</param>
     /// <returns>An instance of TBatches containing the list of batches.</returns>
-    function List(const ParamProc: TProc<TUrlPaginationParams>): TBatches; overload;
+    function List(const ParamProc: TProc<TUrlPaginationParams>): TBatches; overload; override;
   end;
 
 implementation
+
+uses
+  System.DateUtils;
+
+function BatchUnixToUtc(const Value: Int64): string;
+begin
+  if Value <= 0 then
+    Exit(EmptyStr);
+  Result := FormatDateTime('yyyy-mm-dd"T"hh:nn:ss"Z"', UnixToDateTime(Value, True));
+end;
 
 { TBatchCreateParams }
 
@@ -604,97 +604,97 @@ end;
 
 function TBatch.GetCancelledAt: Int64;
 begin
-  Result := TInt64OrNull(FCancelledAt).ToInteger;
+  Result := FCancelledAt;
 end;
 
 function TBatch.GetCancelledAtAsString: string;
 begin
-  Result := TInt64OrNull(FCancelledAt).ToUtcDateString;
+  Result := BatchUnixToUtc(FCancelledAt);
 end;
 
 function TBatch.GetCancellingAt: Int64;
 begin
-  Result := TInt64OrNull(FCancellingAt).ToInteger;
+  Result := FCancellingAt;
 end;
 
 function TBatch.GetCancellingAtAsString: string;
 begin
-  Result := TInt64OrNull(FCancellingAt).ToUtcDateString;
+  Result := BatchUnixToUtc(FCancellingAt);
 end;
 
 function TBatch.GetCompletedAt: Int64;
 begin
-  Result := TInt64OrNull(FCompletedAt).ToInteger;
+  Result := FCompletedAt;
 end;
 
 function TBatch.GetCompletedAtAsString: string;
 begin
-  Result := TInt64OrNull(FCompletedAt).ToUtcDateString;
+  Result := BatchUnixToUtc(FCompletedAt);
 end;
 
 function TBatch.GetCreatedAt: Int64;
 begin
-  Result := TInt64OrNull(FCreatedAt).ToInteger;
+  Result := FCreatedAt;
 end;
 
 function TBatch.GetCreatedAtAsString: string;
 begin
-  Result := TInt64OrNull(FCreatedAt).ToUtcDateString;
+  Result := BatchUnixToUtc(FCreatedAt);
 end;
 
 function TBatch.GetExpiredAt: Int64;
 begin
-  Result := TInt64OrNull(FExpiredAt).ToInteger;
+  Result := FExpiredAt;
 end;
 
 function TBatch.GetExpiredAtAsString: string;
 begin
-  Result := TInt64OrNull(FExpiredAt).ToUtcDateString;
+  Result := BatchUnixToUtc(FExpiredAt);
 end;
 
 function TBatch.GetExpiresAt: Int64;
 begin
-  Result := TInt64OrNull(FExpiresAt).ToInteger;
+  Result := FExpiresAt;
 end;
 
 function TBatch.GetExpiresAtAsString: string;
 begin
-  Result := TInt64OrNull(FExpiresAt).ToUtcDateString;
+  Result := BatchUnixToUtc(FExpiresAt);
 end;
 
 function TBatch.GetFailedAt: Int64;
 begin
-  Result := TInt64OrNull(FFailedAt).ToInteger;
+  Result := FFailedAt;
 end;
 
 function TBatch.GetFailedAtAsString: string;
 begin
-  Result := TInt64OrNull(FFailedAt).ToUtcDateString;
+  Result := BatchUnixToUtc(FFailedAt);
 end;
 
 function TBatch.GetFinalizingAt: Int64;
 begin
-  Result := TInt64OrNull(FFinalizingAt).ToInteger;
+  Result := FFinalizingAt;
 end;
 
 function TBatch.GetFinalizingAtAsString: string;
 begin
-  Result := TInt64OrNull(FFinalizingAt).ToUtcDateString;
+  Result := BatchUnixToUtc(FFinalizingAt);
 end;
 
 function TBatch.GetInProgressAt: Int64;
 begin
-  Result := TInt64OrNull(FInProgressAt).ToInteger;
+  Result := FInProgressAt;
 end;
 
 function TBatch.GetInProgressAtAsString: string;
 begin
-  Result := TInt64OrNull(FInProgressAt).ToUtcDateString;
+  Result := BatchUnixToUtc(FInProgressAt);
 end;
 
-{ TBatchRoute }
+{ TBatchAsynchronousSupport }
 
-procedure TBatchRoute.AsynCancel(const BatchId: string;
+procedure TBatchAsynchronousSupport.AsynCancel(const BatchId: string;
   const CallBacks: TFunc<TAsynBatch>);
 begin
   with TAsynCallBackExec<TAsynBatch, TBatch>.Create(CallBacks) do
@@ -713,7 +713,7 @@ begin
   end;
 end;
 
-procedure TBatchRoute.AsynCreate(const ParamProc: TProc<TBatchCreateParams>;
+procedure TBatchAsynchronousSupport.AsynCreate(const ParamProc: TProc<TBatchCreateParams>;
   const CallBacks: TFunc<TAsynBatch>);
 begin
   with TAsynCallBackExec<TAsynBatch, TBatch>.Create(CallBacks) do
@@ -732,7 +732,7 @@ begin
   end;
 end;
 
-procedure TBatchRoute.AsynList(const ParamProc: TProc<TUrlPaginationParams>;
+procedure TBatchAsynchronousSupport.AsynList(const ParamProc: TProc<TUrlPaginationParams>;
   const CallBacks: TFunc<TAsynBatches>);
 begin
   with TAsynCallBackExec<TAsynBatches, TBatches>.Create(CallBacks) do
@@ -751,7 +751,7 @@ begin
   end;
 end;
 
-procedure TBatchRoute.AsynList(const CallBacks: TFunc<TAsynBatches>);
+procedure TBatchAsynchronousSupport.AsynList(const CallBacks: TFunc<TAsynBatches>);
 begin
   with TAsynCallBackExec<TAsynBatches, TBatches>.Create(CallBacks) do
   try
@@ -769,7 +769,7 @@ begin
   end;
 end;
 
-procedure TBatchRoute.AsynRetrieve(const BatchId: string;
+procedure TBatchAsynchronousSupport.AsynRetrieve(const BatchId: string;
   const CallBacks: TFunc<TAsynBatch>);
 begin
   with TAsynCallBackExec<TAsynBatch, TBatch>.Create(CallBacks) do
@@ -786,6 +786,63 @@ begin
   finally
     Free;
   end;
+end;
+
+{ TBatchRoute }
+
+function TBatchRoute.AsyncAwaitCreate(const ParamProc: TProc<TBatchCreateParams>;
+  const CallBacks: TFunc<TPromiseBatch>): TPromise<TBatch>;
+begin
+  Result := TAsyncAwaitHelper.WrapAsyncAwait<TBatch>(
+    procedure(const CallBackParams: TFunc<TAsynBatch>)
+    begin
+      AsynCreate(ParamProc, CallBackParams);
+    end,
+    CallBacks);
+end;
+
+function TBatchRoute.AsyncAwaitRetrieve(const BatchId: string;
+  const CallBacks: TFunc<TPromiseBatch>): TPromise<TBatch>;
+begin
+  Result := TAsyncAwaitHelper.WrapAsyncAwait<TBatch>(
+    procedure(const CallBackParams: TFunc<TAsynBatch>)
+    begin
+      AsynRetrieve(BatchId, CallBackParams);
+    end,
+    CallBacks);
+end;
+
+function TBatchRoute.AsyncAwaitCancel(const BatchId: string;
+  const CallBacks: TFunc<TPromiseBatch>): TPromise<TBatch>;
+begin
+  Result := TAsyncAwaitHelper.WrapAsyncAwait<TBatch>(
+    procedure(const CallBackParams: TFunc<TAsynBatch>)
+    begin
+      AsynCancel(BatchId, CallBackParams);
+    end,
+    CallBacks);
+end;
+
+function TBatchRoute.AsyncAwaitList(
+  const CallBacks: TFunc<TPromiseBatches>): TPromise<TBatches>;
+begin
+  Result := TAsyncAwaitHelper.WrapAsyncAwait<TBatches>(
+    procedure(const CallBackParams: TFunc<TAsynBatches>)
+    begin
+      AsynList(CallBackParams);
+    end,
+    CallBacks);
+end;
+
+function TBatchRoute.AsyncAwaitList(const ParamProc: TProc<TUrlPaginationParams>;
+  const CallBacks: TFunc<TPromiseBatches>): TPromise<TBatches>;
+begin
+  Result := TAsyncAwaitHelper.WrapAsyncAwait<TBatches>(
+    procedure(const CallBackParams: TFunc<TAsynBatches>)
+    begin
+      AsynList(ParamProc, CallBackParams);
+    end,
+    CallBacks);
 end;
 
 function TBatchRoute.Cancel(const BatchId: string): TBatch;

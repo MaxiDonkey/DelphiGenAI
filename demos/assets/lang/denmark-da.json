@@ -1,0 +1,466 @@
+﻿{
+  "lang": "da-DK",
+  "input": {
+    "placeholder": {
+      "askQuestion": "Stil et spørgsmål..."
+    },
+    "menu": {
+      "endpoint": "Slutpunkt",
+      "webResearch": "Websøgning",
+      "thinking": "Ræsonnement",
+      "attachFiles": "Vedhæft filer",
+      "knowledgeSearch": "Vidensøgning",
+      "vision": "Vision",
+      "deepResearch": "Dybdegående søgning",
+      "integration": "Integration",
+      "media": "Medie",
+      "custom": "Brugerdefineret",
+      "settings": "Indstillinger",
+      "model": "Model",
+      "project": "Projekt"
+    },
+    "thinking": {
+      "low": "Lav",
+      "medium": "Mellem",
+      "high": "Høj"
+    },
+    "endpoint": {
+      "chatCompletion": "v1/chat/completions",
+      "chatResponse": "v1/chat/responses",
+      "message": "v1/message",
+      "generateContent": ":generateContent",
+      "interactions": "v1/interactions",
+      "conversation": "v1/conversation",
+      "provider": {
+        "chatCompletion": "OpenAI, DeepSeek, MistralAI",
+        "chatResponse": "OpenAI",
+        "message": "Claude",
+        "generateContent": "Gemini",
+        "interactions": "Gemini",
+        "conversation": "MistralAI"
+      }
+    },
+    "integration": {
+      "function": "Funktion",
+      "mcp": "MCP",
+      "jsCodeSandbox": "JS-sandkasse",
+      "skills": "Færdigheder",
+      "agents": "Agenter"
+    },
+    "media": {
+      "createImage": "Opret et billede",
+      "createVideo": "Opret en video",
+      "createAudio": "Opret lyd",
+      "speechToText": "Tale til tekst",
+      "textToSpeech": "Tekst til tale"
+    },
+    "project": {
+      "add": "Tilføj projekt",
+      "none": "ingen",
+      "noneUsed": "Intet projekt brugt",
+      "delete": "Slet"
+    },
+    "chips": {
+      "endpoint": "Slutpunkt: {title}",
+      "webResearch": "Websøgning",
+      "thinking": "Ræsonnement: {title}",
+      "knowledgeSearch": "Vidensøgning ({count})",
+      "deepResearch": "Dybdegående søgning",
+      "filesAttached": "Vedhæftede filer ({count})",
+      "vision": "Vision ({count})",
+      "integrationFunction": "Integration: Funktion ({count})",
+      "integrationMcp": "Integration: MCP ({count})",
+      "integrationJsCodeSandbox": "Integration: JS-sandkasse ({count})",
+      "integrationSkills": "Integration: Færdigheder ({count})",
+      "integrationAgents": "Integration: Agenter ({count})",
+      "mediaCreateImage": "Medie: Opret et billede",
+      "mediaCreateVideo": "Medie: Opret en video",
+      "mediaCreateAudio": "Medie: Opret lyd",
+      "speechToText": "Tale til tekst ({count})",
+      "mediaTextToSpeech": "Medie: Tekst til tale",
+      "custom": "Brugerdefineret ({count})"
+    }
+  },
+  "requestParams": {
+    "panel": {
+      "title": "Indstillinger",
+      "close": "Luk",
+      "theme": {
+        "light": "Lys",
+        "dark": "Mørk"
+      }
+    },
+    "summary": {
+      "alwaysAvailable": "Altid tilgængelig",
+      "enabled": "Aktiveret",
+      "disabled": "Deaktiveret",
+      "enabledDisabled": "{enabled} aktiveret / {disabled} deaktiveret"
+    },
+    "categories": {
+      "appSettings": {
+        "title": "Programindstillinger",
+        "subtitle": "Generelt",
+        "panelSubtitle": ""
+      },
+      "systemPrompt": {
+        "title": "Systemprompt"
+      },
+      "settings": {
+        "title": "Generelle indstillinger"
+      },
+      "sampling": {
+        "title": "Sampling"
+      },
+      "structuredOutput": {
+        "title": "Struktureret output"
+      },
+      "vendorSettings": {
+        "title": "Leverandørindstillinger"
+      }
+    },
+    "items": {
+      "appSettings": {
+        "lookAndFeel": {
+          "label": "Udseende"
+        },
+        "language": {
+          "label": "Sprog",
+          "placeholder": "Vælg et sprog"
+        },
+        "scrollButtons": {
+          "label": "Rulleknapper"
+        }
+      },
+      "systemPrompt": {
+        "systemPrompt": {
+          "label": "Systemprompt",
+          "labelWhenDisabled": "Deaktiveret",
+          "labelWhenEnabled": "Aktiveret",
+          "placeholder": "Indtast systemprompten"
+        }
+      },
+      "settings": {
+        "temperature": {
+          "label": "Temperatur"
+        },
+        "maxTokens": {
+          "label": "Maks. tokens"
+        },
+        "stopStrings": {
+          "label": "Stopstrenge",
+          "placeholder": "Én stopstreng pr. linje"
+        }
+      },
+      "sampling": {
+        "topK": {
+          "label": "Top-k"
+        },
+        "topP": {
+          "label": "Top-p"
+        },
+        "presencePenalty": {
+          "label": "Tilstedeværelsesstraf"
+        },
+        "randomSeed": {
+          "label": "Tilfældigt frø"
+        }
+      },
+      "structuredOutput": {
+        "jsonSchema": {
+          "label": "JSON-skema",
+          "labelWhenDisabled": "Deaktiveret",
+          "labelWhenEnabled": "Aktiveret",
+          "placeholder": "Indtast JSON-skemaet",
+          "invalidJsonMessage": "Ugyldig JSON"
+        }
+      },
+      "vendorSettings": {
+        "parallelToolCalls": {
+          "label": "Parallelle værktøjskald"
+        },
+        "backgroundResponse": {
+          "label": "Baggrundssvar"
+        },
+        "usingPreviousId": {
+          "label": "Brug tidligere ID"
+        },
+        "store": {
+          "label": "Gem"
+        }
+      }
+    }
+  },
+  "filesDrawer": {
+    "aria": {
+      "leftPanel": "Venstre sidepanel"
+    },
+    "actions": {
+      "openPanel": "Åbn panel",
+      "newSession": "Ny session",
+      "closePanel": "Luk panel",
+      "nextPage": "Næste side",
+      "more": "Mere",
+      "rename": "Omdøb",
+      "delete": "Slet"
+    }
+  },
+  "scroll": {
+    "top": "Rul til toppen",
+    "bottom": "Rul til bunden"
+  },
+  "selector": {
+    "branchAfterMessage": "Opret en gren efter denne besked",
+    "copyMessage": "Kopiér besked",
+    "deleteMessage": "Slet besked"
+  },
+  "confirmation": {
+    "title": "Bekræftelse",
+    "question": "Bekræft venligst.",
+    "yes": "Ja",
+    "no": "Nej"
+  },
+  "inputString": {
+    "title": "Indtastning",
+    "message": "Indtast venligst en værdi.",
+    "ok": "OK",
+    "cancel": "Annullér"
+  },
+  "webDecisionDlg": {
+    "title": "Bekræftelse",
+    "message": "Bekræft venligst.",
+    "ok": "OK",
+    "cancel": "Annullér",
+    "close": "Luk"
+  },
+  "displayFile": {
+    "fallbackName": "Fil {index}",
+    "badge": {
+      "pdf": "PDF",
+      "sheet": "XLS",
+      "doc": "DOC",
+      "slide": "PPT",
+      "text": "TXT",
+      "pascal": "PAS",
+      "code": "</>",
+      "file": "FIL"
+    },
+    "status": {
+      "file": "FIL"
+    },
+    "debug": {
+      "error": "DisplayFile-fejl: {error}"
+    }
+  },
+  "displayImage": {
+    "action": {
+      "close": "Luk"
+    },
+    "error": {
+      "unavailable": "Billede utilgængeligt"
+    },
+    "alt": {
+      "imageIndex": "Billede {index}"
+    },
+    "debug": {
+      "error": "DisplayImages-fejl: {error}"
+    }
+  },
+  "display": {
+    "reasoning": {
+      "title": "Ræsonnement"
+    },
+    "toolGroup": {
+      "label": "Anvendte værktøjer"
+    },
+    "code": {
+      "copy": "Kopiér",
+      "copied": "Kopieret",
+      "copyToClipboard": "Kopiér til udklipsholder"
+    }
+  },
+  "errors": {
+    "aria": {
+      "systemMessages": "Systembeskeder"
+    },
+    "action": {
+      "close": "Luk"
+    }
+  },
+  "promptFile": {
+    "debug": {
+      "error": "PromptFile-fejl: {error}"
+    }
+  },
+  "displayVideo": {
+    "fallbackName": "Video {index}",
+    "fallbackNameWithExtension": "Video {index}.{ext}",
+    "action": {
+      "open": "Åbn",
+      "close": "Luk"
+    },
+    "debug": {
+      "error": "DisplayVideo-fejl: {error}"
+    }
+  },
+  "displayAudio": {
+    "fallbackName": "Lyd {index}",
+    "fallbackNameWithExtension": "Lyd {index}.{ext}",
+    "status": {
+      "stop": "Stop",
+      "loading": "Indlæser",
+      "unavailable": "Utilgængelig",
+      "pause": "Pause",
+      "playing": "Afspiller"
+    },
+    "debug": {
+      "error": "DisplayAudio-fejl: {error}"
+    }
+  },
+  "modelSelector": {
+    "panel": {
+      "title": "Vælg standardmodeller",
+      "aria": {
+        "dialog": "Vælg standardmodeller"
+      }
+    },
+    "actions": {
+      "close": "Luk"
+    },
+    "defaults": {
+      "title": "Standardmodel",
+      "empty": "Ingen standardmodel for denne kategori."
+    },
+    "status": {
+      "notAssigned": "Ikke tildelt",
+      "noDefaultModel": "Ingen standardmodel"
+    },
+    "categories": {
+      "allModels": {
+        "label": "Modelliste"
+      },
+      "textGeneration": {
+        "label": "Tekstgenerering"
+      },
+      "imageCreation": {
+        "label": "Billedoprettelse"
+      },
+      "videoCreation": {
+        "label": "Videooprettelse"
+      },
+      "audioCreation": {
+        "label": "Lydoprettelse"
+      },
+      "textToSpeech": {
+        "label": "Tekst til tale"
+      },
+      "deepResearch": {
+        "label": "Dybdegående søgning"
+      }
+    },
+    "features": {
+      "webResearch": "Websøgning",
+      "thinking": "Ræsonnement",
+      "attachFiles": "Vedhæft filer",
+      "vision": "Vision",
+      "createImage": "Opret et billede",
+      "createVideo": "Opret en video",
+      "createAudio": "Opret lyd",
+      "speechToText": "Tale til tekst",
+      "textToSpeech": "Tekst til tale",
+      "deepResearch": "Dybdegående søgning"
+    }
+  },
+  "cardSelector": {
+    "panel": {
+      "title": "Vælg et element",
+      "ariaLabel": "Vælg et element",
+      "selectDialogTitle": "{selectPrefix} {dialogLabel}"
+    },
+    "actions": {
+      "selectPrefix": "Vælg",
+      "close": "Luk",
+      "edit": "Redigér",
+      "settings": "Indstillinger",
+      "cancel": "Annullér",
+      "select": "Vælg"
+    },
+    "messages": {
+      "empty": "Ingen tilgængelige elementer.",
+      "noComment": ""
+    },
+    "dialogs": {
+      "function": {
+        "label": "Funktion"
+      },
+      "mcp": {
+        "label": "MCP"
+      },
+      "skills": {
+        "label": "Færdigheder"
+      },
+      "agents": {
+        "label": "Agenter"
+      },
+      "custom": {
+        "label": "Brugerdefineret"
+      }
+    }
+  },
+  "prompt": {
+    "toggleCollapse": "Skjul eller udvid prompt",
+    "summary": {
+      "open": "Åbn promptresumé",
+      "close": "Luk promptresumé"
+    }
+  },
+  "more": {
+    "delete_qa": "Bekræft venligst sletningen af det aktuelle spørgsmål og svar samt alle efterfølgende indtastninger.",
+    "delete_chat_session": "Er du sikker? #10#10Denne handling kan ikke fortrydes og vil slette alle beskeder i denne samtale.",
+    "aborted": "Handling afbrudt...",
+    "aborted_operation": "Handling afbrudt",
+    "model_file_not_found": "%s: fil oprettet. #10Åbn denne fil, og angiv listen over tilgængelige modeller.",
+    "batch_begin_error": "Kunne ikke aktivere batchvisning.",
+    "batch_end_error": "Kunne ikke frigive batchvisning.",
+    "focus_error": "Inputboblen kunne ikke modtage fokus.",
+    "stop_audio_media_error": "Kunne ikke stoppe lydmedie.",
+    "stop_video_media_error": "Kunne ikke stoppe videomedie.",
+    "internal_theme_error": "Kunne ikke opdatere sidens tema.",
+    "deserialization_error": "Deserialiseringsfejl: ugyldigt JSON-input %s",
+    "welcome": "Velkommen til dit arbejdsområde",
+    "structured_output_error": "Det strukturerede output er ugyldigt: redigér dets værdi i indstillingerne.",
+    "card_json_file_not_found": "Ingen JSON-fil understøtter %s",
+    "models_categories_count_error": "Definér venligst kategorier for standardmodeller",
+    "invalid_categories_file_error": "Ugyldig JSON-fil for kategorier",
+    "text_generation_cant_handled_error": "Ingen standardmodel: tekstgenerering kan ikke behandles",
+    "image_creation_aborted_error": "Ingen standardmodel konfigureret: billedoprettelse afbrudt",
+    "video_creation_aborted_error": "Ingen standardmodel konfigureret: videooprettelse afbrudt",
+    "audio_creation_aborted_error": "Ingen standardmodel konfigureret: lydoprettelse afbrudt",
+    "stt_operation_aborted_error": "Ingen standardmodel konfigureret: STT-operation afbrudt",
+    "tts_operation_aborted_error": "Ingen standardmodel konfigureret: TTS-operation afbrudt",
+    "deep_research_operation_aborted_error": "Ingen standardmodel konfigureret: dybdegående søgning afbrudt",
+    "missing_default_models_error": "Manglende standardmodeller for visse kategorier. #10 Kontrollér modelindstillinger",
+    "api_key_empty_name_error": "Nøglenavnet må ikke være tomt.",
+    "api_key_enter_dialog_prompt": "Indtast venligst API-nøgleværdien for %s",
+    "api_key_not_found": "%s: API-nøgle ikke fundet",
+    "api_key_deleted": "%s: API-nøgle er blevet slettet",
+    "api_key_exists": "%s: API-nøgle findes",
+    "api_key_modified": "%s: API-nøgle er blevet ændret.",
+    "api_key_inserted": "%s: API-nøgle er blevet indsat",
+    "web_decision_dlg_title": "Bekræftelse",
+    "web_decision_dlg_message": "Bekræft venligst.",
+    "web_decision_dlg_ok": "OK",
+    "web_decision_dlg_cancel": "Annullér",
+    "web_decision_dlg_close": "Luk",
+    "demo_anthropic_tool_confirmation_title": "Bekræftelse",
+    "demo_anthropic_tool_allow": "Tillad",
+    "demo_anthropic_tool_deny": "Afvis",
+    "demo_anthropic_tool_allow_call": "Tillad dette værktøjskald?",
+    "demo_anthropic_interrupted_by_user": "Afbrudt af brugeren.",
+    "command_plugin_not_be_null": "Plugin må ikke være nul",
+    "command_unknown": "Ukendt kommando: /%s",
+    "command_action_unknown": "Ukendt handling: /%s %s",
+    "command_missing_action": "Manglende handling for /%s",
+    "command_incorrect_number_of_arguments": "Forkert antal argumenter for /%s %s (modtaget %d)",
+    "command_no_plugin_for": "Intet plugin for /%s"
+  }
+}

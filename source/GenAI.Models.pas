@@ -1,4 +1,4 @@
-unit GenAI.Models;
+﻿unit GenAI.Models;
 
 {-------------------------------------------------------------------------------
 
@@ -12,7 +12,7 @@ interface
 uses
   System.SysUtils, System.Classes, System.Threading, REST.Json.Types,
   GenAI.API.Params, GenAI.API, GenAI.Async.Support, GenAI.Async.Promise,
-  GenAI.API.Deletion, GenAI.Types;
+  GenAI.API.Deletion;
 
 type
   /// <summary>
@@ -26,13 +26,12 @@ type
   TModel = class(TJSONFingerprint)
   private
     FId: string;
-    FCreated: TInt64OrNull;
+    FCreated: Int64;
     FObject: string;
     [JsonNameAttribute('owned_by')]
     FOwnedBy: string;
   private
     function GetCreatedAsString: string;
-    function GetCreated: Int64;
   public
     /// <summary>
     /// Gets or sets the unique identifier of the model.
@@ -42,7 +41,7 @@ type
     /// <summary>
     /// Gets the creation timestamp of the model, represented as a Unix timestamp.
     /// </summary>
-    property Created: Int64 read GetCreated;
+    property Created: Int64 read FCreated write FCreated;
 
     /// <summary>
     /// Gets the creation timestamp of the model as a string.
@@ -127,15 +126,22 @@ type
   /// </remarks>
   TPromiseModels = TPromiseCallBack<TModels>;
 
-  /// <summary>
-  /// Provides routes for managing model data via API calls, including listing, retrieving, and deleting models.
-  /// </summary>
-  /// <remarks>
-  /// The TModelsRoute class includes methods that facilitate asynchronous and synchronous operations
-  /// to list, delete, and retrieve OpenAI models through the API. It acts as a controller for the
-  /// interaction with the OpenAI model endpoints.
-  /// </remarks>
-  TModelsRoute = class(TGenAIRoute)
+  TModelsAbstractSupport = class(TGenAIRoute)
+  protected
+    function List: TModels; virtual; abstract;
+    function Delete(const ModelId: string): TDeletion; virtual; abstract;
+    function Retrieve(const ModelId: string): TModel; virtual; abstract;
+  end;
+
+  TModelsAsynchronousSupport = class(TModelsAbstractSupport)
+  protected
+    procedure AsynList(const CallBacks: TFunc<TAsynModels>);
+    procedure AsynDelete(const ModelId: string; const CallBacks: TFunc<TAsynDeletion>);
+    procedure AsynRetrieve(const ModelId: string; const CallBacks: TFunc<TAsynModel>);
+  end;
+
+  TModelsRoute = class(TModelsAsynchronousSupport)
+  public
     /// <summary>
     /// Asynchronously retrieves the list of available models and returns a promise that resolves with the result.
     /// </summary>
@@ -193,44 +199,27 @@ type
     /// Synchronously lists all available models and returns them in a TModels object.
     /// </summary>
     /// <returns>A TModels object containing a list of all models.</returns>
-    function List: TModels;
+    function List: TModels; override;
 
     /// <summary>
     /// Synchronously deletes a specified model by ID and returns the deletion status.
     /// </summary>
     /// <param name="ModelId">The unique identifier of the model to be deleted.</param>
-    /// <returns>A TModelDeletion object indicating the status of the deletion.</returns>
-    function Delete(const ModelId: string): TDeletion;
+    /// <returns>A TDeletion object indicating the status of the deletion.</returns>
+    function Delete(const ModelId: string): TDeletion; override;
 
     /// <summary>
     /// Synchronously retrieves a specific model by ID and returns it in a TModel object.
     /// </summary>
     /// <param name="ModelId">The unique identifier of the model to be retrieved.</param>
     /// <returns>A TModel object containing the model details.</returns>
-    function Retrieve(const ModelId: string): TModel;
-
-    /// <summary>
-    /// Asynchronously lists all available models and returns them in a TModels object through a callback mechanism.
-    /// </summary>
-    /// <param name="CallBacks">A set of callback functions for success, error, and start conditions.</param>
-    procedure AsynList(const CallBacks: TFunc<TAsynModels>);
-
-    /// <summary>
-    /// Asynchronously deletes a specified model by ID and returns the deletion status through a callback mechanism.
-    /// </summary>
-    /// <param name="ModelId">The unique identifier of the model to be deleted.</param>
-    /// <param name="CallBacks">A set of callback functions for success, error, and start conditions.</param>
-    procedure AsynDelete(const ModelId: string; const CallBacks: TFunc<TAsynDeletion>);
-
-    /// <summary>
-    /// Asynchronously retrieves a specific model by ID and returns it in a TModel object through a callback mechanism.
-    /// </summary>
-    /// <param name="ModelId">The unique identifier of the model to be retrieved.</param>
-    /// <param name="CallBacks">A set of callback functions for success, error, and start conditions.</param>
-    procedure AsynRetrieve(const ModelId: string; const CallBacks: TFunc<TAsynModel>);
+    function Retrieve(const ModelId: string): TModel; override;
   end;
 
 implementation
+
+uses
+  System.DateUtils;
 
 { TModels }
 
@@ -239,6 +228,64 @@ begin
   for var Item in FData do
     Item.Free;
   inherited;
+end;
+
+{ TModelsAsynchronousSupport }
+
+procedure TModelsAsynchronousSupport.AsynDelete(const ModelId: string;
+  const CallBacks: TFunc<TAsynDeletion>);
+begin
+  with TAsynCallBackExec<TAsynDeletion, TDeletion>.Create(CallBacks) do
+  try
+    Sender := Use.Param.Sender;
+    OnStart := Use.Param.OnStart;
+    OnSuccess := Use.Param.OnSuccess;
+    OnError := Use.Param.OnError;
+    Run(
+      function: TDeletion
+      begin
+        Result := Self.Delete(ModelId);
+      end);
+  finally
+    Free;
+  end;
+end;
+
+procedure TModelsAsynchronousSupport.AsynList(const CallBacks: TFunc<TAsynModels>);
+begin
+  with TAsynCallBackExec<TAsynModels, TModels>.Create(CallBacks) do
+  try
+    Sender := Use.Param.Sender;
+    OnStart := Use.Param.OnStart;
+    OnSuccess := Use.Param.OnSuccess;
+    OnError := Use.Param.OnError;
+    Run(
+      function: TModels
+      begin
+        Result := Self.List;
+      end);
+  finally
+    Free;
+  end;
+end;
+
+procedure TModelsAsynchronousSupport.AsynRetrieve(const ModelId: string;
+  const CallBacks: TFunc<TAsynModel>);
+begin
+  with TAsynCallBackExec<TAsynModel, TModel>.Create(CallBacks) do
+  try
+    Sender := Use.Param.Sender;
+    OnStart := Use.Param.OnStart;
+    OnSuccess := Use.Param.OnSuccess;
+    OnError := Use.Param.OnError;
+    Run(
+      function: TModel
+      begin
+        Result := Self.Retrieve(ModelId);
+      end);
+  finally
+    Free;
+  end;
 end;
 
 { TModelsRoute }
@@ -276,62 +323,6 @@ begin
     CallBacks);
 end;
 
-procedure TModelsRoute.AsynDelete(const ModelId: string;
-  const CallBacks: TFunc<TAsynDeletion>);
-begin
-  with TAsynCallBackExec<TAsynDeletion, TDeletion>.Create(CallBacks) do
-  try
-    Sender := Use.Param.Sender;
-    OnStart := Use.Param.OnStart;
-    OnSuccess := Use.Param.OnSuccess;
-    OnError := Use.Param.OnError;
-    Run(
-      function: TDeletion
-      begin
-        Result := Self.Delete(ModelId);
-      end);
-  finally
-    Free;
-  end;
-end;
-
-procedure TModelsRoute.AsynList(const CallBacks: TFunc<TAsynModels>);
-begin
-  with TAsynCallBackExec<TAsynModels, TModels>.Create(CallBacks) do
-  try
-    Sender := Use.Param.Sender;
-    OnStart := Use.Param.OnStart;
-    OnSuccess := Use.Param.OnSuccess;
-    OnError := Use.Param.OnError;
-    Run(
-      function: TModels
-      begin
-        Result := Self.List;
-      end);
-  finally
-    Free;
-  end;
-end;
-
-procedure TModelsRoute.AsynRetrieve(const ModelId: string;
-  const CallBacks: TFunc<TAsynModel>);
-begin
-  with TAsynCallBackExec<TAsynModel, TModel>.Create(CallBacks) do
-  try
-    Sender := Use.Param.Sender;
-    OnStart := Use.Param.OnStart;
-    OnSuccess := Use.Param.OnSuccess;
-    OnError := Use.Param.OnError;
-    Run(
-      function: TModel
-      begin
-        Result := Self.Retrieve(ModelId);
-      end);
-  finally
-    Free;
-  end;
-end;
-
 function TModelsRoute.Delete(const ModelId: string): TDeletion;
 begin
   Result := API.Delete<TDeletion>(Format('models/%s', [ModelId]));
@@ -349,14 +340,11 @@ end;
 
 { TModel }
 
-function TModel.GetCreated: Int64;
-begin
-  Result := TInt64OrNull(FCreated).ToInteger;
-end;
-
 function TModel.GetCreatedAsString: string;
 begin
-  Result := TInt64OrNull(FCreated).ToUtcDateString;
+  if FCreated <= 0 then
+    Exit(EmptyStr);
+  Result := FormatDateTime('yyyy-mm-dd"T"hh:nn:ss"Z"', UnixToDateTime(FCreated, True));
 end;
 
 end.

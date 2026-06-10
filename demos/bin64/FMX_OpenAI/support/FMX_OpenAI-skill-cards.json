@@ -1,0 +1,14 @@
+﻿{
+    "type": "card-selection-dialog-set-data",
+    "dialog": "skills",
+    "cards": [
+        {
+            "name": "delphi-uses-graph",
+            "commentaire": "source: custom - Delphi `uses` dependency graph (Mermaid\/DOT\/SVG + cycles)",
+            "badge": "",
+            "content": "custom",
+            "id": "skill_6a1fff026fac8191b3936874914ec3440278a494b880149f"
+        }
+    ],
+    "selectedId": ""
+}

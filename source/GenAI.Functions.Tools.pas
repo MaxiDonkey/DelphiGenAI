@@ -1,4 +1,4 @@
-unit GenAI.Functions.Tools;
+﻿unit GenAI.Functions.Tools;
 
 {-------------------------------------------------------------------------------
 
@@ -31,10 +31,12 @@ type
     /// A <c>TJSONObject</c> representing the function in JSON format.
     /// </returns>
     function ToJson: TJSONObject;
+
     /// <summary>
     /// The function properties
     /// </summary>
     property &Function: IFunctionCore read FFunction write FFunction;
+
     /// <summary>
     /// Adds a function to the chat message tool.
     /// </summary>
@@ -59,6 +61,7 @@ type
     /// Gets or sets the name of the called function
     /// </summary>
     property Name: string read FName write FName;
+
     /// <summary>
     /// Gets or sets the calculed Arguments for the called function
     /// </summary>
@@ -78,14 +81,17 @@ type
     /// Gets or sets the id of the called function
     /// </summary>
     property Id: string read FId write FId;
+
     /// <summary>
     /// Gets or sets the type of the called function
     /// </summary>
     property &Type: string read FType write FType;
+
     /// <summary>
     /// Gets or sets the specifics of the called function
     /// </summary>
     property &Function: TCalledFunctionSpecifics read FFunction write FFunction;
+
     /// <summary>
     /// Destructor that ensures proper memory management by freeing the <c>FFunction</c> property
     /// when the <c>TCalledFunction</c> instance is destroyed.

@@ -1,4 +1,4 @@
-unit GenAI.Containers;
+ï»¿unit GenAI.Containers;
 
 {-------------------------------------------------------------------------------
 
@@ -31,6 +31,28 @@ type
     class function New(const Minutes: Integer): TExpiresAfterParams; overload;
   end;
 
+  /// <summary>
+  /// Network policy parameters controlling the container's outbound network access.
+  /// </summary>
+  TContainerNetworkPolicyParams = class(TJSONParam)
+    /// <summary>
+    /// The type of network policy. One of 'disabled' or 'allowlist'.
+    /// </summary>
+    function &Type(const Value: string): TContainerNetworkPolicyParams;
+
+    /// <summary>
+    /// The list of outbound domains the container is allowed to reach (used with the 'allowlist' type).
+    /// </summary>
+    function AllowedDomains(const Value: TArray<string>): TContainerNetworkPolicyParams;
+
+    /// <summary>
+    /// Optional domain-scoped credentials. Each item is an object with 'domain', 'name' and 'value' fields.
+    /// </summary>
+    function DomainSecrets(const Value: TJSONArray): TContainerNetworkPolicyParams;
+
+    class function New: TContainerNetworkPolicyParams;
+  end;
+
   TContainerParams = class(TJSONParam)
     /// <summary>
     /// Name of the container to create.
@@ -46,6 +68,23 @@ type
     /// IDs of files to copy to the container.
     /// </summary>
     function FileIds(const Value: TArray<string>): TContainerParams;
+
+    /// <summary>
+    /// Memory allocated to the container. One of '1g', '4g', '16g' or '64g'.
+    /// </summary>
+    function MemoryLimit(const Value: string): TContainerParams;
+
+    /// <summary>
+    /// Network policy controlling the container's outbound access.
+    /// </summary>
+    function NetworkPolicy(const Value: TContainerNetworkPolicyParams): TContainerParams;
+
+    /// <summary>
+    /// Skills to make available within the container. Each array item is either a skill reference
+    /// (<c>{ "type": "skill_reference", "skill_id": ..., "version": ... }</c>) or an inline skill
+    /// (<c>{ "type": "inline", "name": ..., "description": ..., "source": { "type": "base64", "media_type": ..., "data": ... } }</c>).
+    /// </summary>
+    function Skills(const Value: TJSONArray): TContainerParams;
 
     class function New: TContainerParams; overload;
     class function New(const Name: string): TContainerParams; overload;
@@ -87,6 +126,23 @@ type
     property Minutes: Int64 read FMinutes write FMinutes;
   end;
 
+  TContainerNetworkPolicy = class
+  private
+    FType: string;
+    [JsonNameAttribute('allowed_domains')]
+    FAllowedDomains: TArray<string>;
+  public
+    /// <summary>
+    /// The type of network policy ('disabled' or 'allowlist').
+    /// </summary>
+    property &Type: string read FType write FType;
+
+    /// <summary>
+    /// The list of outbound domains the container is allowed to reach.
+    /// </summary>
+    property AllowedDomains: TArray<string> read FAllowedDomains write FAllowedDomains;
+  end;
+
   TContainer = class(TJSONFingerprint)
   private
     [JsonNameAttribute('created_at')]
@@ -94,7 +150,13 @@ type
     [JsonNameAttribute('expires_after')]
     FExpiresAfter  : TExpiresAfter;
     FId            : string;
+    [JsonNameAttribute('last_active_at')]
+    FLastActiveAt  : Int64;
+    [JsonNameAttribute('memory_limit')]
+    FMemoryLimit   : string;
     FName          : string;
+    [JsonNameAttribute('network_policy')]
+    FNetworkPolicy : TContainerNetworkPolicy;
     FObject        : string;
     FStatus        : string;
   public
@@ -116,9 +178,24 @@ type
     property Id: string read FId write FId;
 
     /// <summary>
+    /// Unix timestamp (in seconds) when the container was last active.
+    /// </summary>
+    property LastActiveAt: Int64 read FLastActiveAt write FLastActiveAt;
+
+    /// <summary>
+    /// Memory allocated to the container (e.g., '1g', '4g', '16g', '64g').
+    /// </summary>
+    property MemoryLimit: string read FMemoryLimit write FMemoryLimit;
+
+    /// <summary>
     /// Name of the container.
     /// </summary>
     property Name: string read FName write FName;
+
+    /// <summary>
+    /// Network policy controlling the container's outbound access.
+    /// </summary>
+    property NetworkPolicy: TContainerNetworkPolicy read FNetworkPolicy write FNetworkPolicy;
 
     /// <summary>
     /// The type of this object.
@@ -179,20 +256,20 @@ type
   /// </summary>
   /// <remarks>
   /// <para>
-  /// Alias of <c>TAsynCallBack&lt;TContainer&gt;</c>. Exposes the framework’s event-driven async
+  /// â€¢ Alias of <c>TAsynCallBack&lt;TContainer&gt;</c>. Exposes the frameworkï¿½s event-driven async
   /// lifecycle for container operations (create, list, retrieve, delete) with dispatcher-safe notifications.
   /// </para>
   /// <para>
-  /// Typical handlers include <c>OnStart</c> (invoked when the request begins), <c>OnSuccess</c>
+  /// â€¢ Typical handlers include <c>OnStart</c> (invoked when the request begins), <c>OnSuccess</c>
   /// (delivering the resolved <c>TContainer</c>), and <c>OnError</c> (propagating failures).
   /// </para>
   /// <para>
-  /// Use this alias with route methods such as <c>TContainersRoute.AsynCreate</c>,
+  /// â€¢ Use this alias with route methods such as <c>TContainersRoute.AsynCreate</c>,
   /// <c>TContainersRoute.AsynRetrieve</c>, and <c>TContainersRoute.AsynDelete</c>. For list operations,
   /// prefer <c>TAsynContainerList</c>.
   /// </para>
   /// <para>
-  /// The resulting <c>TContainer</c> inherits <c>TJSONFingerprint</c> and surfaces fields including
+  /// â€¢ The resulting <c>TContainer</c> inherits <c>TJSONFingerprint</c> and surfaces fields including
   /// <c>Id</c>, <c>Name</c>, <c>Status</c>, <c>CreatedAt</c>, and <c>ExpiresAfter</c> (anchor/minutes).
   /// </para>
   /// </remarks>
@@ -203,22 +280,22 @@ type
   /// </summary>
   /// <remarks>
   /// <para>
-  /// Alias of <c>TPromiseCallBack&lt;TContainer&gt;</c>. Provides a promise-based asynchronous workflow
+  /// â€¢ Alias of <c>TPromiseCallBack&lt;TContainer&gt;</c>. Provides a promise-based asynchronous workflow
   /// for container operations (create, retrieve, delete), enabling structured chaining, continuation,
   /// and centralized error handling in non-blocking flows.
   /// </para>
   /// <para>
-  /// Standard promise handlers include <c>OnStart</c> (triggered when the request begins),
+  /// â€¢ Standard promise handlers include <c>OnStart</c> (triggered when the request begins),
   /// <c>OnSuccess</c> (resolve, invoked with the completed <c>TContainer</c>), and
   /// <c>OnError</c> (reject, invoked on failure).
   /// </para>
   /// <para>
-  /// Use this alias with await-style methods such as <c>TContainersRoute.AsyncAwaitCreate</c>,
+  /// â€¢ Use this alias with await-style methods such as <c>TContainersRoute.AsyncAwaitCreate</c>,
   /// <c>TContainersRoute.AsyncAwaitRetrieve</c>, or <c>TContainersRoute.AsyncAwaitDelete</c> to keep
   /// intent explicit while preserving strong typing of the promised payload.
   /// </para>
   /// <para>
-  /// The resolved <c>TContainer</c> inherits <c>TJSONFingerprint</c> and exposes fields such as
+  /// â€¢ The resolved <c>TContainer</c> inherits <c>TJSONFingerprint</c> and exposes fields such as
   /// <c>Id</c>, <c>Name</c>, <c>Status</c>, <c>CreatedAt</c>, and <c>ExpiresAfter</c> (anchor/minutes),
   /// along with the raw API payload accessible through the <c>JSONResponse</c> property.
   /// </para>
@@ -230,21 +307,21 @@ type
   /// </summary>
   /// <remarks>
   /// <para>
-  /// Alias of <c>TAsynCallBack&lt;TContainerList&gt;</c>. Exposes the framework’s event-driven asynchronous
+  /// â€¢ Alias of <c>TAsynCallBack&lt;TContainerList&gt;</c>. Exposes the frameworkï¿½s event-driven asynchronous
   /// lifecycle for list operations on containers (e.g., enumeration, pagination, or workspace management),
   /// enabling non-blocking execution with dispatcher-safe notifications.
   /// </para>
   /// <para>
-  /// Typical handlers include <c>OnStart</c> (invoked when the listing request begins),
+  /// â€¢ Typical handlers include <c>OnStart</c> (invoked when the listing request begins),
   /// <c>OnSuccess</c> (delivering the resolved <c>TContainerList</c> payload), and
   /// <c>OnError</c> (triggered on failure or network error).
   /// </para>
   /// <para>
-  /// Use this alias with asynchronous methods such as <c>TContainersRoute.AsynList</c> to keep intent explicit
+  /// â€¢ Use this alias with asynchronous methods such as <c>TContainersRoute.AsynList</c> to keep intent explicit
   /// and preserve strong typing of the callback payload.
   /// </para>
   /// <para>
-  /// The resulting <c>TContainerList</c> inherits <c>TJSONFingerprint</c> and provides pagination
+  /// â€¢ The resulting <c>TContainerList</c> inherits <c>TJSONFingerprint</c> and provides pagination
   /// metadata (<c>FirstId</c>, <c>LastId</c>, <c>HasMore</c>) along with a strongly typed collection of
   /// <c>TContainer</c> instances accessible through the <c>Data</c> property.
   /// </para>
@@ -256,22 +333,22 @@ type
   /// </summary>
   /// <remarks>
   /// <para>
-  /// Alias of <c>TPromiseCallBack&lt;TContainerList&gt;</c>. Provides a promise-based asynchronous workflow
+  /// â€¢ Alias of <c>TPromiseCallBack&lt;TContainerList&gt;</c>. Provides a promise-based asynchronous workflow
   /// for container list operations (such as pagination, enumeration, or bulk retrieval), enabling structured
   /// chaining, continuation, and centralized error handling in non-blocking flows.
   /// </para>
   /// <para>
-  /// Standard promise handlers include <c>OnStart</c> (triggered when the request begins),
+  /// â€¢ Standard promise handlers include <c>OnStart</c> (triggered when the request begins),
   /// <c>OnSuccess</c> (resolve, invoked when the operation completes successfully with a
   /// <c>TContainerList</c> payload), and <c>OnError</c> (reject, invoked in case of network or
   /// server failure).
   /// </para>
   /// <para>
-  /// Use this alias with await-style methods such as <c>TContainersRoute.AsyncAwaitList</c> to make the
+  /// â€¢ Use this alias with await-style methods such as <c>TContainersRoute.AsyncAwaitList</c> to make the
   /// intent explicit while maintaining strong typing of the promised payload.
   /// </para>
   /// <para>
-  /// The resolved <c>TContainerList</c> inherits <c>TJSONFingerprint</c> and includes pagination markers
+  /// â€¢ The resolved <c>TContainerList</c> inherits <c>TJSONFingerprint</c> and includes pagination markers
   /// (<c>FirstId</c>, <c>LastId</c>, <c>HasMore</c>) along with a strongly typed array of <c>TContainer</c>
   /// instances accessible via the <c>Data</c> property.
   /// </para>
@@ -283,21 +360,21 @@ type
   /// </summary>
   /// <remarks>
   /// <para>
-  /// Alias of <c>TAsynCallBack&lt;TContainersDelete&gt;</c>. Exposes the framework’s event-driven asynchronous
+  /// â€¢ Alias of <c>TAsynCallBack&lt;TContainersDelete&gt;</c>. Exposes the frameworkï¿½s event-driven asynchronous
   /// lifecycle for container deletion operations, enabling non-blocking execution with dispatcher-safe and
   /// UI-friendly notifications.
   /// </para>
   /// <para>
-  /// Typical handlers include <c>OnStart</c> (invoked when the deletion request begins),
+  /// â€¢ Typical handlers include <c>OnStart</c> (invoked when the deletion request begins),
   /// <c>OnSuccess</c> (delivering the resolved <c>TContainersDelete</c> payload), and
   /// <c>OnError</c> (triggered on failure or connection error).
   /// </para>
   /// <para>
-  /// Use this alias with asynchronous methods such as <c>TContainersRoute.AsynDelete</c> to make the intent
+  /// â€¢ Use this alias with asynchronous methods such as <c>TContainersRoute.AsynDelete</c> to make the intent
   /// explicit and preserve strong typing of the callback payload.
   /// </para>
   /// <para>
-  /// The resulting <c>TContainersDelete</c> inherits <c>TJSONFingerprint</c> and provides information about
+  /// â€¢ The resulting <c>TContainersDelete</c> inherits <c>TJSONFingerprint</c> and provides information about
   /// the deleted container, including its <c>Id</c>, <c>Object</c> type (always <c>container.deleted</c>),
   /// and the <c>Deleted</c> flag confirming the deletion.
   /// </para>
@@ -309,28 +386,44 @@ type
   /// </summary>
   /// <remarks>
   /// <para>
-  /// Alias of <c>TPromiseCallBack&lt;TContainersDelete&gt;</c>. Provides a promise-based asynchronous
+  /// â€¢ Alias of <c>TPromiseCallBack&lt;TContainersDelete&gt;</c>. Provides a promise-based asynchronous
   /// workflow for container deletion operations, enabling structured chaining, continuation,
   /// and centralized error handling in non-blocking execution flows.
   /// </para>
   /// <para>
-  /// Standard promise handlers include <c>OnStart</c> (triggered when the deletion request begins),
+  /// â€¢ Standard promise handlers include <c>OnStart</c> (triggered when the deletion request begins),
   /// <c>OnSuccess</c> (resolve, invoked with the completed <c>TContainersDelete</c>), and
   /// <c>OnError</c> (reject, invoked on failure).
   /// </para>
   /// <para>
-  /// Use this alias with await-style methods such as <c>TContainersRoute.AsyncAwaitDelete</c> to keep
+  /// â€¢ Use this alias with await-style methods such as <c>TContainersRoute.AsyncAwaitDelete</c> to keep
   /// intent explicit while preserving strong typing of the promised payload.
   /// </para>
   /// <para>
-  /// The resolved <c>TContainersDelete</c> inherits <c>TJSONFingerprint</c> and provides information about
+  /// â€¢ The resolved <c>TContainersDelete</c> inherits <c>TJSONFingerprint</c> and provides information about
   /// the deleted container, including its <c>Id</c>, <c>Object</c> type (always <c>container.deleted</c>),
   /// and the <c>Deleted</c> flag indicating successful deletion.
   /// </para>
   /// </remarks>
   TPromiseContainersDelete = TPromiseCallBack<TContainersDelete>;
 
-  TContainersRoute = class(TGenAIRoute)
+  TContainersAbstractSupport = class(TGenAIRoute)
+  protected
+    function Create(const ParamProc: TProc<TContainerParams>): TContainer; virtual; abstract;
+    function List(const ParamProc: TProc<TUrlContainerParams>): TContainerList; virtual; abstract;
+    function Retrieve(const ContainerId: string): TContainer; virtual; abstract;
+    function Delete(const ContainerId: string): TContainersDelete; virtual; abstract;
+  end;
+
+  TContainersAsynchronousSupport = class(TContainersAbstractSupport)
+  public
+    procedure AsynCreate(const ParamProc: TProc<TContainerParams>; const CallBacks: TFunc<TAsynContainer>);
+    procedure AsynList(const ParamProc: TProc<TUrlContainerParams>; const CallBacks: TFunc<TAsynContainerList>);
+    procedure AsynRetrieve(const ContainerId: string; const CallBacks: TFunc<TAsynContainer>);
+    procedure AsynDelete(const ContainerId: string; const CallBacks: TFunc<TAsynContainersDelete>);
+  end;
+
+  TContainersRoute = class(TContainersAsynchronousSupport)
     /// <summary>
     /// Asynchronously creates a new container and returns a <c>TPromise&lt;TContainer&gt;</c> handle.
     /// </summary>
@@ -348,16 +441,16 @@ type
     /// </returns>
     /// <remarks>
     /// <para>
-    /// • Performs a non-blocking <c>POST</c> to the <c>/containers</c> endpoint. The resolved <c>TContainer</c>
+    /// â€¢ Performs a non-blocking <c>POST</c> to the <c>/containers</c> endpoint. The resolved <c>TContainer</c>
     /// includes identifiers, <c>Name</c>, <c>Status</c>, <c>CreatedAt</c>, and <c>ExpiresAfter</c>.
     /// The raw API payload is available via <c>TJSONFingerprint.JSONResponse</c>.
     /// </para>
     /// <para>
-    /// • Internally wraps <c>TContainersRoute.AsynCreate</c> with <c>TAsyncAwaitHelper.WrapAsyncAwait</c>,
+    /// â€¢ Internally wraps <c>TContainersRoute.AsynCreate</c> with <c>TAsyncAwaitHelper.WrapAsyncAwait</c>,
     /// exposing a promise-based interface while preserving strong typing of the result.
     /// </para>
     /// <para>
-    /// • Use this method when you need non-blocking container creation with structured continuation and
+    /// â€¢ Use this method when you need non-blocking container creation with structured continuation and
     /// centralized error handling. For an event-driven alternative, use <c>AsynCreate</c>.
     /// </para>
     /// </remarks>
@@ -380,17 +473,17 @@ type
     /// </returns>
     /// <remarks>
     /// <para>
-    /// • Performs a non-blocking <c>GET</c> request to the <c>/containers</c> endpoint.
+    /// â€¢ Performs a non-blocking <c>GET</c> request to the <c>/containers</c> endpoint.
     /// The resolved <c>TContainerList</c> provides pagination metadata (<c>FirstId</c>, <c>LastId</c>, <c>HasMore</c>)
     /// and a typed collection of <c>TContainer</c> instances via the <c>Data</c> property.
     /// The raw API payload is available through <c>TJSONFingerprint.JSONResponse</c>.
     /// </para>
     /// <para>
-    /// • Internally wraps <c>TContainersRoute.AsynList</c> with <c>TAsyncAwaitHelper.WrapAsyncAwait</c>,
+    /// â€¢ Internally wraps <c>TContainersRoute.AsynList</c> with <c>TAsyncAwaitHelper.WrapAsyncAwait</c>,
     /// exposing a promise-based interface while preserving strong typing of the result.
     /// </para>
     /// <para>
-    /// • Use this method to enumerate, paginate, or refresh container listings without blocking the main thread.
+    /// â€¢ Use this method to enumerate, paginate, or refresh container listings without blocking the main thread.
     /// For an event-driven alternative, use <c>AsynList</c>.
     /// </para>
     /// </remarks>
@@ -412,17 +505,17 @@ type
     /// </returns>
     /// <remarks>
     /// <para>
-    /// • Executes a non-blocking <c>GET</c> request to the <c>/containers/{container_id}</c> endpoint.
+    /// â€¢ Executes a non-blocking <c>GET</c> request to the <c>/containers/{container_id}</c> endpoint.
     /// The resolved <c>TContainer</c> object includes fields such as <c>Id</c>, <c>Name</c>, <c>Status</c>,
     /// <c>CreatedAt</c>, and <c>ExpiresAfter</c> (anchor/minutes).
     /// The raw API payload is available through <c>TJSONFingerprint.JSONResponse</c>.
     /// </para>
     /// <para>
-    /// • Internally wraps <c>TContainersRoute.AsynRetrieve</c> with <c>TAsyncAwaitHelper.WrapAsyncAwait</c>,
+    /// â€¢ Internally wraps <c>TContainersRoute.AsynRetrieve</c> with <c>TAsyncAwaitHelper.WrapAsyncAwait</c>,
     /// providing a promise-based interface while preserving strong typing of the result.
     /// </para>
     /// <para>
-    /// • Use this method to asynchronously query the current state or metadata of a specific container
+    /// â€¢ Use this method to asynchronously query the current state or metadata of a specific container
     /// without blocking the main thread. For an event-driven alternative, use <c>AsynRetrieve</c>.
     /// </para>
     /// </remarks>
@@ -444,17 +537,17 @@ type
     /// </returns>
     /// <remarks>
     /// <para>
-    /// • Performs a non-blocking <c>DELETE</c> request to the <c>/containers/{container_id}</c> endpoint.
+    /// â€¢ Performs a non-blocking <c>DELETE</c> request to the <c>/containers/{container_id}</c> endpoint.
     /// The resolved <c>TContainersDelete</c> object provides information about the deleted resource,
     /// including its <c>Id</c>, <c>Object</c> type (always <c>container.deleted</c>), and the <c>Deleted</c> flag
     /// confirming successful deletion. The raw API payload is preserved in <c>TJSONFingerprint.JSONResponse</c>.
     /// </para>
     /// <para>
-    /// • Internally wraps <c>TContainersRoute.AsynDelete</c> with <c>TAsyncAwaitHelper.WrapAsyncAwait</c>,
+    /// â€¢ Internally wraps <c>TContainersRoute.AsynDelete</c> with <c>TAsyncAwaitHelper.WrapAsyncAwait</c>,
     /// providing a promise-based abstraction while maintaining strong typing of the result.
     /// </para>
     /// <para>
-    /// • Use this method to asynchronously remove containers without blocking execution, while retaining
+    /// â€¢ Use this method to asynchronously remove containers without blocking execution, while retaining
     /// centralized error handling and continuation support. For an event-driven alternative, use <c>AsynDelete</c>.
     /// </para>
     /// </remarks>
@@ -466,7 +559,7 @@ type
     /// </summary>
     /// <param name="ParamProc">
     /// A configuration procedure used to populate the JSON body through a <c>TContainerParams</c> instance.
-    /// Use it to define the container’s <c>Name</c>, optional <c>ExpiresAfter</c> settings
+    /// Use it to define the containerï¿½s <c>Name</c>, optional <c>ExpiresAfter</c> settings
     /// (anchor and duration in minutes), and optionally attach existing files via <c>FileIds</c>.
     /// </param>
     /// <returns>
@@ -474,25 +567,25 @@ type
     /// </returns>
     /// <remarks>
     /// <para>
-    /// • Executes a synchronous <c>POST</c> request to the <c>/containers</c> endpoint.
+    /// â€¢ Executes a synchronous <c>POST</c> request to the <c>/containers</c> endpoint.
     /// The <paramref name="ParamProc"/> callback is used to define the JSON request parameters
     /// through a fluent <c>TContainerParams</c> builder.
     /// </para>
     /// <para>
-    /// • The returned <c>TContainer</c> includes key properties such as <c>Id</c>, <c>Name</c>,
+    /// â€¢ The returned <c>TContainer</c> includes key properties such as <c>Id</c>, <c>Name</c>,
     /// <c>Status</c>, <c>CreatedAt</c>, and <c>ExpiresAfter</c> (anchor/minutes).
     /// </para>
     /// <para>
-    /// • The raw API JSON payload is preserved in the <c>JSONResponse</c> property inherited
+    /// â€¢ The raw API JSON payload is preserved in the <c>JSONResponse</c> property inherited
     /// from <c>TJSONFingerprint</c>, providing access to the original response structure for
     /// debugging or inspection.
     /// </para>
     /// <para>
-    /// • This method performs the operation synchronously and blocks until the container is created.
+    /// â€¢ This method performs the operation synchronously and blocks until the container is created.
     /// For non-blocking or UI-friendly asynchronous creation, use <c>AsyncAwaitCreate</c>.
     /// </para>
     /// </remarks>
-    function Create(const ParamProc: TProc<TContainerParams>): TContainer;
+    function Create(const ParamProc: TProc<TContainerParams>): TContainer; override;
 
     /// <summary>
     /// Retrieves a paginated list of containers and returns a <c>TContainerList</c> containing the results.
@@ -506,28 +599,28 @@ type
     /// </returns>
     /// <remarks>
     /// <para>
-    /// • Executes a synchronous <c>GET</c> request to the <c>/containers</c> endpoint.
+    /// â€¢ Executes a synchronous <c>GET</c> request to the <c>/containers</c> endpoint.
     /// The <paramref name="ParamProc"/> callback allows fine-grained control of pagination
     /// and sorting through the fluent <c>TUrlContainerParams</c> builder.
     /// </para>
     /// <para>
-    /// • The returned <c>TContainerList</c> includes pagination metadata such as <c>FirstId</c>, <c>LastId</c>,
+    /// â€¢ The returned <c>TContainerList</c> includes pagination metadata such as <c>FirstId</c>, <c>LastId</c>,
     /// and <c>HasMore</c>, along with a strongly typed array of <c>TContainer</c> objects accessible via the <c>Data</c> property.
     /// </para>
     /// <para>
-    /// • Each <c>TContainer</c> entry provides information such as <c>Id</c>, <c>Name</c>, <c>Status</c>,
+    /// â€¢ Each <c>TContainer</c> entry provides information such as <c>Id</c>, <c>Name</c>, <c>Status</c>,
     /// <c>CreatedAt</c>, and <c>ExpiresAfter</c> (anchor/minutes).
     /// </para>
     /// <para>
-    /// • The raw API JSON payload is preserved in the <c>JSONResponse</c> property inherited
+    /// â€¢ The raw API JSON payload is preserved in the <c>JSONResponse</c> property inherited
     /// from <c>TJSONFingerprint</c>, allowing low-level inspection of the API response.
     /// </para>
     /// <para>
-    /// • This method performs a blocking request and should be used when synchronous access is acceptable.
+    /// â€¢ This method performs a blocking request and should be used when synchronous access is acceptable.
     /// For a non-blocking alternative with promise-based or event-driven behavior, use <c>AsyncAwaitList</c> or <c>AsynList</c>.
     /// </para>
     /// </remarks>
-    function List(const ParamProc: TProc<TUrlContainerParams>): TContainerList;
+    function List(const ParamProc: TProc<TUrlContainerParams>): TContainerList; override;
 
     /// <summary>
     /// Retrieves detailed information about a specific container and returns a <c>TContainer</c> instance.
@@ -540,24 +633,24 @@ type
     /// </returns>
     /// <remarks>
     /// <para>
-    /// • Executes a synchronous <c>GET</c> request to the <c>/containers/{container_id}</c> endpoint.
+    /// â€¢ Executes a synchronous <c>GET</c> request to the <c>/containers/{container_id}</c> endpoint.
     /// The request retrieves the full record of the container identified by <paramref name="ContainerId"/>.
     /// </para>
     /// <para>
-    /// • The returned <c>TContainer</c> includes fields such as <c>Id</c>, <c>Name</c>, <c>Status</c>,
-    /// <c>CreatedAt</c>, and <c>ExpiresAfter</c> (anchor/minutes). These values describe the container’s
+    /// â€¢ The returned <c>TContainer</c> includes fields such as <c>Id</c>, <c>Name</c>, <c>Status</c>,
+    /// <c>CreatedAt</c>, and <c>ExpiresAfter</c> (anchor/minutes). These values describe the containerï¿½s
     /// lifecycle, metadata, and expiration configuration.
     /// </para>
     /// <para>
-    /// • The raw JSON response from the API is preserved in the <c>JSONResponse</c> property inherited
+    /// â€¢ The raw JSON response from the API is preserved in the <c>JSONResponse</c> property inherited
     /// from <c>TJSONFingerprint</c>, providing access to the original payload for logging or debugging.
     /// </para>
     /// <para>
-    /// • This method performs the operation synchronously and blocks until completion.
+    /// â€¢ This method performs the operation synchronously and blocks until completion.
     /// For a non-blocking, asynchronous equivalent with promise-based handling, use <c>AsyncAwaitRetrieve</c>.
     /// </para>
     /// </remarks>
-    function Retrieve(const ContainerId: string): TContainer;
+    function Retrieve(const ContainerId: string): TContainer; override;
 
     /// <summary>
     /// Deletes an existing container and returns a <c>TContainersDelete</c> instance representing the deletion result.
@@ -570,192 +663,25 @@ type
     /// </returns>
     /// <remarks>
     /// <para>
-    /// • Executes a synchronous <c>DELETE</c> request to the <c>/containers/{container_id}</c> endpoint.
+    /// â€¢ Executes a synchronous <c>DELETE</c> request to the <c>/containers/{container_id}</c> endpoint.
     /// The request permanently removes the specified container and its associated data from the system.
     /// </para>
     /// <para>
-    /// • The returned <c>TContainersDelete</c> includes the deleted container’s <c>Id</c>,
+    /// â€¢ The returned <c>TContainersDelete</c> includes the deleted containerï¿½s <c>Id</c>,
     /// the <c>Object</c> type (always <c>container.deleted</c>), and a <c>Deleted</c> flag set to <c>True</c>
     /// to confirm successful removal.
     /// </para>
     /// <para>
-    /// • The raw API JSON payload is preserved in the <c>JSONResponse</c> property inherited
+    /// â€¢ The raw API JSON payload is preserved in the <c>JSONResponse</c> property inherited
     /// from <c>TJSONFingerprint</c>, allowing inspection or diagnostic tracing of the API response.
     /// </para>
     /// <para>
-    /// • This method performs a blocking deletion and should be used in synchronous contexts.
+    /// â€¢ This method performs a blocking deletion and should be used in synchronous contexts.
     /// For non-blocking asynchronous deletion with promise-based or event-driven handling,
     /// use <c>AsyncAwaitDelete</c> or <c>AsynDelete</c>.
     /// </para>
     /// </remarks>
-    function Delete(const ContainerId: string): TContainersDelete;
-
-    /// <summary>
-    /// Asynchronously creates a new container and triggers callback events during its lifecycle.
-    /// </summary>
-    /// <param name="ParamProc">
-    /// A configuration procedure used to populate the JSON body through a <c>TContainerParams</c> instance.
-    /// Use it to define fields such as <c>Name</c>, optional expiration settings (<c>ExpiresAfter</c>),
-    /// and optional file associations via <c>FileIds</c>.
-    /// </param>
-    /// <param name="CallBacks">
-    /// A factory function returning a configured <c>TAsynContainer</c> instance.
-    /// This instance defines asynchronous event handlers such as <c>OnStart</c>, <c>OnSuccess</c>, and <c>OnError</c>.
-    /// </param>
-    /// <remarks>
-    /// <para>
-    /// • Sends an asynchronous <c>POST</c> request to the <c>/containers</c> endpoint.
-    /// The <paramref name="ParamProc"/> callback defines the container creation parameters,
-    /// while <paramref name="CallBacks"/> specifies the asynchronous event lifecycle.
-    /// </para>
-    /// <para>
-    /// • The <c>OnStart</c> event is triggered when the creation request begins.
-    /// The <c>OnSuccess</c> event is invoked upon successful completion and delivers the resulting <c>TContainer</c> instance.
-    /// The <c>OnError</c> event is fired if an exception or API error occurs during the request.
-    /// </para>
-    /// <para>
-    /// • The operation runs on a background thread, enabling safe use in GUI or multi-threaded environments
-    /// without blocking the main thread.
-    /// </para>
-    /// <para>
-    /// • The <c>TContainer</c> object returned in <c>OnSuccess</c> contains details such as <c>Id</c>, <c>Name</c>,
-    /// <c>Status</c>, <c>CreatedAt</c>, and <c>ExpiresAfter</c>. The raw API response is preserved in
-    /// <c>TJSONFingerprint.JSONResponse</c> for debugging or inspection.
-    /// </para>
-    /// <para>
-    /// • Use this method when you need to create containers asynchronously with event-driven progress reporting
-    /// and error handling rather than blocking execution until completion.
-    /// </para>
-    /// </remarks>
-    procedure AsynCreate(const ParamProc: TProc<TContainerParams>;
-      const CallBacks: TFunc<TAsynContainer>);
-
-    /// <summary>
-    /// Asynchronously retrieves a paginated list of containers and triggers callback events during the operation.
-    /// </summary>
-    /// <param name="ParamProc">
-    /// A configuration procedure used to define query parameters through a <c>TUrlContainerParams</c> instance.
-    /// Use it to set pagination and sorting options such as <c>After</c>, <c>limit</c>, and <c>Order</c>.
-    /// </param>
-    /// <param name="CallBacks">
-    /// A factory function returning a configured <c>TAsynContainerList</c> instance.
-    /// This instance defines asynchronous lifecycle handlers such as <c>OnStart</c>, <c>OnSuccess</c>, and <c>OnError</c>.
-    /// </param>
-    /// <remarks>
-    /// <para>
-    /// • Sends an asynchronous <c>GET</c> request to the <c>/containers</c> endpoint.
-    /// The <paramref name="ParamProc"/> callback configures the query parameters for pagination and sorting,
-    /// while <paramref name="CallBacks"/> provides the asynchronous event handlers.
-    /// </para>
-    /// <para>
-    /// • The <c>OnStart</c> event is triggered when the request begins.
-    /// The <c>OnSuccess</c> event is invoked when the operation completes successfully and delivers
-    /// a <c>TContainerList</c> payload containing both metadata and container entries.
-    /// The <c>OnError</c> event is fired if a network, API, or parsing error occurs during execution.
-    /// </para>
-    /// <para>
-    /// • The operation runs asynchronously on a background thread, ensuring that the main thread
-    /// remains responsive (especially in GUI or service contexts) while the request is processed.
-    /// </para>
-    /// <para>
-    /// • The resulting <c>TContainerList</c> object includes pagination markers (<c>FirstId</c>, <c>LastId</c>, <c>HasMore</c>)
-    /// and an array of <c>TContainer</c> instances accessible via the <c>Data</c> property.
-    /// Each <c>TContainer</c> includes details such as <c>Id</c>, <c>Name</c>, <c>Status</c>, and <c>CreatedAt</c>.
-    /// </para>
-    /// <para>
-    /// • The raw API payload is available through the <c>JSONResponse</c> property inherited from <c>TJSONFingerprint</c>
-    /// for debugging or diagnostic inspection.
-    /// </para>
-    /// <para>
-    /// • Use this method when asynchronously enumerating containers with event-driven progress reporting
-    /// and centralized error handling, avoiding blocking calls in interactive or multithreaded environments.
-    /// </para>
-    /// </remarks>
-    procedure AsynList(const ParamProc: TProc<TUrlContainerParams>;
-      const CallBacks: TFunc<TAsynContainerList>);
-
-    /// <summary>
-    /// Asynchronously retrieves detailed information about a specific container and triggers callback events during the operation.
-    /// </summary>
-    /// <param name="ContainerId">
-    /// The unique identifier of the container to retrieve.
-    /// </param>
-    /// <param name="CallBacks">
-    /// A factory function returning a configured <c>TAsynContainer</c> instance.
-    /// This instance defines asynchronous lifecycle handlers such as <c>OnStart</c>, <c>OnSuccess</c>, and <c>OnError</c>.
-    /// </param>
-    /// <remarks>
-    /// <para>
-    /// • Sends an asynchronous <c>GET</c> request to the <c>/containers/{container_id}</c> endpoint.
-    /// The <paramref name="CallBacks"/> argument defines the asynchronous lifecycle of the request,
-    /// including start, completion, and error notification.
-    /// </para>
-    /// <para>
-    /// • The <c>OnStart</c> event is triggered when the request begins.
-    /// The <c>OnSuccess</c> event is invoked when the operation completes successfully and delivers
-    /// a <c>TContainer</c> object containing metadata such as <c>Id</c>, <c>Name</c>, <c>Status</c>,
-    /// <c>CreatedAt</c>, and <c>ExpiresAfter</c> (anchor/minutes).
-    /// The <c>OnError</c> event is fired if a network, API, or server-side failure occurs.
-    /// </para>
-    /// <para>
-    /// • The operation runs asynchronously on a background thread, ensuring that the main thread
-    /// remains responsive during the retrieval process (ideal for GUI or service applications).
-    /// </para>
-    /// <para>
-    /// • The <c>TContainer</c> returned in <c>OnSuccess</c> inherits <c>TJSONFingerprint</c>,
-    /// allowing direct access to the raw JSON payload via the <c>JSONResponse</c> property
-    /// for inspection, logging, or debugging purposes.
-    /// </para>
-    /// <para>
-    /// • Use this method when you need to retrieve container details asynchronously with event-driven
-    /// progress and error handling, instead of blocking the calling thread until completion.
-    /// </para>
-    /// </remarks>
-    procedure AsynRetrieve(const ContainerId: string;
-      const CallBacks: TFunc<TAsynContainer>);
-
-    /// <summary>
-    /// Asynchronously deletes a container and triggers callback events during the operation.
-    /// </summary>
-    /// <param name="ContainerId">
-    /// The unique identifier of the container to delete.
-    /// </param>
-    /// <param name="CallBacks">
-    /// A factory function returning a configured <c>TAsynContainersDelete</c> instance.
-    /// This instance defines asynchronous lifecycle handlers such as <c>OnStart</c>, <c>OnSuccess</c>, and <c>OnError</c>.
-    /// </param>
-    /// <remarks>
-    /// <para>
-    /// • Sends an asynchronous <c>DELETE</c> request to the <c>/containers/{container_id}</c> endpoint.
-    /// The <paramref name="CallBacks"/> argument specifies the asynchronous event handlers used to
-    /// monitor progress and manage success or error outcomes.
-    /// </para>
-    /// <para>
-    /// • The <c>OnStart</c> event is triggered when the delete request begins.
-    /// The <c>OnSuccess</c> event is invoked upon successful completion and delivers a
-    /// <c>TContainersDelete</c> payload containing details of the deletion result.
-    /// The <c>OnError</c> event is fired if a network, API, or server error occurs during execution.
-    /// </para>
-    /// <para>
-    /// • The operation runs asynchronously on a background thread, ensuring that the main thread remains
-    /// responsive during potentially long-running delete operations—ideal for GUI or service-based applications.
-    /// </para>
-    /// <para>
-    /// • The resulting <c>TContainersDelete</c> object includes the deleted container’s <c>Id</c>,
-    /// the <c>Object</c> type (always <c>container.deleted</c>), and a <c>Deleted</c> flag set to <c>True</c>
-    /// upon successful deletion.
-    /// </para>
-    /// <para>
-    /// • The raw JSON API response is preserved in the <c>JSONResponse</c> property inherited from
-    /// <c>TJSONFingerprint</c>, allowing access to the original payload for diagnostics or audit purposes.
-    /// </para>
-    /// <para>
-    /// • Use this method when deleting containers asynchronously with event-driven lifecycle handling,
-    /// providing non-blocking execution and centralized error management instead of a synchronous, blocking delete.
-    /// </para>
-    /// </remarks>
-    procedure AsynDelete(const ContainerId: string;
-      const CallBacks: TFunc<TAsynContainersDelete>);
+    function Delete(const ContainerId: string): TContainersDelete; override;
   end;
 
 implementation
@@ -772,6 +698,22 @@ function TContainerParams.FileIds(
   const Value: TArray<string>): TContainerParams;
 begin
   Result := TContainerParams(Add('file_ids', Value));
+end;
+
+function TContainerParams.MemoryLimit(const Value: string): TContainerParams;
+begin
+  Result := TContainerParams(Add('memory_limit', Value));
+end;
+
+function TContainerParams.NetworkPolicy(
+  const Value: TContainerNetworkPolicyParams): TContainerParams;
+begin
+  Result := TContainerParams(Add('network_policy', Value.Detach));
+end;
+
+function TContainerParams.Skills(const Value: TJSONArray): TContainerParams;
+begin
+  Result := TContainerParams(Add('skills', Value));
 end;
 
 function TContainerParams.Name(
@@ -817,12 +759,39 @@ begin
   Result := TExpiresAfterParams.Create;
 end;
 
+{ TContainerNetworkPolicyParams }
+
+function TContainerNetworkPolicyParams.&Type(
+  const Value: string): TContainerNetworkPolicyParams;
+begin
+  Result := TContainerNetworkPolicyParams(Add('type', Value));
+end;
+
+function TContainerNetworkPolicyParams.AllowedDomains(
+  const Value: TArray<string>): TContainerNetworkPolicyParams;
+begin
+  Result := TContainerNetworkPolicyParams(Add('allowed_domains', Value));
+end;
+
+function TContainerNetworkPolicyParams.DomainSecrets(
+  const Value: TJSONArray): TContainerNetworkPolicyParams;
+begin
+  Result := TContainerNetworkPolicyParams(Add('domain_secrets', Value));
+end;
+
+class function TContainerNetworkPolicyParams.New: TContainerNetworkPolicyParams;
+begin
+  Result := TContainerNetworkPolicyParams.Create;
+end;
+
 { TContainer }
 
 destructor TContainer.Destroy;
 begin
   if Assigned(FExpiresAfter) then
     FExpiresAfter.Free;
+  if Assigned(FNetworkPolicy) then
+    FNetworkPolicy.Free;
   inherited;
 end;
 
@@ -874,7 +843,9 @@ begin
     CallBacks);
 end;
 
-procedure TContainersRoute.AsynCreate(const ParamProc: TProc<TContainerParams>;
+{ TContainersAsynchronousSupport }
+
+procedure TContainersAsynchronousSupport.AsynCreate(const ParamProc: TProc<TContainerParams>;
   const CallBacks: TFunc<TAsynContainer>);
 begin
   with TAsynCallBackExec<TAsynContainer, TContainer>.Create(CallBacks) do
@@ -893,7 +864,7 @@ begin
   end;
 end;
 
-procedure TContainersRoute.AsynDelete(const ContainerId: string;
+procedure TContainersAsynchronousSupport.AsynDelete(const ContainerId: string;
   const CallBacks: TFunc<TAsynContainersDelete>);
 begin
   with TAsynCallBackExec<TAsynContainersDelete, TContainersDelete>.Create(CallBacks) do
@@ -912,7 +883,7 @@ begin
   end;
 end;
 
-procedure TContainersRoute.AsynList(const ParamProc: TProc<TUrlContainerParams>;
+procedure TContainersAsynchronousSupport.AsynList(const ParamProc: TProc<TUrlContainerParams>;
   const CallBacks: TFunc<TAsynContainerList>);
 begin
   with TAsynCallBackExec<TAsynContainerList, TContainerList>.Create(CallBacks) do
@@ -931,7 +902,7 @@ begin
   end;
 end;
 
-procedure TContainersRoute.AsynRetrieve(const ContainerId: string;
+procedure TContainersAsynchronousSupport.AsynRetrieve(const ContainerId: string;
   const CallBacks: TFunc<TAsynContainer>);
 begin
   with TAsynCallBackExec<TAsynContainer, TContainer>.Create(CallBacks) do

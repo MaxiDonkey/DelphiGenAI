@@ -18,15 +18,21 @@ Example without parameters
 ```pascal
 //uses GenAI, GenAI.Types, GenAI.Tutorial.VCL;
 
-  //Asynchronous example
-  Client.Files.AsynList(
-    function : TAsynFiles
-    begin
-      Result.Sender := TutorialHub;
-      Result.OnStart := Start;
-      Result.OnSuccess := Display;
-      Result.OnError := Display;
-    end);
+    //Asynchronous promise example
+  var Promise := Client.Files.AsyncAwaitList;
+
+  Promise
+    .&Then<Integer>(
+      function (List: TFiles): Integer
+      begin
+        Display(TutorialHub, List);
+        Result := Length(List.Data);
+      end)
+    .&Catch(
+      procedure (E: Exception)
+      begin
+        Display(TutorialHub, E.Message);
+      end);
 
   //Synchronous example
 //  var Value := Client.Files.List;
@@ -35,22 +41,6 @@ Example without parameters
 //  finally
 //    Value.Free;
 //  end;
-
-    //Asynchronous promise example
-//  var Promise := Client.Files.AsyncAwaitList;
-//
-//  Promise
-//    .&Then<Integer>(
-//      function (List: TFiles): Integer
-//      begin
-//        Display(TutorialHub, List);
-//        Result := Length(List.Data);
-//      end)
-//    .&Catch(
-//      procedure (E: Exception)
-//      begin
-//        Display(TutorialHub, E.Message);
-//      end);
 ```
 
 <br>
@@ -60,20 +50,26 @@ Example using parameters
 ```pascal
 //uses GenAI, GenAI.Types, GenAI.Tutorial.VCL;
 
-  //Asynchronous example
-  Client.Files.AsynList(
+  //Asynchronous promise example
+  var Promise := Client.Files.AsyncAwaitList(
     procedure (Params: TFileUrlParams)
     begin
-      Params.Purpose('batch');
+      Params.Purpose('user_data');
       Params.Limit(10);
-    end,
-    function : TAsynFiles
-    begin
-      Result.Sender := TutorialHub;
-      Result.OnStart := Start;
-      Result.OnSuccess := Display;
-      Result.OnError := Display;
     end);
+
+  Promise
+    .&Then<Integer>(
+      function (List: TFiles): Integer
+      begin
+        Display(TutorialHub, List);
+        Result := Length(List.Data);
+      end)
+    .&Catch(
+      procedure (E: Exception)
+      begin
+        Display(TutorialHub, E.Message);
+      end);
 
   //Synchronous example
 //  var Value := Client.Files.List(
@@ -87,27 +83,6 @@ Example using parameters
 //  finally
 //    Value.Free;
 //  end;
-
-  //Asynchronous promise example
-//  var Promise := Client.Files.AsyncAwaitList(
-//    procedure (Params: TFileUrlParams)
-//    begin
-//      Params.Purpose('user_data');
-//      Params.Limit(10);
-//    end);
-//
-//  Promise
-//    .&Then<Integer>(
-//      function (List: TFiles): Integer
-//      begin
-//        Display(TutorialHub, List);
-//        Result := Length(List.Data);
-//      end)
-//    .&Catch(
-//      procedure (E: Exception)
-//      begin
-//        Display(TutorialHub, E.Message);
-//      end);
 ```
 
 Refer to [parameters documentation](https://platform.openai.com/docs/api-reference/files/list).
@@ -125,20 +100,31 @@ The Assistants API accommodates files containing up to 2 million tokens and acce
 ```pascal
 //uses GenAI, GenAI.Types, GenAI.Tutorial.VCL;
 
-  //Asynchronous example
-  Client.Files.AsynUpload(
+    //Asynchronous promise example
+  var Promise := Client.Files.AsyncAwaitUpload(
     procedure (Params: TFileUploadParams)
     begin
-      Params.&File('BatchExample.jsonl');
-      Params.Purpose(TFilesPurpose.batch);
+      Params.&File(Document);
+      Params.Purpose(TFilesPurpose.user_data);
     end,
-    function : TAsynFile
+    function : TPromiseFile
     begin
       Result.Sender := TutorialHub;
       Result.OnStart := Start;
-      Result.OnSuccess := Display;
-      Result.OnError := Display;
     end);
+
+  Promise
+    .&Then<TFile>(
+      function (Value: TFile): TFile
+      begin
+        Result := Value;
+        Display(TutorialHub, Value);
+      end)
+    .&Catch(
+      procedure (E: Exception)
+      begin
+        Display(TutorialHub, E.Message);
+      end);
 
   //Synchronous example
 //  var Value := Client.Files.Upload(
@@ -152,32 +138,6 @@ The Assistants API accommodates files containing up to 2 million tokens and acce
 //  finally
 //    Value.Free;
 //  end;
-
-    //Asynchronous promise example
-//  var Promise := Client.Files.AsyncAwaitUpload(
-//    procedure (Params: TFileUploadParams)
-//    begin
-//      Params.&File(Document);
-//      Params.Purpose(TFilesPurpose.user_data);
-//    end,
-//    function : TPromiseFile
-//    begin
-//      Result.Sender := TutorialHub;
-//      Result.OnStart := Start;
-//    end);
-//
-//  Promise
-//    .&Then<TFile>(
-//      function (Value: TFile): TFile
-//      begin
-//        Result := Value;
-//        Display(TutorialHub, Value);
-//      end)
-//    .&Catch(
-//      procedure (E: Exception)
-//      begin
-//        Display(TutorialHub, E.Message);
-//      end);
 ```
 
 <br/>
@@ -193,15 +153,27 @@ Returns information about a specific file.
 
   TutorialHub.Id := '...Id file to retrieve...';
 
-  //Asynchronous example
-  Client.Files.AsynRetrieve(TutorialHub.Id,
-    function : TAsynFile
+    //Asynchronous promise example
+  var Promise := Client.Files.AsyncAwaitRetrieve(
+    TutorialHub.Id,
+    function : TPromiseFile
     begin
       Result.Sender := TutorialHub;
       Result.OnStart := Start;
-      Result.OnSuccess := Display;
-      Result.OnError := Display;
     end);
+
+  Promise
+    .&Then<TFile>(
+      function (Value: TFile): TFile
+      begin
+        Result := Value;
+        Display(TutorialHub, Value);
+      end)
+    .&Catch(
+      procedure (E: Exception)
+      begin
+        Display(TutorialHub, E.Message);
+      end);
 
   //Synchronous example
 //  var Value := Client.Files.Retrieve(TutorialHub.Id);
@@ -210,28 +182,6 @@ Returns information about a specific file.
 //  finally
 //    Value.Free;
 //  end;
-
-    //Asynchronous promise example
-//  var Promise := Client.Files.AsyncAwaitRetrieve(
-//    TutorialHub.Id,
-//    function : TPromiseFile
-//    begin
-//      Result.Sender := TutorialHub;
-//      Result.OnStart := Start;
-//    end);
-//
-//  Promise
-//    .&Then<TFile>(
-//      function (Value: TFile): TFile
-//      begin
-//        Result := Value;
-//        Display(TutorialHub, Value);
-//      end)
-//    .&Catch(
-//      procedure (E: Exception)
-//      begin
-//        Display(TutorialHub, E.Message);
-//      end);
 ```
 
 <br/>
@@ -247,23 +197,13 @@ Returns the contents of the specified file.
 
   TutorialHub.Id := '...Id of the file to retrieve content...';
 
-  //Asynchronous example
-  Client.Files.AsynRetrieveContent(TutorialHub.Id,
-    function : TAsynFileContent
-    begin
-      Result.Sender := TutorialHub;
-      Result.OnStart := Start;
-      Result.OnSuccess := Display;
-      Result.OnError := Display;
-    end);
-
   //Synchronous example
-//  var Value := Client.Files.RetrieveContent(TutorialHub.Id);
-//  try
-//    Display(TutorialHub, Value);
-//  finally
-//    Value.Free;
-//  end;
+  var Value := Client.Files.RetrieveContent(TutorialHub.Id);
+  try
+    Display(TutorialHub, Value);
+  finally
+    Value.Free;
+  end;
 ```
 
 <br/>

@@ -1,0 +1,466 @@
+﻿{
+  "lang": "uk-UA",
+  "input": {
+    "placeholder": {
+      "askQuestion": "Поставте запитання..."
+    },
+    "menu": {
+      "endpoint": "Кінцева точка",
+      "webResearch": "Пошук у Вебі",
+      "thinking": "Міркування",
+      "attachFiles": "Прикріпити файли",
+      "knowledgeSearch": "Пошук знань",
+      "vision": "Зір",
+      "deepResearch": "Глибоке дослідження",
+      "integration": "Інтеграція",
+      "media": "Медіа",
+      "custom": "Користувацький",
+      "settings": "Налаштування",
+      "model": "Модель",
+      "project": "Проєкт"
+    },
+    "thinking": {
+      "low": "Низький",
+      "medium": "Середній",
+      "high": "Високий"
+    },
+    "endpoint": {
+      "chatCompletion": "v1/chat/completions",
+      "chatResponse": "v1/chat/responses",
+      "message": "v1/message",
+      "generateContent": ":generateContent",
+      "interactions": "v1/interactions",
+      "conversation": "v1/conversation",
+      "provider": {
+        "chatCompletion": "OpenAI, DeepSeek, MistralAI",
+        "chatResponse": "OpenAI",
+        "message": "Claude",
+        "generateContent": "Gemini",
+        "interactions": "Gemini",
+        "conversation": "MistralAI"
+      }
+    },
+    "integration": {
+      "function": "Функція",
+      "mcp": "MCP",
+      "jsCodeSandbox": "Пісочниця JS",
+      "skills": "Навички",
+      "agents": "Агенти"
+    },
+    "media": {
+      "createImage": "Створити зображення",
+      "createVideo": "Створити відео",
+      "createAudio": "Створити аудіо",
+      "speechToText": "Мовлення в текст",
+      "textToSpeech": "Текст у мовлення"
+    },
+    "project": {
+      "add": "Додати проєкт",
+      "none": "немає",
+      "noneUsed": "Проєкт не використовується",
+      "delete": "Видалити"
+    },
+    "chips": {
+      "endpoint": "Кінцева точка: {title}",
+      "webResearch": "Пошук у Вебі",
+      "thinking": "Міркування: {title}",
+      "knowledgeSearch": "Пошук знань ({count})",
+      "deepResearch": "Глибоке дослідження",
+      "filesAttached": "Прикріплені файли ({count})",
+      "vision": "Зір ({count})",
+      "integrationFunction": "Інтеграція: Функція ({count})",
+      "integrationMcp": "Інтеграція: MCP ({count})",
+      "integrationJsCodeSandbox": "Інтеграція: Пісочниця JS ({count})",
+      "integrationSkills": "Інтеграція: Навички ({count})",
+      "integrationAgents": "Інтеграція: Агенти ({count})",
+      "mediaCreateImage": "Медіа: Створити зображення",
+      "mediaCreateVideo": "Медіа: Створити відео",
+      "mediaCreateAudio": "Медіа: Створити аудіо",
+      "speechToText": "Мовлення в текст ({count})",
+      "mediaTextToSpeech": "Медіа: Текст у мовлення",
+      "custom": "Користувацький ({count})"
+    }
+  },
+  "requestParams": {
+    "panel": {
+      "title": "Налаштування",
+      "close": "Закрити",
+      "theme": {
+        "light": "Світла",
+        "dark": "Темна"
+      }
+    },
+    "summary": {
+      "alwaysAvailable": "Завжди доступно",
+      "enabled": "Увімкнено",
+      "disabled": "Вимкнено",
+      "enabledDisabled": "{enabled} увімкнено / {disabled} вимкнено"
+    },
+    "categories": {
+      "appSettings": {
+        "title": "Налаштування застосунку",
+        "subtitle": "Загальні",
+        "panelSubtitle": ""
+      },
+      "systemPrompt": {
+        "title": "Системний запит"
+      },
+      "settings": {
+        "title": "Загальні налаштування"
+      },
+      "sampling": {
+        "title": "Вибірка"
+      },
+      "structuredOutput": {
+        "title": "Структурований вивід"
+      },
+      "vendorSettings": {
+        "title": "Параметри постачальника"
+      }
+    },
+    "items": {
+      "appSettings": {
+        "lookAndFeel": {
+          "label": "Вигляд"
+        },
+        "language": {
+          "label": "Мова",
+          "placeholder": "Виберіть мову"
+        },
+        "scrollButtons": {
+          "label": "Кнопки прокручування"
+        }
+      },
+      "systemPrompt": {
+        "systemPrompt": {
+          "label": "Системний запит",
+          "labelWhenDisabled": "Вимкнено",
+          "labelWhenEnabled": "Увімкнено",
+          "placeholder": "Уведіть системний запит"
+        }
+      },
+      "settings": {
+        "temperature": {
+          "label": "Температура"
+        },
+        "maxTokens": {
+          "label": "Макс. токенів"
+        },
+        "stopStrings": {
+          "label": "Рядки зупинки",
+          "placeholder": "Один рядок зупинки на рядок"
+        }
+      },
+      "sampling": {
+        "topK": {
+          "label": "Top-k"
+        },
+        "topP": {
+          "label": "Top-p"
+        },
+        "presencePenalty": {
+          "label": "Штраф за присутність"
+        },
+        "randomSeed": {
+          "label": "Випадкове зерно"
+        }
+      },
+      "structuredOutput": {
+        "jsonSchema": {
+          "label": "Схема JSON",
+          "labelWhenDisabled": "Вимкнено",
+          "labelWhenEnabled": "Увімкнено",
+          "placeholder": "Уведіть схему JSON",
+          "invalidJsonMessage": "Недійсний JSON"
+        }
+      },
+      "vendorSettings": {
+        "parallelToolCalls": {
+          "label": "Паралельні виклики інструментів"
+        },
+        "backgroundResponse": {
+          "label": "Відповідь у фоновому режимі"
+        },
+        "usingPreviousId": {
+          "label": "Використати попередній ID"
+        },
+        "store": {
+          "label": "Зберегти"
+        }
+      }
+    }
+  },
+  "filesDrawer": {
+    "aria": {
+      "leftPanel": "Ліва бічна панель"
+    },
+    "actions": {
+      "openPanel": "Відкрити панель",
+      "newSession": "Нова сесія",
+      "closePanel": "Закрити панель",
+      "nextPage": "Наступна сторінка",
+      "more": "Більше",
+      "rename": "Перейменувати",
+      "delete": "Видалити"
+    }
+  },
+  "scroll": {
+    "top": "Прокрутити вгору",
+    "bottom": "Прокрутити вниз"
+  },
+  "selector": {
+    "branchAfterMessage": "Створити гілку після цього повідомлення",
+    "copyMessage": "Копіювати повідомлення",
+    "deleteMessage": "Видалити повідомлення"
+  },
+  "confirmation": {
+    "title": "Підтвердження",
+    "question": "Будь ласка, підтвердьте.",
+    "yes": "Так",
+    "no": "Ні"
+  },
+  "inputString": {
+    "title": "Введення",
+    "message": "Будь ласка, уведіть значення.",
+    "ok": "OK",
+    "cancel": "Скасувати"
+  },
+  "webDecisionDlg": {
+    "title": "Підтвердження",
+    "message": "Будь ласка, підтвердьте.",
+    "ok": "OK",
+    "cancel": "Скасувати",
+    "close": "Закрити"
+  },
+  "displayFile": {
+    "fallbackName": "Файл {index}",
+    "badge": {
+      "pdf": "PDF",
+      "sheet": "XLS",
+      "doc": "DOC",
+      "slide": "PPT",
+      "text": "TXT",
+      "pascal": "PAS",
+      "code": "</>",
+      "file": "ФАЙЛ"
+    },
+    "status": {
+      "file": "ФАЙЛ"
+    },
+    "debug": {
+      "error": "Помилка DisplayFile: {error}"
+    }
+  },
+  "displayImage": {
+    "action": {
+      "close": "Закрити"
+    },
+    "error": {
+      "unavailable": "Зображення недоступне"
+    },
+    "alt": {
+      "imageIndex": "Зображення {index}"
+    },
+    "debug": {
+      "error": "Помилка DisplayImages: {error}"
+    }
+  },
+  "display": {
+    "reasoning": {
+      "title": "Міркування"
+    },
+    "toolGroup": {
+      "label": "Використані інструменти"
+    },
+    "code": {
+      "copy": "Копіювати",
+      "copied": "Скопійовано",
+      "copyToClipboard": "Копіювати в буфер обміну"
+    }
+  },
+  "errors": {
+    "aria": {
+      "systemMessages": "Системні повідомлення"
+    },
+    "action": {
+      "close": "Закрити"
+    }
+  },
+  "promptFile": {
+    "debug": {
+      "error": "Помилка PromptFile: {error}"
+    }
+  },
+  "displayVideo": {
+    "fallbackName": "Відео {index}",
+    "fallbackNameWithExtension": "Відео {index}.{ext}",
+    "action": {
+      "open": "Відкрити",
+      "close": "Закрити"
+    },
+    "debug": {
+      "error": "Помилка DisplayVideo: {error}"
+    }
+  },
+  "displayAudio": {
+    "fallbackName": "Аудіо {index}",
+    "fallbackNameWithExtension": "Аудіо {index}.{ext}",
+    "status": {
+      "stop": "Зупинити",
+      "loading": "Завантаження",
+      "unavailable": "Недоступно",
+      "pause": "Пауза",
+      "playing": "Відтворення"
+    },
+    "debug": {
+      "error": "Помилка DisplayAudio: {error}"
+    }
+  },
+  "modelSelector": {
+    "panel": {
+      "title": "Вибрати моделі за замовчуванням",
+      "aria": {
+        "dialog": "Вибрати моделі за замовчуванням"
+      }
+    },
+    "actions": {
+      "close": "Закрити"
+    },
+    "defaults": {
+      "title": "Модель за замовчуванням",
+      "empty": "Немає моделі за замовчуванням для цієї категорії."
+    },
+    "status": {
+      "notAssigned": "Не призначено",
+      "noDefaultModel": "Немає моделі за замовчуванням"
+    },
+    "categories": {
+      "allModels": {
+        "label": "Список моделей"
+      },
+      "textGeneration": {
+        "label": "Генерація тексту"
+      },
+      "imageCreation": {
+        "label": "Створення зображень"
+      },
+      "videoCreation": {
+        "label": "Створення відео"
+      },
+      "audioCreation": {
+        "label": "Створення аудіо"
+      },
+      "textToSpeech": {
+        "label": "Текст у мовлення"
+      },
+      "deepResearch": {
+        "label": "Глибоке дослідження"
+      }
+    },
+    "features": {
+      "webResearch": "Пошук у Вебі",
+      "thinking": "Міркування",
+      "attachFiles": "Прикріпити файли",
+      "vision": "Зір",
+      "createImage": "Створити зображення",
+      "createVideo": "Створити відео",
+      "createAudio": "Створити аудіо",
+      "speechToText": "Мовлення в текст",
+      "textToSpeech": "Текст у мовлення",
+      "deepResearch": "Глибоке дослідження"
+    }
+  },
+  "cardSelector": {
+    "panel": {
+      "title": "Вибрати елемент",
+      "ariaLabel": "Вибрати елемент",
+      "selectDialogTitle": "{selectPrefix} {dialogLabel}"
+    },
+    "actions": {
+      "selectPrefix": "Вибрати",
+      "close": "Закрити",
+      "edit": "Редагувати",
+      "settings": "Налаштування",
+      "cancel": "Скасувати",
+      "select": "Вибрати"
+    },
+    "messages": {
+      "empty": "Немає доступних елементів.",
+      "noComment": ""
+    },
+    "dialogs": {
+      "function": {
+        "label": "Функція"
+      },
+      "mcp": {
+        "label": "MCP"
+      },
+      "skills": {
+        "label": "Навички"
+      },
+      "agents": {
+        "label": "Агенти"
+      },
+      "custom": {
+        "label": "Користувацький"
+      }
+    }
+  },
+  "prompt": {
+    "toggleCollapse": "Згорнути або розгорнути запит",
+    "summary": {
+      "open": "Відкрити зведення запиту",
+      "close": "Закрити зведення запиту"
+    }
+  },
+  "more": {
+    "delete_qa": "Будь ласка, підтвердьте видалення поточного запитання та відповіді, а також усіх наступних записів.",
+    "delete_chat_session": "Ви впевнені? #10#10Цю дію не можна скасувати, і вона видалить усі повідомлення в цій розмові.",
+    "aborted": "Операцію перервано...",
+    "aborted_operation": "Операцію перервано",
+    "model_file_not_found": "%s: файл створено. #10Будь ласка, відкрийте цей файл і вкажіть список доступних моделей.",
+    "batch_begin_error": "Не вдалося ввімкнути пакетне відображення.",
+    "batch_end_error": "Не вдалося звільнити пакетне відображення.",
+    "focus_error": "Бульбашка введення не змогла отримати фокус.",
+    "stop_audio_media_error": "Не вдалося зупинити аудіомедіа.",
+    "stop_video_media_error": "Не вдалося зупинити відеомедіа.",
+    "internal_theme_error": "Не вдається оновити тему сторінки.",
+    "deserialization_error": "Помилка десеріалізації: недійсні вхідні дані JSON %s",
+    "welcome": "Ласкаво просимо до вашого робочого простору",
+    "structured_output_error": "Структурований вивід недійсний: будь ласка, відредагуйте його значення в налаштуваннях.",
+    "card_json_file_not_found": "Жоден файл JSON не підтримує %s",
+    "models_categories_count_error": "Будь ласка, визначте категорії для моделей за замовчуванням",
+    "invalid_categories_file_error": "Недійсний файл JSON для категорій",
+    "text_generation_cant_handled_error": "Немає моделі за замовчуванням: генерацію тексту не може бути оброблено",
+    "image_creation_aborted_error": "Не налаштовано модель за замовчуванням: створення зображення перервано",
+    "video_creation_aborted_error": "Не налаштовано модель за замовчуванням: створення відео перервано",
+    "audio_creation_aborted_error": "Не налаштовано модель за замовчуванням: створення аудіо перервано",
+    "stt_operation_aborted_error": "Не налаштовано модель за замовчуванням: операцію STT перервано",
+    "tts_operation_aborted_error": "Не налаштовано модель за замовчуванням: операцію TTS перервано",
+    "deep_research_operation_aborted_error": "Не налаштовано модель за замовчуванням: глибоке дослідження перервано",
+    "missing_default_models_error": "Відсутні моделі за замовчуванням для деяких категорій. #10 Перевірте налаштування моделей",
+    "api_key_empty_name_error": "Назва ключа не може бути порожньою.",
+    "api_key_enter_dialog_prompt": "Будь ласка, уведіть значення ключа API для %s",
+    "api_key_not_found": "%s: ключ API не знайдено",
+    "api_key_deleted": "%s: ключ API видалено",
+    "api_key_exists": "%s: ключ API існує",
+    "api_key_modified": "%s: ключ API змінено.",
+    "api_key_inserted": "%s: ключ API вставлено",
+    "web_decision_dlg_title": "Підтвердження",
+    "web_decision_dlg_message": "Будь ласка, підтвердьте.",
+    "web_decision_dlg_ok": "OK",
+    "web_decision_dlg_cancel": "Скасувати",
+    "web_decision_dlg_close": "Закрити",
+    "demo_anthropic_tool_confirmation_title": "Підтвердження",
+    "demo_anthropic_tool_allow": "Дозволити",
+    "demo_anthropic_tool_deny": "Заборонити",
+    "demo_anthropic_tool_allow_call": "Дозволити цей виклик інструмента?",
+    "demo_anthropic_interrupted_by_user": "Перервано користувачем.",
+    "command_plugin_not_be_null": "Плагін не може бути порожнім",
+    "command_unknown": "Невідома команда: /%s",
+    "command_action_unknown": "Невідома дія: /%s %s",
+    "command_missing_action": "Відсутня дія для /%s",
+    "command_incorrect_number_of_arguments": "Неправильна кількість аргументів для /%s %s (отримано %d)",
+    "command_no_plugin_for": "Немає плагіна для /%s"
+  }
+}

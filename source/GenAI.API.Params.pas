@@ -14,6 +14,9 @@ uses
   REST.JsonReflect, System.Generics.Collections, System.Threading, System.TypInfo,
   GenAI.Consts;
 
+const
+  NULL = 'null';
+
 type
   /// <summary>
   /// Represents a reference to a procedure that takes a single argument of type T and returns no value.
@@ -54,6 +57,7 @@ type
     /// The current instance of <c>TUrlParam</c>, allowing for method chaining.
     /// </returns>
     function Add(const Name, Value: string): TUrlParam; overload; virtual;
+
     /// <summary>
     /// Adds an integer parameter to the query string.
     /// </summary>
@@ -67,6 +71,7 @@ type
     /// The current instance of <c>TUrlParam</c>, allowing for method chaining.
     /// </returns>
     function Add(const Name: string; Value: Integer): TUrlParam; overload; virtual;
+
     /// <summary>
     /// Adds an integer 64 parameter to the query string.
     /// </summary>
@@ -80,6 +85,7 @@ type
     /// The current instance of <c>TUrlParam</c>, allowing for method chaining.
     /// </returns>
     function Add(const Name: string; Value: Int64): TUrlParam; overload; virtual;
+
     /// <summary>
     /// Adds a boolean parameter to the query string.
     /// </summary>
@@ -93,6 +99,7 @@ type
     /// The current instance of <c>TUrlParam</c>, allowing for method chaining.
     /// </returns>
     function Add(const Name: string; Value: Boolean): TUrlParam; overload; virtual;
+
     /// <summary>
     /// Adds a double parameter to the query string.
     /// </summary>
@@ -106,6 +113,7 @@ type
     /// The current instance of <c>TUrlParam</c>, allowing for method chaining.
     /// </returns>
     function Add(const Name: string; Value: Double): TUrlParam; overload; virtual;
+
     /// <summary>
     /// Adds an array of string values to the query string as a single parameter.
     /// </summary>
@@ -119,6 +127,7 @@ type
     /// The current instance of <c>TUrlParam</c>, allowing for method chaining.
     /// </returns>
     function Add(const Name: string; Value: TArray<string>): TUrlParam; overload; virtual;
+
     /// <summary>
     /// Gets the constructed query string with all parameters.
     /// </summary>
@@ -126,6 +135,7 @@ type
     /// The query string, prefixed with a question mark ("?") if parameters are present.
     /// </returns>
     property Value: string read GetValue;
+
     constructor Create; virtual;
   end;
 
@@ -143,6 +153,7 @@ type
     /// <param name="Value">The limit on the number of objects, ranging from 1 to 100.</param>
     /// <returns>The instance of TUrlPaginationParams for method chaining.</returns>
     function Limit(const Value: Integer): TUrlPaginationParams;
+
     /// <summary>
     /// A cursor for use in pagination. after is an object ID that defines your place in the list.
     /// For instance, if you make a list request and receive 100 objects, ending with obj_foo, your
@@ -169,6 +180,7 @@ type
     /// <param name="Value">"Asc" for ascending order or "Desc" for descending order.</param>
     /// <returns>The instance of TUrlAdvancedParams for method chaining.</returns>
     function Order(const Value: string): TUrlAdvancedParams;
+
     /// <summary>
     /// A cursor for use in pagination. This parameter allows you to specify an object ID that defines
     /// your place in the list when navigating to the previous set of results.
@@ -209,6 +221,7 @@ type
     /// The current instance of <c>TJSONParam</c>, allowing for method chaining.
     /// </returns>
     function Add(const Key: string; const Value: string): TJSONParam; overload; virtual;
+
     /// <summary>
     /// Adds a key-value pair to the JSON object, where the value is an integer.
     /// </summary>
@@ -222,6 +235,7 @@ type
     /// The current instance of <c>TJSONParam</c>, allowing for method chaining.
     /// </returns>
     function Add(const Key: string; const Value: Integer): TJSONParam; overload; virtual;
+
     /// <summary>
     /// Adds a key-value pair to the JSON object, where the value is an integer 64.
     /// </summary>
@@ -235,6 +249,7 @@ type
     /// The current instance of <c>TJSONParam</c>, allowing for method chaining.
     /// </returns>
     function Add(const Key: string; const Value: Int64): TJSONParam; overload; virtual;
+
     /// <summary>
     /// Adds a key-value pair to the JSON object, where the value is an extended (floating-point number).
     /// </summary>
@@ -248,6 +263,7 @@ type
     /// The current instance of <c>TJSONParam</c>, allowing for method chaining.
     /// </returns>
     function Add(const Key: string; const Value: Extended): TJSONParam; overload; virtual;
+
     /// <summary>
     /// Adds a key-value pair to the JSON object, where the value is a boolean.
     /// </summary>
@@ -261,6 +277,7 @@ type
     /// The current instance of <c>TJSONParam</c>, allowing for method chaining.
     /// </returns>
     function Add(const Key: string; const Value: Boolean): TJSONParam; overload; virtual;
+
     /// <summary>
     /// Adds a key-value pair to the JSON object, where the value is a date-time object.
     /// </summary>
@@ -280,6 +297,7 @@ type
     /// Converting local DateTime to universal time (UTC) and then formatting it.
     /// </remarks>
     function Add(const Key: string; const Value: TDateTime; Format: string): TJSONParam; overload; virtual;
+
     /// <summary>
     /// Adds a key-value pair to the JSON object, where the value is another JSON object.
     /// </summary>
@@ -293,6 +311,7 @@ type
     /// The current instance of <c>TJSONParam</c>, allowing for method chaining.
     /// </returns>
     function Add(const Key: string; const Value: TJSONValue): TJSONParam; overload; virtual;
+
     /// <summary>
     /// Adds a key-value pair to the JSON object, where the value is a TJSONParam object.
     /// </summary>
@@ -306,6 +325,7 @@ type
     /// The current instance of <c>TJSONParam</c>, allowing for method chaining.
     /// </returns>
     function Add(const Key: string; const Value: TJSONParam): TJSONParam; overload; virtual;
+
     /// <summary>
     /// Adds a key-value pair to the JSON object, where the value is an array of string.
     /// </summary>
@@ -319,6 +339,7 @@ type
     /// The current instance of <c>TJSONParam</c>, allowing for method chaining.
     /// </returns>
     function Add(const Key: string; Value: TArray<string>): TJSONParam; overload; virtual;
+
     /// <summary>
     /// Adds a key-value pair to the JSON object, where the value is an array of integer.
     /// </summary>
@@ -332,6 +353,7 @@ type
     /// The current instance of <c>TJSONParam</c>, allowing for method chaining.
     /// </returns>
     function Add(const Key: string; Value: TArray<Integer>): TJSONParam; overload; virtual;
+
     /// <summary>
     /// Adds a key-value pair to the JSON object, where the value is an array of integer 64.
     /// </summary>
@@ -345,6 +367,7 @@ type
     /// The current instance of <c>TJSONParam</c>, allowing for method chaining.
     /// </returns>
     function Add(const Key: string; Value: TArray<Int64>): TJSONParam; overload; virtual;
+
     /// <summary>
     /// Adds a key-value pair to the JSON object, where the value is an array of extended.
     /// </summary>
@@ -358,6 +381,7 @@ type
     /// The current instance of <c>TJSONParam</c>, allowing for method chaining.
     /// </returns>
     function Add(const Key: string; Value: TArray<Extended>): TJSONParam; overload; virtual;
+
     /// <summary>
     /// Adds a key-value pair to the JSON object, where the value is an array of JSON object.
     /// </summary>
@@ -371,10 +395,28 @@ type
     /// The current instance of <c>TJSONParam</c>, allowing for method chaining.
     /// </returns>
     function Add(const Key: string; Value: TArray<TJSONValue>): TJSONParam; overload; virtual;
+
+    /// <summary>
+    /// Adds a key-value pair to the JSON object, where the value is an array of
+    /// <c>TJSONParam</c>. Ownership of each item's JSON object is transferred into
+    /// the created array, and every <c>TJSONParam</c> item is freed by this method.
+    /// </summary>
+    /// <param name="Key">
+    /// The key of the pair to add.
+    /// </param>
+    /// <param name="Value">
+    /// An array of <c>TJSONParam</c> to associate with the key.
+    /// </param>
+    /// <returns>
+    /// The current instance of <c>TJSONParam</c>, allowing for method chaining.
+    /// </returns>
+    function Add(const Key: string; Value: TArray<TJSONParam>): TJSONParam; overload; virtual;
+
     /// <summary>
     /// Clears all key-value pairs from the JSON object.
     /// </summary>
     procedure Clear; virtual;
+
     /// <summary>
     /// Removes a key-value pair from the JSON object by its key.
     /// </summary>
@@ -382,6 +424,7 @@ type
     /// The key of the pair to remove.
     /// </param>
     procedure Delete(const Key: string); virtual;
+
     /// <summary>
     /// Detaches the internal JSON object from the <c>TJSONParam</c> instance.
     /// </summary>
@@ -397,6 +440,7 @@ type
     /// </para>
     /// </remarks>
     function Detach: TJSONObject;
+
     /// <summary>
     /// Gets or creates a JSON object associated with the specified key.
     /// </summary>
@@ -407,6 +451,7 @@ type
     /// A JSON object associated with the specified key.
     /// </returns>
     function GetOrCreateObject(const Name: string): TJSONObject;
+
     /// <summary>
     /// Gets or creates a JSON value of a specified type associated with the given key.
     /// </summary>
@@ -421,6 +466,7 @@ type
     /// The JSON value associated with the specified key, creating a new one if it does not exist.
     /// </returns>
     function GetOrCreate<T: TJSONValue, constructor>(const Name: string): T;
+
     /// <summary>
     /// Converts the JSON object into a compact JSON string.
     /// </summary>
@@ -431,6 +477,7 @@ type
     /// A compact JSON string.
     /// </returns>
     function ToJsonString(FreeObject: Boolean = False): string; virtual;
+
     /// <summary>
     /// Converts the JSON object into a formatted string.
     /// </summary>
@@ -441,6 +488,7 @@ type
     /// A formatted JSON string.
     /// </returns>
     function ToFormat(FreeObject: Boolean = False): string;
+
     /// <summary>
     /// Converts the JSON object into an array of key-value string pairs.
     /// </summary>
@@ -449,6 +497,7 @@ type
     /// and the associated value converted to a string.
     /// </returns>
     function ToStringPairs: TArray<TPair<string, string>>;
+
     /// <summary>
     /// Converts the JSON object into a string stream for use with file or network operations.
     /// </summary>
@@ -457,10 +506,12 @@ type
     /// The stream must be freed by the caller after use.
     /// </returns>
     function ToStream: TStringStream;
+
     /// <summary>
     /// Gets the number of key-value pairs in the JSON object.
     /// </summary>
     property Count: Integer read GetCount;
+
     /// <summary>
     /// Gets or sets the internal JSON object.
     /// </summary>
@@ -468,16 +519,50 @@ type
   end;
 
   /// <summary>
-  /// Represents a base class for all classes obtained after deserialization.
+  /// Base class for all classes obtained after deserialization. Stores the raw JSON
+  /// string returned by the API and exposes the post-deserialization lifecycle used by
+  /// the two-step (double) deserialization mechanism.
   /// </summary>
   /// <remarks>
-  /// This class is designed to store the raw JSON string returned by the API,
-  /// allowing applications to access the original JSON response if needed.
+  /// Step 1 maps the payload to the object graph; step 2 (the deserializer calls
+  /// <c>InternalFinalizeDeserialize</c> after the raw JSON has been bound to every
+  /// fingerprint via <c>TJSONFingerprintBinder</c>) lets each DTO re-parse its own
+  /// <c>JSONResponse</c> to rebuild polymorphic / streaming content that RTTI cannot
+  /// resolve on its own.
   /// </remarks>
   TJSONFingerprint = class
   private
+    FJSONPayload: string;
     FJSONResponse: string;
+  protected
+    /// <summary>
+    /// Rebuilds polymorphic content structures after deserialization (override per DTO).
+    /// Relies on <c>JSONResponse</c> to extract and rebuild internal representations.
+    /// </summary>
+    procedure ContentUpdate; virtual;
+
+    /// <summary>
+    /// Builds the strongly-typed streaming event object graph from the raw payload
+    /// (override per DTO). Relies on <c>JSONResponse</c>.
+    /// </summary>
+    procedure StreamEventBuilder; virtual;
+
+    /// <summary>
+    /// Post-deserialization hook. Derived classes perform their second-step parsing here
+    /// (typically by calling <c>ContentUpdate</c> and/or <c>StreamEventBuilder</c>).
+    /// </summary>
+    procedure AfterDeserialize; virtual;
   public
+    /// <summary>
+    /// Finalizes deserialization by running the post-deserialization hooks. Intended to be
+    /// called exclusively by the deserialization infrastructure, once the object has been
+    /// instantiated, bound and its <c>JSONResponse</c> assigned.
+    /// </summary>
+    procedure InternalFinalizeDeserialize;
+
+    /// <summary>The original request payload associated with this response (if any).</summary>
+    property JSONPayload: string read FJSONPayload write FJSONPayload;
+
     /// <summary>
     /// Gets or sets the raw JSON string returned by the API.
     /// </summary>
@@ -501,6 +586,8 @@ type
     /// Provides runtime type information (RTTI) for enhanced handling of string values.
     /// </summary>
     RTTI: TRttiContext;
+    class function GetMemberValue<T>(Data: TObject; const Field: string): T; static;
+    class procedure SetMemberValue<T>(Data: TObject; const Field: string; const Value: T); static;
   public
     constructor Create; reintroduce;
   end;
@@ -573,10 +660,82 @@ type
     procedure ProcessParam(const AKey: string; ACallback: TProc<TValue>);
   end;
 
+  /// <summary>
+  /// Represents an optional, deserialized content whose presence in the API
+  /// response is tracked explicitly.
+  /// </summary>
+  /// <remarks>
+  /// <para>
+  /// <c>HasValue</c> is <c>True</c> when the instance was populated from an actual
+  /// payload returned by the API, and <c>False</c> when it only exists as a
+  /// placeholder (no corresponding content was present in the response).
+  /// </para>
+  /// </remarks>
+  TOptionalContent = class
+  private
+    FHasValue: Boolean;
+  public
+    /// <summary>
+    /// Indicates whether this instance contains a value provided by the
+    /// deserialization process.
+    /// </summary>
+    property HasValue: Boolean read FHasValue;
+
+    /// <summary>
+    /// Marks this instance as containing a value provided by the deserialization process.
+    /// </summary>
+    procedure MarkHasValue; inline;
+  end;
+
+  /// <summary>
+  /// Utility record exposing helper functions to parse JSON strings and to build
+  /// <c>TJSONArray</c> values from arrays of <c>TJSONParam</c> or <c>TJSONObject</c>.
+  /// </summary>
+  TJSONHelper = record
+    /// <summary>
+    /// Parses a JSON string into a <c>TJSONObject</c>. Raises if the string is not
+    /// a valid JSON object.
+    /// </summary>
+    class function StringToJson(const Value: string): TJSONObject; static;
+
+    /// <summary>
+    /// Parses a JSON string into a <c>TJSONArray</c>. Raises if the string is not
+    /// a valid JSON array.
+    /// </summary>
+    class function StringToJsonArray(const Value: string): TJSONArray; static;
+
+    /// <summary>
+    /// Builds a <c>TJSONArray</c> by detaching the JSON object of each
+    /// <c>TJSONParam</c> item (ownership is transferred to the array).
+    /// </summary>
+    class function ToJsonArray<T: TJSONParam>(const Value: TArray<T>): TJSONArray; overload; static;
+
+    /// <summary>
+    /// Builds a <c>TJSONArray</c> from an array of <c>TJSONObject</c> (ownership of
+    /// each object is transferred to the array).
+    /// </summary>
+    class function ToJsonArray(const Value: TArray<TJSONObject>): TJSONArray; overload; static;
+
+    /// <summary>
+    /// Attempts to parse a JSON string into a <c>TJSONValue</c>.
+    /// </summary>
+    class function TryParse(const Value: string; out Json: TJSONValue): Boolean; static;
+
+    /// <summary>
+    /// Attempts to parse a JSON string into a <c>TJSONObject</c>.
+    /// </summary>
+    class function TryGetObject(const Value: string; out Obj: TJSONObject): Boolean; static;
+
+    /// <summary>
+    /// Attempts to parse a JSON string into a <c>TJSONArray</c>.
+    /// </summary>
+    class function TryGetArray(const Value: string; out Arr: TJSONArray): Boolean; static;
+  end;
+
 implementation
 
 uses
-  System.DateUtils, System.NetEncoding;
+  System.DateUtils, System.NetEncoding, GenAI.Types.Rtti;
 
 { TJSONInterceptorStringToString }
 
@@ -585,6 +744,40 @@ begin
   inherited Create;
   ConverterType := ctString;
   ReverterType := rtString;
+end;
+
+class function TJSONInterceptorStringToString.GetMemberValue<T>(Data: TObject;
+  const Field: string): T;
+begin
+  Result := TRttiMemberAccess.GetValue<T>(Data, Field);
+end;
+
+class procedure TJSONInterceptorStringToString.SetMemberValue<T>(Data: TObject;
+  const Field: string; const Value: T);
+begin
+  TRttiMemberAccess.SetValue<T>(Data, Field, Value);
+end;
+
+{ TJSONFingerprint }
+
+procedure TJSONFingerprint.AfterDeserialize;
+begin
+  {--- Default: no second-step processing. Derived DTOs override this. }
+end;
+
+procedure TJSONFingerprint.ContentUpdate;
+begin
+  {--- Default: nothing. Derived DTOs override to rebuild polymorphic content. }
+end;
+
+procedure TJSONFingerprint.StreamEventBuilder;
+begin
+  {--- Default: nothing. Derived DTOs override to build streaming events. }
+end;
+
+procedure TJSONFingerprint.InternalFinalizeDeserialize;
+begin
+  AfterDeserialize;
 end;
 
 { Fetch }
@@ -699,14 +892,19 @@ end;
 
 function TJSONParam.Add(const Key: string; const Value: TJSONParam): TJSONParam;
 begin
-  {--- Note
-     This line performs a deep clone of Value.JSON into the local JSON, which is
-     generally suitable if you don't want the two TJSONParams to share the same
-     references.
-     - However, keep in mind that this operation can be costly for large
-     objects and is not always necessary if you're certain not to modify or retain
-     the same JSON instance in multiple places.
+  {--- Clone semantics for a single TJSONParam to avoid consuming the argument.
+     A nil value is serialized as an explicit JSON null.
+     - Note: the deep clone of Value.JSON can be costly for large objects and is
+     not always necessary if you're certain not to modify or retain the same JSON
+     instance in multiple places.
   }
+  if Value = nil then
+    begin
+      Delete(Key);
+      FJSON.AddPair(Key, TJSONNull.Create);
+      Exit(Self);
+    end;
+
   Add(Key, TJSONValue(Value.JSON.Clone));
   Result := Self;
 end;
@@ -1247,5 +1445,164 @@ begin
   Result := Self;
 end;
 
-end.
+{ TJSONParam (array of TJSONParam) }
 
+function TJSONParam.Add(const Key: string; Value: TArray<TJSONParam>): TJSONParam;
+begin
+  var JSONArray := TJSONArray.Create;
+  try
+    for var Item in Value do
+    try
+      if Item = nil then
+        begin
+          JSONArray.AddElement(TJSONNull.Create);
+          Continue;
+        end;
+
+      {--- Transfer ownership of Item.JSON into the array:
+           - if Item.JSON is nil, treat it as an empty object. }
+      if Item.FJSON = nil then
+        Item.FJSON := TJSONObject.Create;
+
+      JSONArray.AddElement(Item.FJSON);
+      Item.FJSON := nil;
+    finally
+      Item.Free;
+    end;
+
+    {--- transfers ownership of JSONArray to FJSON }
+    Add(Key, JSONArray);
+  except
+    JSONArray.Free;
+    raise;
+  end;
+  Result := Self;
+end;
+
+{ TOptionalContent }
+
+procedure TOptionalContent.MarkHasValue;
+begin
+  FHasValue := True;
+end;
+
+{ TJSONHelper }
+
+class function TJSONHelper.StringToJson(const Value: string): TJSONObject;
+begin
+  var JSON := TJSONObject.ParseJSONValue(Value);
+  if not Assigned(JSON) then
+    raise Exception.CreateFmt('Invalid JSON: %s', [Value]);
+
+  if not (JSON is TJSONObject) then
+    begin
+      JSON.Free;
+      raise Exception.Create('JSON is not an object');
+    end;
+
+  Result := TJSONObject(JSON);
+end;
+
+class function TJSONHelper.StringToJsonArray(const Value: string): TJSONArray;
+begin
+  var JSON := TJSONObject.ParseJSONValue(Value);
+  if not Assigned(JSON) then
+    raise Exception.CreateFmt('Invalid JSON: %s', [Value]);
+
+  if not (JSON is TJSONArray) then
+    begin
+      JSON.Free;
+      raise Exception.Create('JSON is not an array');
+    end;
+
+  Result := TJSONArray(JSON);
+end;
+
+class function TJSONHelper.ToJsonArray(
+  const Value: TArray<TJSONObject>): TJSONArray;
+begin
+  Result := TJSONArray.Create;
+  try
+    for var Item in Value do
+      begin
+        if Item = nil then
+          Continue;
+
+        Result.Add(Item);
+      end;
+  except
+    Result.Free;
+    raise;
+  end;
+end;
+
+class function TJSONHelper.ToJsonArray<T>(const Value: TArray<T>): TJSONArray;
+begin
+  Result := TJSONArray.Create;
+  try
+    for var Item in Value do
+      begin
+        if Item = nil then
+          Continue;
+
+        Result.Add(Item.Detach);
+      end;
+  except
+    Result.Free;
+    raise;
+  end;
+end;
+
+class function TJSONHelper.TryGetArray(const Value: string;
+  out Arr: TJSONArray): Boolean;
+var
+  JSONValue: TJSONValue;
+begin
+  Arr := nil;
+  if not TryParse(Value, JSONValue) then
+    Exit(False);
+
+  if JSONValue is TJSONArray then
+    begin
+      Arr := TJSONArray(JSONValue);
+      Exit(True);
+    end;
+
+  JSONValue.Free;
+  Result := False;
+end;
+
+class function TJSONHelper.TryGetObject(const Value: string;
+  out Obj: TJSONObject): Boolean;
+var
+  JSONValue: TJSONValue;
+begin
+  Obj := nil;
+  if not TryParse(Value, JSONValue) then
+    Exit(False);
+
+  if JSONValue is TJSONObject then
+    begin
+      Obj := TJSONObject(JSONValue);
+      Exit(True);
+    end;
+
+  JSONValue.Free;
+  Result := False;
+end;
+
+class function TJSONHelper.TryParse(const Value: string;
+  out Json: TJSONValue): Boolean;
+begin
+  Json := nil;
+  try
+    Json := TJSONObject.ParseJSONValue(Value);
+    Result := Json <> nil;
+  except
+    Json.Free;
+    Json := nil;
+    Result := False;
+  end;
+end;
+
+end.

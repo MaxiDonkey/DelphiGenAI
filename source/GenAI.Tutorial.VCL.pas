@@ -1,4 +1,4 @@
-unit GenAI.Tutorial.VCL;
+﻿unit GenAI.Tutorial.VCL;
 
 { Tutorial Support Unit
 
@@ -16,7 +16,9 @@ uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, Winapi.ShellAPI,
   System.Variants, System.Classes,
   Vcl.Graphics, Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.ExtCtrls,
-  System.UITypes, Vcl.MPlayer, system.JSON, GenAI, GenAI.Types;
+  System.UITypes, Vcl.MPlayer, system.JSON,
+
+  GenAI, GenAI.Types;
 
 type
   TToolProc = procedure (const Value: string) of object;
@@ -165,26 +167,14 @@ type
   procedure Display(Sender: TObject; Value: TVectorStoreFiles); overload;
   procedure Display(Sender: TObject; Value: TVectorStoreBatch); overload;
   procedure Display(Sender: TObject; Value: TVectorStoreBatches); overload;
-  procedure Display(Sender: TObject; Value: TAssistant); overload;
-  procedure Display(Sender: TObject; Value: TAssistants); overload;
-  procedure Display(Sender: TObject; Value: TThreads); overload;
-  procedure Display(Sender: TObject; Value: TMessages); overload;
-  procedure Display(Sender: TObject; Value: TMessagesList); overload;
-  procedure Display(Sender: TObject; Value: TRun); overload;
-  procedure Display(Sender: TObject; Value: TRuns); overload;
-  procedure Display(Sender: TObject; Value: TRunStep); overload;
-  procedure Display(Sender: TObject; Value: TRunSteps); overload;
+  procedure Display(Sender: TObject; Value: TChatCompletion); overload;
+  procedure Display(Sender: TObject; Value: TChatDelete); overload;
+  procedure Display(Sender: TObject; Value: TChatMessages); overload;
   procedure Display(Sender: TObject; Value: TResponse); overload;
   procedure Display(Sender: TObject; Value: TResponseDelete); overload;
   procedure Display(Sender: TObject; Value: TResponses); overload;
-  procedure Display(Sender: TObject; Value: TChatMessages); overload;
-  procedure Display(Sender: TObject; Value: TChatCompletion); overload;
-  procedure Display(Sender: TObject; Value: TChatDelete); overload;
   procedure Display(Sender: TObject; Value: TResponseItem); overload;
   procedure Display(Sender: TObject; Value: TConversations); overload;
-  procedure Display(Sender: TObject; Value: TVideoJob); overload;
-  procedure Display(Sender: TObject; Value: TVideoJobList); overload;
-  procedure Display(Sender: TObject; Value: TVideoDownloaded); overload;
   procedure Display(Sender: TObject; Value: TContainer); overload;
   procedure Display(Sender: TObject; Value: TContainerList); overload;
   procedure Display(Sender: TObject; Value: TContainersDelete); overload;
@@ -339,7 +329,7 @@ begin
   var index := 1;
   for var Item in Value.Embedding do
     begin
-      Display(Sender, F(Format('V[%d]', [index]), Item.ToString(ffNumber, 2, 6)));
+      Display(Sender, F(Format('V[%d]', [index]), Item.ToString(ffNumber, 6, 6)));
       Inc(index);
     end;
   Display(Sender);
@@ -610,102 +600,6 @@ begin
   Display(Sender)
 end;
 
-procedure Display(Sender: TObject; Value: TAssistant);
-begin
-  if not Value.JSONResponse.IsEmpty then
-    TutorialHub.JSONResponse := Value.JSONResponse;
-  Display(Sender, [
-    F('id', Value.Id),
-    F('object', Value.&Object),
-    F('name', Value.Name),
-    F('model', Value.Model)
-  ]);
-  Display(Sender);
-end;
-
-procedure Display(Sender: TObject; Value: TAssistants);
-begin
-  TutorialHub.JSONResponse := Value.JSONResponse;
-  for var Item in Value.Data do
-    Display(Sender, Item);
-  Display(Sender)
-end;
-
-procedure Display(Sender: TObject; Value: TThreads);
-begin
-  TutorialHub.JSONResponse := Value.JSONResponse;
-  Display(Sender, [
-    F('id', Value.Id),
-    F('object', Value.&Object),
-    F('created_at', Value.CreatedAtAsString)
-  ]);
-  Display(Sender);
-end;
-
-procedure Display(Sender: TObject; Value: TMessages);
-begin
-  if not Value.JSONResponse.IsEmpty then
-    TutorialHub.JSONResponse := Value.JSONResponse;
-  Display(Sender, F('id', [Value.Id, F('status', Value.Status.ToString)]));
-  for var Item in Value.Content do
-    Display(Sender, Item.Text.Value);
-  Display(Sender);
-end;
-
-procedure Display(Sender: TObject; Value: TMessagesList);
-begin
-  TutorialHub.JSONResponse := Value.JSONResponse;
-  for var Item in Value.Data do
-    Display(Sender, Item);
-  Display(Sender);
-end;
-
-procedure Display(Sender: TObject; Value: TRun);
-begin
-  if not Value.JSONResponse.IsEmpty then
-    TutorialHub.JSONResponse := Value.JSONResponse;
-  Display(Sender, [
-    F('id', Value.Id),
-    F('status',Value.Status.ToString),
-    F('thread_id', Value.ThreadId),
-    F('assistant_id', Value.AssistantId),
-    F('expires_at', Value.ExpiresAtAsString)
-  ]);
-  Display(Sender);
-end;
-
-procedure Display(Sender: TObject; Value: TRuns);
-begin
-  TutorialHub.JSONResponse := Value.JSONResponse;
-  for var Item in Value.Data do
-    Display(Sender, Item);
-  Display(Sender);
-end;
-
-procedure Display(Sender: TObject; Value: TRunStep);
-begin
-  if not Value.JSONResponse.IsEmpty then
-    TutorialHub.JSONResponse := Value.JSONResponse;
-  Display(Sender, [
-    F('id', Value.Id),
-    F('status',Value.Status.ToString),
-    F('thread_id', Value.ThreadId),
-    F('assistant_id', Value.AssistantId),
-    F('run_id', Value.RunId),
-    F('step_details.type', Value.StepDetails.&Type.ToString),
-    F('step_details.message_creation.MessageId', Value.StepDetails.MessageCreation.MessageId)
-  ]);
-  Display(Sender);
-end;
-
-procedure Display(Sender: TObject; Value: TRunSteps);
-begin
-  TutorialHub.JSONResponse := Value.JSONResponse;
-  for var Item in Value.Data do
-    Display(Sender, Item);
-  Display(Sender);
-end;
-
 procedure Display(Sender: TObject; Value: TResponse);
 begin
   TutorialHub.JSONResponse := Value.JSONResponse;
@@ -811,34 +705,6 @@ begin
   Display(Sender, F('metadata', Value.Metadata));
 end;
 
-procedure Display(Sender: TObject; Value: TVideoJob);
-begin
-  if not Value.JSONResponse.IsEmpty then
-    TutorialHub.JSONResponse := Value.JSONResponse;
-  Display(Sender, F('id', Value.Id));
-  Display(Sender, F('progress', Value.Progress.ToString));
-  Display(Sender, F('status', Value.Status));
-  Display(Sender);
-end;
-
-procedure Display(Sender: TObject; Value: TVideoJobList);
-begin
-  TutorialHub.JSONResponse := Value.JSONResponse;
-  for var item in Value.Data do
-    Display(Sender, Item);
-  Display(Sender);
-end;
-
-procedure Display(Sender: TObject; Value: TVideoDownloaded);
-begin
-  if TutorialHub.FileName.IsEmpty then
-    Exit;
-  Value.SaveToFile(TutorialHub.FileName);
-  Display(Sender, TutorialHub.FileName + ' downloaded');
-  if ShellExecute(0, nil, PChar(TutorialHub.FileName), nil, nil, SW_SHOWNORMAL) <= 32 then
-    RaiseLastOSError;
-end;
-
 procedure Display(Sender: TObject; Value: TContainer);
 begin
   if not Value.JSONResponse.IsEmpty then
@@ -847,7 +713,7 @@ begin
   Display(Sender, F('Name', Value.Name));
   Display(Sender, F('status', Value.Status));
   Display(Sender, F('expire_after', Value.ExpiresAfter.Minutes.ToString + ' minutes'));
-  Display(Sender, F('created_at', TInt64OrNull(Value.CreatedAt).ToUtcDateString));
+  Display(Sender, F('created_at', Value.CreatedAt.toString));
 end;
 
 procedure Display(Sender: TObject; Value: TContainerList);

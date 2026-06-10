@@ -46,8 +46,9 @@ The Chat API can be used for both single-turn requests and multi-turn, stateless
 
   TutorialHub.JSONRequestClear;
 
-  //Asynchronous example
-  Client.Chat.AsynCreate(
+  //Asynchronous promise example
+  Display(TutorialHub, 'This may take a few seconds.');
+  var Promise := Client.Chat.AsyncAwaitCreate(
     procedure (Params: TChatParams)
     begin
       Params.Model('gpt-4o');
@@ -55,16 +56,25 @@ The Chat API can be used for both single-turn requests and multi-turn, stateless
         FromSystem('You are a comedian looking for jokes for your new show.'),
         FromUser('What is the difference between a mathematician and a physicist?')
       ]);
-      //Params.Store(True);  // to store chat completion
-      TutorialHub.JSONRequest := Params.ToFormat(); //to display JSON Request
-    end,
-    function : TAsynChat
-    begin
-      Result.Sender := TutorialHub;
-      Result.OnStart := Start;
-      Result.OnSuccess := Display;
-      Result.OnError := Display;
+      Params.MaxCompletionTokens(1024);
+      Params.Store(False);
+      TutorialHub.JSONRequest := Params.ToFormat();
     end);
+
+  promise
+    .&Then<string>(
+      function (Value: TChat): string
+      begin
+        for var Item in Value.Choices do
+          Result := Result + Item.Message.Content;
+        Display(TutorialHub, Value);
+        ShowMessage(Result);
+      end)
+    .&Catch(
+      procedure (E: Exception)
+      begin
+        Display(TutorialHub, E.Message);
+      end);
 
   //Synchronous example
 //  var Value := Client.Chat.Create(
@@ -83,36 +93,6 @@ The Chat API can be used for both single-turn requests and multi-turn, stateless
 //  finally
 //    Value.Free;
 //  end;
-
-  //Asynchronous promise example
-//  Display(TutorialHub, 'This may take a few seconds.');
-//  var Promise := Client.Chat.AsyncAwaitCreate(
-//    procedure (Params: TChatParams)
-//    begin
-//      Params.Model('gpt-4o');
-//      Params.Messages([
-//        FromSystem('You are a comedian looking for jokes for your new show.'),
-//        FromUser('What is the difference between a mathematician and a physicist?')
-//      ]);
-//      Params.MaxCompletionTokens(1024);
-//      Params.Store(False);
-//      TutorialHub.JSONRequest := Params.ToFormat();
-//    end);
-//
-//  promise
-//    .&Then<string>(
-//      function (Value: TChat): string
-//      begin
-//        for var Item in Value.Choices do
-//          Result := Result + Item.Message.Content;
-//        Display(TutorialHub, Value);
-//        ShowMessage(Result);
-//      end)
-//    .&Catch(
-//      procedure (E: Exception)
-//      begin
-//        Display(TutorialHub, E.Message);
-//      end);
 ```
 <br>
 
@@ -137,27 +117,53 @@ By using the GenAI.Tutorial.VCL unit along with the initialization described [ab
 
   TutorialHub.JSONRequestClear;
 
-  //Asynchronous example
-  Client.Chat.AsynCreateStream(
+  //Asynchronous promise example
+  var Promise := Client.Chat.AsyncAwaitCreateStream(
     procedure(Params: TChatParams)
     begin
-      Params.Model('gpt-4.1-mini');
+      Params.Model('gpt-4.1-nano');
       Params.Messages([
-          FromSystem('You are a comedian looking for jokes for your new show.'),
-          FromUser('What is the difference between a mathematician and a physicist?')]);
-      //Params.Store(True);  // to store chat completion
+          FromDeveloper('You are a funny domestic assistant.'),
+          FromUser('Hello'),
+          FromAssistant('Great to meet you. What would you like to know?'),
+          FromUser('I have two dogs in my house. How many paws are in my house?')
+      ]);
       Params.Stream;
-      TutorialHub.JSONRequest := Params.ToFormat(); //to display JSON Request
+      Params.Store(False);
+      TutorialHub.JSONRequest := Params.ToFormat();
     end,
-    function : TAsynChatStream
+    function : TPromiseChatStream
     begin
       Result.Sender := TutorialHub;
       Result.OnStart := Start;
-      Result.OnProgress := DisplayStream;
-      Result.OnError := Display;
+
+      Result.OnProgress :=
+        procedure (Sender: TObject; Chunk: TChat)
+        begin
+          DisplayStream(Sender, Chunk);
+        end;
+
       Result.OnDoCancel := DoCancellation;
-      Result.OnCancellation := Cancellation;
+
+      Result.OnCancellation :=
+        function (Sender: TObject): string
+        begin
+          Cancellation(Sender);
+        end
     end);
+
+  Promise
+    .&Then<string>(
+      function (Value: string): string
+      begin
+        Result := Value;
+        ShowMessage(Result);
+      end)
+    .&Catch(
+      procedure (E: Exception)
+      begin
+        Display(TutorialHub, E.Message);
+      end);
 
   //Synchronous example
 //  Client.Chat.CreateStream(
@@ -178,54 +184,6 @@ By using the GenAI.Tutorial.VCL unit along with the initialization described [ab
 //          DisplayStream(TutorialHub, Chat);
 //        end;
 //    end);
-
-  //Asynchronous promise example
-//  var Promise := Client.Chat.AsyncAwaitCreateStream(
-//    procedure(Params: TChatParams)
-//    begin
-//      Params.Model('gpt-4.1-nano');
-//      Params.Messages([
-//          FromDeveloper('You are a funny domestic assistant.'),
-//          FromUser('Hello'),
-//          FromAssistant('Great to meet you. What would you like to know?'),
-//          FromUser('I have two dogs in my house. How many paws are in my house?')
-//      ]);
-//      Params.Stream;
-//      Params.Store(False);
-//      TutorialHub.JSONRequest := Params.ToFormat();
-//    end,
-//    function : TPromiseChatStream
-//    begin
-//      Result.Sender := TutorialHub;
-//      Result.OnStart := Start;
-//
-//      Result.OnProgress :=
-//        procedure (Sender: TObject; Chunk: TChat)
-//        begin
-//          DisplayStream(Sender, Chunk);
-//        end;
-//
-//      Result.OnDoCancel := DoCancellation;
-//
-//      Result.OnCancellation :=
-//        function (Sender: TObject): string
-//        begin
-//          Cancellation(Sender);
-//        end
-//    end);
-//
-//  Promise
-//    .&Then<string>(
-//      function (Value: string): string
-//      begin
-//        Result := Value;
-//        ShowMessage(Result);
-//      end)
-//    .&Catch(
-//      procedure (E: Exception)
-//      begin
-//        Display(TutorialHub, E.Message);
-//      end);
 ```
 
 <p align="center">
@@ -247,9 +205,9 @@ The `GenAI Chat API` enables the creation of interactive chat experiences tailor
 
   TutorialHub.JSONRequestClear;
 
-  //Asynchronous example
-  Client.Chat.AsynCreateStream(
-    procedure(Params: TChatParams)
+  //Synchronous example
+  Client.Chat.CreateStream(
+    procedure (Params: TChatParams)
     begin
       Params.Model('gpt-4.1-nano');
       Params.Messages([
@@ -259,39 +217,15 @@ The `GenAI Chat API` enables the creation of interactive chat experiences tailor
           FromUser('I have two dogs in my house. How many paws are in my house?') ]);
       Params.MaxCompletionTokens(1024);
       Params.Stream;
-      TutorialHub.JSONRequest := Params.ToFormat(); //to display JSON Request
+      TutorialHub.JSONRequest := Params.ToFormat();
     end,
-    function : TAsynChatStream
+    procedure (var Chat: TChat; IsDone: Boolean; var Cancel: Boolean)
     begin
-      Result.Sender := TutorialHub;
-      Result.OnStart := Start;
-      Result.OnProgress := DisplayStream;
-      Result.OnError := Display;
-      Result.OnDoCancel := DoCancellation;
-      Result.OnCancellation := Cancellation;
+      if (not IsDone) and Assigned(Chat) then
+        begin
+          DisplayStream(TutorialHub, Chat);
+        end;
     end);
-
-  //Synchronous example
-//  Client.Chat.CreateStream(
-//    procedure (Params: TChatParams)
-//    begin
-//      Params.Model('gpt-4.1-nano');
-//      Params.Messages([
-//          FromDeveloper('You are a funny domestic assistant.'),
-//          FromUser('Hello'),
-//          FromAssistant('Great to meet you. What would you like to know?'),
-//          FromUser('I have two dogs in my house. How many paws are in my house?') ]);
-//      Params.MaxCompletionTokens(1024);
-//      Params.Stream;
-//      TutorialHub.JSONRequest := Params.ToFormat();
-//    end,
-//    procedure (var Chat: TChat; IsDone: Boolean; var Cancel: Boolean)
-//    begin
-//      if (not IsDone) and Assigned(Chat) then
-//        begin
-//          DisplayStream(TutorialHub, Chat);
-//        end;
-//    end);
 ```
 
 >[!TIP]
@@ -433,15 +367,21 @@ Get a stored chat completion. Only [Chat Completions](#text-generation) that hav
 
   TutorialHub.JSONRequestClear;
 
-  //Asynchronous example
-  Client.Chat.AsynGetCompletion('completion_id',   //e.g. 'chatcmpl-BO9ybVceB3aXFyMRKR3MKUEzWcFqE'
-    function : TAsynChat
-    begin
-      Result.Sender := TutorialHub;
-      Result.OnStart := Start;
-      Result.OnSuccess := Display;
-      Result.OnError := Display;
-    end);
+  //Asynchronous promise example
+  var Promise := Client.Chat.AsyncAwaitGetCompletion('completion_id');   //e.g. 'chatcmpl-BO9ybVceB3aXFyMRKR3MKUEzWcFqE'
+
+  promise
+    .&Then<TChat>(
+      function (Value: TChat): TChat
+      begin
+        Result := Value;
+        Display(TutorialHub, Value);
+      end)
+    .&Catch(
+      procedure (E: Exception)
+      begin
+        Display(TutorialHub, E.Message);
+      end);
 
   //Synchronous example
 //  var Value := Client.Chat.GetCompletion('completion_id');   //e.g. 'chatcmpl-BO9ybVceB3aXFyMRKR3MKUEzWcFqE'
@@ -450,22 +390,6 @@ Get a stored chat completion. Only [Chat Completions](#text-generation) that hav
 //  finally
 //    Value.Free;
 //  end;
-
-  //Asynchronous promise example
-//  var Promise := Client.Chat.AsyncAwaitGetCompletion('completion_id');   //e.g. 'chatcmpl-BO9ybVceB3aXFyMRKR3MKUEzWcFqE'
-//
-//  promise
-//    .&Then<TChat>(
-//      function (Value: TChat): TChat
-//      begin
-//        Result := Value;
-//        Display(TutorialHub, Value);
-//      end)
-//    .&Catch(
-//      procedure (E: Exception)
-//      begin
-//        Display(TutorialHub, E.Message);
-//      end);
 ```
 
 <br>
@@ -479,20 +403,27 @@ Get the messages in a stored chat completion. Only [Chat Completions](#text-gene
 
   TutorialHub.JSONRequestClear;
 
-  //Asynchronous example
-  Client.Chat.AsynGetMessages('completion_id',   //e.g. 'chatcmpl-BO9ybVceB3aXFyMRKR3MKUEzWcFqE'
+  //Asynchronous promise example
+  var Promise := Client.Chat.AsyncAwaitGetMessages(
+    'completion_id',   //e.g. 'chatcmpl-BO9ybVceB3aXFyMRKR3MKUEzWcFqE',
     procedure (Param: TUrlChatParams)
     begin
       Param.Limit(15);
       Param.Order('asc');
-    end,
-    function : TAsynChatMessages
-    begin
-      Result.Sender := TutorialHub;
-      Result.OnStart := Start;
-      Result.OnSuccess := Display;
-      Result.OnError := Display;
     end);
+
+  promise
+    .&Then<TChatMessages>(
+      function (Value: TChatMessages): TChatMessages
+      begin
+        Result := Value;
+        Display(TutorialHub, Value);
+      end)
+    .&Catch(
+      procedure (E: Exception)
+      begin
+        Display(TutorialHub, E.Message);
+      end);
 
   //Synchronous example
 //  var Value := Client.Chat.GetMessages('completion_id',   //e.g. 'chatcmpl-BO9ybVceB3aXFyMRKR3MKUEzWcFqE'
@@ -506,28 +437,6 @@ Get the messages in a stored chat completion. Only [Chat Completions](#text-gene
 //  finally
 //    Value.Free;
 //  end;
-
-  //Asynchronous promise example
-//  var Promise := Client.Chat.AsyncAwaitGetMessages(
-//    'completion_id',   //e.g. 'chatcmpl-BO9ybVceB3aXFyMRKR3MKUEzWcFqE',
-//    procedure (Param: TUrlChatParams)
-//    begin
-//      Param.Limit(15);
-//      Param.Order('asc');
-//    end);
-//
-//  promise
-//    .&Then<TChatMessages>(
-//      function (Value: TChatMessages): TChatMessages
-//      begin
-//        Result := Value;
-//        Display(TutorialHub, Value);
-//      end)
-//    .&Catch(
-//      procedure (E: Exception)
-//      begin
-//        Display(TutorialHub, E.Message);
-//      end);
 ```
 
 <br>
@@ -541,20 +450,25 @@ List stored Chat Completions. Only [Chat Completions](#text-generation) that hav
 
   TutorialHub.JSONRequestClear;
 
-  //Asynchronous example
-  Client.Chat.AsynList(
+  //Asynchronous promise example
+  var Promise := Client.Chat.AsyncAwaitList(
     procedure (Params: TUrlChatListParams)
     begin
       Params.Limit(15);
-    end,
-    function : TAsynChatCompletion
-    begin
-      Result.Sender := TutorialHub;
-      Result.OnStart := Start;
-      Result.OnSuccess := Display;
-      Result.OnError := Display;
     end);
 
+  promise
+    .&Then<TChatCompletion>(
+      function (Value: TChatCompletion): TChatCompletion
+      begin
+        Result := Value;
+        Display(TutorialHub, Value);
+      end)
+    .&Catch(
+      procedure (E: Exception)
+      begin
+        Display(TutorialHub, E.Message);
+      end);
 
   //Synchronous example
 //  var Value := Client.Chat.List(
@@ -567,26 +481,6 @@ List stored Chat Completions. Only [Chat Completions](#text-generation) that hav
 //  finally
 //    Value.Free;
 //  end;
-
-  //Asynchronous promise example
-//  var Promise := Client.Chat.AsyncAwaitList(
-//    procedure (Params: TUrlChatListParams)
-//    begin
-//      Params.Limit(15);
-//    end);
-//
-//  promise
-//    .&Then<TChatCompletion>(
-//      function (Value: TChatCompletion): TChatCompletion
-//      begin
-//        Result := Value;
-//        Display(TutorialHub, Value);
-//      end)
-//    .&Catch(
-//      procedure (E: Exception)
-//      begin
-//        Display(TutorialHub, E.Message);
-//      end);
 ```
 
 <br>
@@ -600,20 +494,27 @@ Modify a stored chat completion. Only [Chat Completions](#text-generation) that 
 
   TutorialHub.JSONRequestClear;
 
-  //Asynchronous example
-  Client.Chat.AsynUpdate('completion_id',   //e.g. 'chatcmpl-BO9ybVceB3aXFyMRKR3MKUEzWcFqE'
+  //Asynchronous promise example
+  var Promise := Client.Chat.AsyncAwaitUpdate(
+    'completion_id',   //e.g. 'chatcmpl-BO9ybVceB3aXFyMRKR3MKUEzWcFqE'
     procedure (Params: TChatUpdateParams)
     begin
-      Params.Metadata(TJSONObject.Create.AddPair('foo', 'bar'));
+      Params.Metadata(TJSONObject.Create.AddPair('foo1', 'bar1'));
       TutorialHub.JSONRequest := Params.ToFormat();
-    end,
-    function : TAsynChat
-    begin
-      Result.Sender := TutorialHub;
-      Result.OnStart := Start;
-      Result.OnSuccess := Display;
-      Result.OnError := Display;
     end);
+
+  promise
+    .&Then<TChat>(
+      function (Value: TChat): TChat
+      begin
+        Result := Value;
+        Display(TutorialHub, Value);
+      end)
+    .&Catch(
+      procedure (E: Exception)
+      begin
+        Display(TutorialHub, E.Message);
+      end);
 
   //Synchronous example
 //  var Value := Client.Chat.Update('completion_id',   //e.g. 'chatcmpl-BO9ybVceB3aXFyMRKR3MKUEzWcFqE'
@@ -627,29 +528,6 @@ Modify a stored chat completion. Only [Chat Completions](#text-generation) that 
 //  finally
 //    Value.Free;
 //  end;
-
-  //Asynchronous promise example
-//  var Promise := Client.Chat.AsyncAwaitUpdate(
-//    'completion_id',   //e.g. 'chatcmpl-BO9ybVceB3aXFyMRKR3MKUEzWcFqE'
-//    procedure (Params: TChatUpdateParams)
-//    begin
-//      Params.Metadata(TJSONObject.Create.AddPair('foo1', 'bar1'));
-//      TutorialHub.JSONRequest := Params.ToFormat();
-//    end);
-//
-//  promise
-//    .&Then<TChat>(
-//      function (Value: TChat): TChat
-//      begin
-//        Result := Value;
-//        Display(TutorialHub, Value);
-//      end)
-//    .&Catch(
-//      procedure (E: Exception)
-//      begin
-//        Display(TutorialHub, E.Message);
-//      end);
-
 ```
 
 <br>
@@ -663,15 +541,21 @@ Delete a stored chat completion. Only [Chat Completions](#text-generation) that 
 
   TutorialHub.JSONRequestClear;
 
-  //Asynchronous example
-  Client.Chat.AsynDelete('completion_id',   //e.g. 'chatcmpl-BO9ybVceB3aXFyMRKR3MKUEzWcFqE'
-    function : TAsynChatDelete
-    begin
-      Result.Sender := TutorialHub;
-      Result.OnStart := Start;
-      Result.OnSuccess := Display;
-      Result.OnError := Display;
-    end);
+  //Asynchronous promise example
+  var Promise := Client.Chat.AsyncAwaitDelete('completion_id');   //e.g. 'chatcmpl-BO9ybVceB3aXFyMRKR3MKUEzWcFqE'
+
+  promise
+    .&Then<TChatDelete>(
+      function (Value: TChatDelete): TChatDelete
+      begin
+        Result := Value;
+        Display(TutorialHub, Value);
+      end)
+    .&Catch(
+      procedure (E: Exception)
+      begin
+        Display(TutorialHub, E.Message);
+      end);
 
   //Synchronous example
 //  var Value := Client.Chat.Delete('completion_id');   //e.g. 'chatcmpl-BO9ybVceB3aXFyMRKR3MKUEzWcFqE'
@@ -680,22 +564,6 @@ Delete a stored chat completion. Only [Chat Completions](#text-generation) that 
 //  finally
 //    Value.Free;
 //  end;
-
-  //Asynchronous promise example
-//  var Promise := Client.Chat.AsyncAwaitDelete('completion_id');   //e.g. 'chatcmpl-BO9ybVceB3aXFyMRKR3MKUEzWcFqE'
-//
-//  promise
-//    .&Then<TChatDelete>(
-//      function (Value: TChatDelete): TChatDelete
-//      begin
-//        Result := Value;
-//        Display(TutorialHub, Value);
-//      end)
-//    .&Catch(
-//      procedure (E: Exception)
-//      begin
-//        Display(TutorialHub, E.Message);
-//      end);
 ```
 
 <br>
@@ -722,45 +590,24 @@ Refer to official [documentation](https://platform.openai.com/docs/guides/audio?
   TutorialHub.JSONRequestClear;
   TutorialHub.FileName := 'AudioResponse.mp3';
 
-  //Asynchronous example
-  Client.Chat.AsynCreate(
+  //Synchronous example
+  var Value := Client.Chat.Create(
     procedure (Params: TChatParams)
     begin
       Params.Model('gpt-4o-audio-preview');
       Params.Modalities(['text', 'audio']);
-      Params.Audio('ballad', 'mp3');
+      Params.Audio('ash', 'mp3');
       Params.Messages([
         FromUser('Is a golden retriever a good family dog?')
       ]);
-      Params.MaxCompletionTokens(1024);
-      TutorialHub.JSONRequest := Params.ToFormat(); //to display JSON Request
-    end,
-    function : TAsynChat
-    begin
-      Result.Sender := TutorialHub;
-      Result.OnStart := Start;
-      Result.OnSuccess := DisplayAudio;
-      Result.OnError := Display;
+      Params.MaxCompletionTokens(1024)
+      TutorialHub.JSONRequest := Params.ToFormat();
     end);
-
-  //Synchronous example
-//  var Value := Client.Chat.Create(
-//    procedure (Params: TChatParams)
-//    begin
-//      Params.Model('gpt-4o-audio-preview');
-//      Params.Modalities(['text', 'audio']);
-//      Params.Audio('ash', 'mp3');
-//      Params.Messages([
-//        FromUser('Is a golden retriever a good family dog?')
-//      ]);
-//      Params.MaxCompletionTokens(1024)
-//      TutorialHub.JSONRequest := Params.ToFormat();
-//    end);
-//  try
-//    DisplayAudio(TutorialHub, Value);
-//  finally
-//    Value.Free;
-//  end;
+  try
+    DisplayAudio(TutorialHub, Value);
+  finally
+    Value.Free;
+  end;
 ```
 
 >[!NOTE]
@@ -823,43 +670,23 @@ Refer to official [documentation](https://platform.openai.com/docs/guides/audio?
   TutorialHub.JSONRequestClear;
   var Ref := 'https://cdn.openai.com/API/docs/audio/alloy.wav';
 
-  //Asynchronous example
-  Client.Chat.ASynCreate(
+  //Synchronous example
+  var Value := Client.Chat.Create(
     procedure (Params: TChatParams)
     begin
       Params.Model('gpt-4o-audio-preview');
-      Params.Modalities(['text']); 
+      Params.Modalities(['text']);
       Params.Messages([
         FromUser('What is in this recording?', [Ref])
       ]);
       Params.MaxCompletionTokens(1024);
       TutorialHub.JSONRequest := Params.ToFormat();
-    end,
-    function : TAsynChat
-    begin
-      Result.Sender := TutorialHub;
-      Result.OnStart := Start;
-      Result.OnSuccess := Display; 
-      Result.OnError := Display;
     end);
-
-  //Synchronous example
-//  var Value := Client.Chat.Create(
-//    procedure (Params: TChatParams)
-//    begin
-//      Params.Model('gpt-4o-audio-preview');
-//      Params.Modalities(['text']);
-//      Params.Messages([
-//        FromUser('What is in this recording?', [Ref])
-//      ]);
-//      Params.MaxCompletionTokens(1024);
-//      TutorialHub.JSONRequest := Params.ToFormat();
-//    end);
-//  try
-//    Display(TutorialHub, Value);
-//  finally
-//    Value.Free;
-//  end;
+  try
+    Display(TutorialHub, Value);
+  finally
+    Value.Free;
+  end;
 ```
 
 ### Audio to Audio
@@ -870,8 +697,8 @@ Refer to official [documentation](https://platform.openai.com/docs/guides/audio?
   TutorialHub.JSONRequestClear;
   TutorialHub.FileName := 'Response.mp3';
 
-  //Asynchronous example
-  Client.Chat.ASynCreate(
+  //Synchronous example
+  var Value := Client.Chat.Create(
     procedure (Params: TChatParams)
     begin
       Params.Model('gpt-4o-audio-preview');
@@ -882,33 +709,12 @@ Refer to official [documentation](https://platform.openai.com/docs/guides/audio?
       ]);
       Params.MaxCompletionTokens(1024);
       TutorialHub.JSONRequest := Params.ToFormat();
-    end,
-    function : TAsynChat
-    begin
-      Result.Sender := TutorialHub;
-      Result.OnStart := Start;
-      Result.OnSuccess := DisplayAudio;
-      Result.OnError := Display;
     end);
-
-  //Synchronous example
-//  var Value := Client.Chat.Create(
-//    procedure (Params: TChatParams)
-//    begin
-//      Params.Model('gpt-4o-audio-preview');
-//      Params.Modalities(['text', 'audio']);
-//      Params.Audio('ash', 'mp3');
-//      Params.Messages([
-//        FromUser(['SpeechRecorded.mp3'])
-//      ]);
-//      Params.MaxCompletionTokens(1024);
-//      TutorialHub.JSONRequest := Params.ToFormat();
-//    end);
-//  try
-//    DisplayAudio(TutorialHub, Value);
-//  finally
-//    Value.Free;
-//  end;
+  try
+    DisplayAudio(TutorialHub, Value);
+  finally
+    Value.Free;
+  end;
 ```
 
 <br>
@@ -963,8 +769,8 @@ Refer to the [official documentation](https://platform.openai.com/docs/guides/vi
   //var Ref := 'D:\My_folder\Images\My_image.png'; //This content will be encoded in base-64 by GenAI
   TutorialHub.JSONRequestClear;
 
-  //Asynchronous example
-  Client.Chat.AsynCreateStream(
+  //Synchronous example
+  var Value := Client.Chat.CreateStream(
     procedure (Params: TChatParams)
     begin
       Params.Model('gpt-4o-mini');
@@ -976,34 +782,11 @@ Refer to the [official documentation](https://platform.openai.com/docs/guides/vi
       Params.Stream;
       TutorialHub.JSONRequest := Params.ToFormat();
     end,
-    function : TAsynChatStream
+    procedure (var Chat: TChat; IsDone: Boolean; var Cancel: Boolean)
     begin
-      Result.Sender := TutorialHub;
-      Result.OnStart := Start;
-      Result.OnProgress := DisplayStream;
-      Result.OnError := Display;
-      Result.OnDoCancel := DoCancellation;
-      Result.OnCancellation := Cancellation;
+      if Assigned(Chat) and not IsDone then
+        DisplayStream(TutorialHub, Chat);
     end);
-
-  //Synchronous example
-//  var Value := Client.Chat.CreateStream(
-//    procedure (Params: TChatParams)
-//    begin
-//      Params.Model('gpt-4o-mini');
-//      Params.Messages([
-//        FromUser('What is in this image?', [Url])
-//        //FromUser('What is in this image?', [Ref])
-//      ]);
-//      Params.MaxCompletionTokens(1024);
-//      Params.Stream;
-//      TutorialHub.JSONRequest := Params.ToFormat();
-//    end,
-//    procedure (var Chat: TChat; IsDone: Boolean; var Cancel: Boolean)
-//    begin
-//      if Assigned(Chat) and not IsDone then
-//        DisplayStream(TutorialHub, Chat);
-//    end);
 ```
 This example uses streaming. The non-streamed version is straightforward to implement, so it is not covered here.
 
@@ -1018,8 +801,8 @@ This example uses streaming. The non-streamed version is straightforward to impl
   var Url2 := 'https://assets.visitorscoverage.com/production/wp-content/uploads/2024/04/AdobeStock_626542468-min-1024x683.jpeg';
   TutorialHub.JSONRequestClear;
 
-  //Asynchronous example
-  Client.Chat.AsynCreateStream(
+  //Synchronous example
+  var Value := Client.Chat.CreateStream(
     procedure (Params: TChatParams)
     begin
       Params.Model('gpt-4o-mini');
@@ -1030,33 +813,11 @@ This example uses streaming. The non-streamed version is straightforward to impl
       Params.Stream;
       TutorialHub.JSONRequest := Params.ToFormat();
     end,
-    function : TAsynChatStream
+    procedure (var Chat: TChat; IsDone: Boolean; var Cancel: Boolean)
     begin
-      Result.Sender := TutorialHub;
-      Result.OnStart := Start;
-      Result.OnProgress := DisplayStream;
-      Result.OnError := Display;
-      Result.OnDoCancel := DoCancellation;
-      Result.OnCancellation := Cancellation;
+      if Assigned(Chat) and not IsDone then
+        DisplayStream(TutorialHub, Chat);
     end);
-
-  //Synchronous example
-//  var Value := Client.Chat.CreateStream(
-//    procedure (Params: TChatParams)
-//    begin
-//      Params.Model('gpt-4o-mini');
-//      Params.Messages([
-//        FromUser('What are the differences between two images?', [Url1, Url2])
-//      ]);
-//      Params.MaxCompletionTokens(1024);
-//      Params.Stream;
-//      TutorialHub.JSONRequest := Params.ToFormat();
-//    end,
-//    procedure (var Chat: TChat; IsDone: Boolean; var Cancel: Boolean)
-//    begin
-//      if Assigned(Chat) and not IsDone then
-//        DisplayStream(TutorialHub, Chat);
-//    end);
 ```
 
 <br>
@@ -1155,38 +916,20 @@ These models incorporate web search to deliver more accurate and up-to-date resp
 
   TutorialHub.JSONRequestClear;
 
-  //Asynchronous example
-  Client.Chat.AsynCreate(
+  //Synchronous example
+  var Value := Client.Chat.Create(
     procedure (Params: TChatParams)
     begin
       Params.Model('gpt-4o-search-preview');
       Params.Messages([
         FromUser('What was a positive news story from today?')
       ]);
-      TutorialHub.JSONRequest := Params.ToFormat();
-    end,
-    function : TAsynChat
-    begin
-      Result.Sender := TutorialHub;
-      Result.OnStart := Start;
-      Result.OnSuccess := Display;
-      Result.OnError := Display;
     end);
-
-  //Synchronous example
-//  var Value := Client.Chat.Create(
-//    procedure (Params: TChatParams)
-//    begin
-//      Params.Model('gpt-4o-search-preview');
-//      Params.Messages([
-//        FromUser('What was a positive news story from today?')
-//      ]);
-//    end);
-//  try
-//    Display(TutorialHub, Value);
-//  finally
-//    Value.Free;
-//  end;  
+  try
+    Display(TutorialHub, Value);
+  finally
+    Value.Free;
+  end;  
 ```
 
 <br>
@@ -1248,8 +991,8 @@ To enhance search relevance based on geographic location, you can provide an app
   
   TutorialHub.JSONRequestClear;
 
-  //Asynchronous example
-  Client.Chat.AsynCreate(
+  //Synchronous example
+  var Value := Client.Chat.Create(
     procedure (Params: TChatParams)
     begin
       Params.Model('gpt-4o-search-preview');
@@ -1262,36 +1005,12 @@ To enhance search relevance based on geographic location, you can provide an app
             .Country('GB')
             .Region('London')
         );
-      TutorialHub.JSONRequest := Params.ToFormat();
-    end,
-    function : TAsynChat
-    begin
-      Result.Sender := TutorialHub;
-      Result.OnStart := Start;
-      Result.OnSuccess := Display;
-      Result.OnError := Display;
     end);
-
-  //Synchronous example
-//  var Value := Client.Chat.Create(
-//    procedure (Params: TChatParams)
-//    begin
-//      Params.Model('gpt-4o-search-preview');
-//      Params.Messages([
-//        FromUser('What was a positive news story from today?')
-//      ]);
-//      Params.WebSearchOptions(
-//          TUserLocationApproximate.Create
-//            .City('London')
-//            .Country('GB')
-//            .Region('London')
-//        );
-//    end);
-//  try
-//    Display(TutorialHub, Value);
-//  finally
-//    Value.Free;
-//  end;
+  try
+    Display(TutorialHub, Value);
+  finally
+    Value.Free;
+  end;
 ```
 
 <br>
@@ -1315,8 +1034,8 @@ Available Options:
 
   TutorialHub.JSONRequestClear;
 
-  //Asynchronous example
-  Client.Chat.AsynCreate(
+  //Synchronous example
+  var Value := Client.Chat.Create(
     procedure (Params: TChatParams)
     begin
       Params.Model('gpt-4o-search-preview');
@@ -1324,31 +1043,12 @@ Available Options:
         FromUser('What was a positive news story from today?')
       ]);
       Params.WebSearchOptions('high'); //or TSearchWebOptions.high
-      TutorialHub.JSONRequest := Params.ToFormat();
-    end,
-    function : TAsynChat
-    begin
-      Result.Sender := TutorialHub;
-      Result.OnStart := Start;
-      Result.OnSuccess := Display;
-      Result.OnError := Display;
     end);
-
-  //Synchronous example
-//  var Value := Client.Chat.Create(
-//    procedure (Params: TChatParams)
-//    begin
-//      Params.Model('gpt-4o-search-preview');
-//      Params.Messages([
-//        FromUser('What was a positive news story from today?')
-//      ]);
-//      Params.WebSearchOptions('high'); //or TSearchWebOptions.high
-//    end);
-//  try
-//    Display(TutorialHub, Value);
-//  finally
-//    Value.Free;
-//  end;
+  try
+    Display(TutorialHub, Value);
+  finally
+    Value.Free;
+  end;
 ```
 
 >[!NOTE]

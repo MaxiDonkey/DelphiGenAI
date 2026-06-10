@@ -21,6 +21,15 @@ Create and manage containers for use with the `Code Interpreter` tool.
 
 [Create Container](https://platform.openai.com/docs/api-reference/containers/createContainers)
 
+The request body accepts the following parameters:
+
+- **Name** *(required)* — name of the container to create.
+- **ExpiresAfter** — expiration policy: `Anchor` (only `last_active_at` is currently supported) and `Minutes` (number of minutes after the anchor before the container expires).
+- **FileIds** — IDs of files to copy into the container.
+- **MemoryLimit** — memory allocated to the container. One of `1g` (default), `4g`, `16g`, or `64g`.
+- **NetworkPolicy** — outbound network access policy (`TContainerNetworkPolicyParams`): `Type` (`disabled` or `allowlist`), `AllowedDomains` (domains reachable when `Type` is `allowlist`) and optional `DomainSecrets` (domain-scoped credentials made of `domain`, `name` and `value`).
+- **Skills** — skills made available inside the container. Each item is either a skill reference (`type` = `skill_reference`, with `skill_id` and `version`) or an inline skill (`type` = `inline`, with `name`, `description` and `source`).
+
 ```pascal
 //uses GenAI, GenAI.Types, GenAI.Tutorial.VCL;
 
@@ -45,20 +54,6 @@ Create and manage containers for use with the `Code Interpreter` tool.
       begin
         Display(TutorialHub, E.Message);
       end);
-
-  //Asynchronous example
-//  Client.Containers.AsynCreate(
-//    procedure (Params: TContainerParams)
-//    begin
-//      Params.Name('FirstContainer');
-//    end,
-//    function : TAsynContainer
-//    begin
-//      Result.Sender := TutorialHub;
-//      Result.OnStart := Start;
-//      Result.OnSuccess := Display;
-//      Result.OnError := Display;
-//    end);
 
   //Synchronous example
 //  var Value := Client.Containers.Create(
@@ -90,6 +85,9 @@ Result
 }
 ```
 
+>[!NOTE]
+>The returned container object also exposes `memory_limit` and `network_policy` (in addition to `id`, `name`, `status`, `created_at`, `last_active_at` and `expires_after`).
+
 <br>
 
 ### List containers
@@ -120,20 +118,6 @@ Result
       begin
         Display(TutorialHub, E.Message);
       end);
-
-  //Asynchronous example
-//  Client.Containers.AsynList(
-//    procedure (Params: TUrlContainerParams)
-//    begin
-//      Params.Order('desc');
-//    end,
-//    function : TAsynContainerList
-//    begin
-//      Result.Sender := TutorialHub;
-//      Result.OnStart := Start;
-//      Result.OnSuccess := Display;
-//      Result.OnError := Display;
-//    end);
 
   //Synchronous example
 //  var Value := Client.Containers.List(
@@ -201,16 +185,6 @@ Result
         Display(TutorialHub, E.Message);
       end);
 
-  //Asynchronous example
-//  Client.Containers.AsynRetrieve(ContainerId,
-//    function : TAsynContainer
-//    begin
-//      Result.Sender := TutorialHub;
-//      Result.OnStart := Start;
-//      Result.OnSuccess := Display;
-//      Result.OnError := Display;
-//    end);
-
   //Synchronous example
 //  var Value := Client.Containers.Retrieve(ContainerId);
 //  try
@@ -264,16 +238,6 @@ Result
       begin
         Display(TutorialHub, E.Message);
       end);
-
-  //Asynchronous example
-//  Client.Containers.AsynDelete(ContainerId,
-//    function : TAsynContainersDelete
-//    begin
-//      Result.Sender := TutorialHub;
-//      Result.OnStart := Start;
-//      Result.OnSuccess := Display;
-//      Result.OnError := Display;
-//    end);
 
   //Synchronous example
 //  var Value := Client.Containers.Delete(ContainerId);
@@ -329,20 +293,6 @@ You can send either a multipart/form-data request with the raw file content, or 
       begin
         Display(TutorialHub, E.Message);
       end);
-
-  //Asynchronous example
-//  Client.ContainerFiles.AsynCreate(ContainerId,
-//    procedure (Params: TContainerFilesParams)
-//    begin
-//      Params.&File('realtime-webrtc-globals.js');
-//    end,
-//    function : TAsynContainerFile
-//    begin
-//      Result.Sender := TutorialHub;
-//      Result.OnStart := Start;
-//      Result.OnSuccess := Display;
-//      Result.OnError := Display;
-//    end);
 
   //Synchronous example
 //  var Value := Client.ContainerFiles.Create(ContainerId,
@@ -402,20 +352,6 @@ Result
       begin
         Display(TutorialHub, E.Message);
       end);
-
-  //Asynchronous example
-//  Client.ContainerFiles.AsynList(ContainerId,
-//    procedure (Params: TUrlContainerFileParams)
-//    begin
-//      Params.Order('desc');
-//    end,
-//    function : TAsynContainerFileList
-//    begin
-//      Result.Sender := TutorialHub;
-//      Result.OnStart := Start;
-//      Result.OnSuccess := Display;
-//      Result.OnError := Display;
-//    end);
 
   //Synchronous example
 //  var Value := Client.ContainerFiles.List(ContainerId,
@@ -481,16 +417,6 @@ Result
         Display(TutorialHub, E.Message);
       end);
 
-  //Asynchronous example
-//  Client.ContainerFiles.AsynRetrieve(ContainerId, FileId,
-//    function : TAsynContainerFile
-//    begin
-//      Result.Sender := TutorialHub;
-//      Result.OnStart := Start;
-//      Result.OnSuccess := Display;
-//      Result.OnError := Display;
-//    end);
-
   //Synchronous example
 //  var Value := Client.ContainerFiles.Retrieve(ContainerId, FileId);
 //  try
@@ -543,16 +469,6 @@ Result
         Display(TutorialHub, E.Message);
       end);
 
-  //Asynchronous example
-//  Client.ContainerFiles.AsynGetContent(ContainerId, FileId,
-//    function : TAsynContainerFileContent
-//    begin
-//      Result.Sender := TutorialHub;
-//      Result.OnStart := Start;
-//      Result.OnSuccess := Display;
-//      Result.OnError := Display;
-//    end);
-
   //Synchronous example
 //  var Value := Client.ContainerFiles.GetContent(ContainerId, FileId);
 //  try
@@ -572,6 +488,8 @@ begin
   Display(TutorialHub.Memo3, Value.AsString); 
 end;
 ```
+
+Besides `AsString`, `TContainerFileContent` also provides `SaveToFile(const FileName: string)` to persist the retrieved content directly to disk.
 
 <br>
 
@@ -601,16 +519,6 @@ end;
       begin
         Display(TutorialHub, E.Message);
       end);
-
-  //Asynchronous example
-//  Client.ContainerFiles.AsynDelete(ContainerId, FileId,
-//    function : TAsynContainerFilesDelete
-//    begin
-//      Result.Sender := TutorialHub;
-//      Result.OnStart := Start;
-//      Result.OnSuccess := Display;
-//      Result.OnError := Display;
-//    end);
 
   //Synchronous example
 //  var Value := Client.ContainerFiles.Delete(ContainerId, FileId);

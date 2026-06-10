@@ -1,4 +1,4 @@
-unit GenAI.Async.Params;
+﻿unit GenAI.Async.Params;
 
 {-------------------------------------------------------------------------------
 
@@ -9,7 +9,7 @@ unit GenAI.Async.Params;
 
 interface
 
-{$REGION  'Dev notes : GenAI.Async.Support'}
+{$REGION  'Dev notes'}
 
 (*
       Unit containing generic interfaces and classes for managing parameters
@@ -203,3 +203,4 @@ begin
 end;
 
 end.
+

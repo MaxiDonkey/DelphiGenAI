@@ -25,22 +25,28 @@ For details on selecting the appropriate file extensions for different scenarios
 ```pascal
 //uses GenAI, GenAI.Types, GenAI.Tutorial.VCL;
 
-  //Asynchronous example
-  Client.Uploads.AsynCreate(
+  //Asynchronous promise example
+  var Promise := Client.Uploads.AsyncAwaitCreate(
     procedure (Params: TUploadCreateParams)
     begin
       Params.Purpose('fine-tune');
       Params.Filename('BatchExample.jsonl');
       Params.bytes(FileSize('BatchExample.jsonl'));
       Params.MimeType('text/jsonl');
-    end,
-    function : TAsynUpload
-    begin
-      Result.Sender := TutorialHub;
-      Result.OnStart := Start;
-      Result.OnSuccess := Display;
-      Result.OnError := Display;
     end);
+
+  Promise
+    .&Then<TUpload>(
+      function (Value: TUpload): TUpload
+      begin
+        Display(TutorialHub, Value);
+        Result := Value;
+      end)
+    .&Catch(
+      procedure (E: Exception)
+      begin
+        Display(TutorialHub, E.Message);
+      end);
 
   //Synchronous example
 //  var Value := Client.Uploads.Create(
@@ -56,29 +62,6 @@ For details on selecting the appropriate file extensions for different scenarios
 //  finally
 //    Value.Free;
 //  end;
-
-  //Asynchronous promise example
-//  var Promise := Client.Uploads.AsyncAwaitCreate(
-//    procedure (Params: TUploadCreateParams)
-//    begin
-//      Params.Purpose('fine-tune');
-//      Params.Filename('BatchExample.jsonl');
-//      Params.bytes(FileSize('BatchExample.jsonl'));
-//      Params.MimeType('text/jsonl');
-//    end);
-//
-//  Promise
-//    .&Then<TUpload>(
-//      function (Value: TUpload): TUpload
-//      begin
-//        Display(TutorialHub, Value);
-//        Result := Value;
-//      end)
-//    .&Catch(
-//      procedure (E: Exception)
-//      begin
-//        Display(TutorialHub, E.Message);
-//      end);
 ```
 
 <br/>
@@ -92,15 +75,21 @@ Cancels the Upload. No Parts may be added after an Upload is cancelled.
 
   TutorialHub.Id := 'upload_679207849ec8819086bc0e54f5c66d62';
 
-  //Asynchronous example
-  Client.Uploads.AsynCancel(TutorialHub.Id,
-    function : TAsynUpload
-    begin
-      Result.Sender := TutorialHub;
-      Result.OnStart := Start;
-      Result.OnSuccess := Display;
-      Result.OnError := Display;
-    end);
+  //Asynchronous promise example
+  var Promise := Client.Uploads.AsyncAwaitCancel(TutorialHub.Id);
+
+  Promise
+    .&Then<TUpload>(
+      function (Value: TUpload): TUpload
+      begin
+        Display(TutorialHub, Value);
+        Result := Value;
+      end)
+    .&Catch(
+      procedure (E: Exception)
+      begin
+        Display(TutorialHub, E.Message);
+      end);
 
   //Synchronous example
 //  var Value := Client.Uploads.Cancel(TutorialHub.Id);
@@ -109,22 +98,6 @@ Cancels the Upload. No Parts may be added after an Upload is cancelled.
 //  finally
 //    Value.Free;
 //  end;
-
-  //Asynchronous promise example
-//  var Promise := Client.Uploads.AsyncAwaitCancel(TutorialHub.Id);
-//
-//  Promise
-//    .&Then<TUpload>(
-//      function (Value: TUpload): TUpload
-//      begin
-//        Display(TutorialHub, Value);
-//        Result := Value;
-//      end)
-//    .&Catch(
-//      procedure (E: Exception)
-//      begin
-//        Display(TutorialHub, E.Message);
-//      end);
 ```
 
 <br/>
@@ -142,52 +115,26 @@ It is possible to add multiple Parts in parallel. You can decide the intended or
 
   TutorialHub.Id := 'upload_679207849ec8819086bc0e54f5c66d62';
 
-  //Asynchronous example
-  Client.Uploads.AsynAddPart(TutorialHub.Id,
+  //Asynchronous promise example
+  var Promise := Client.Uploads.AsyncAwaitAddPart(
+    TutorialHub.Id,
     procedure (Params: TUploadPartParams)
     begin
       Params.Data('BatchExample.jsonl');
-    end,
-    function : TAsynUploadPart
-    begin
-      Result.Sender := TutorialHub;
-      Result.OnStart := Start;
-      Result.OnSuccess := Display;
-      Result.OnError := Display;
     end);
 
-  //Asynchronous example
-//  var Value := Client.Uploads.AddPart(TutorialHub.Id,
-//    procedure (Params: TUploadPartParams)
-//    begin
-//      Params.Data('BatchExample.jsonl');
-//    end);
-//  try
-//    Display(TutorialHub, Value);
-//  finally
-//    Value.Free;
-//  end;
-
-  //Asynchronous promise example
-//  var Promise := Client.Uploads.AsyncAwaitAddPart(
-//    TutorialHub.Id,
-//    procedure (Params: TUploadPartParams)
-//    begin
-//      Params.Data('BatchExample.jsonl');
-//    end);
-//
-//  Promise
-//    .&Then<TUploadPart>(
-//      function (Value: TUploadPart): TUploadPart
-//      begin
-//        Display(TutorialHub, Value);
-//        Result := Value;
-//      end)
-//    .&Catch(
-//      procedure (E: Exception)
-//      begin
-//        Display(TutorialHub, E.Message);
-//      end);
+  Promise
+    .&Then<TUploadPart>(
+      function (Value: TUploadPart): TUploadPart
+      begin
+        Display(TutorialHub, Value);
+        Result := Value;
+      end)
+    .&Catch(
+      procedure (E: Exception)
+      begin
+        Display(TutorialHub, E.Message);
+      end);
 ```
 
 <br/>
@@ -207,50 +154,24 @@ The number of bytes uploaded upon completion must match the number of bytes init
 
   TutorialHub.Id := 'upload_679207849ec8819086bc0e54f5c66d62';
 
-  //Asynchronous example
-  Client.Uploads.AsynComplete(TutorialHub.Id,
+  //Asynchronous promise example
+  var Promise := Client.Uploads.AsyncAwaitComplete(
+    TutorialHub.Id,
     procedure (Params: TUploadCompleteParams)
     begin
       Params.PartIds(['BatchExample.jsonl'])
-    end,
-    function : TAsynUpload
-    begin
-      Result.Sender := TutorialHub;
-      Result.OnStart := Start;
-      Result.OnSuccess := Display;
-      Result.OnError := Display;
     end);
 
-  //Asynchronous example
-//  var Value := Client.Uploads.Complete(TutorialHub.Id,
-//    procedure (Params: TUploadCompleteParams)
-//    begin
-//      Params.PartIds(['BatchExample.jsonl'])
-//    end);
-//  try
-//    Display(TutorialHub, Value);
-//  finally
-//    Value.Free;
-//  end;
-
-  //Asynchronous promise example
-//  var Promise := Client.Uploads.AsyncAwaitComplete(
-//    TutorialHub.Id,
-//    procedure (Params: TUploadCompleteParams)
-//    begin
-//      Params.PartIds(['BatchExample.jsonl'])
-//    end);
-//
-//  Promise
-//    .&Then<TUpload>(
-//      function (Value: TUpload): TUpload
-//      begin
-//        Display(TutorialHub, Value);
-//        Result := Value;
-//      end)
-//    .&Catch(
-//      procedure (E: Exception)
-//      begin
-//        Display(TutorialHub, E.Message);
-//      end);
+  Promise
+    .&Then<TUpload>(
+      function (Value: TUpload): TUpload
+      begin
+        Display(TutorialHub, Value);
+        Result := Value;
+      end)
+    .&Catch(
+      procedure (E: Exception)
+      begin
+        Display(TutorialHub, E.Message);
+      end);
 ```

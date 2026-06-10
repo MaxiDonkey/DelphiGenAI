@@ -31,21 +31,27 @@ Create a vector store. [Refer to documentation](https://platform.openai.com/docs
 //uses GenAI, GenAI.Types, GenAI.Tutorial.VCL;
   
   TutorialHub.JSONRequestClear;
-  
-  //Asynchronous example
-  Client.VectorStore.AsynCreate(
+
+  //Asynchronous promise example
+  var Promise := Client.VectorStore.AsyncAwaitCreate(
     procedure (Params: TVectorStoreCreateParams)
     begin
-      Params.Name('Support FAQ');
+      Params.Name('GenAI project Data');
       TutorialHub.JSONRequest := Params.ToFormat();
-    end,
-    function : TAsynVectorStore
-    begin
-      Result.Sender := TutorialHub;
-      Result.OnStart := Start;
-      Result.OnSuccess := Display;
-      Result.OnError := Display;
     end);
+
+  Promise
+    .&Then<string>(
+      function (Value: TVectorStore): string
+      begin
+        Result := Value.Id;
+        Display(TutorialHub, Value);
+      end)
+    .&Catch(
+      procedure (E: Exception)
+      begin
+        Display(TutorialHub, E.Message);
+      end);
 
   //Synchronous example
 //  var Value := Client.VectorStore.Create(
@@ -59,27 +65,6 @@ Create a vector store. [Refer to documentation](https://platform.openai.com/docs
 //  finally
 //    Value.Free;
 //  end;
-
-  //Asynchronous promise example
-//  var Promise := Client.VectorStore.AsyncAwaitCreate(
-//    procedure (Params: TVectorStoreCreateParams)
-//    begin
-//      Params.Name('GenAI project Data');
-//      TutorialHub.JSONRequest := Params.ToFormat();
-//    end);
-//
-//  Promise
-//    .&Then<string>(
-//      function (Value: TVectorStore): string
-//      begin
-//        Result := Value.Id;
-//        Display(TutorialHub, Value);
-//      end)
-//    .&Catch(
-//      procedure (E: Exception)
-//      begin
-//        Display(TutorialHub, E.Message);
-//      end);
 ```
 
 The Json response.
@@ -111,15 +96,21 @@ Returns a list of vector stores.
 
   TutorialHub.JSONRequestClear;
 
-  //Asynchronous example
-  Client.VectorStore.AsynList(
-    function : TAsynVectorStores
-    begin
-      Result.Sender := TutorialHub;
-      Result.OnStart := Start;
-      Result.OnSuccess := Display;
-      Result.OnError := Display;
-    end);
+  //Asynchronous promise example
+  var Promise := Client.VectorStore.AsyncAwaitList;
+
+  Promise
+    .&Then<TVectorStores>(
+      function (Value: TVectorStores): TVectorStores
+      begin
+        Result := Value;
+        Display(TutorialHub, Value);
+      end)
+    .&Catch(
+      procedure (E: Exception)
+      begin
+        Display(TutorialHub, E.Message);
+      end);
 
   //Synchronous example
 //  var Value := Client.VectorStore.List;
@@ -128,22 +119,6 @@ Returns a list of vector stores.
 //  finally
 //    Value.Free;
 //  end;
-
-  //Asynchronous promise example
-//  var Promise := Client.VectorStore.AsyncAwaitList;
-//
-//  Promise
-//    .&Then<TVectorStores>(
-//      function (Value: TVectorStores): TVectorStores
-//      begin
-//        Result := Value;
-//        Display(TutorialHub, Value);
-//      end)
-//    .&Catch(
-//      procedure (E: Exception)
-//      begin
-//        Display(TutorialHub, E.Message);
-//      end);
 ```
 
 Example using [parameter](https://platform.openai.com/docs/api-reference/vector-stores/list).
@@ -153,19 +128,25 @@ Example using [parameter](https://platform.openai.com/docs/api-reference/vector-
 
   TutorialHub.JSONRequestClear;
 
-  //Asynchronous example
-  Client.VectorStore.AsynList(
+  //Asynchronous promise example
+  var Promise := Client.VectorStore.AsyncAwaitList(
     procedure (Params: TVectorStoreUrlParam)
     begin
-      Params.Limit(3);
-    end,
-    function : TAsynVectorStores
-    begin
-      Result.Sender := TutorialHub;
-      Result.OnStart := Start;
-      Result.OnSuccess := Display;
-      Result.OnError := Display;
+      Params.Limit(30);
     end);
+
+  Promise
+    .&Then<TVectorStores>(
+      function (Value: TVectorStores): TVectorStores
+      begin
+        Result := Value;
+        Display(TutorialHub, Value);
+      end)
+    .&Catch(
+      procedure (E: Exception)
+      begin
+        Display(TutorialHub, E.Message);
+      end);
 
   //Synchronous example
 //  var Value := Client.VectorStore.List(
@@ -178,26 +159,6 @@ Example using [parameter](https://platform.openai.com/docs/api-reference/vector-
 //  finally
 //    Value.Free;
 //  end;
-
-  //Asynchronous promise example
-//  var Promise := Client.VectorStore.AsyncAwaitList(
-//    procedure (Params: TVectorStoreUrlParam)
-//    begin
-//      Params.Limit(30);
-//    end);
-//
-//  Promise
-//    .&Then<TVectorStores>(
-//      function (Value: TVectorStores): TVectorStores
-//      begin
-//        Result := Value;
-//        Display(TutorialHub, Value);
-//      end)
-//    .&Catch(
-//      procedure (E: Exception)
-//      begin
-//        Display(TutorialHub, E.Message);
-//      end);
 ```
 
 <br/>
@@ -211,15 +172,21 @@ Retrieves a vector store by its ID.
 
   TutorialHub.Id := 'vs_abc123';
 
-  //Asynchronous example
-  Client.VectorStore.AsynRetrieve(TutorialHub.Id,
-    function : TAsynVectorStore
-    begin
-      Result.Sender := TutorialHub;
-      Result.OnStart := Start;
-      Result.OnSuccess := Display;
-      Result.OnError := Display;
-    end);
+  //Asynchronous promise example
+  var Promise := Client.VectorStore.AsyncAwaitRetrieve(TutorialHub.Id);
+
+  Promise
+    .&Then<string>(
+      function (Value: TVectorStore): string
+      begin
+        Result := Value.Id;
+        Display(TutorialHub, Value);
+      end)
+    .&Catch(
+      procedure (E: Exception)
+      begin
+        Display(TutorialHub, E.Message);
+      end);
 
   //Synchronous example
 //  var Value := Client.VectorStore.Retrieve(TutorialHub.Id);
@@ -228,22 +195,6 @@ Retrieves a vector store by its ID.
 //  finally
 //    Value.Free;
 //  end;
-
-  //Asynchronous promise example
-//  var Promise := Client.VectorStore.AsyncAwaitRetrieve(TutorialHub.Id);
-//
-//  Promise
-//    .&Then<string>(
-//      function (Value: TVectorStore): string
-//      begin
-//        Result := Value.Id;
-//        Display(TutorialHub, Value);
-//      end)
-//    .&Catch(
-//      procedure (E: Exception)
-//      begin
-//        Display(TutorialHub, E.Message);
-//      end);
 ```
 
 <br/>
@@ -261,21 +212,28 @@ Modifies a vector store by its ID.
     .AddPair('customer_id', 'user_123456789')
     .AddPair('vector_description', 'vector store user');
 
-  //Asynchronous example
-  Client.VectorStore.AsynUpdate(TutorialHub.Id,
+  //Asynchronous promise example
+  var Promise := Client.VectorStore.AsyncAwaitUpdate(
+    TutorialHub.Id,
     procedure (Params: TVectorStoreUpdateParams)
     begin
       Params.Name('Support FAQ user');
       Params.Metadata(Metadata);
       TutorialHub.JSONRequest := Params.ToFormat();
-    end,
-    function : TAsynVectorStore
-    begin
-      Result.Sender := TutorialHub;
-      Result.OnStart := Start;
-      Result.OnSuccess := Display;
-      Result.OnError := Display;
     end);
+
+  Promise
+    .&Then<string>(
+      function (Value: TVectorStore): string
+      begin
+        Result := Value.Id;
+        Display(TutorialHub, Value);
+      end)
+    .&Catch(
+      procedure (E: Exception)
+      begin
+        Display(TutorialHub, E.Message);
+      end);
 
   //Synchronous example
 //  var Value := Client.VectorStore.Update(TutorialHub.Id,
@@ -290,29 +248,6 @@ Modifies a vector store by its ID.
 //  finally
 //    Value.Free;
 //  end;
-
-  //Asynchronous promise example
-//  var Promise := Client.VectorStore.AsyncAwaitUpdate(
-//    TutorialHub.Id,
-//    procedure (Params: TVectorStoreUpdateParams)
-//    begin
-//      Params.Name('Support FAQ user');
-//      Params.Metadata(Metadata);
-//      TutorialHub.JSONRequest := Params.ToFormat();
-//    end);
-//
-//  Promise
-//    .&Then<string>(
-//      function (Value: TVectorStore): string
-//      begin
-//        Result := Value.Id;
-//        Display(TutorialHub, Value);
-//      end)
-//    .&Catch(
-//      procedure (E: Exception)
-//      begin
-//        Display(TutorialHub, E.Message);
-//      end);
 ```
 
 <br/>
@@ -326,15 +261,21 @@ Delete a vector store by its ID.
 
   TutorialHub.Id := 'vs_abc123';
 
-  //Asynchronous example
-  Client.VectorStore.AsynDelete(TutorialHub.Id,
-    function : TAsynDeletion
-    begin
-      Result.Sender := TutorialHub;
-      Result.OnStart := Start;
-      Result.OnSuccess := Display;
-      Result.OnError := Display;
-    end);
+  //Asynchronous promise example
+  var Promise := Client.VectorStore.AsyncAwaitDelete(TutorialHub.Id);
+
+  Promise
+    .&Then<string>(
+      function (Value: TDeletion): string
+      begin
+        Result := Value.Id;
+        Display(TutorialHub, Value);
+      end)
+    .&Catch(
+      procedure (E: Exception)
+      begin
+        Display(TutorialHub, E.Message);
+      end);
 
   //Synchronous example
 //  var Value := Client.VectorStore.Delete(TutorialHub.Id);
@@ -343,22 +284,6 @@ Delete a vector store by its ID.
 //  finally
 //    Value.Free;
 //  end;
-
-  //Asynchronous promise example
-//  var Promise := Client.VectorStore.AsyncAwaitDelete(TutorialHub.Id);
-//
-//  Promise
-//    .&Then<string>(
-//      function (Value: TDeletion): string
-//      begin
-//        Result := Value.Id;
-//        Display(TutorialHub, Value);
-//      end)
-//    .&Catch(
-//      procedure (E: Exception)
-//      begin
-//        Display(TutorialHub, E.Message);
-//      end);
 ```
 
 The JSON response.
@@ -414,20 +339,27 @@ To create the file store containing ***file1*** and ***file2***, the provided co
   var Id1 := 'file-123';
   var Id2 := 'file-456';
 
-  //Asynchronous example
-  Client.VectorStoreFiles.AsynCreate(TutorialHub.id,
+  //Asynchronous promise example
+  var Promise := Client.VectorStoreFiles.AsyncAwaitCreate(
+    TutorialHub.id,
     procedure (Params: TVectorStoreFilesCreateParams)
     begin
-      Params.FileId(Id1);  // or Params.FileId(Id2);
+      Params.FileId(Id1); // or Params.FileId(Id2);
       TutorialHub.JSONRequest := Params.ToFormat();
-    end,
-    function : TAsynVectorStoreFile
-    begin
-      Result.Sender := TutorialHub;
-      Result.OnStart := Start;
-      Result.OnSuccess := Display;
-      Result.OnError := Display;
     end);
+
+  Promise
+    .&Then<TVectorStoreFile>(
+      function (Value: TVectorStoreFile): TVectorStoreFile
+      begin
+        Result := Value;
+        Display(TutorialHub, Value);
+      end)
+    .&Catch(
+      procedure (E: Exception)
+      begin
+        Display(TutorialHub, E.Message);
+      end);
 
   //Synchronous example
 //  var Value := Client.VectorStoreFiles.Create(TutorialHub.id,
@@ -441,28 +373,6 @@ To create the file store containing ***file1*** and ***file2***, the provided co
 //  finally
 //    Value.Free;
 //  end;
-
-  //Asynchronous promise example
-//  var Promise := Client.VectorStoreFiles.AsyncAwaitCreate(
-//    TutorialHub.id,
-//    procedure (Params: TVectorStoreFilesCreateParams)
-//    begin
-//      Params.FileId(Id1); // or Params.FileId(Id2);
-//      TutorialHub.JSONRequest := Params.ToFormat();
-//    end);
-//
-//  Promise
-//    .&Then<TVectorStoreFile>(
-//      function (Value: TVectorStoreFile): TVectorStoreFile
-//      begin
-//        Result := Value;
-//        Display(TutorialHub, Value);
-//      end)
-//    .&Catch(
-//      procedure (E: Exception)
-//      begin
-//        Display(TutorialHub, E.Message);
-//      end);
 ```
 
 The JSON response:
@@ -501,15 +411,21 @@ Returns a list of vector store files.
   TutorialHub.JSONRequestClear;
   TutorialHub.Id := 'vs_abc123';
 
-  //Asynchronous example
-  Client.VectorStoreFiles.AsynList(TutorialHub.Id,
-    function : TAsynVectorStoreFiles
-    begin
-      Result.Sender := TutorialHub;
-      Result.OnStart := Start;
-      Result.OnSuccess := Display;
-      Result.OnError := Display;
-    end);
+  //Asynchronous promise example
+  var Promise := Client.VectorStoreFiles.AsyncAwaitList(TutorialHub.Id);
+
+  promise
+    .&Then<TVectorStoreFiles>(
+      function (Value: TVectorStoreFiles): TVectorStoreFiles
+      begin
+        Result := Value;
+        Display(TutorialHub, Value);
+      end)
+    .&Catch(
+      procedure (E: Exception)
+      begin
+        Display(TutorialHub, E.Message);
+      end);
 
   //Synchronous example
 //  var Value := Client.VectorStoreFiles.List(TutorialHub.Id);
@@ -518,22 +434,6 @@ Returns a list of vector store files.
 //  finally
 //    Value.Free;
 //  end;
-
-  //Asynchronous promise example
-//  var Promise := Client.VectorStoreFiles.AsyncAwaitList(TutorialHub.Id);
-//
-//  promise
-//    .&Then<TVectorStoreFiles>(
-//      function (Value: TVectorStoreFiles): TVectorStoreFiles
-//      begin
-//        Result := Value;
-//        Display(TutorialHub, Value);
-//      end)
-//    .&Catch(
-//      procedure (E: Exception)
-//      begin
-//        Display(TutorialHub, E.Message);
-//      end);
 ```
 
 <br/>
@@ -548,20 +448,26 @@ Refert to [parameters documentation](https://platform.openai.com/docs/api-refere
   TutorialHub.JSONRequestClear;
   TutorialHub.Id := 'vs_abc123';
 
-  //Asynchronous example
-  Client.VectorStoreFiles.AsynList(TutorialHub.Id,
+  //Asynchronous promise example
+  var Promise := Client.VectorStoreFiles.AsyncAwaitList(TutorialHub.Id,
     procedure (Params: TVectorStoreFilesUrlParams)
     begin
       Params.Limit(5);
       Params.Filter('completed');
-    end,
-    function : TAsynVectorStoreFiles
-    begin
-      Result.Sender := TutorialHub;
-      Result.OnStart := Start;
-      Result.OnSuccess := Display;
-      Result.OnError := Display;
     end);
+
+  promise
+    .&Then<TVectorStoreFiles>(
+      function (Value: TVectorStoreFiles): TVectorStoreFiles
+      begin
+        Result := Value;
+        Display(TutorialHub, Value);
+      end)
+    .&Catch(
+      procedure (E: Exception)
+      begin
+        Display(TutorialHub, E.Message);
+      end);
 
   //Synchronous example
 //  var Value := Client.VectorStoreFiles.List(TutorialHub.Id,
@@ -575,27 +481,6 @@ Refert to [parameters documentation](https://platform.openai.com/docs/api-refere
 //  finally
 //    Value.Free;
 //  end;
-
-  //Asynchronous promise example
-//  var Promise := Client.VectorStoreFiles.AsyncAwaitList(TutorialHub.Id,
-//    procedure (Params: TVectorStoreFilesUrlParams)
-//    begin
-//      Params.Limit(5);
-//      Params.Filter('completed');
-//    end);
-//
-//  promise
-//    .&Then<TVectorStoreFiles>(
-//      function (Value: TVectorStoreFiles): TVectorStoreFiles
-//      begin
-//        Result := Value;
-//        Display(TutorialHub, Value);
-//      end)
-//    .&Catch(
-//      procedure (E: Exception)
-//      begin
-//        Display(TutorialHub, E.Message);
-//      end);
 ```
 
 The JSON response:
@@ -659,17 +544,22 @@ Retrieves a vector store file.
   TutorialHub.Id := 'vs_abc123';
   var Id1 := 'file-123';
 
-  //Asynchronous example
-  Client.VectorStoreFiles.AsynRetrieve(
-    TutorialHub.Id,
-    Id1,
-    function : TAsynVectorStoreFile
-    begin
-      Result.Sender := TutorialHub;
-      Result.OnStart := Start;
-      Result.OnSuccess := Display;
-      Result.OnError := Display;
-    end);
+  //Asynchronous promise example
+  var Promise := Client.VectorStoreFiles.AsyncAwaitRetrieve(TutorialHub.Id, Id);
+
+  Promise
+    .&Then<int64>(
+      function (Value: TVectorStoreFile): int64
+      begin
+        Result := Value.UsageBytes;
+        Display(TutorialHub, Value);
+        ShowMessage((Result div 1000000).ToString + ' MB created at : ' + Value.CreatedAtAsString);
+      end)
+    .&Catch(
+      procedure (E: Exception)
+      begin
+        Display(TutorialHub, E.Message);
+      end);
 
   //Synchronous example
 //  var Value := Client.VectorStoreFiles.Retrieve(
@@ -680,23 +570,6 @@ Retrieves a vector store file.
 //  finally
 //    Value.Free;
 //  end;
-
-  //Asynchronous promise example
-//  var Promise := Client.VectorStoreFiles.AsyncAwaitRetrieve(TutorialHub.Id, Id);
-//
-//  Promise
-//    .&Then<int64>(
-//      function (Value: TVectorStoreFile): int64
-//      begin
-//        Result := Value.UsageBytes;
-//        Display(TutorialHub, Value);
-//        ShowMessage((Result div 1000000).ToString + ' MB created at : ' + Value.CreatedAtAsString);
-//      end)
-//    .&Catch(
-//      procedure (E: Exception)
-//      begin
-//        Display(TutorialHub, E.Message);
-//      end);
 ```
 
 The JSON response:
@@ -732,18 +605,21 @@ Remove a vector store file. This action will detach the file from the vector sto
   TutorialHub.Id := 'vs_abc123';
   var Id1 := 'file-123';
 
-  //Asynchronous example
-  Client.VectorStoreFiles.AsynDelete(
-    TutorialHub.Id,
-    Id1,
-    function : TAsynDeletion
-    begin
-      Result.Sender := TutorialHub;
-      Result.OnStart := Start;
-      Result.OnSuccess := Display;
-      Result.OnError := Display;
-    end);
+  //Asynchronous promise example
+  var Promise := Client.VectorStore.AsyncAwaitDelete(TutorialHub.Id);
 
+  Promise
+    .&Then<string>(
+      function (Value: TDeletion): string
+      begin
+        Result := Value.Id;
+        Display(TutorialHub, Value);
+      end)
+    .&Catch(
+      procedure (E: Exception)
+      begin
+        Display(TutorialHub, E.Message);
+      end);
 
   //Synchronous example
 //  var Value := Client.VectorStoreFiles.Delete(
@@ -754,22 +630,6 @@ Remove a vector store file. This action will detach the file from the vector sto
 //  finally
 //    Value.Free;
 //  end;
-
-  //Asynchronous promise example
-//  var Promise := Client.VectorStore.AsyncAwaitDelete(TutorialHub.Id);
-//
-//  Promise
-//    .&Then<string>(
-//      function (Value: TDeletion): string
-//      begin
-//        Result := Value.Id;
-//        Display(TutorialHub, Value);
-//      end)
-//    .&Catch(
-//      procedure (E: Exception)
-//      begin
-//        Display(TutorialHub, E.Message);
-//      end);
 ```
 
 The JSON response:
@@ -822,33 +682,18 @@ To create the batch store containing ***file1*** and ***file2***, uses example b
   var Id1 := 'file-123';
   var Id2 := 'file-456';
 
-  //Asynchronous example
-  Client.VectorStoreBatch.AsynCreate(TutorialHub.id,
+  //Synchronous example
+  var Value := Client.VectorStoreBatch.Create(TutorialHub.id,
     procedure (Params: TVectorStoreBatchCreateParams)
     begin
       Params.FileId([Id1, Id2]);
       TutorialHub.JSONRequest := Params.ToFormat();
-    end,
-    function : TAsynVectorStoreBatch
-    begin
-      Result.Sender := TutorialHub;
-      Result.OnStart := Start;
-      Result.OnSuccess := Display;
-      Result.OnError := Display;
     end);
-
-  //Synchronous example
-//  var Value := Client.VectorStoreBatch.Create(TutorialHub.id,
-//    procedure (Params: TVectorStoreBatchCreateParams)
-//    begin
-//      Params.FileId([Id1, Id2]);
-//      TutorialHub.JSONRequest := Params.ToFormat();
-//    end);
-//  try
-//    Display(TutorialHub, Value);
-//  finally
-//    Value.Free;
-//  end;
+  try
+    Display(TutorialHub, Value);
+  finally
+    Value.Free;
+  end;
 ```
 
 The JSON response:
@@ -884,25 +729,13 @@ Returns a list of vector store files in a batch.
   TutorialHub.Id := 'vs_cde456';
   var BatchId := 'vsfb_789';
 
-  //Asynchronous example
-  Client.VectorStoreBatch.AsynList(
-    TutorialHub.Id,
-    BatchId,
-    function : TAsynVectorStoreBatches
-    begin
-      Result.Sender := TutorialHub;
-      Result.OnStart := Start;
-      Result.OnSuccess := Display;
-      Result.OnError := Display;
-    end);
-
   //Synchronous example
-//  var Value := Client.VectorStoreBatch.List(TutorialHub.Id, BatchId);
-//  try
-//    Display(TutorialHub, Value);
-//  finally
-//    Value.Free;
-//  end;
+  var Value := Client.VectorStoreBatch.List(TutorialHub.Id, BatchId);
+  try
+    Display(TutorialHub, Value);
+  finally
+    Value.Free;
+  end;
 ```
 
 <br/>
@@ -918,35 +751,18 @@ Refert to [parameters documentation](https://platform.openai.com/docs/api-refere
   TutorialHub.Id := 'vs_cde456';
   var BatchId := 'vsfb_789';
 
-  //Asynchronous example
-  Client.VectorStoreBatch.AsynList(
-    TutorialHub.Id,
-    BatchId,
+  //Synchronous example
+  var Value := Client.VectorStoreBatch.List(TutorialHub.Id, BatchId,
     procedure (Params: TVectorStoreFilesUrlParams)
     begin
       Params.Limit(5);
       Params.Filter('completed');
-    end,
-    function : TAsynVectorStoreBatches
-    begin
-      Result.Sender := TutorialHub;
-      Result.OnStart := Start;
-      Result.OnSuccess := Display;
-      Result.OnError := Display;
     end);
-
-  //Synchronous example
-//  var Value := Client.VectorStoreBatch.List(TutorialHub.Id, BatchId,
-//    procedure (Params: TVectorStoreFilesUrlParams)
-//    begin
-//      Params.Limit(5);
-//      Params.Filter('completed');
-//    end);
-//  try
-//    Display(TutorialHub, Value);
-//  finally
-//    Value.Free;
-//  end;
+  try
+    Display(TutorialHub, Value);
+  finally
+    Value.Free;
+  end;
 ```
 
 The JSON response:
@@ -990,27 +806,15 @@ Returns a list of vector store files in a batch.
   TutorialHub.Id := 'vs_cde456';
   var BatchId := 'vsfb_7891';
 
-  //Asynchronous example
-  Client.VectorStoreBatch.AsynRetrieve(
-    TutorialHub.Id,
-    BatchId,
-    function : TAsynVectorStoreBatch
-    begin
-      Result.Sender := TutorialHub;
-      Result.OnStart := Start;
-      Result.OnSuccess := Display;
-      Result.OnError := Display;
-    end);
-
   //Synchronous example
-//  var Value := Client.VectorStoreBatch.Retrieve(
-//                 TutorialHub.Id,
-//                 BatchId);
-//  try
-//    Display(TutorialHub, Value);
-//  finally
-//    Value.Free;
-//  end;
+  var Value := Client.VectorStoreBatch.Retrieve(
+                 TutorialHub.Id,
+                 BatchId);
+  try
+    Display(TutorialHub, Value);
+  finally
+    Value.Free;
+  end;
 ```
 
 The JSON response:
@@ -1044,27 +848,15 @@ Cancel a vector store file batch. This attempts to cancel the processing of file
   TutorialHub.Id := 'vs_cde456';
   var BatchId := 'vsfb_789';
 
-  //Asynchronous example
-  Client.VectorStoreBatch.AsynRetrieve(
-    TutorialHub.Id,
-    BatchId,
-    function : TAsynVectorStoreBatch
-    begin
-      Result.Sender := TutorialHub;
-      Result.OnStart := Start;
-      Result.OnSuccess := Display;
-      Result.OnError := Display;
-    end);
-
   //Synchronous example
-//  var Value := Client.VectorStoreBatch.Cancel(
-//                 TutorialHub.Id,
-//                 BatchId);
-//  try
-//    Display(TutorialHub, Value);
-//  finally
-//    Value.Free;
-//  end;
+  var Value := Client.VectorStoreBatch.Cancel(
+                 TutorialHub.Id,
+                 BatchId);
+  try
+    Display(TutorialHub, Value);
+  finally
+    Value.Free;
+  end;
 ```
 
 The JSON response:

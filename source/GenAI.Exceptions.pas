@@ -1,4 +1,4 @@
-unit GenAI.Exceptions;
+﻿unit GenAI.Exceptions;
 
 {-------------------------------------------------------------------------------
 
@@ -42,6 +42,7 @@ type
     /// from the <c>TErrorCore</c> object.
     /// </remarks>
     constructor Create(const ACode: Int64; const AError: TErrorCore); reintroduce; overload;
+
     /// <summary>
     /// Creates an instance of the <c>TGenAIException</c> class with an error code and a custom error message.
     /// </summary>
@@ -55,6 +56,7 @@ type
     /// This constructor initializes the exception with a code and a custom error message.
     /// </remarks>
     constructor Create(const ACode: Int64; const Value: string); reintroduce; overload;
+
     /// <summary>
     /// Formats the error message with the code and description.
     /// </summary>
@@ -65,6 +67,7 @@ type
     /// Use this method to obtain a user-friendly error description for logging or debugging purposes.
     /// </remarks>
     function FormatErrorMessage: string;
+
     /// <summary>
     /// The error code associated with the exception.
     /// </summary>
@@ -72,6 +75,7 @@ type
     /// An <c>Int64</c> representing the error code.
     /// </value>
     property Code: Int64 read FCode write FCode;
+
     /// <summary>
     /// The detailed error message describing the issue.
     /// </summary>
@@ -79,6 +83,7 @@ type
     /// A <c>string</c> containing the error message.
     /// </value>
     property ErrorMessage: string read FErrorMessage write FErrorMessage;
+
     /// <summary>
     /// An optional parameter related to the error, providing additional context.
     /// </summary>

@@ -116,41 +116,20 @@ List your organization's fine-tuning jobs. Refer to [parameters documentation](h
 ```pascal
 //uses GenAI, GenAI.Types, GenAI.Tutorial.VCL;
 
-  //Asynchronous example
-  Client.FineTuning.AsynList(
+  //Synchronous example
+  var Value := Client.FineTuning.List(
     procedure (Params: TUrlPaginationParams)
     begin
       Params.Limit(1);
-    end,
-    function : TAsynFineTuningJobs
-    begin
-      Result.Sender := TutorialHub;
-      Result.OnStart := Start;
-      Result.OnSuccess :=
-        procedure (Sender: TObject; Value: TFineTuningJobs)
-        begin
-          TutorialHub.JSONResponse := Value.JSONResponse;
-          for var Item in Value.Data do
-            Display(TutorialHub, Item.Id);
-          Display(TutorialHub, F('hasmore',VarToStr(Value.HasMore)));
-        end;
-      Result.OnError := Display;
     end);
-
-  //Synchronous example
-//  var Value := Client.FineTuning.List(
-//    procedure (Params: TUrlPaginationParams)
-//    begin
-//      Params.Limit(1);
-//    end);
-//  try
-//    TutorialHub.JSONResponse := Value.JSONResponse;
-//    for var Item in Value.Data do
-//      Display(TutorialHub, Item.Id);
-//    Display(TutorialHub, F('hasmore',VarToStr(Value.HasMore)));
-//  finally
-//    Value.Free;
-//  end;
+  try
+    TutorialHub.JSONResponse := Value.JSONResponse;
+    for var Item in Value.Data do
+      Display(TutorialHub, Item.Id);
+    Display(TutorialHub, F('hasmore',VarToStr(Value.HasMore)));
+  finally
+    Value.Free;
+  end;
 ```
 
 <br/>

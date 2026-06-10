@@ -1,4 +1,4 @@
-unit GenAI.Responses.Helpers;
+﻿unit GenAI.Responses.Helpers;
 
 {-------------------------------------------------------------------------------
 

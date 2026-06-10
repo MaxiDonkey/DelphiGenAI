@@ -1,0 +1,466 @@
+﻿{
+  "lang": "pl-PL",
+  "input": {
+    "placeholder": {
+      "askQuestion": "Zadaj pytanie..."
+    },
+    "menu": {
+      "endpoint": "Punkt końcowy",
+      "webResearch": "Wyszukiwanie w sieci",
+      "thinking": "Rozumowanie",
+      "attachFiles": "Załącz pliki",
+      "knowledgeSearch": "Wyszukiwanie wiedzy",
+      "vision": "Wizja",
+      "deepResearch": "Dogłębne badanie",
+      "integration": "Integracja",
+      "media": "Multimedia",
+      "custom": "Niestandardowy",
+      "settings": "Ustawienia",
+      "model": "Model",
+      "project": "Projekt"
+    },
+    "thinking": {
+      "low": "Niski",
+      "medium": "Średni",
+      "high": "Wysoki"
+    },
+    "endpoint": {
+      "chatCompletion": "v1/chat/completions",
+      "chatResponse": "v1/chat/responses",
+      "message": "v1/message",
+      "generateContent": ":generateContent",
+      "interactions": "v1/interactions",
+      "conversation": "v1/conversation",
+      "provider": {
+        "chatCompletion": "OpenAI, DeepSeek, MistralAI",
+        "chatResponse": "OpenAI",
+        "message": "Claude",
+        "generateContent": "Gemini",
+        "interactions": "Gemini",
+        "conversation": "MistralAI"
+      }
+    },
+    "integration": {
+      "function": "Funkcja",
+      "mcp": "MCP",
+      "jsCodeSandbox": "Piaskownica JS",
+      "skills": "Umiejętności",
+      "agents": "Agenci"
+    },
+    "media": {
+      "createImage": "Utwórz obraz",
+      "createVideo": "Utwórz wideo",
+      "createAudio": "Utwórz audio",
+      "speechToText": "Mowa na tekst",
+      "textToSpeech": "Tekst na mowę"
+    },
+    "project": {
+      "add": "Dodaj projekt",
+      "none": "brak",
+      "noneUsed": "Nie użyto projektu",
+      "delete": "Usuń"
+    },
+    "chips": {
+      "endpoint": "Punkt końcowy: {title}",
+      "webResearch": "Wyszukiwanie w sieci",
+      "thinking": "Rozumowanie: {title}",
+      "knowledgeSearch": "Wyszukiwanie wiedzy ({count})",
+      "deepResearch": "Dogłębne badanie",
+      "filesAttached": "Załączone pliki ({count})",
+      "vision": "Wizja ({count})",
+      "integrationFunction": "Integracja: Funkcja ({count})",
+      "integrationMcp": "Integracja: MCP ({count})",
+      "integrationJsCodeSandbox": "Integracja: Piaskownica JS ({count})",
+      "integrationSkills": "Integracja: Umiejętności ({count})",
+      "integrationAgents": "Integracja: Agenci ({count})",
+      "mediaCreateImage": "Multimedia: Utwórz obraz",
+      "mediaCreateVideo": "Multimedia: Utwórz wideo",
+      "mediaCreateAudio": "Multimedia: Utwórz audio",
+      "speechToText": "Mowa na tekst ({count})",
+      "mediaTextToSpeech": "Multimedia: Tekst na mowę",
+      "custom": "Niestandardowy ({count})"
+    }
+  },
+  "requestParams": {
+    "panel": {
+      "title": "Ustawienia",
+      "close": "Zamknij",
+      "theme": {
+        "light": "Jasny",
+        "dark": "Ciemny"
+      }
+    },
+    "summary": {
+      "alwaysAvailable": "Zawsze dostępne",
+      "enabled": "Włączone",
+      "disabled": "Wyłączone",
+      "enabledDisabled": "{enabled} włączone / {disabled} wyłączone"
+    },
+    "categories": {
+      "appSettings": {
+        "title": "Ustawienia aplikacji",
+        "subtitle": "Ogólne",
+        "panelSubtitle": ""
+      },
+      "systemPrompt": {
+        "title": "Prompt systemowy"
+      },
+      "settings": {
+        "title": "Ustawienia ogólne"
+      },
+      "sampling": {
+        "title": "Próbkowanie"
+      },
+      "structuredOutput": {
+        "title": "Dane wyjściowe strukturalne"
+      },
+      "vendorSettings": {
+        "title": "Opcje dostawcy"
+      }
+    },
+    "items": {
+      "appSettings": {
+        "lookAndFeel": {
+          "label": "Wygląd"
+        },
+        "language": {
+          "label": "Język",
+          "placeholder": "Wybierz język"
+        },
+        "scrollButtons": {
+          "label": "Przyciski przewijania"
+        }
+      },
+      "systemPrompt": {
+        "systemPrompt": {
+          "label": "Prompt systemowy",
+          "labelWhenDisabled": "Wyłączony",
+          "labelWhenEnabled": "Włączony",
+          "placeholder": "Wprowadź prompt systemowy"
+        }
+      },
+      "settings": {
+        "temperature": {
+          "label": "Temperatura"
+        },
+        "maxTokens": {
+          "label": "Maks. tokenów"
+        },
+        "stopStrings": {
+          "label": "Ciągi zatrzymujące",
+          "placeholder": "Jeden ciąg zatrzymujący na linię"
+        }
+      },
+      "sampling": {
+        "topK": {
+          "label": "Top-k"
+        },
+        "topP": {
+          "label": "Top-p"
+        },
+        "presencePenalty": {
+          "label": "Kara za obecność"
+        },
+        "randomSeed": {
+          "label": "Ziarno losowe"
+        }
+      },
+      "structuredOutput": {
+        "jsonSchema": {
+          "label": "Schemat JSON",
+          "labelWhenDisabled": "Wyłączony",
+          "labelWhenEnabled": "Włączony",
+          "placeholder": "Wprowadź schemat JSON",
+          "invalidJsonMessage": "Nieprawidłowy JSON"
+        }
+      },
+      "vendorSettings": {
+        "parallelToolCalls": {
+          "label": "Równoległe wywołania narzędzi"
+        },
+        "backgroundResponse": {
+          "label": "Odpowiedź w tle"
+        },
+        "usingPreviousId": {
+          "label": "Użyj poprzedniego ID"
+        },
+        "store": {
+          "label": "Zapisz"
+        }
+      }
+    }
+  },
+  "filesDrawer": {
+    "aria": {
+      "leftPanel": "Lewy panel boczny"
+    },
+    "actions": {
+      "openPanel": "Otwórz panel",
+      "newSession": "Nowa sesja",
+      "closePanel": "Zamknij panel",
+      "nextPage": "Następna strona",
+      "more": "Więcej",
+      "rename": "Zmień nazwę",
+      "delete": "Usuń"
+    }
+  },
+  "scroll": {
+    "top": "Przewiń do góry",
+    "bottom": "Przewiń w dół"
+  },
+  "selector": {
+    "branchAfterMessage": "Utwórz gałąź po tej wiadomości",
+    "copyMessage": "Kopiuj wiadomość",
+    "deleteMessage": "Usuń wiadomość"
+  },
+  "confirmation": {
+    "title": "Potwierdzenie",
+    "question": "Proszę potwierdzić.",
+    "yes": "Tak",
+    "no": "Nie"
+  },
+  "inputString": {
+    "title": "Wprowadzanie",
+    "message": "Proszę wprowadzić wartość.",
+    "ok": "OK",
+    "cancel": "Anuluj"
+  },
+  "webDecisionDlg": {
+    "title": "Potwierdzenie",
+    "message": "Proszę potwierdzić.",
+    "ok": "OK",
+    "cancel": "Anuluj",
+    "close": "Zamknij"
+  },
+  "displayFile": {
+    "fallbackName": "Plik {index}",
+    "badge": {
+      "pdf": "PDF",
+      "sheet": "XLS",
+      "doc": "DOC",
+      "slide": "PPT",
+      "text": "TXT",
+      "pascal": "PAS",
+      "code": "</>",
+      "file": "PLIK"
+    },
+    "status": {
+      "file": "PLIK"
+    },
+    "debug": {
+      "error": "Błąd DisplayFile: {error}"
+    }
+  },
+  "displayImage": {
+    "action": {
+      "close": "Zamknij"
+    },
+    "error": {
+      "unavailable": "Obraz niedostępny"
+    },
+    "alt": {
+      "imageIndex": "Obraz {index}"
+    },
+    "debug": {
+      "error": "Błąd DisplayImages: {error}"
+    }
+  },
+  "display": {
+    "reasoning": {
+      "title": "Rozumowanie"
+    },
+    "toolGroup": {
+      "label": "Użyte narzędzia"
+    },
+    "code": {
+      "copy": "Kopiuj",
+      "copied": "Skopiowano",
+      "copyToClipboard": "Kopiuj do schowka"
+    }
+  },
+  "errors": {
+    "aria": {
+      "systemMessages": "Komunikaty systemowe"
+    },
+    "action": {
+      "close": "Zamknij"
+    }
+  },
+  "promptFile": {
+    "debug": {
+      "error": "Błąd PromptFile: {error}"
+    }
+  },
+  "displayVideo": {
+    "fallbackName": "Wideo {index}",
+    "fallbackNameWithExtension": "Wideo {index}.{ext}",
+    "action": {
+      "open": "Otwórz",
+      "close": "Zamknij"
+    },
+    "debug": {
+      "error": "Błąd DisplayVideo: {error}"
+    }
+  },
+  "displayAudio": {
+    "fallbackName": "Audio {index}",
+    "fallbackNameWithExtension": "Audio {index}.{ext}",
+    "status": {
+      "stop": "Zatrzymaj",
+      "loading": "Ładowanie",
+      "unavailable": "Niedostępne",
+      "pause": "Pauza",
+      "playing": "Odtwarzanie"
+    },
+    "debug": {
+      "error": "Błąd DisplayAudio: {error}"
+    }
+  },
+  "modelSelector": {
+    "panel": {
+      "title": "Wybierz modele domyślne",
+      "aria": {
+        "dialog": "Wybierz modele domyślne"
+      }
+    },
+    "actions": {
+      "close": "Zamknij"
+    },
+    "defaults": {
+      "title": "Model domyślny",
+      "empty": "Brak modelu domyślnego dla tej kategorii."
+    },
+    "status": {
+      "notAssigned": "Nieprzypisany",
+      "noDefaultModel": "Brak modelu domyślnego"
+    },
+    "categories": {
+      "allModels": {
+        "label": "Lista modeli"
+      },
+      "textGeneration": {
+        "label": "Generowanie tekstu"
+      },
+      "imageCreation": {
+        "label": "Tworzenie obrazów"
+      },
+      "videoCreation": {
+        "label": "Tworzenie wideo"
+      },
+      "audioCreation": {
+        "label": "Tworzenie audio"
+      },
+      "textToSpeech": {
+        "label": "Tekst na mowę"
+      },
+      "deepResearch": {
+        "label": "Dogłębne badanie"
+      }
+    },
+    "features": {
+      "webResearch": "Wyszukiwanie w sieci",
+      "thinking": "Rozumowanie",
+      "attachFiles": "Załącz pliki",
+      "vision": "Wizja",
+      "createImage": "Utwórz obraz",
+      "createVideo": "Utwórz wideo",
+      "createAudio": "Utwórz audio",
+      "speechToText": "Mowa na tekst",
+      "textToSpeech": "Tekst na mowę",
+      "deepResearch": "Dogłębne badanie"
+    }
+  },
+  "cardSelector": {
+    "panel": {
+      "title": "Wybierz element",
+      "ariaLabel": "Wybierz element",
+      "selectDialogTitle": "{selectPrefix} {dialogLabel}"
+    },
+    "actions": {
+      "selectPrefix": "Wybierz",
+      "close": "Zamknij",
+      "edit": "Edytuj",
+      "settings": "Ustawienia",
+      "cancel": "Anuluj",
+      "select": "Wybierz"
+    },
+    "messages": {
+      "empty": "Brak dostępnych elementów.",
+      "noComment": ""
+    },
+    "dialogs": {
+      "function": {
+        "label": "Funkcja"
+      },
+      "mcp": {
+        "label": "MCP"
+      },
+      "skills": {
+        "label": "Umiejętności"
+      },
+      "agents": {
+        "label": "Agenci"
+      },
+      "custom": {
+        "label": "Niestandardowy"
+      }
+    }
+  },
+  "prompt": {
+    "toggleCollapse": "Zwiń lub rozwiń prompt",
+    "summary": {
+      "open": "Otwórz podsumowanie promptu",
+      "close": "Zamknij podsumowanie promptu"
+    }
+  },
+  "more": {
+    "delete_qa": "Proszę potwierdzić usunięcie bieżącego pytania i odpowiedzi, a także wszystkich kolejnych wpisów.",
+    "delete_chat_session": "Czy jesteś pewien? #10#10Ta akcja jest nieodwracalna i usunie wszystkie wiadomości w tej rozmowie.",
+    "aborted": "Operacja przerwana...",
+    "aborted_operation": "Operacja przerwana",
+    "model_file_not_found": "%s: plik utworzony. #10Otwórz ten plik i podaj listę dostępnych modeli.",
+    "batch_begin_error": "Nie udało się włączyć renderowania wsadowego.",
+    "batch_end_error": "Nie udało się zwolnić renderowania wsadowego.",
+    "focus_error": "Dymek wprowadzania nie mógł otrzymać fokusu.",
+    "stop_audio_media_error": "Nie udało się zatrzymać mediów audio.",
+    "stop_video_media_error": "Nie udało się zatrzymać mediów wideo.",
+    "internal_theme_error": "Nie można zaktualizować motywu strony.",
+    "deserialization_error": "Błąd deserializacji: nieprawidłowe wejście JSON %s",
+    "welcome": "Witaj w swoim obszarze roboczym",
+    "structured_output_error": "Strukturalne dane wyjściowe są nieprawidłowe: edytuj ich wartość w ustawieniach.",
+    "card_json_file_not_found": "Żaden plik JSON nie obsługuje %s",
+    "models_categories_count_error": "Proszę zdefiniować kategorie dla modeli domyślnych",
+    "invalid_categories_file_error": "Nieprawidłowy plik JSON dla kategorii",
+    "text_generation_cant_handled_error": "Brak modelu domyślnego: generowanie tekstu nie może zostać przetworzone",
+    "image_creation_aborted_error": "Nie skonfigurowano modelu domyślnego: tworzenie obrazu przerwane",
+    "video_creation_aborted_error": "Nie skonfigurowano modelu domyślnego: tworzenie wideo przerwane",
+    "audio_creation_aborted_error": "Nie skonfigurowano modelu domyślnego: tworzenie audio przerwane",
+    "stt_operation_aborted_error": "Nie skonfigurowano modelu domyślnego: operacja STT przerwana",
+    "tts_operation_aborted_error": "Nie skonfigurowano modelu domyślnego: operacja TTS przerwana",
+    "deep_research_operation_aborted_error": "Nie skonfigurowano modelu domyślnego: dogłębne badanie przerwane",
+    "missing_default_models_error": "Brakujące modele domyślne dla niektórych kategorii. #10 Sprawdź ustawienia modeli",
+    "api_key_empty_name_error": "Nazwa klucza nie może być pusta.",
+    "api_key_enter_dialog_prompt": "Proszę wprowadzić wartość klucza API dla %s",
+    "api_key_not_found": "%s: klucz API nie został znaleziony",
+    "api_key_deleted": "%s: klucz API został usunięty",
+    "api_key_exists": "%s: klucz API istnieje",
+    "api_key_modified": "%s: klucz API został zmodyfikowany.",
+    "api_key_inserted": "%s: klucz API został wstawiony",
+    "web_decision_dlg_title": "Potwierdzenie",
+    "web_decision_dlg_message": "Proszę potwierdzić.",
+    "web_decision_dlg_ok": "OK",
+    "web_decision_dlg_cancel": "Anuluj",
+    "web_decision_dlg_close": "Zamknij",
+    "demo_anthropic_tool_confirmation_title": "Potwierdzenie",
+    "demo_anthropic_tool_allow": "Zezwól",
+    "demo_anthropic_tool_deny": "Odmów",
+    "demo_anthropic_tool_allow_call": "Zezwolić na to wywołanie narzędzia?",
+    "demo_anthropic_interrupted_by_user": "Przerwane przez użytkownika.",
+    "command_plugin_not_be_null": "Wtyczka nie może być pusta",
+    "command_unknown": "Nieznane polecenie: /%s",
+    "command_action_unknown": "Nieznana akcja: /%s %s",
+    "command_missing_action": "Brakująca akcja dla /%s",
+    "command_incorrect_number_of_arguments": "Nieprawidłowa liczba argumentów dla /%s %s (otrzymano %d)",
+    "command_no_plugin_for": "Brak wtyczki dla /%s"
+  }
+}

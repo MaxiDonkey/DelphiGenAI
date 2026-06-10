@@ -1,0 +1,466 @@
+﻿{
+  "lang": "ja-JP",
+  "input": {
+    "placeholder": {
+      "askQuestion": "質問してください..."
+    },
+    "menu": {
+      "endpoint": "エンドポイント",
+      "webResearch": "ウェブ検索",
+      "thinking": "推論",
+      "attachFiles": "ファイルを添付",
+      "knowledgeSearch": "ナレッジ検索",
+      "vision": "ビジョン",
+      "deepResearch": "詳細調査",
+      "integration": "連携",
+      "media": "メディア",
+      "custom": "カスタム",
+      "settings": "設定",
+      "model": "モデル",
+      "project": "プロジェクト"
+    },
+    "thinking": {
+      "low": "低",
+      "medium": "中",
+      "high": "高"
+    },
+    "endpoint": {
+      "chatCompletion": "v1/chat/completions",
+      "chatResponse": "v1/chat/responses",
+      "message": "v1/message",
+      "generateContent": ":generateContent",
+      "interactions": "v1/interactions",
+      "conversation": "v1/conversation",
+      "provider": {
+        "chatCompletion": "OpenAI, DeepSeek, MistralAI",
+        "chatResponse": "OpenAI",
+        "message": "Claude",
+        "generateContent": "Gemini",
+        "interactions": "Gemini",
+        "conversation": "MistralAI"
+      }
+    },
+    "integration": {
+      "function": "関数",
+      "mcp": "MCP",
+      "jsCodeSandbox": "JS サンドボックス",
+      "skills": "スキル",
+      "agents": "エージェント"
+    },
+    "media": {
+      "createImage": "画像を作成",
+      "createVideo": "動画を作成",
+      "createAudio": "音声を作成",
+      "speechToText": "音声をテキストに変換",
+      "textToSpeech": "テキストを音声に変換"
+    },
+    "project": {
+      "add": "プロジェクトを追加",
+      "none": "なし",
+      "noneUsed": "使用中のプロジェクトなし",
+      "delete": "削除"
+    },
+    "chips": {
+      "endpoint": "エンドポイント:{title}",
+      "webResearch": "ウェブ検索",
+      "thinking": "推論:{title}",
+      "knowledgeSearch": "ナレッジ検索({count})",
+      "deepResearch": "詳細調査",
+      "filesAttached": "添付ファイル({count})",
+      "vision": "ビジョン({count})",
+      "integrationFunction": "連携:関数({count})",
+      "integrationMcp": "連携:MCP({count})",
+      "integrationJsCodeSandbox": "連携:JS サンドボックス({count})",
+      "integrationSkills": "連携:スキル({count})",
+      "integrationAgents": "連携:エージェント({count})",
+      "mediaCreateImage": "メディア:画像を作成",
+      "mediaCreateVideo": "メディア:動画を作成",
+      "mediaCreateAudio": "メディア:音声を作成",
+      "speechToText": "音声をテキストに変換({count})",
+      "mediaTextToSpeech": "メディア:テキストを音声に変換",
+      "custom": "カスタム({count})"
+    }
+  },
+  "requestParams": {
+    "panel": {
+      "title": "設定",
+      "close": "閉じる",
+      "theme": {
+        "light": "ライト",
+        "dark": "ダーク"
+      }
+    },
+    "summary": {
+      "alwaysAvailable": "常に使用可能",
+      "enabled": "有効",
+      "disabled": "無効",
+      "enabledDisabled": "有効 {enabled} 件 / 無効 {disabled} 件"
+    },
+    "categories": {
+      "appSettings": {
+        "title": "アプリケーション設定",
+        "subtitle": "全般",
+        "panelSubtitle": ""
+      },
+      "systemPrompt": {
+        "title": "システムプロンプト"
+      },
+      "settings": {
+        "title": "全般設定"
+      },
+      "sampling": {
+        "title": "サンプリング"
+      },
+      "structuredOutput": {
+        "title": "構造化出力"
+      },
+      "vendorSettings": {
+        "title": "ベンダーオプション"
+      }
+    },
+    "items": {
+      "appSettings": {
+        "lookAndFeel": {
+          "label": "外観"
+        },
+        "language": {
+          "label": "言語",
+          "placeholder": "言語を選択"
+        },
+        "scrollButtons": {
+          "label": "スクロールボタン"
+        }
+      },
+      "systemPrompt": {
+        "systemPrompt": {
+          "label": "システムプロンプト",
+          "labelWhenDisabled": "無効",
+          "labelWhenEnabled": "有効",
+          "placeholder": "システムプロンプトを入力"
+        }
+      },
+      "settings": {
+        "temperature": {
+          "label": "温度"
+        },
+        "maxTokens": {
+          "label": "最大トークン数"
+        },
+        "stopStrings": {
+          "label": "停止文字列",
+          "placeholder": "1 行に 1 つの停止文字列"
+        }
+      },
+      "sampling": {
+        "topK": {
+          "label": "Top-k"
+        },
+        "topP": {
+          "label": "Top-p"
+        },
+        "presencePenalty": {
+          "label": "存在ペナルティ"
+        },
+        "randomSeed": {
+          "label": "ランダムシード"
+        }
+      },
+      "structuredOutput": {
+        "jsonSchema": {
+          "label": "JSON スキーマ",
+          "labelWhenDisabled": "無効",
+          "labelWhenEnabled": "有効",
+          "placeholder": "JSON スキーマを入力",
+          "invalidJsonMessage": "無効な JSON です"
+        }
+      },
+      "vendorSettings": {
+        "parallelToolCalls": {
+          "label": "並列ツール呼び出し"
+        },
+        "backgroundResponse": {
+          "label": "バックグラウンド応答"
+        },
+        "usingPreviousId": {
+          "label": "以前の ID を使用"
+        },
+        "store": {
+          "label": "保存"
+        }
+      }
+    }
+  },
+  "filesDrawer": {
+    "aria": {
+      "leftPanel": "左サイドパネル"
+    },
+    "actions": {
+      "openPanel": "パネルを開く",
+      "newSession": "新規セッション",
+      "closePanel": "パネルを閉じる",
+      "nextPage": "次のページ",
+      "more": "その他",
+      "rename": "名前を変更",
+      "delete": "削除"
+    }
+  },
+  "scroll": {
+    "top": "先頭にスクロール",
+    "bottom": "末尾にスクロール"
+  },
+  "selector": {
+    "branchAfterMessage": "このメッセージの後にブランチを作成",
+    "copyMessage": "メッセージをコピー",
+    "deleteMessage": "メッセージを削除"
+  },
+  "confirmation": {
+    "title": "確認",
+    "question": "確認してください。",
+    "yes": "はい",
+    "no": "いいえ"
+  },
+  "inputString": {
+    "title": "入力",
+    "message": "値を入力してください。",
+    "ok": "OK",
+    "cancel": "キャンセル"
+  },
+  "webDecisionDlg": {
+    "title": "確認",
+    "message": "確認してください。",
+    "ok": "OK",
+    "cancel": "キャンセル",
+    "close": "閉じる"
+  },
+  "displayFile": {
+    "fallbackName": "ファイル {index}",
+    "badge": {
+      "pdf": "PDF",
+      "sheet": "XLS",
+      "doc": "DOC",
+      "slide": "PPT",
+      "text": "TXT",
+      "pascal": "PAS",
+      "code": "</>",
+      "file": "ファイル"
+    },
+    "status": {
+      "file": "ファイル"
+    },
+    "debug": {
+      "error": "DisplayFile エラー:{error}"
+    }
+  },
+  "displayImage": {
+    "action": {
+      "close": "閉じる"
+    },
+    "error": {
+      "unavailable": "画像を利用できません"
+    },
+    "alt": {
+      "imageIndex": "画像 {index}"
+    },
+    "debug": {
+      "error": "DisplayImages エラー:{error}"
+    }
+  },
+  "display": {
+    "reasoning": {
+      "title": "推論"
+    },
+    "toolGroup": {
+      "label": "使用したツール"
+    },
+    "code": {
+      "copy": "コピー",
+      "copied": "コピーしました",
+      "copyToClipboard": "クリップボードにコピー"
+    }
+  },
+  "errors": {
+    "aria": {
+      "systemMessages": "システムメッセージ"
+    },
+    "action": {
+      "close": "閉じる"
+    }
+  },
+  "promptFile": {
+    "debug": {
+      "error": "PromptFile エラー:{error}"
+    }
+  },
+  "displayVideo": {
+    "fallbackName": "動画 {index}",
+    "fallbackNameWithExtension": "動画 {index}.{ext}",
+    "action": {
+      "open": "開く",
+      "close": "閉じる"
+    },
+    "debug": {
+      "error": "DisplayVideo エラー:{error}"
+    }
+  },
+  "displayAudio": {
+    "fallbackName": "音声 {index}",
+    "fallbackNameWithExtension": "音声 {index}.{ext}",
+    "status": {
+      "stop": "停止",
+      "loading": "読み込み中",
+      "unavailable": "利用不可",
+      "pause": "一時停止",
+      "playing": "再生中"
+    },
+    "debug": {
+      "error": "DisplayAudio エラー:{error}"
+    }
+  },
+  "modelSelector": {
+    "panel": {
+      "title": "既定のモデルを選択",
+      "aria": {
+        "dialog": "既定のモデルを選択"
+      }
+    },
+    "actions": {
+      "close": "閉じる"
+    },
+    "defaults": {
+      "title": "既定のモデル",
+      "empty": "このカテゴリに既定のモデルはありません。"
+    },
+    "status": {
+      "notAssigned": "未割り当て",
+      "noDefaultModel": "既定のモデルなし"
+    },
+    "categories": {
+      "allModels": {
+        "label": "モデル一覧"
+      },
+      "textGeneration": {
+        "label": "テキスト生成"
+      },
+      "imageCreation": {
+        "label": "画像作成"
+      },
+      "videoCreation": {
+        "label": "動画作成"
+      },
+      "audioCreation": {
+        "label": "音声作成"
+      },
+      "textToSpeech": {
+        "label": "テキストを音声に変換"
+      },
+      "deepResearch": {
+        "label": "詳細調査"
+      }
+    },
+    "features": {
+      "webResearch": "ウェブ検索",
+      "thinking": "推論",
+      "attachFiles": "ファイルを添付",
+      "vision": "ビジョン",
+      "createImage": "画像を作成",
+      "createVideo": "動画を作成",
+      "createAudio": "音声を作成",
+      "speechToText": "音声をテキストに変換",
+      "textToSpeech": "テキストを音声に変換",
+      "deepResearch": "詳細調査"
+    }
+  },
+  "cardSelector": {
+    "panel": {
+      "title": "項目を選択",
+      "ariaLabel": "項目を選択",
+      "selectDialogTitle": "{selectPrefix} {dialogLabel}"
+    },
+    "actions": {
+      "selectPrefix": "選択",
+      "close": "閉じる",
+      "edit": "編集",
+      "settings": "設定",
+      "cancel": "キャンセル",
+      "select": "選択"
+    },
+    "messages": {
+      "empty": "利用可能な項目がありません。",
+      "noComment": ""
+    },
+    "dialogs": {
+      "function": {
+        "label": "関数"
+      },
+      "mcp": {
+        "label": "MCP"
+      },
+      "skills": {
+        "label": "スキル"
+      },
+      "agents": {
+        "label": "エージェント"
+      },
+      "custom": {
+        "label": "カスタム"
+      }
+    }
+  },
+  "prompt": {
+    "toggleCollapse": "プロンプトを折りたたむ/展開する",
+    "summary": {
+      "open": "プロンプトの概要を開く",
+      "close": "プロンプトの概要を閉じる"
+    }
+  },
+  "more": {
+    "delete_qa": "現在の質問と回答、およびその後のすべての項目の削除を確認してください。",
+    "delete_chat_session": "よろしいですか? #10#10この操作は元に戻せず、この会話のすべてのメッセージが削除されます。",
+    "aborted": "操作が中止されました...",
+    "aborted_operation": "操作が中止されました",
+    "model_file_not_found": "%s:ファイルが作成されました。#10このファイルを開き、利用可能なモデルの一覧を指定してください。",
+    "batch_begin_error": "バッチ表示の有効化に失敗しました。",
+    "batch_end_error": "バッチ表示の解放に失敗しました。",
+    "focus_error": "入力バブルがフォーカスを取得できませんでした。",
+    "stop_audio_media_error": "音声メディアの停止に失敗しました。",
+    "stop_video_media_error": "動画メディアの停止に失敗しました。",
+    "internal_theme_error": "ページのテーマを更新できません。",
+    "deserialization_error": "逆シリアル化エラー:無効な JSON 入力 %s",
+    "welcome": "ワークスペースへようこそ",
+    "structured_output_error": "構造化出力が無効です:設定で値を編集してください。",
+    "card_json_file_not_found": "%s をサポートする JSON ファイルがありません",
+    "models_categories_count_error": "既定のモデルのカテゴリを定義してください",
+    "invalid_categories_file_error": "カテゴリ用の JSON ファイルが無効です",
+    "text_generation_cant_handled_error": "既定のモデルがありません:テキスト生成を処理できません",
+    "image_creation_aborted_error": "既定のモデルが設定されていません:画像作成が中止されました",
+    "video_creation_aborted_error": "既定のモデルが設定されていません:動画作成が中止されました",
+    "audio_creation_aborted_error": "既定のモデルが設定されていません:音声作成が中止されました",
+    "stt_operation_aborted_error": "既定のモデルが設定されていません:STT 操作が中止されました",
+    "tts_operation_aborted_error": "既定のモデルが設定されていません:TTS 操作が中止されました",
+    "deep_research_operation_aborted_error": "既定のモデルが設定されていません:詳細調査が中止されました",
+    "missing_default_models_error": "一部のカテゴリで既定のモデルが不足しています。#10 モデル設定を確認してください",
+    "api_key_empty_name_error": "キー名を空にすることはできません。",
+    "api_key_enter_dialog_prompt": "%s の API キー値を入力してください",
+    "api_key_not_found": "%s:API キーが見つかりません",
+    "api_key_deleted": "%s:API キーを削除しました",
+    "api_key_exists": "%s:API キーは既に存在します",
+    "api_key_modified": "%s:API キーを変更しました。",
+    "api_key_inserted": "%s:API キーを挿入しました",
+    "web_decision_dlg_title": "確認",
+    "web_decision_dlg_message": "確認してください。",
+    "web_decision_dlg_ok": "OK",
+    "web_decision_dlg_cancel": "キャンセル",
+    "web_decision_dlg_close": "閉じる",
+    "demo_anthropic_tool_confirmation_title": "確認",
+    "demo_anthropic_tool_allow": "許可",
+    "demo_anthropic_tool_deny": "拒否",
+    "demo_anthropic_tool_allow_call": "このツール呼び出しを許可しますか?",
+    "demo_anthropic_interrupted_by_user": "ユーザーによって中断されました。",
+    "command_plugin_not_be_null": "プラグインを null にすることはできません",
+    "command_unknown": "不明なコマンド:/%s",
+    "command_action_unknown": "不明なアクション:/%s %s",
+    "command_missing_action": "/%s のアクションがありません",
+    "command_incorrect_number_of_arguments": "/%s %s の引数の数が正しくありません(受信 %d 個)",
+    "command_no_plugin_for": "/%s のプラグインがありません"
+  }
+}

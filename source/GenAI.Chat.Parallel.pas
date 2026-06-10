@@ -1,4 +1,4 @@
-unit GenAI.Chat.Parallel;
+﻿unit GenAI.Chat.Parallel;
 
 {-------------------------------------------------------------------------------
 
@@ -10,18 +10,10 @@ unit GenAI.Chat.Parallel;
 interface
 
 uses
-  System.SysUtils, System.Classes, System.Generics.Collections, System.SyncObjs, System.Threading,
+  System.SysUtils, System.Classes, System.Generics.Collections, System.Threading,
   GenAI.Types, GenAI.Async.Support, GenAI.API.Params;
 
 type
-  /// <summary>
-  /// Represents an item in a bundle of chat prompts and responses.
-  /// </summary>
-  /// <remarks>
-  /// This class stores information about a single chat request, including its index,
-  /// associated prompt, generated response, and related chat object.
-  /// It is used within a <c>TBundleList</c> to manage multiple asynchronous chat requests.
-  /// </remarks>
   TBundleItem = class
   private
     FIndex: Integer;
@@ -34,18 +26,22 @@ type
     /// Gets or sets the index of the item in the bundle.
     /// </summary>
     property Index: Integer read FIndex write FIndex;
+
     /// <summary>
     /// Gets or sets the finishing index of the item after processing.
     /// </summary>
     property FinishIndex: Integer read FFinishIndex write FFinishIndex;
+
     /// <summary>
     /// Gets or sets the prompt associated with this bundle item.
     /// </summary>
     property Prompt: string read FPrompt write FPrompt;
+
     /// <summary>
     /// Gets or sets the response generated for the given prompt.
     /// </summary>
     property Response: string read FResponse write FResponse;
+
     /// <summary>
     /// Gets or sets the chat object associated with this item.
     /// </summary>
@@ -54,6 +50,7 @@ type
     /// including metadata related to the AI-generated response.
     /// </remarks>
     property Chat: TObject read FChat write FChat;
+
     /// <summary>
     /// Destroys the <c>TBundleItem</c> instance and releases associated resources.
     /// </summary>
@@ -63,17 +60,10 @@ type
     destructor Destroy; override;
   end;
 
-  /// <summary>
-  /// Manages a collection of <c>TBundleItem</c> objects.
-  /// </summary>
-  /// <remarks>
-  /// This class provides methods to add, retrieve, and count items in a bundle.
-  /// It is designed to store multiple chat request items processed in parallel.
-  /// The internal storage uses a <c>TObjectList&lt;TBundleItem&gt;</c> with automatic memory management.
-  /// </remarks>
   TBundleList = class
   private
     FItems: TObjectList<TBundleItem>;
+    FLock: TObject;
   public
     /// <summary>
     /// Initializes a new instance of <c>TBundleList</c>.
@@ -83,6 +73,7 @@ type
     /// ensuring that items are automatically freed when the list is destroyed.
     /// </remarks>
     constructor Create;
+
     /// <summary>
     /// Destroys the <c>TBundleList</c> instance and releases all associated resources.
     /// </summary>
@@ -90,6 +81,7 @@ type
     /// This destructor frees all <c>TBundleItem</c> objects stored in the list.
     /// </remarks>
     destructor Destroy; override;
+
     /// <summary>
     /// Adds a new item to the bundle.
     /// </summary>
@@ -104,6 +96,7 @@ type
     /// and adds it to the internal list.
     /// </remarks>
     function Add(const AIndex: Integer): TBundleItem;
+
     /// <summary>
     /// Retrieves an item from the bundle by its index.
     /// </summary>
@@ -117,6 +110,7 @@ type
     /// Raised if the specified index is out of bounds.
     /// </exception>
     function Item(const AIndex: Integer): TBundleItem;
+
     /// <summary>
     /// Gets the total number of items in the bundle.
     /// </summary>
@@ -124,6 +118,7 @@ type
     /// The number of items stored in the bundle.
     /// </returns>
     function Count: Integer;
+
     /// <summary>
     /// Provides direct access to the internal list of <c>TBundleItem</c> objects.
     /// </summary>
@@ -188,14 +183,6 @@ type
     class procedure ContinueWith(const Task: ITask; const NextAction: TProc; const TimeOut: Cardinal = 120000);
   end;
 
-  /// <summary>
-  /// Represents the parameters used for configuring a chat request bundle.
-  /// </summary>
-  /// <remarks>
-  /// This class extends <c>TParameters</c> and provides specific methods for setting chat-related
-  /// parameters, such as prompts, model selection, and reasoning effort.
-  /// It is used to structure and pass multiple requests efficiently in parallel processing.
-  /// </remarks>
   TBundleParams = class(TParameters)
   const
     S_PROMPT = 'prompts';
@@ -216,6 +203,7 @@ type
     /// The current instance of <c>TBundleParams</c> for method chaining.
     /// </returns>
     function Prompts(const Value: TArray<string>): TBundleParams;
+
     /// <summary>
     /// Sets the AI model to be used for processing the chat requests.
     /// </summary>
@@ -226,6 +214,7 @@ type
     /// The current instance of <c>TBundleParams</c> for method chaining.
     /// </returns>
     function Model(const Value: string): TBundleParams;
+
     /// <summary>
     /// Sets the reasoning effort level for the chat requests.
     /// </summary>
@@ -236,6 +225,7 @@ type
     /// The current instance of <c>TBundleParams</c> for method chaining.
     /// </returns>
     function ReasoningEffort(const Value: TReasoningEffort): TBundleParams; overload;
+
     /// <summary>
     /// Sets the reasoning effort level for the chat requests.
     /// </summary>
@@ -246,6 +236,7 @@ type
     /// The current instance of <c>TBundleParams</c> for method chaining.
     /// </returns>
     function ReasoningEffort(const Value: string): TBundleParams; overload;
+
     /// <summary>
     /// Sets the search size parameter for the chat request bundle.
     /// </summary>
@@ -259,6 +250,7 @@ type
     /// The search size parameter is used to control web search.
     /// </remarks>
     function SearchSize(const Value: string): TBundleParams;
+
     /// <summary>
     /// Sets the city parameter to influence web-based search results based on location.
     /// </summary>
@@ -274,6 +266,7 @@ type
     /// generating location-relevant information.
     /// </remarks>
     function City(const Value: string): TBundleParams;
+
     /// <summary>
     /// Sets the country parameter to influence web-based search results based on geographic location.
     /// </summary>
@@ -289,6 +282,7 @@ type
     /// conjunction with the city parameter to provide regional context.
     /// </remarks>
     function Country(const Value: string): TBundleParams;
+
     /// <summary>
     /// Sets the system message for the chat request bundle.
     /// </summary>
@@ -304,22 +298,27 @@ type
     /// of the AI responses, acting as a global directive for the conversation context.
     /// </remarks>
     function System(const Value: string): TBundleParams;
+
     /// <summary>
     /// Returns prompt array
     /// </summary>
     function GetPrompt: TArray<string>;
+
     /// <summary>
     /// Returns system or developer instructions
     /// </summary>
     function GetSystem: string;
+
     /// <summary>
     /// Returns the model name
     /// </summary>
     function GetModel: string;
+
     /// <summary>
     /// Returns reasoning effort for reasoning model
     /// </summary>
     function GetReasoningEffort: string;
+
     /// <summary>
     /// Retrieves the value of the search size parameter used in the chat request bundle.
     /// </summary>
@@ -331,6 +330,7 @@ type
     /// It can be used to adjust the scope of information retrieval, with higher values allowing broader searches.
     /// </remarks>
     function GetSearchSize: string;
+
     /// <summary>
     /// Retrieves the value of the city parameter configured for the chat request bundle.
     /// </summary>
@@ -342,6 +342,7 @@ type
     /// allowing for more accurate and localized results when location relevance is important.
     /// </remarks>
     function GetCity: string;
+
     /// <summary>
     /// Retrieves the configured city parameter used to influence AI responses.
     /// </summary>
@@ -353,6 +354,7 @@ type
     /// based on the specified location. It is especially useful when handling queries with a regional focus.
     /// </remarks>
     function GetCountry: string;
+
     /// <summary>
     /// Initializes a new instance of <c>TBundleParams</c> with default values.
     /// </summary>
@@ -370,31 +372,48 @@ function TBundleList.Add(const AIndex: Integer): TBundleItem;
 begin
   Result := TBundleItem.Create;
   Result.Index := AIndex;
-  FItems.Add(Result);
+  TMonitor.Enter(FLock);
+  try
+    FItems.Add(Result);
+  finally
+    TMonitor.Exit(FLock);
+  end;
 end;
 
 function TBundleList.Count: Integer;
 begin
-  Result := FItems.Count;
+  TMonitor.Enter(FLock);
+  try
+    Result := FItems.Count;
+  finally
+    TMonitor.Exit(FLock);
+  end;
 end;
 
 constructor TBundleList.Create;
 begin
   inherited Create;
+  FLock := TObject.Create;
   FItems := TObjectList<TBundleItem>.Create(True);
 end;
 
 destructor TBundleList.Destroy;
 begin
   FItems.Free;
+  FLock.Free;
   inherited;
 end;
 
 function TBundleList.Item(const AIndex: Integer): TBundleItem;
 begin
-  if (AIndex < 0) or (AIndex > Pred(Count)) then
-    raise Exception.Create('Index out of bounds');
-  Result := FItems.Items[AIndex];
+  TMonitor.Enter(FLock);
+  try
+    if (AIndex < 0) or (AIndex > Pred(FItems.Count)) then
+      raise Exception.Create('Index out of bounds');
+    Result := FItems.Items[AIndex];
+  finally
+    TMonitor.Exit(FLock);
+  end;
 end;
 
 { TTaskHelper }

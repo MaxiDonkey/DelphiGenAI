@@ -1,4 +1,4 @@
-unit GenAI.Batch.Reader;
+﻿unit GenAI.Batch.Reader;
 
 {-------------------------------------------------------------------------------
 
@@ -14,13 +14,6 @@ uses
   REST.JsonReflect, GenAI.API, GenAI.Batch.Interfaces;
 
 type
-  /// <summary>
-  /// Implements the <see cref="IJSONLReader{T}"/> interface for reading and deserializing
-  /// JSONL (JSON Lines) input into a strongly typed array of batch output objects.
-  /// </summary>
-  /// <typeparam name="T">
-  /// The type of the response body object to be deserialized. Must be a class with a parameterless constructor.
-  /// </typeparam>
   TJSONLReader<T: class, constructor> = class(TInterfacedObject, IJSONLReader<T>)
   private
     FInput: string;
@@ -37,6 +30,7 @@ type
     /// An array of deserialized <typeparamref name="TBatchOutput{T}"/> objects.
     /// </returns>
     function Deserialize(const Value: string): TArray<TBatchOutput<T>>;
+
     /// <summary>
     /// Creates an instance of the <see cref="TJSONLReader{T}"/> class.
     /// </summary>

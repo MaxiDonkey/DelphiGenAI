@@ -1,4 +1,4 @@
-unit GenAI.Consts;
+﻿unit GenAI.Consts;
 
 {-------------------------------------------------------------------------------
 
@@ -33,7 +33,7 @@ uses
 
 function IsReasoningModel(const Value: string): Boolean;
 begin
-  Result := IndexStr(Value.Trim.Tolower, ReasoningModels) > -1;
+  Result := IndexStr(Value.Trim.ToLower, ReasoningModels) > -1;
 end;
 
 function MimeTypeToAudioType(const MimeType: string): string;

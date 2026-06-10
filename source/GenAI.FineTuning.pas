@@ -1,4 +1,4 @@
-unit GenAI.FineTuning;
+﻿unit GenAI.FineTuning;
 
 {-------------------------------------------------------------------------------
 
@@ -6,6 +6,10 @@ unit GenAI.FineTuning;
       Visit the Github repository for the documentation and use examples
 
  ------------------------------------------------------------------------------}
+
+interface
+
+{$REGION 'dev note'}
 
 (*
     --- NOTE ---
@@ -112,20 +116,15 @@ unit GenAI.FineTuning;
   when human preferences or subjective criteria are central to your project.
 *)
 
-interface
+{$ENDREGION}
 
 uses
   System.SysUtils, System.Classes, System.Threading, System.JSON, REST.Json.Types,
   REST.JsonReflect,
   GenAI.API.Params, GenAI.API, GenAI.Consts, GenAI.Types, GenAI.Async.Support,
-  GenAI.API.Lists;
+  GenAI.Async.Promise, GenAI.API.Lists;
 
 type
-  /// <summary>
-  /// Represents the configuration parameters for Weights and Biases (WandB) integration
-  /// in fine-tuning jobs. These parameters specify project details, run names, entities,
-  /// and tags associated with WandB.
-  /// </summary>
   TWandbParams = class(TJSONParam)
   public
     /// <summary>
@@ -139,6 +138,7 @@ type
     /// Returns the current instance of <c>TWandbParams</c> to allow method chaining.
     /// </returns>
     function Project(const Value: string): TWandbParams;
+
     /// <summary>
     /// Sets a custom display name for the Weights and Biases run.
     /// If not provided, the fine-tuning job ID will be used as the default name.
@@ -150,6 +150,7 @@ type
     /// Returns the current instance of <c>TWandbParams</c> to allow method chaining.
     /// </returns>
     function Name(const Value: string): TWandbParams;
+
     /// <summary>
     /// Sets the entity (e.g., team or username) to associate with the Weights and Biases run.
     /// If not specified, the default entity for the registered WandB API key is used.
@@ -161,6 +162,7 @@ type
     /// Returns the current instance of <c>TWandbParams</c> to allow method chaining.
     /// </returns>
     function Entity(const Value: string): TWandbParams;
+
     /// <summary>
     /// Attaches tags to the Weights and Biases run. These tags can be used for filtering
     /// and categorizing runs within the WandB interface.
@@ -172,6 +174,7 @@ type
     /// Returns the current instance of <c>TWandbParams</c> to allow method chaining.
     /// </returns>
     function Tags(const Value: TArray<string>): TWandbParams;
+
     /// <summary>
     /// Creates a new instance of <c>TWandbParams</c> with the specified project, name, entity,
     /// and tags pre-configured.
@@ -194,11 +197,6 @@ type
     class function New(const Project, Name, Entity: string; const Tags: TArray<string>): TWandbParams;
   end;
 
-  /// <summary>
-  /// Represents the configuration parameters for integrating external services
-  /// into fine-tuning jobs. This class supports defining the type of integration
-  /// (e.g., Weights and Biases) and its associated configuration details.
-  /// </summary>
   TJobIntegrationParams = class(TJSONParam)
   public
     /// <summary>
@@ -212,6 +210,7 @@ type
     /// Returns the current instance of <c>TJobIntegrationParams</c> to allow method chaining.
     /// </returns>
     function &Type(const Value: string): TJobIntegrationParams;
+
     /// <summary>
     /// Configures the Weights and Biases (WandB) integration for the fine-tuning job
     /// using a pre-defined <c>TWandbParams</c> object.
@@ -224,6 +223,7 @@ type
     /// Returns the current instance of <c>TJobIntegrationParams</c> to allow method chaining.
     /// </returns>
     function Wandb(const Value: TWandbParams): TJobIntegrationParams; overload;
+
     /// <summary>
     /// Configures the Weights and Biases (WandB) integration for the fine-tuning job
     /// using a raw JSON object.
@@ -236,13 +236,9 @@ type
     /// Returns the current instance of <c>TJobIntegrationParams</c> to allow method chaining.
     /// </returns>
     function Wandb(const Value: TJSONObject): TJobIntegrationParams; overload;
+
   end;
 
-  /// <summary>
-  /// Represents the configuration of hyperparameters for fine-tuning jobs.
-  /// This class provides methods to set parameters such as batch size,
-  /// learning rate, number of epochs, and beta (for DPO).
-  /// </summary>
   THyperparametersParams = class(TJSONParam)
   public
     /// <summary>
@@ -257,6 +253,7 @@ type
     /// Returns the current instance of <c>THyperparametersParams</c> to allow method chaining.
     /// </returns>
     function Beta(const Value: Double): THyperparametersParams;
+
     /// <summary>
     /// Sets the batch size for the fine-tuning job. A larger batch size means
     /// model parameters are updated less frequently, but with lower variance.
@@ -268,6 +265,7 @@ type
     /// Returns the current instance of <c>THyperparametersParams</c> to allow method chaining.
     /// </returns>
     function BatchSize(const Value: Integer): THyperparametersParams;
+
     /// <summary>
     /// Sets the learning rate multiplier for the fine-tuning job. A smaller learning
     /// rate may help avoid overfitting, while a larger one speeds up training.
@@ -279,6 +277,7 @@ type
     /// Returns the current instance of <c>THyperparametersParams</c> to allow method chaining.
     /// </returns>
     function LearningRateMultiplier(const Value: Double): THyperparametersParams;
+
     /// <summary>
     /// Sets the number of epochs for the fine-tuning job. An epoch refers to one
     /// full cycle through the training dataset.
@@ -292,10 +291,6 @@ type
     function NEpochs(const Value: Integer): THyperparametersParams;
   end;
 
-  /// <summary>
-  /// Represents the configuration parameters for the supervised fine-tuning method.
-  /// This class allows specifying hyperparameters to be used in supervised learning tasks.
-  /// </summary>
   TSupervisedMethodParams = class(TJSONParam)
   public
     /// <summary>
@@ -311,6 +306,7 @@ type
     /// Returns the current instance of <c>TSupervisedMethodParams</c> to allow method chaining.
     /// </returns>
     function Hyperparameters(const Value: THyperparametersParams): TSupervisedMethodParams;
+
     /// <summary>
     /// Creates a new instance of <c>TSupervisedMethodParams</c> with the specified hyperparameters.
     /// This method simplifies initialization when configuring the supervised method for fine-tuning.
@@ -325,11 +321,6 @@ type
     class function New(const Value: THyperparametersParams): TSupervisedMethodParams;
   end;
 
-  /// <summary>
-  /// Represents the configuration parameters for the DPO (Direct Preference Optimization)
-  /// fine-tuning method. This class allows specifying hyperparameters to be used
-  /// in DPO-based learning tasks.
-  /// </summary>
   TDpoMethodParams = class(TJSONParam)
   public
     /// <summary>
@@ -345,6 +336,7 @@ type
     /// Returns the current instance of <c>TDpoMethodParams</c> to allow method chaining.
     /// </returns>
     function Hyperparameters(const Value: THyperparametersParams): TDpoMethodParams;
+
     /// <summary>
     /// Creates a new instance of <c>TDpoMethodParams</c> with the specified hyperparameters.
     /// This method simplifies initialization when configuring the DPO method for fine-tuning.
@@ -359,11 +351,6 @@ type
     class function New(const Value: THyperparametersParams): TDpoMethodParams;
   end;
 
-  /// <summary>
-  /// Represents the configuration for the fine-tuning method to be used in a job.
-  /// This class supports multiple methods, such as supervised learning or
-  /// Direct Preference Optimization (DPO), and allows setting their respective parameters.
-  /// </summary>
   TJobMethodParams = class(TJSONParam)
   public
     /// <summary>
@@ -376,6 +363,7 @@ type
     /// Returns the current instance of <c>TJobMethodParams</c> to allow method chaining.
     /// </returns>
     function &Type(const Value: string): TJobMethodParams; overload;
+
     /// <summary>
     /// Sets the type of fine-tuning method to use, using the <c>TJobMethodType</c> enumeration.
     /// </summary>
@@ -386,6 +374,7 @@ type
     /// Returns the current instance of <c>TJobMethodParams</c> to allow method chaining.
     /// </returns>
     function &Type(const Value: TJobMethodType): TJobMethodParams; overload;
+
     /// <summary>
     /// Configures the supervised fine-tuning method by setting its hyperparameters.
     /// </summary>
@@ -397,6 +386,7 @@ type
     /// Returns the current instance of <c>TJobMethodParams</c> to allow method chaining.
     /// </returns>
     function Supervised(const Value: TSupervisedMethodParams): TJobMethodParams;
+
     /// <summary>
     /// Configures the DPO (Direct Preference Optimization) fine-tuning method by setting its hyperparameters.
     /// </summary>
@@ -408,6 +398,7 @@ type
     /// Returns the current instance of <c>TJobMethodParams</c> to allow method chaining.
     /// </returns>
     function Dpo(const Value: TDpoMethodParams): TJobMethodParams;
+
     /// <summary>
     /// Creates a new instance of <c>TJobMethodParams</c> configured with a supervised fine-tuning method.
     /// </summary>
@@ -419,6 +410,7 @@ type
     /// A new instance of <c>TJobMethodParams</c> configured for supervised fine-tuning.
     /// </returns>
     class function NewSupervised(const Value: THyperparametersParams): TJobMethodParams;
+
     /// <summary>
     /// Creates a new instance of <c>TJobMethodParams</c> configured with a DPO fine-tuning method.
     /// </summary>
@@ -432,11 +424,6 @@ type
     class function NewDpo(const Value: THyperparametersParams): TJobMethodParams;
   end;
 
-  /// <summary>
-  /// Represents the configuration parameters for creating a fine-tuning job.
-  /// This class allows setting various properties, such as the model to fine-tune,
-  /// training and validation files, hyperparameters, and optional metadata.
-  /// </summary>
   TFineTuningJobParams = class(TJSONParam)
   public
     /// <summary>
@@ -449,6 +436,7 @@ type
     /// Returns the current instance of <c>TFineTuningJobParams</c> to allow method chaining.
     /// </returns>
     function Model(const Value: string): TFineTuningJobParams;
+
     /// <summary>
     /// Sets the file ID of the training dataset to be used for fine-tuning.
     /// The file must be uploaded and formatted as a JSONL file with the purpose "fine-tune".
@@ -460,6 +448,7 @@ type
     /// Returns the current instance of <c>TFineTuningJobParams</c> to allow method chaining.
     /// </returns>
     function TrainingFile(const Value: string): TFineTuningJobParams;
+
     /// <summary>
     /// Sets an optional suffix to be added to the name of the fine-tuned model.
     /// </summary>
@@ -470,6 +459,7 @@ type
     /// Returns the current instance of <c>TFineTuningJobParams</c> to allow method chaining.
     /// </returns>
     function Suffix(const Value: string): TFineTuningJobParams;
+
     /// <summary>
     /// Sets the file ID of the validation dataset to be used for fine-tuning.
     /// The file must be uploaded and formatted as a JSONL file with the purpose "fine-tune".
@@ -481,6 +471,7 @@ type
     /// Returns the current instance of <c>TFineTuningJobParams</c> to allow method chaining.
     /// </returns>
     function ValidationFile(const Value: string): TFineTuningJobParams;
+
     /// <summary>
     /// Configures the integrations (e.g., Weights and Biases) for the fine-tuning job.
     /// </summary>
@@ -491,6 +482,7 @@ type
     /// Returns the current instance of <c>TFineTuningJobParams</c> to allow method chaining.
     /// </returns>
     function Integrations(const Value: TArray<TJobIntegrationParams>): TFineTuningJobParams;
+
     /// <summary>
     /// Sets the random seed for the fine-tuning job to ensure reproducibility.
     /// If not provided, a random seed will be generated.
@@ -502,6 +494,7 @@ type
     /// Returns the current instance of <c>TFineTuningJobParams</c> to allow method chaining.
     /// </returns>
     function Seed(const Value: Integer): TFineTuningJobParams;
+
     /// <summary>
     /// Configures the method and hyperparameters for the fine-tuning job.
     /// </summary>
@@ -513,6 +506,7 @@ type
     /// Returns the current instance of <c>TFineTuningJobParams</c> to allow method chaining.
     /// </returns>
     function Method(const Value: TJobMethodParams): TFineTuningJobParams; overload;
+
     /// <summary>
     /// Configures the method and hyperparameters for the fine-tuning job
     /// by specifying the method type and its corresponding hyperparameters.
@@ -530,11 +524,6 @@ type
     function Method(const AType: TJobMethodType; const Value: THyperparametersParams): TFineTuningJobParams; overload;
   end;
 
-  /// <summary>
-  /// Represents detailed error information for a fine-tuning job that has failed.
-  /// This class contains information about the error code, message, and the parameter
-  /// that caused the failure.
-  /// </summary>
   TFineTuningJobError = class
   private
     FCode: string;
@@ -545,24 +534,18 @@ type
     /// Gets or sets the machine-readable error code.
     /// </summary>
     property Code: string read FCode write FCode;
+
     /// <summary>
     /// Gets or sets the human-readable error message providing details about the error.
     /// </summary>
     property Message: string read FMessage write FMessage;
+
     /// <summary>
     /// Gets or sets the name of the parameter that caused the error, if applicable.
     /// </summary>
     property Param: string read FParam write FParam;
   end;
 
-  /// <summary>
-  /// Represents the hyperparameters used for a fine-tuning job in OpenAI's fine-tuning API.
-  /// </summary>
-  /// <remarks>
-  /// The hyperparameters include options to control the training process, such as the batch size,
-  /// learning rate, number of epochs, and beta (used in specific fine-tuning methods like DPO).
-  /// These parameters allow customization of the model's fine-tuning behavior for optimal performance.
-  /// </remarks>
   THyperparameters = class
   private
     FBeta: Variant;
@@ -581,6 +564,7 @@ type
     /// the policy and reference model in DPO fine-tuning.
     /// </remarks>
     property Beta: Variant read FBeta write FBeta;
+
     /// <summary>
     /// Gets or sets the batch size for the fine-tuning job.
     /// </summary>
@@ -589,6 +573,7 @@ type
     /// but decreases the variance in parameter updates.
     /// </remarks>
     property BatchSize: Variant read FBatchSize write FBatchSize;
+
     /// <summary>
     /// Gets or sets the learning rate multiplier for the fine-tuning job.
     /// </summary>
@@ -597,6 +582,7 @@ type
     /// to control the magnitude of parameter updates.
     /// </value>
     property LearningRateMultiplier: Variant read FLearningRateMultiplier write FLearningRateMultiplier;
+
     /// <summary>
     /// Gets or sets the number of epochs for the fine-tuning job.
     /// </summary>
@@ -607,13 +593,6 @@ type
     property NEpochs: Variant read FNEpochs write FNEpochs;
   end;
 
-  /// <summary>
-  /// Represents the configuration for integrating with Weights and Biases (WandB) in a fine-tuning job.
-  /// </summary>
-  /// <remarks>
-  /// This class provides methods to set project details, display names, entities, and tags
-  /// for runs tracked in WandB during the fine-tuning process.
-  /// </remarks>
   TWanDB = class
   private
     FProject: string;
@@ -631,6 +610,7 @@ type
     /// The updated instance of the <c>TWanDB</c> class.
     /// </returns>
     property Project: string read FProject write FProject;
+
     /// <summary>
     /// Gets or sets the display name for the run in WandB.
     /// </summary>
@@ -641,6 +621,7 @@ type
     /// The updated instance of the <c>TWanDB</c> class.
     /// </returns>
     property Name: string read FName write FName;
+
     /// <summary>
     /// Gets or sets the entity (team or username) associated with the WandB run.
     /// </summary>
@@ -652,6 +633,7 @@ type
     /// The updated instance of the <c>TWanDB</c> class.
     /// </returns>
     property Entity: string read FEntity write FEntity;
+
     /// <summary>
     /// Gets or sets the tags to be attached to the WandB run.
     /// </summary>
@@ -665,14 +647,6 @@ type
     property Tags: TArray<string> read FTags write FTags;
   end;
 
-  /// <summary>
-  /// Represents the integration settings for a fine-tuning job, including integration with tools
-  /// like Weights and Biases (WandB).
-  /// </summary>
-  /// <remarks>
-  /// This class allows configuration of the type of integration and specific settings for each tool,
-  /// such as WandB.
-  /// </remarks>
   FineTuningJobIntegration = class
   private
     FType: string;
@@ -685,6 +659,7 @@ type
     /// A string representing the integration type, such as "wandb".
     /// </remarks>
     property &Type: string read FType write FType;
+
     /// <summary>
     /// Gets or sets the configuration for the Weights and Biases (WandB) integration.
     /// </summary>
@@ -693,15 +668,10 @@ type
     /// tags, and entity.
     /// </remarks>
     property Wandb: TWanDB read FWandb write FWandb;
+
     destructor Destroy; override;
   end;
 
-  /// <summary>
-  /// Represents the configuration for supervised fine-tuning in a fine-tuning job.
-  /// </summary>
-  /// <remarks>
-  /// This class contains the hyperparameters that define the supervised fine-tuning process.
-  /// </remarks>
   TSupervised = class
   private
     FHyperparameters: THyperparameters;
@@ -714,16 +684,10 @@ type
     /// batch size, learning rate, and number of epochs.
     /// </remarks>
     property Hyperparameters: THyperparameters read FHyperparameters write FHyperparameters;
+
     destructor Destroy; override;
   end;
 
-  /// <summary>
-  /// Represents the configuration for the DPO (Direct Preference Optimization) fine-tuning method
-  /// in a fine-tuning job.
-  /// </summary>
-  /// <remarks>
-  /// This class contains the hyperparameters that define the DPO fine-tuning process.
-  /// </remarks>
   TDpo = class
   private
     FHyperparameters: THyperparameters;
@@ -736,16 +700,10 @@ type
     /// beta, batch size, learning rate, and number of epochs.
     /// </remarks>
     property Hyperparameters: THyperparameters read FHyperparameters write FHyperparameters;
+
     destructor Destroy; override;
   end;
 
-  /// <summary>
-  /// Represents the method configuration for fine-tuning in a fine-tuning job.
-  /// </summary>
-  /// <remarks>
-  /// This class defines the type of fine-tuning method (e.g., supervised or DPO) and includes the
-  /// specific configurations for each method.
-  /// </remarks>
   TFineTuningMethod = class
   private
     [JsonReflectAttribute(ctString, rtString, TJobMethodTypeInterceptor)]
@@ -760,6 +718,7 @@ type
     /// A value of type <c>TJobMethodType</c> that specifies whether the method is "supervised" or "dpo".
     /// </remarks>
     property &Type: TJobMethodType read FType write FType;
+
     /// <summary>
     /// Gets or sets the configuration for supervised fine-tuning.
     /// </summary>
@@ -768,6 +727,7 @@ type
     /// fine-tuning.
     /// </remarks>
     property Supervised: TSupervised read FSupervised write FSupervised;
+
     /// <summary>
     /// Gets or sets the configuration for DPO (Direct Preference Optimization) fine-tuning.
     /// </summary>
@@ -775,25 +735,20 @@ type
     /// An instance of the <c>TDpo</c> class containing the hyperparameters for DPO fine-tuning.
     /// </remarks>
     property Dpo: TDpo read FDpo write FDpo;
+
     destructor Destroy; override;
   end;
 
-  /// <summary>
-  /// Represents a fine-tuning job in OpenAI's fine-tuning API.
-  /// </summary>
-  /// <remarks>
-  /// This class contains details about a fine-tuning job, including its status, configuration, and results.
-  /// </remarks>
   TFineTuningJob = class(TJSONFingerprint)
   private
     FId: string;
     [JsonNameAttribute('created_at')]
-    FCreatedAt: TInt64OrNull;
+    FCreatedAt: Int64;
     FError: TFineTuningJobError;
     [JsonNameAttribute('fine_tuned_model')]
     FFineTunedModel: string;
     [JsonNameAttribute('finished_at')]
-    FFinishedAt: TInt64OrNull;
+    FFinishedAt: Int64;
     FHyperparameters: THyperparameters;
     FModel: string;
     FObject: string;
@@ -812,7 +767,7 @@ type
     FIntegrations: TArray<FineTuningJobIntegration>;
     FSeed: Int64;
     [JsonNameAttribute('estimated_finish')]
-    FEstimatedFinish: TInt64OrNull;
+    FEstimatedFinish: Int64;
     FMethod: TFineTuningMethod;
   private
     function GetCreatedAtAsString: string;
@@ -829,6 +784,7 @@ type
     /// A string representing the fine-tuning job's ID.
     /// </remarks>
     property Id: string read FId write FId;
+
     /// <summary>
     /// Gets the creation timestamp of the fine-tuning job in Unix format (seconds).
     /// </summary>
@@ -836,6 +792,7 @@ type
     /// A 64-bit integer representing the creation time of the job.
     /// </remarks>
     property CreatedAt: Int64 read GetCreatedAt;
+
     /// <summary>
     /// Gets the creation timestamp of the fine-tuning job as a human-readable string.
     /// </summary>
@@ -843,6 +800,7 @@ type
     /// A string representation of the job's creation timestamp.
     /// </remarks>
     property CreatedAtAsString: string read GetCreatedAtAsString;
+
     /// <summary>
     /// Gets or sets the error details, if the fine-tuning job has failed.
     /// </summary>
@@ -850,6 +808,7 @@ type
     /// An instance of <c>TFineTuningJobError</c> containing error information, or <c>nil</c> if no error occurred.
     /// </remarks>
     property Error: TFineTuningJobError read FError write FError;
+
     /// <summary>
     /// Gets or sets the name of the fine-tuned model created by this job.
     /// </summary>
@@ -857,6 +816,7 @@ type
     /// A string representing the name of the fine-tuned model, or <c>nil</c> if the job is not complete.
     /// </remarks>
     property FineTunedModel: string read FFineTunedModel write FFineTunedModel;
+
     /// <summary>
     /// Gets or sets the completion timestamp of the fine-tuning job in Unix format (seconds).
     /// </summary>
@@ -864,6 +824,7 @@ type
     /// A 64-bit integer representing the completion time of the job, or <c>nil</c> if the job is still running.
     /// </remarks>
     property FinishedAt: Int64 read GetFinishedAt;
+
     /// <summary>
     /// Gets the completion timestamp of the fine-tuning job as a human-readable string.
     /// </summary>
@@ -871,6 +832,7 @@ type
     /// A string representation of the job's completion timestamp.
     /// </remarks>
     property FinishedAtAsString: string read GetFinishedAtAsString;
+
     /// <summary>
     /// Gets or sets the hyperparameters used in the fine-tuning job.
     /// </summary>
@@ -878,6 +840,7 @@ type
     /// An instance of the <c>THyperparameters</c> class containing the hyperparameter configuration.
     /// </remarks>
     property Hyperparameters: THyperparameters read FHyperparameters write FHyperparameters;
+
     /// <summary>
     /// Gets or sets the base model being fine-tuned.
     /// </summary>
@@ -885,6 +848,7 @@ type
     /// A string representing the name of the base model.
     /// </remarks>
     property Model: string read FModel write FModel;
+
     /// <summary>
     /// Gets or sets the object type for the fine-tuning job.
     /// </summary>
@@ -892,6 +856,7 @@ type
     /// A string that always indicates the type of this object, typically "fine_tuning.job".
     /// </remarks>
     property &Object: string read FObject write FObject;
+
     /// <summary>
     /// Gets or sets the organization ID associated with the fine-tuning job.
     /// </summary>
@@ -899,6 +864,7 @@ type
     /// A string representing the organization ID.
     /// </remarks>
     property OrganizationId: string read FOrganizationId write FOrganizationId;
+
     /// <summary>
     /// Gets or sets the list of result file IDs generated by the fine-tuning job.
     /// </summary>
@@ -906,6 +872,7 @@ type
     /// An array of strings containing the IDs of the result files.
     /// </remarks>
     property ResultFiles: TArray<string> read FResultFiles write FResultFiles;
+
     /// <summary>
     /// Gets or sets the current status of the fine-tuning job.
     /// </summary>
@@ -913,6 +880,7 @@ type
     /// A value of type <c>TFineTunedStatus</c> representing the job's status (e.g., running, succeeded, failed).
     /// </remarks>
     property Status: TFineTunedStatus read FStatus write FStatus;
+
     /// <summary>
     /// Gets or sets the total number of billable tokens processed by this fine-tuning job.
     /// </summary>
@@ -920,6 +888,7 @@ type
     /// A 64-bit integer representing the total tokens processed, or <c>nil</c> if the job is still running.
     /// </remarks>
     property TrainedTokens: Int64 read FTrainedTokens write FTrainedTokens;
+
     /// <summary>
     /// Gets or sets the file ID used for training data in the fine-tuning job.
     /// </summary>
@@ -927,6 +896,7 @@ type
     /// A string representing the training file ID.
     /// </remarks>
     property TrainingFile: string read FTrainingFile write FTrainingFile;
+
     /// <summary>
     /// Gets or sets the file ID used for validation data in the fine-tuning job.
     /// </summary>
@@ -934,6 +904,7 @@ type
     /// A string representing the validation file ID, or <c>nil</c> if no validation file was provided.
     /// </remarks>
     property ValidationFile: string read FValidationFile write FValidationFile;
+
     /// <summary>
     /// Gets or sets the list of integrations enabled for the fine-tuning job.
     /// </summary>
@@ -941,6 +912,7 @@ type
     /// An array of <c>FineTuningJobIntegration</c> instances representing the enabled integrations.
     /// </remarks>
     property Integrations: TArray<FineTuningJobIntegration> read FIntegrations write FIntegrations;
+
     /// <summary>
     /// Gets or sets the random seed used for the fine-tuning job.
     /// </summary>
@@ -948,6 +920,7 @@ type
     /// A 64-bit integer representing the seed value.
     /// </remarks>
     property Seed: Int64 read FSeed write FSeed;
+
     /// <summary>
     /// Gets the estimated completion time for the fine-tuning job in Unix format (seconds).
     /// </summary>
@@ -955,6 +928,7 @@ type
     /// A 64-bit integer representing the estimated finish time, or <c>nil</c> if the job is not running.
     /// </remarks>
     property EstimatedFinish: Int64 read GetEstimatedFinish;
+
     /// <summary>
     /// Gets the estimated completion time of the fine-tuning job as a human-readable string.
     /// </summary>
@@ -962,6 +936,7 @@ type
     /// A string representation of the job's estimated finish time.
     /// </remarks>
     property EstimatedFinishAsString: string read GetEstimatedFinishAsString;
+
     /// <summary>
     /// Gets or sets the method configuration for the fine-tuning job.
     /// </summary>
@@ -969,6 +944,7 @@ type
     /// An instance of the <c>TFineTuningMethod</c> class containing the method configuration.
     /// </remarks>
     property Method: TFineTuningMethod read FMethod write FMethod;
+
     destructor Destroy; override;
   end;
 
@@ -985,19 +961,12 @@ type
   public
   end;
 
-  /// <summary>
-  /// Represents an event associated with a fine-tuning job in OpenAI's fine-tuning API.
-  /// </summary>
-  /// <remarks>
-  /// This class provides information about a specific event, including its type, timestamp,
-  /// message, and associated data.
-  /// </remarks>
   TJobEvent = class
   private
     FObject: string;
     FId: string;
     [JsonNameAttribute('created_at')]
-    FCreatedAt: TInt64OrNull;
+    FCreatedAt: Int64;
     FLevel: string;
     FMessage: string;
     FType: string;
@@ -1013,6 +982,7 @@ type
     /// A string that always has the value "fine_tuning.job.event".
     /// </remarks>
     property &Object: string read FObject write FObject;
+
     /// <summary>
     /// Gets or sets the unique identifier for the event.
     /// </summary>
@@ -1020,6 +990,7 @@ type
     /// A string representing the event's unique ID.
     /// </remarks>
     property Id: string read FId write FId;
+
     /// <summary>
     /// Gets the timestamp when the event was created, in Unix format (seconds).
     /// </summary>
@@ -1027,6 +998,7 @@ type
     /// A 64-bit integer representing the event's creation time.
     /// </remarks>
     property CreatedAt: Int64 read GetCreatedAt;
+
     /// <summary>
     /// Gets the creation timestamp of the event as a human-readable string.
     /// </summary>
@@ -1034,6 +1006,7 @@ type
     /// A string representation of the event's creation timestamp.
     /// </remarks>
     property CreatedAtAsString: string read GetCreatedAtAsString;
+
     /// <summary>
     /// Gets or sets the log level of the event.
     /// </summary>
@@ -1041,6 +1014,7 @@ type
     /// A string indicating the log level (e.g., "info", "warning", "error").
     /// </remarks>
     property Level: string read FLevel write FLevel;
+
     /// <summary>
     /// Gets or sets the message associated with the event.
     /// </summary>
@@ -1048,6 +1022,7 @@ type
     /// A string containing a human-readable description of the event.
     /// </remarks>
     property Message: string read FMessage write FMessage;
+
     /// <summary>
     /// Gets or sets the type of the event.
     /// </summary>
@@ -1055,6 +1030,7 @@ type
     /// A string describing the event type (e.g., "status", "metrics").
     /// </remarks>
     property &Type: string read FType write FType;
+
     /// <summary>
     /// Gets or sets the additional data associated with the event.
     /// </summary>
@@ -1062,6 +1038,7 @@ type
     /// An instance of <c>TEventData</c> containing event-specific data, or <c>nil</c> if no data is available.
     /// </remarks>
     property Data: TEventData read FData write FData;
+
     destructor Destroy; override;
   end;
 
@@ -1074,13 +1051,6 @@ type
   /// </remarks>
   TJobEvents = TPaginatedList<TJobEvent>;
 
-  /// <summary>
-  /// Represents the metrics collected during a fine-tuning job in OpenAI's fine-tuning API.
-  /// </summary>
-  /// <remarks>
-  /// This class contains various metrics related to the training and validation process,
-  /// including loss values and token accuracy.
-  /// </remarks>
   TMetrics = class
   private
     FStep: Double;
@@ -1104,6 +1074,7 @@ type
     /// A double representing the step at which the metrics were collected.
     /// </remarks>
     property Step: Double read FStep write FStep;
+
     /// <summary>
     /// Gets or sets the training loss at the specified step.
     /// </summary>
@@ -1111,6 +1082,7 @@ type
     /// A double representing the loss value calculated from the training dataset.
     /// </remarks>
     property TrainLoss: Double read FTrainLoss write FTrainLoss;
+
     /// <summary>
     /// Gets or sets the mean token accuracy during training at the specified step.
     /// </summary>
@@ -1118,6 +1090,7 @@ type
     /// A double representing the average accuracy of tokens processed during training.
     /// </remarks>
     property TrainMeanTokenAccuracy: Double read FTrainMeanTokenAccuracy write FTrainMeanTokenAccuracy;
+
     /// <summary>
     /// Gets or sets the validation loss at the specified step.
     /// </summary>
@@ -1125,6 +1098,7 @@ type
     /// A double representing the loss value calculated from the validation dataset.
     /// </remarks>
     property ValidLoss: Double read FValidLoss write FValidLoss;
+
     /// <summary>
     /// Gets or sets the mean token accuracy during validation at the specified step.
     /// </summary>
@@ -1132,6 +1106,7 @@ type
     /// A double representing the average accuracy of tokens processed during validation.
     /// </remarks>
     property ValidMeanTokenAccuracy: Double read FValidMeanTokenAccuracy write FValidMeanTokenAccuracy;
+
     /// <summary>
     /// Gets or sets the full validation loss at the specified step.
     /// </summary>
@@ -1139,6 +1114,7 @@ type
     /// A double representing the loss value calculated from the entire validation dataset.
     /// </remarks>
     property FullValidLoss: Double read FFullValidLoss write FFullValidLoss;
+
     /// <summary>
     /// Gets or sets the mean token accuracy over the entire validation dataset at the specified step.
     /// </summary>
@@ -1148,18 +1124,11 @@ type
     property FullValidMeanTokenAccuracy: Double read FFullValidMeanTokenAccuracy write FFullValidMeanTokenAccuracy;
   end;
 
-  /// <summary>
-  /// Represents a model checkpoint for a fine-tuning job in OpenAI's fine-tuning API.
-  /// </summary>
-  /// <remarks>
-  /// This class contains details about a specific checkpoint, including the step number, metrics,
-  /// and the fine-tuned model checkpoint identifier.
-  /// </remarks>
   TJobCheckpoint = class
   private
     FId: string;
     [JsonNameAttribute('created_at')]
-    FCreatedAt: TInt64OrNull;
+    FCreatedAt: Int64;
     [JsonNameAttribute('fine_tuned_model_checkpoint')]
     FFineTunedModelCheckpoint: string;
     [JsonNameAttribute('step_number')]
@@ -1179,6 +1148,7 @@ type
     /// A string representing the checkpoint's unique ID.
     /// </remarks>
     property Id: string read FId write FId;
+
     /// <summary>
     /// Gets the timestamp when the checkpoint was created, in Unix format (seconds).
     /// </summary>
@@ -1186,6 +1156,7 @@ type
     /// A 64-bit integer representing the checkpoint's creation time.
     /// </remarks>
     property CreatedAt: Int64 read GetCreatedAt;
+
     /// <summary>
     /// Gets the creation timestamp of the checkpoint as a human-readable string.
     /// </summary>
@@ -1193,6 +1164,7 @@ type
     /// A string representation of the checkpoint's creation timestamp.
     /// </remarks>
     property CreatedAtAsString: string read GetCreatedAtAsString;
+
     /// <summary>
     /// Gets or sets the identifier of the fine-tuned model checkpoint.
     /// </summary>
@@ -1200,6 +1172,7 @@ type
     /// A string representing the name of the fine-tuned model checkpoint.
     /// </remarks>
     property FineTunedModelCheckpoint: string read FFineTunedModelCheckpoint write FFineTunedModelCheckpoint;
+
     /// <summary>
     /// Gets or sets the step number when this checkpoint was created.
     /// </summary>
@@ -1207,6 +1180,7 @@ type
     /// A 64-bit integer representing the step number at which the checkpoint was generated.
     /// </remarks>
     property StepNumber: Int64 read FStepNumber write FStepNumber;
+
     /// <summary>
     /// Gets or sets the metrics recorded at the checkpoint's step.
     /// </summary>
@@ -1214,6 +1188,7 @@ type
     /// An instance of <c>TMetrics</c> containing metrics such as training loss and accuracy.
     /// </remarks>
     property Metrics: TMetrics read FMetrics write FMetrics;
+
     /// <summary>
     /// Gets or sets the ID of the fine-tuning job associated with this checkpoint.
     /// </summary>
@@ -1221,6 +1196,7 @@ type
     /// A string representing the ID of the fine-tuning job that generated this checkpoint.
     /// </remarks>
     property FineTuningJobId: string read FFineTuningJobId write FFineTuningJobId;
+
     /// <summary>
     /// Gets or sets the object type of the checkpoint.
     /// </summary>
@@ -1228,6 +1204,7 @@ type
     /// A string that always has the value "fine_tuning.job.checkpoint".
     /// </remarks>
     property &Object: string read FObject write FObject;
+
     destructor Destroy; override;
   end;
 
@@ -1281,137 +1258,108 @@ type
   TAsynJobCheckpoints = TAsynCallBack<TJobCheckpoints>;
 
   /// <summary>
-  /// Provides methods to interact with the OpenAI fine-tuning API routes.
+  /// Promise-based callback for asynchronous operations returning a <c>TFineTuningJob</c>.
   /// </summary>
-  /// <remarks>
-  /// This class includes methods for creating, retrieving, listing, canceling, and managing fine-tuning jobs,
-  /// as well as accessing associated events and checkpoints.
-  /// </remarks>
-  TFineTuningRoute = class(TGenAIRoute)
-    /// <summary>
-    /// Asynchronously creates a new fine-tuning job with the specified parameters.
-    /// </summary>
-    /// <param name="ParamProc">
-    /// A procedure that sets the parameters for the fine-tuning job.
-    /// </param>
-    /// <param name="CallBacks">
-    /// A function that defines the asynchronous callback behavior.
-    /// </param>
-    /// <remarks>
-    /// This method initiates a fine-tuning job creation and invokes the provided callbacks when complete.
-    /// </remarks>
+  TPromiseFineTuningJob = TPromiseCallBack<TFineTuningJob>;
+
+  /// <summary>
+  /// Promise-based callback for asynchronous operations returning a <c>TFineTuningJobs</c> collection.
+  /// </summary>
+  TPromiseFineTuningJobs = TPromiseCallBack<TFineTuningJobs>;
+
+  /// <summary>
+  /// Promise-based callback for asynchronous operations returning a <c>TJobEvents</c> collection.
+  /// </summary>
+  TPromiseJobEvents = TPromiseCallBack<TJobEvents>;
+
+  /// <summary>
+  /// Promise-based callback for asynchronous operations returning a <c>TJobCheckpoints</c> collection.
+  /// </summary>
+  TPromiseJobCheckpoints = TPromiseCallBack<TJobCheckpoints>;
+
+  TFineTuningAbstractSupport = class(TGenAIRoute)
+  protected
+    function Create(const ParamProc: TProc<TFineTuningJobParams>): TFineTuningJob; virtual; abstract;
+    function Cancel(const JobId: string): TFineTuningJob; virtual; abstract;
+    function List: TFineTuningJobs; overload; virtual; abstract;
+    function List(const ParamProc: TProc<TUrlPaginationParams>): TFineTuningJobs; overload; virtual; abstract;
+    function Events(const JobId: string): TJobEvents; overload; virtual; abstract;
+    function Events(const JobId: string; const ParamProc: TProc<TUrlPaginationParams>): TJobEvents; overload; virtual; abstract;
+    function Checkpoints(const JobId: string): TJobCheckpoints; overload; virtual; abstract;
+    function Checkpoints(const JobId: string; const ParamProc: TProc<TUrlPaginationParams>): TJobCheckpoints; overload; virtual; abstract;
+    function Retrieve(const JobId: string): TFineTuningJob; virtual; abstract;
+  end;
+
+  TFineTuningAsynchronousSupport = class(TFineTuningAbstractSupport)
+  public
     procedure AsynCreate(const ParamProc: TProc<TFineTuningJobParams>; const CallBacks: TFunc<TAsynFineTuningJob>);
-    /// <summary>
-    /// Asynchronously cancels a running fine-tuning job.
-    /// </summary>
-    /// <param name="JobId">
-    /// The ID of the fine-tuning job to cancel.
-    /// </param>
-    /// <param name="CallBacks">
-    /// A function that defines the asynchronous callback behavior.
-    /// </param>
-    /// <remarks>
-    /// This method cancels a fine-tuning job and invokes the provided callbacks when complete.
-    /// </remarks>
     procedure AsynCancel(const JobId: string; const CallBacks: TFunc<TAsynFineTuningJob>);
-    /// <summary>
-    /// Asynchronously retrieves a list of fine-tuning jobs.
-    /// </summary>
-    /// <param name="CallBacks">
-    /// A function that defines the asynchronous callback behavior.
-    /// </param>
-    /// <remarks>
-    /// This method retrieves all fine-tuning jobs associated with the account and invokes the callbacks when complete.
-    /// </remarks>
     procedure AsynList(const CallBacks: TFunc<TAsynFineTuningJobs>); overload;
-    /// <summary>
-    /// Asynchronously retrieves a list of fine-tuning jobs with additional query parameters.
-    /// </summary>
-    /// <param name="ParamProc">
-    /// A procedure to define query parameters such as pagination.
-    /// </param>
-    /// <param name="CallBacks">
-    /// A function that defines the asynchronous callback behavior.
-    /// </param>
-    /// <remarks>
-    /// This method retrieves fine-tuning jobs using the specified parameters and invokes the callbacks when complete.
-    /// </remarks>
     procedure AsynList(const ParamProc: TProc<TUrlPaginationParams>; const CallBacks: TFunc<TAsynFineTuningJobs>); overload;
-    /// <summary>
-    /// Asynchronously retrieves events for a specific fine-tuning job.
-    /// </summary>
-    /// <param name="JobId">
-    /// The ID of the fine-tuning job for which events are being retrieved.
-    /// </param>
-    /// <param name="CallBacks">
-    /// A function that defines the asynchronous callback behavior.
-    /// </param>
-    /// <remarks>
-    /// This method retrieves status updates and events for the specified fine-tuning job.
-    /// </remarks>
     procedure AsynEvents(const JobId: string; const CallBacks: TFunc<TAsynJobEvents>); overload;
-    /// <summary>
-    /// Asynchronously retrieves events for a specific fine-tuning job with additional query parameters.
-    /// </summary>
-    /// <param name="JobId">
-    /// The ID of the fine-tuning job for which events are being retrieved.
-    /// </param>
-    /// <param name="ParamProc">
-    /// A procedure to define query parameters such as pagination.
-    /// </param>
-    /// <param name="CallBacks">
-    /// A function that defines the asynchronous callback behavior.
-    /// </param>
-    /// <remarks>
-    /// This method retrieves status updates and events for the specified fine-tuning job
-    /// with additional parameters for customization.
-    /// </remarks>
     procedure AsynEvents(const JobId: string; const ParamProc: TProc<TUrlPaginationParams>;
       const CallBacks: TFunc<TAsynJobEvents>); overload;
-    /// <summary>
-    /// Asynchronously retrieves checkpoints for a specific fine-tuning job.
-    /// </summary>
-    /// <param name="JobId">
-    /// The ID of the fine-tuning job for which checkpoints are being retrieved.
-    /// </param>
-    /// <param name="CallBacks">
-    /// A function that defines the asynchronous callback behavior.
-    /// </param>
-    /// <remarks>
-    /// This method retrieves checkpoints generated during the specified fine-tuning job.
-    /// </remarks>
     procedure AsynCheckpoints(const JobId: string; const CallBacks: TFunc<TAsynJobCheckpoints>); overload;
-    /// <summary>
-    /// Asynchronously retrieves checkpoints for a specific fine-tuning job with additional query parameters.
-    /// </summary>
-    /// <param name="JobId">
-    /// The ID of the fine-tuning job for which checkpoints are being retrieved.
-    /// </param>
-    /// <param name="ParamProc">
-    /// A procedure to define query parameters such as pagination.
-    /// </param>
-    /// <param name="CallBacks">
-    /// A function that defines the asynchronous callback behavior.
-    /// </param>
-    /// <remarks>
-    /// This method retrieves checkpoints generated during the specified fine-tuning job
-    /// with additional parameters for customization.
-    /// </remarks>
     procedure AsynCheckpoints(const JobId: string; const ParamProc: TProc<TUrlPaginationParams>;
       const CallBacks: TFunc<TAsynJobCheckpoints>); overload;
-    /// <summary>
-    /// Asynchronously retrieves details about a specific fine-tuning job.
-    /// </summary>
-    /// <param name="JobId">
-    /// The ID of the fine-tuning job to retrieve.
-    /// </param>
-    /// <param name="CallBacks">
-    /// A function that defines the asynchronous callback behavior.
-    /// </param>
-    /// <remarks>
-    /// This method retrieves details about the specified fine-tuning job and invokes the callbacks when complete.
-    /// </remarks>
     procedure AsynRetrieve(const JobId: string; const CallBacks: TFunc<TAsynFineTuningJob>);
+  end;
+
+  TFineTuningRoute = class(TFineTuningAsynchronousSupport)
+  public
+    /// <summary>
+    /// Asynchronously creates a new fine-tuning job and returns a promise that resolves with the result.
+    /// </summary>
+    function AsyncAwaitCreate(const ParamProc: TProc<TFineTuningJobParams>;
+      const CallBacks: TFunc<TPromiseFineTuningJob> = nil): TPromise<TFineTuningJob>;
+
+    /// <summary>
+    /// Asynchronously cancels a running fine-tuning job and returns a promise that resolves with the updated job.
+    /// </summary>
+    function AsyncAwaitCancel(const JobId: string;
+      const CallBacks: TFunc<TPromiseFineTuningJob> = nil): TPromise<TFineTuningJob>;
+
+    /// <summary>
+    /// Asynchronously retrieves the list of fine-tuning jobs and returns a promise that resolves with the collection.
+    /// </summary>
+    function AsyncAwaitList(const CallBacks: TFunc<TPromiseFineTuningJobs> = nil): TPromise<TFineTuningJobs>; overload;
+
+    /// <summary>
+    /// Asynchronously retrieves the list of fine-tuning jobs with query parameters and returns a promise.
+    /// </summary>
+    function AsyncAwaitList(const ParamProc: TProc<TUrlPaginationParams>;
+      const CallBacks: TFunc<TPromiseFineTuningJobs> = nil): TPromise<TFineTuningJobs>; overload;
+
+    /// <summary>
+    /// Asynchronously retrieves events for a fine-tuning job and returns a promise that resolves with the collection.
+    /// </summary>
+    function AsyncAwaitEvents(const JobId: string;
+      const CallBacks: TFunc<TPromiseJobEvents> = nil): TPromise<TJobEvents>; overload;
+
+    /// <summary>
+    /// Asynchronously retrieves events for a fine-tuning job with query parameters and returns a promise.
+    /// </summary>
+    function AsyncAwaitEvents(const JobId: string; const ParamProc: TProc<TUrlPaginationParams>;
+      const CallBacks: TFunc<TPromiseJobEvents> = nil): TPromise<TJobEvents>; overload;
+
+    /// <summary>
+    /// Asynchronously retrieves checkpoints for a fine-tuning job and returns a promise that resolves with the collection.
+    /// </summary>
+    function AsyncAwaitCheckpoints(const JobId: string;
+      const CallBacks: TFunc<TPromiseJobCheckpoints> = nil): TPromise<TJobCheckpoints>; overload;
+
+    /// <summary>
+    /// Asynchronously retrieves checkpoints for a fine-tuning job with query parameters and returns a promise.
+    /// </summary>
+    function AsyncAwaitCheckpoints(const JobId: string; const ParamProc: TProc<TUrlPaginationParams>;
+      const CallBacks: TFunc<TPromiseJobCheckpoints> = nil): TPromise<TJobCheckpoints>; overload;
+
+    /// <summary>
+    /// Asynchronously retrieves details about a fine-tuning job and returns a promise that resolves with the job.
+    /// </summary>
+    function AsyncAwaitRetrieve(const JobId: string;
+      const CallBacks: TFunc<TPromiseFineTuningJob> = nil): TPromise<TFineTuningJob>;
+
     /// <summary>
     /// Creates a new fine-tuning job with the specified parameters.
     /// </summary>
@@ -1424,7 +1372,8 @@ type
     /// <remarks>
     /// This method synchronously creates a fine-tuning job and returns the job details.
     /// </remarks>
-    function Create(const ParamProc: TProc<TFineTuningJobParams>): TFineTuningJob;
+    function Create(const ParamProc: TProc<TFineTuningJobParams>): TFineTuningJob; override;
+
     /// <summary>
     /// Cancels a running fine-tuning job.
     /// </summary>
@@ -1437,7 +1386,8 @@ type
     /// <remarks>
     /// This method synchronously cancels the specified fine-tuning job.
     /// </remarks>
-    function Cancel(const JobId: string): TFineTuningJob;
+    function Cancel(const JobId: string): TFineTuningJob; override;
+
     /// <summary>
     /// Retrieves a list of fine-tuning jobs.
     /// </summary>
@@ -1447,7 +1397,8 @@ type
     /// <remarks>
     /// This method synchronously retrieves all fine-tuning jobs associated with the account.
     /// </remarks>
-    function List: TFineTuningJobs; overload;
+    function List: TFineTuningJobs; overload; override;
+
     /// <summary>
     /// Retrieves a list of fine-tuning jobs with additional query parameters.
     /// </summary>
@@ -1460,7 +1411,8 @@ type
     /// <remarks>
     /// This method synchronously retrieves fine-tuning jobs using the specified parameters.
     /// </remarks>
-    function List(const ParamProc: TProc<TUrlPaginationParams>): TFineTuningJobs; overload;
+    function List(const ParamProc: TProc<TUrlPaginationParams>): TFineTuningJobs; overload; override;
+
     /// <summary>
     /// Retrieves events for a specific fine-tuning job.
     /// </summary>
@@ -1473,7 +1425,8 @@ type
     /// <remarks>
     /// This method synchronously retrieves status updates and events for the specified fine-tuning job.
     /// </remarks>
-    function Events(const JobId: string): TJobEvents; overload;
+    function Events(const JobId: string): TJobEvents; overload; override;
+
     /// <summary>
     /// Retrieves events for a specific fine-tuning job with additional query parameters.
     /// </summary>
@@ -1490,7 +1443,8 @@ type
     /// This method synchronously retrieves status updates and events for the specified fine-tuning job
     /// with additional parameters for customization.
     /// </remarks>
-    function Events(const JobId: string; const ParamProc: TProc<TUrlPaginationParams>): TJobEvents; overload;
+    function Events(const JobId: string; const ParamProc: TProc<TUrlPaginationParams>): TJobEvents; overload; override;
+
     /// <summary>
     /// Retrieves checkpoints for a specific fine-tuning job.
     /// </summary>
@@ -1503,7 +1457,8 @@ type
     /// <remarks>
     /// This method synchronously retrieves checkpoints for the specified fine-tuning job.
     /// </remarks>
-    function Checkpoints(const JobId: string): TJobCheckpoints; overload;
+    function Checkpoints(const JobId: string): TJobCheckpoints; overload; override;
+
     /// <summary>
     /// Retrieves checkpoints for a specific fine-tuning job with additional query parameters.
     /// </summary>
@@ -1520,7 +1475,8 @@ type
     /// This method synchronously retrieves checkpoints for the specified fine-tuning job
     /// with additional parameters for customization.
     /// </remarks>
-    function Checkpoints(const JobId: string; const ParamProc: TProc<TUrlPaginationParams>): TJobCheckpoints; overload;
+    function Checkpoints(const JobId: string; const ParamProc: TProc<TUrlPaginationParams>): TJobCheckpoints; overload; override;
+
     /// <summary>
     /// Retrieves details about a specific fine-tuning job.
     /// </summary>
@@ -1533,10 +1489,20 @@ type
     /// <remarks>
     /// This method synchronously retrieves details about the specified fine-tuning job.
     /// </remarks>
-    function Retrieve(const JobId: string): TFineTuningJob;
+    function Retrieve(const JobId: string): TFineTuningJob; override;
   end;
 
 implementation
+
+uses
+  System.DateUtils;
+
+function FineTuningUnixToUtc(const Value: Int64): string;
+begin
+  if Value <= 0 then
+    Exit(EmptyStr);
+  Result := FormatDateTime('yyyy-mm-dd"T"hh:nn:ss"Z"', UnixToDateTime(Value, True));
+end;
 
 { TFineTuningJobParams }
 
@@ -1682,7 +1648,7 @@ end;
 
 function THyperparametersParams.Beta(const Value: Double): THyperparametersParams;
 begin
-  Result := THyperparametersParams(Add('type', Value));
+  Result := THyperparametersParams(Add('beta', Value));
 end;
 
 function THyperparametersParams.LearningRateMultiplier(
@@ -1739,32 +1705,32 @@ end;
 
 function TFineTuningJob.GetCreatedAt: Int64;
 begin
-  Result := TInt64OrNull(FCreatedAt).ToInteger;
+  Result := FCreatedAt;
 end;
 
 function TFineTuningJob.GetCreatedAtAsString: string;
 begin
-  Result := TInt64OrNull(FCreatedAt).ToUtcDateString;
+  Result := FineTuningUnixToUtc(FCreatedAt);
 end;
 
 function TFineTuningJob.GetEstimatedFinish: Int64;
 begin
-  Result := TInt64OrNull(FEstimatedFinish).ToInteger;
+  Result := FEstimatedFinish;
 end;
 
 function TFineTuningJob.GetEstimatedFinishAsString: string;
 begin
-  Result := TInt64OrNull(FEstimatedFinish).ToUtcDateString;
+  Result := FineTuningUnixToUtc(FEstimatedFinish);
 end;
 
 function TFineTuningJob.GetFinishedAt: Int64;
 begin
-  Result := TInt64OrNull(FFinishedAt).ToInteger;
+  Result := FFinishedAt;
 end;
 
 function TFineTuningJob.GetFinishedAtAsString: string;
 begin
-  Result := TInt64OrNull(FFinishedAt).ToUtcDateString;
+  Result := FineTuningUnixToUtc(FFinishedAt);
 end;
 
 { FineTuningJobIntegration }
@@ -1805,9 +1771,9 @@ begin
   inherited;
 end;
 
-{ TFineTuningRoute }
+{ TFineTuningAsynchronousSupport }
 
-procedure TFineTuningRoute.AsynCancel(const JobId: string;
+procedure TFineTuningAsynchronousSupport.AsynCancel(const JobId: string;
   const CallBacks: TFunc<TAsynFineTuningJob>);
 begin
   with TAsynCallBackExec<TAsynFineTuningJob, TFineTuningJob>.Create(CallBacks) do
@@ -1826,7 +1792,7 @@ begin
   end;
 end;
 
-procedure TFineTuningRoute.AsynCheckpoints(const JobId: string;
+procedure TFineTuningAsynchronousSupport.AsynCheckpoints(const JobId: string;
   const CallBacks: TFunc<TAsynJobCheckpoints>);
 begin
   with TAsynCallBackExec<TAsynJobCheckpoints, TJobCheckpoints>.Create(CallBacks) do
@@ -1845,7 +1811,7 @@ begin
   end;
 end;
 
-procedure TFineTuningRoute.AsynCheckpoints(const JobId: string;
+procedure TFineTuningAsynchronousSupport.AsynCheckpoints(const JobId: string;
   const ParamProc: TProc<TUrlPaginationParams>;
   const CallBacks: TFunc<TAsynJobCheckpoints>);
 begin
@@ -1865,7 +1831,7 @@ begin
   end;
 end;
 
-procedure TFineTuningRoute.AsynCreate(
+procedure TFineTuningAsynchronousSupport.AsynCreate(
   const ParamProc: TProc<TFineTuningJobParams>;
   const CallBacks: TFunc<TAsynFineTuningJob>);
 begin
@@ -1885,7 +1851,7 @@ begin
   end;
 end;
 
-procedure TFineTuningRoute.AsynEvents(const JobId: string;
+procedure TFineTuningAsynchronousSupport.AsynEvents(const JobId: string;
   const CallBacks: TFunc<TAsynJobEvents>);
 begin
   with TAsynCallBackExec<TAsynJobEvents, TJobEvents>.Create(CallBacks) do
@@ -1904,7 +1870,7 @@ begin
   end;
 end;
 
-procedure TFineTuningRoute.AsynEvents(const JobId: string;
+procedure TFineTuningAsynchronousSupport.AsynEvents(const JobId: string;
   const ParamProc: TProc<TUrlPaginationParams>;
   const CallBacks: TFunc<TAsynJobEvents>);
 begin
@@ -1924,7 +1890,7 @@ begin
   end;
 end;
 
-procedure TFineTuningRoute.AsynList(
+procedure TFineTuningAsynchronousSupport.AsynList(
   const CallBacks: TFunc<TAsynFineTuningJobs>);
 begin
   with TAsynCallBackExec<TAsynFineTuningJobs, TFineTuningJobs>.Create(CallBacks) do
@@ -1943,7 +1909,7 @@ begin
   end;
 end;
 
-procedure TFineTuningRoute.AsynList(
+procedure TFineTuningAsynchronousSupport.AsynList(
   const ParamProc: TProc<TUrlPaginationParams>;
   const CallBacks: TFunc<TAsynFineTuningJobs>);
 begin
@@ -1963,7 +1929,7 @@ begin
   end;
 end;
 
-procedure TFineTuningRoute.AsynRetrieve(const JobId: string;
+procedure TFineTuningAsynchronousSupport.AsynRetrieve(const JobId: string;
   const CallBacks: TFunc<TAsynFineTuningJob>);
 begin
   with TAsynCallBackExec<TAsynFineTuningJob, TFineTuningJob>.Create(CallBacks) do
@@ -1980,6 +1946,111 @@ begin
   finally
     Free;
   end;
+end;
+
+{ TFineTuningRoute }
+
+function TFineTuningRoute.AsyncAwaitCreate(
+  const ParamProc: TProc<TFineTuningJobParams>;
+  const CallBacks: TFunc<TPromiseFineTuningJob>): TPromise<TFineTuningJob>;
+begin
+  Result := TAsyncAwaitHelper.WrapAsyncAwait<TFineTuningJob>(
+    procedure(const CallBackParams: TFunc<TAsynFineTuningJob>)
+    begin
+      AsynCreate(ParamProc, CallBackParams);
+    end,
+    CallBacks);
+end;
+
+function TFineTuningRoute.AsyncAwaitCancel(const JobId: string;
+  const CallBacks: TFunc<TPromiseFineTuningJob>): TPromise<TFineTuningJob>;
+begin
+  Result := TAsyncAwaitHelper.WrapAsyncAwait<TFineTuningJob>(
+    procedure(const CallBackParams: TFunc<TAsynFineTuningJob>)
+    begin
+      AsynCancel(JobId, CallBackParams);
+    end,
+    CallBacks);
+end;
+
+function TFineTuningRoute.AsyncAwaitList(
+  const CallBacks: TFunc<TPromiseFineTuningJobs>): TPromise<TFineTuningJobs>;
+begin
+  Result := TAsyncAwaitHelper.WrapAsyncAwait<TFineTuningJobs>(
+    procedure(const CallBackParams: TFunc<TAsynFineTuningJobs>)
+    begin
+      AsynList(CallBackParams);
+    end,
+    CallBacks);
+end;
+
+function TFineTuningRoute.AsyncAwaitList(
+  const ParamProc: TProc<TUrlPaginationParams>;
+  const CallBacks: TFunc<TPromiseFineTuningJobs>): TPromise<TFineTuningJobs>;
+begin
+  Result := TAsyncAwaitHelper.WrapAsyncAwait<TFineTuningJobs>(
+    procedure(const CallBackParams: TFunc<TAsynFineTuningJobs>)
+    begin
+      AsynList(ParamProc, CallBackParams);
+    end,
+    CallBacks);
+end;
+
+function TFineTuningRoute.AsyncAwaitEvents(const JobId: string;
+  const CallBacks: TFunc<TPromiseJobEvents>): TPromise<TJobEvents>;
+begin
+  Result := TAsyncAwaitHelper.WrapAsyncAwait<TJobEvents>(
+    procedure(const CallBackParams: TFunc<TAsynJobEvents>)
+    begin
+      AsynEvents(JobId, CallBackParams);
+    end,
+    CallBacks);
+end;
+
+function TFineTuningRoute.AsyncAwaitEvents(const JobId: string;
+  const ParamProc: TProc<TUrlPaginationParams>;
+  const CallBacks: TFunc<TPromiseJobEvents>): TPromise<TJobEvents>;
+begin
+  Result := TAsyncAwaitHelper.WrapAsyncAwait<TJobEvents>(
+    procedure(const CallBackParams: TFunc<TAsynJobEvents>)
+    begin
+      AsynEvents(JobId, ParamProc, CallBackParams);
+    end,
+    CallBacks);
+end;
+
+function TFineTuningRoute.AsyncAwaitCheckpoints(const JobId: string;
+  const CallBacks: TFunc<TPromiseJobCheckpoints>): TPromise<TJobCheckpoints>;
+begin
+  Result := TAsyncAwaitHelper.WrapAsyncAwait<TJobCheckpoints>(
+    procedure(const CallBackParams: TFunc<TAsynJobCheckpoints>)
+    begin
+      AsynCheckpoints(JobId, CallBackParams);
+    end,
+    CallBacks);
+end;
+
+function TFineTuningRoute.AsyncAwaitCheckpoints(const JobId: string;
+  const ParamProc: TProc<TUrlPaginationParams>;
+  const CallBacks: TFunc<TPromiseJobCheckpoints>): TPromise<TJobCheckpoints>;
+begin
+  Result := TAsyncAwaitHelper.WrapAsyncAwait<TJobCheckpoints>(
+    procedure(const CallBackParams: TFunc<TAsynJobCheckpoints>)
+    begin
+      AsynCheckpoints(JobId, ParamProc, CallBackParams);
+    end,
+    CallBacks);
+end;
+
+function TFineTuningRoute.AsyncAwaitRetrieve(const JobId: string;
+  const CallBacks: TFunc<TPromiseFineTuningJob>): TPromise<TFineTuningJob>;
+begin
+  Result := TAsyncAwaitHelper.WrapAsyncAwait<TFineTuningJob>(
+    procedure(const CallBackParams: TFunc<TAsynFineTuningJob>)
+    begin
+      AsynRetrieve(JobId, CallBackParams);
+    end,
+    CallBacks);
 end;
 
 function TFineTuningRoute.Cancel(const JobId: string): TFineTuningJob;
@@ -2042,12 +2113,12 @@ end;
 
 function TJobEvent.GetCreatedAt: Int64;
 begin
-  Result := TInt64OrNull(FCreatedAt).ToInteger;
+  Result := FCreatedAt;
 end;
 
 function TJobEvent.GetCreatedAtAsString: string;
 begin
-  Result := TInt64OrNull(FCreatedAt).ToUtcDateString;
+  Result := FineTuningUnixToUtc(FCreatedAt);
 end;
 
 { TJobCheckpoint }
@@ -2061,12 +2132,12 @@ end;
 
 function TJobCheckpoint.GetCreatedAt: Int64;
 begin
-  Result := TInt64OrNull(FCreatedAt).ToInteger;
+  Result := FCreatedAt;
 end;
 
 function TJobCheckpoint.GetCreatedAtAsString: string;
 begin
-  Result := TInt64OrNull(FCreatedAt).ToUtcDateString;
+  Result := FineTuningUnixToUtc(FCreatedAt);
 end;
 
 end.

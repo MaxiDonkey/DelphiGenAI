@@ -1,0 +1,466 @@
+﻿{
+  "lang": "tr-TR",
+  "input": {
+    "placeholder": {
+      "askQuestion": "Bir soru sorun..."
+    },
+    "menu": {
+      "endpoint": "Uç nokta",
+      "webResearch": "Web araması",
+      "thinking": "Akıl yürütme",
+      "attachFiles": "Dosya ekle",
+      "knowledgeSearch": "Bilgi araması",
+      "vision": "Görüş",
+      "deepResearch": "Derinlemesine araştırma",
+      "integration": "Entegrasyon",
+      "media": "Medya",
+      "custom": "Özel",
+      "settings": "Ayarlar",
+      "model": "Model",
+      "project": "Proje"
+    },
+    "thinking": {
+      "low": "Düşük",
+      "medium": "Orta",
+      "high": "Yüksek"
+    },
+    "endpoint": {
+      "chatCompletion": "v1/chat/completions",
+      "chatResponse": "v1/chat/responses",
+      "message": "v1/message",
+      "generateContent": ":generateContent",
+      "interactions": "v1/interactions",
+      "conversation": "v1/conversation",
+      "provider": {
+        "chatCompletion": "OpenAI, DeepSeek, MistralAI",
+        "chatResponse": "OpenAI",
+        "message": "Claude",
+        "generateContent": "Gemini",
+        "interactions": "Gemini",
+        "conversation": "MistralAI"
+      }
+    },
+    "integration": {
+      "function": "Fonksiyon",
+      "mcp": "MCP",
+      "jsCodeSandbox": "JS korumalı alanı",
+      "skills": "Beceriler",
+      "agents": "Ajanlar"
+    },
+    "media": {
+      "createImage": "Görsel oluştur",
+      "createVideo": "Video oluştur",
+      "createAudio": "Ses oluştur",
+      "speechToText": "Konuşmayı metne dönüştür",
+      "textToSpeech": "Metni konuşmaya dönüştür"
+    },
+    "project": {
+      "add": "Proje ekle",
+      "none": "yok",
+      "noneUsed": "Kullanılan proje yok",
+      "delete": "Sil"
+    },
+    "chips": {
+      "endpoint": "Uç nokta: {title}",
+      "webResearch": "Web araması",
+      "thinking": "Akıl yürütme: {title}",
+      "knowledgeSearch": "Bilgi araması ({count})",
+      "deepResearch": "Derinlemesine araştırma",
+      "filesAttached": "Ekli dosyalar ({count})",
+      "vision": "Görüş ({count})",
+      "integrationFunction": "Entegrasyon: Fonksiyon ({count})",
+      "integrationMcp": "Entegrasyon: MCP ({count})",
+      "integrationJsCodeSandbox": "Entegrasyon: JS korumalı alanı ({count})",
+      "integrationSkills": "Entegrasyon: Beceriler ({count})",
+      "integrationAgents": "Entegrasyon: Ajanlar ({count})",
+      "mediaCreateImage": "Medya: Görsel oluştur",
+      "mediaCreateVideo": "Medya: Video oluştur",
+      "mediaCreateAudio": "Medya: Ses oluştur",
+      "speechToText": "Konuşmayı metne dönüştür ({count})",
+      "mediaTextToSpeech": "Medya: Metni konuşmaya dönüştür",
+      "custom": "Özel ({count})"
+    }
+  },
+  "requestParams": {
+    "panel": {
+      "title": "Ayarlar",
+      "close": "Kapat",
+      "theme": {
+        "light": "Açık",
+        "dark": "Koyu"
+      }
+    },
+    "summary": {
+      "alwaysAvailable": "Her zaman kullanılabilir",
+      "enabled": "Etkin",
+      "disabled": "Devre dışı",
+      "enabledDisabled": "{enabled} etkin / {disabled} devre dışı"
+    },
+    "categories": {
+      "appSettings": {
+        "title": "Uygulama ayarları",
+        "subtitle": "Genel",
+        "panelSubtitle": ""
+      },
+      "systemPrompt": {
+        "title": "Sistem istemi"
+      },
+      "settings": {
+        "title": "Genel ayarlar"
+      },
+      "sampling": {
+        "title": "Örnekleme"
+      },
+      "structuredOutput": {
+        "title": "Yapılandırılmış çıktı"
+      },
+      "vendorSettings": {
+        "title": "Sağlayıcı seçenekleri"
+      }
+    },
+    "items": {
+      "appSettings": {
+        "lookAndFeel": {
+          "label": "Görünüm"
+        },
+        "language": {
+          "label": "Dil",
+          "placeholder": "Bir dil seçin"
+        },
+        "scrollButtons": {
+          "label": "Kaydırma düğmeleri"
+        }
+      },
+      "systemPrompt": {
+        "systemPrompt": {
+          "label": "Sistem istemi",
+          "labelWhenDisabled": "Devre dışı",
+          "labelWhenEnabled": "Etkin",
+          "placeholder": "Sistem istemini girin"
+        }
+      },
+      "settings": {
+        "temperature": {
+          "label": "Sıcaklık"
+        },
+        "maxTokens": {
+          "label": "Maks. token"
+        },
+        "stopStrings": {
+          "label": "Durdurma dizeleri",
+          "placeholder": "Her satıra bir durdurma dizesi"
+        }
+      },
+      "sampling": {
+        "topK": {
+          "label": "Top-k"
+        },
+        "topP": {
+          "label": "Top-p"
+        },
+        "presencePenalty": {
+          "label": "Varlık cezası"
+        },
+        "randomSeed": {
+          "label": "Rastgele tohum"
+        }
+      },
+      "structuredOutput": {
+        "jsonSchema": {
+          "label": "JSON şeması",
+          "labelWhenDisabled": "Devre dışı",
+          "labelWhenEnabled": "Etkin",
+          "placeholder": "JSON şemasını girin",
+          "invalidJsonMessage": "Geçersiz JSON"
+        }
+      },
+      "vendorSettings": {
+        "parallelToolCalls": {
+          "label": "Paralel araç çağrıları"
+        },
+        "backgroundResponse": {
+          "label": "Arka plan yanıtı"
+        },
+        "usingPreviousId": {
+          "label": "Önceki kimliği kullan"
+        },
+        "store": {
+          "label": "Kaydet"
+        }
+      }
+    }
+  },
+  "filesDrawer": {
+    "aria": {
+      "leftPanel": "Sol yan panel"
+    },
+    "actions": {
+      "openPanel": "Paneli aç",
+      "newSession": "Yeni oturum",
+      "closePanel": "Paneli kapat",
+      "nextPage": "Sonraki sayfa",
+      "more": "Daha fazla",
+      "rename": "Yeniden adlandır",
+      "delete": "Sil"
+    }
+  },
+  "scroll": {
+    "top": "Başa kaydır",
+    "bottom": "Sona kaydır"
+  },
+  "selector": {
+    "branchAfterMessage": "Bu mesajdan sonra bir dal oluştur",
+    "copyMessage": "Mesajı kopyala",
+    "deleteMessage": "Mesajı sil"
+  },
+  "confirmation": {
+    "title": "Onay",
+    "question": "Lütfen onaylayın.",
+    "yes": "Evet",
+    "no": "Hayır"
+  },
+  "inputString": {
+    "title": "Giriş",
+    "message": "Lütfen bir değer girin.",
+    "ok": "Tamam",
+    "cancel": "İptal"
+  },
+  "webDecisionDlg": {
+    "title": "Onay",
+    "message": "Lütfen onaylayın.",
+    "ok": "Tamam",
+    "cancel": "İptal",
+    "close": "Kapat"
+  },
+  "displayFile": {
+    "fallbackName": "Dosya {index}",
+    "badge": {
+      "pdf": "PDF",
+      "sheet": "XLS",
+      "doc": "DOC",
+      "slide": "PPT",
+      "text": "TXT",
+      "pascal": "PAS",
+      "code": "</>",
+      "file": "DOSYA"
+    },
+    "status": {
+      "file": "DOSYA"
+    },
+    "debug": {
+      "error": "DisplayFile hatası: {error}"
+    }
+  },
+  "displayImage": {
+    "action": {
+      "close": "Kapat"
+    },
+    "error": {
+      "unavailable": "Görsel kullanılamıyor"
+    },
+    "alt": {
+      "imageIndex": "Görsel {index}"
+    },
+    "debug": {
+      "error": "DisplayImages hatası: {error}"
+    }
+  },
+  "display": {
+    "reasoning": {
+      "title": "Akıl yürütme"
+    },
+    "toolGroup": {
+      "label": "Kullanılan araçlar"
+    },
+    "code": {
+      "copy": "Kopyala",
+      "copied": "Kopyalandı",
+      "copyToClipboard": "Panoya kopyala"
+    }
+  },
+  "errors": {
+    "aria": {
+      "systemMessages": "Sistem mesajları"
+    },
+    "action": {
+      "close": "Kapat"
+    }
+  },
+  "promptFile": {
+    "debug": {
+      "error": "PromptFile hatası: {error}"
+    }
+  },
+  "displayVideo": {
+    "fallbackName": "Video {index}",
+    "fallbackNameWithExtension": "Video {index}.{ext}",
+    "action": {
+      "open": "Aç",
+      "close": "Kapat"
+    },
+    "debug": {
+      "error": "DisplayVideo hatası: {error}"
+    }
+  },
+  "displayAudio": {
+    "fallbackName": "Ses {index}",
+    "fallbackNameWithExtension": "Ses {index}.{ext}",
+    "status": {
+      "stop": "Durdur",
+      "loading": "Yükleniyor",
+      "unavailable": "Kullanılamıyor",
+      "pause": "Duraklat",
+      "playing": "Oynatılıyor"
+    },
+    "debug": {
+      "error": "DisplayAudio hatası: {error}"
+    }
+  },
+  "modelSelector": {
+    "panel": {
+      "title": "Varsayılan modelleri seçin",
+      "aria": {
+        "dialog": "Varsayılan modelleri seçin"
+      }
+    },
+    "actions": {
+      "close": "Kapat"
+    },
+    "defaults": {
+      "title": "Varsayılan model",
+      "empty": "Bu kategori için varsayılan model yok."
+    },
+    "status": {
+      "notAssigned": "Atanmamış",
+      "noDefaultModel": "Varsayılan model yok"
+    },
+    "categories": {
+      "allModels": {
+        "label": "Model listesi"
+      },
+      "textGeneration": {
+        "label": "Metin oluşturma"
+      },
+      "imageCreation": {
+        "label": "Görsel oluşturma"
+      },
+      "videoCreation": {
+        "label": "Video oluşturma"
+      },
+      "audioCreation": {
+        "label": "Ses oluşturma"
+      },
+      "textToSpeech": {
+        "label": "Metni konuşmaya dönüştür"
+      },
+      "deepResearch": {
+        "label": "Derinlemesine araştırma"
+      }
+    },
+    "features": {
+      "webResearch": "Web araması",
+      "thinking": "Akıl yürütme",
+      "attachFiles": "Dosya ekle",
+      "vision": "Görüş",
+      "createImage": "Görsel oluştur",
+      "createVideo": "Video oluştur",
+      "createAudio": "Ses oluştur",
+      "speechToText": "Konuşmayı metne dönüştür",
+      "textToSpeech": "Metni konuşmaya dönüştür",
+      "deepResearch": "Derinlemesine araştırma"
+    }
+  },
+  "cardSelector": {
+    "panel": {
+      "title": "Bir öğe seçin",
+      "ariaLabel": "Bir öğe seçin",
+      "selectDialogTitle": "{selectPrefix} {dialogLabel}"
+    },
+    "actions": {
+      "selectPrefix": "Seç",
+      "close": "Kapat",
+      "edit": "Düzenle",
+      "settings": "Ayarlar",
+      "cancel": "İptal",
+      "select": "Seç"
+    },
+    "messages": {
+      "empty": "Kullanılabilir öğe yok.",
+      "noComment": ""
+    },
+    "dialogs": {
+      "function": {
+        "label": "Fonksiyon"
+      },
+      "mcp": {
+        "label": "MCP"
+      },
+      "skills": {
+        "label": "Beceriler"
+      },
+      "agents": {
+        "label": "Ajanlar"
+      },
+      "custom": {
+        "label": "Özel"
+      }
+    }
+  },
+  "prompt": {
+    "toggleCollapse": "İstemi daralt veya genişlet",
+    "summary": {
+      "open": "İstem özetini aç",
+      "close": "İstem özetini kapat"
+    }
+  },
+  "more": {
+    "delete_qa": "Lütfen mevcut soru ve yanıtın, ayrıca tüm sonraki girişlerin silinmesini onaylayın.",
+    "delete_chat_session": "Emin misiniz? #10#10Bu işlem geri alınamaz ve bu konuşmadaki tüm mesajları siler.",
+    "aborted": "İşlem iptal edildi...",
+    "aborted_operation": "İşlem iptal edildi",
+    "model_file_not_found": "%s: dosya oluşturuldu. #10Lütfen bu dosyayı açın ve kullanılabilir modellerin listesini belirtin.",
+    "batch_begin_error": "Toplu görüntüleme etkinleştirilemedi.",
+    "batch_end_error": "Toplu görüntüleme serbest bırakılamadı.",
+    "focus_error": "Giriş balonu odağı alamadı.",
+    "stop_audio_media_error": "Ses medyası durdurulamadı.",
+    "stop_video_media_error": "Video medyası durdurulamadı.",
+    "internal_theme_error": "Sayfa teması güncellenemiyor.",
+    "deserialization_error": "Seri durumdan çıkarma hatası: geçersiz JSON girişi %s",
+    "welcome": "Çalışma alanınıza hoş geldiniz",
+    "structured_output_error": "Yapılandırılmış çıktı geçersiz: lütfen değerini ayarlarda düzenleyin.",
+    "card_json_file_not_found": "Hiçbir JSON dosyası %s'yi desteklemiyor",
+    "models_categories_count_error": "Lütfen varsayılan modeller için kategorileri tanımlayın",
+    "invalid_categories_file_error": "Kategoriler için geçersiz JSON dosyası",
+    "text_generation_cant_handled_error": "Varsayılan model yok: metin oluşturma işlenemiyor",
+    "image_creation_aborted_error": "Varsayılan model yapılandırılmadı: görsel oluşturma iptal edildi",
+    "video_creation_aborted_error": "Varsayılan model yapılandırılmadı: video oluşturma iptal edildi",
+    "audio_creation_aborted_error": "Varsayılan model yapılandırılmadı: ses oluşturma iptal edildi",
+    "stt_operation_aborted_error": "Varsayılan model yapılandırılmadı: STT işlemi iptal edildi",
+    "tts_operation_aborted_error": "Varsayılan model yapılandırılmadı: TTS işlemi iptal edildi",
+    "deep_research_operation_aborted_error": "Varsayılan model yapılandırılmadı: derinlemesine araştırma iptal edildi",
+    "missing_default_models_error": "Bazı kategoriler için varsayılan modeller eksik. #10 Model ayarlarını kontrol edin",
+    "api_key_empty_name_error": "Anahtar adı boş olamaz.",
+    "api_key_enter_dialog_prompt": "Lütfen %s için API anahtar değerini girin",
+    "api_key_not_found": "%s: API anahtarı bulunamadı",
+    "api_key_deleted": "%s: API anahtarı silindi",
+    "api_key_exists": "%s: API anahtarı mevcut",
+    "api_key_modified": "%s: API anahtarı değiştirildi.",
+    "api_key_inserted": "%s: API anahtarı eklendi",
+    "web_decision_dlg_title": "Onay",
+    "web_decision_dlg_message": "Lütfen onaylayın.",
+    "web_decision_dlg_ok": "Tamam",
+    "web_decision_dlg_cancel": "İptal",
+    "web_decision_dlg_close": "Kapat",
+    "demo_anthropic_tool_confirmation_title": "Onay",
+    "demo_anthropic_tool_allow": "İzin ver",
+    "demo_anthropic_tool_deny": "Reddet",
+    "demo_anthropic_tool_allow_call": "Bu araç çağrısına izin verilsin mi?",
+    "demo_anthropic_interrupted_by_user": "Kullanıcı tarafından kesintiye uğratıldı.",
+    "command_plugin_not_be_null": "Eklenti boş olamaz",
+    "command_unknown": "Bilinmeyen komut: /%s",
+    "command_action_unknown": "Bilinmeyen eylem: /%s %s",
+    "command_missing_action": "/%s için eylem eksik",
+    "command_incorrect_number_of_arguments": "/%s %s için hatalı argüman sayısı (alınan %d)",
+    "command_no_plugin_for": "/%s için eklenti yok"
+  }
+}

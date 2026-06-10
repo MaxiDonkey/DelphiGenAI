@@ -54,8 +54,9 @@ To use this endpoint, please refer to the internal documentation available at th
 
   TutorialHub.JSONRequestClear;
 
-  //Asynchronous example
-  Client.Chat.AsynCreate(
+  //Asynchronous promise example
+  Display(TutorialHub, 'This may take a few seconds.');
+  var Promise := Client.Chat.AsyncAwaitCreate(
     procedure (Params: TChatParams)
     begin
       Params
@@ -64,14 +65,22 @@ To use this endpoint, please refer to the internal documentation available at th
           FromSystem('You are a comedian looking for jokes for your new show.'),
           FromUser('What is the difference between a mathematician and a physicist?')]);
       TutorialHub.JSONRequest := Params.ToFormat(); //to display JSON Request
-    end,
-    function : TAsynChat
-    begin
-      Result.Sender := TutorialHub;
-      Result.OnStart := Start;
-      Result.OnSuccess := Display;
-      Result.OnError := Display;
     end);
+
+  promise
+    .&Then<string>(
+      function (Value: TChat): string
+      begin
+        for var Item in Value.Choices do
+          Result := Result + Item.Message.Content;
+        Display(TutorialHub, Value);
+        ShowMessage(Result);
+      end)
+    .&Catch(
+      procedure (E: Exception)
+      begin
+        Display(TutorialHub, E.Message);
+      end);
 
   //Synchronous example
 //  var Value := Client.Chat.Create(
@@ -89,34 +98,6 @@ To use this endpoint, please refer to the internal documentation available at th
 //  finally
 //    Value.Free;
 //  end;
-
-  //Asynchronous promise example
-//  Display(TutorialHub, 'This may take a few seconds.');
-//  var Promise := Client.Chat.AsyncAwaitCreate(
-//    procedure (Params: TChatParams)
-//    begin
-//      Params
-//        .Model('gemini-2.5-flash')
-//        .Messages([
-//          FromSystem('You are a comedian looking for jokes for your new show.'),
-//          FromUser('What is the difference between a mathematician and a physicist?')]);
-//      TutorialHub.JSONRequest := Params.ToFormat(); //to display JSON Request
-//    end);
-//
-//  promise
-//    .&Then<string>(
-//      function (Value: TChat): string
-//      begin
-//        for var Item in Value.Choices do
-//          Result := Result + Item.Message.Content;
-//        Display(TutorialHub, Value);
-//        ShowMessage(Result);
-//      end)
-//    .&Catch(
-//      procedure (E: Exception)
-//      begin
-//        Display(TutorialHub, E.Message);
-//      end);
 ```
 
 Please note that Gemini APIs do not support the `store` property, which is specific to OpenAI models.
@@ -143,8 +124,8 @@ Attempting to enable this feature using: `StreamOptions(TIncludeObfuscation.New(
 
   TutorialHub.JSONRequestClear;
 
-  //Asynchronous example
-  Client.Chat.AsynCreateStream(
+  //Asynchronous promise example
+  var Promise := Client.Chat.AsyncAwaitCreateStream(
     procedure(Params: TChatParams)
     begin
       Params
@@ -154,17 +135,40 @@ Attempting to enable this feature using: `StreamOptions(TIncludeObfuscation.New(
           FromUser('What is the difference between a mathematician and a physicist?')])
         .StreamOptions(TIncludeUsage.New)
         .Stream;
-      TutorialHub.JSONRequest := Params.ToFormat(); //to display JSON Request
+      TutorialHub.JSONRequest := Params.ToFormat();
     end,
-    function : TAsynChatStream
+    function : TPromiseChatStream
     begin
       Result.Sender := TutorialHub;
       Result.OnStart := Start;
-      Result.OnProgress := DisplayStream;
-      Result.OnError := Display;
+
+      Result.OnProgress :=
+        procedure (Sender: TObject; Chunk: TChat)
+        begin
+          DisplayStream(Sender, Chunk);
+        end;
+
       Result.OnDoCancel := DoCancellation;
-      Result.OnCancellation := Cancellation;
+
+      Result.OnCancellation :=
+        function (Sender: TObject): string
+        begin
+          Cancellation(Sender);
+        end
     end);
+
+  Promise
+    .&Then<string>(
+      function (Value: string): string
+      begin
+        Result := Value;
+        ShowMessage(Result);
+      end)
+    .&Catch(
+      procedure (E: Exception)
+      begin
+        Display(TutorialHub, E.Message);
+      end);
 
   //Synchronous example
 //  Client.Chat.CreateStream(
@@ -186,52 +190,6 @@ Attempting to enable this feature using: `StreamOptions(TIncludeObfuscation.New(
 //          DisplayStream(TutorialHub, Chat);
 //        end;
 //    end);
-
-  //Asynchronous promise example
-//  var Promise := Client.Chat.AsyncAwaitCreateStream(
-//    procedure(Params: TChatParams)
-//    begin
-//      Params
-//        .Model('gemini-2.5-flash')
-//        .Messages([
-//          FromSystem('You are a comedian looking for jokes for your new show.'),
-//          FromUser('What is the difference between a mathematician and a physicist?')])
-//        .StreamOptions(TIncludeUsage.New)
-//        .Stream;
-//      TutorialHub.JSONRequest := Params.ToFormat();
-//    end,
-//    function : TPromiseChatStream
-//    begin
-//      Result.Sender := TutorialHub;
-//      Result.OnStart := Start;
-//
-//      Result.OnProgress :=
-//        procedure (Sender: TObject; Chunk: TChat)
-//        begin
-//          DisplayStream(Sender, Chunk);
-//        end;
-//
-//      Result.OnDoCancel := DoCancellation;
-//
-//      Result.OnCancellation :=
-//        function (Sender: TObject): string
-//        begin
-//          Cancellation(Sender);
-//        end
-//    end);
-//
-//  Promise
-//    .&Then<string>(
-//      function (Value: string): string
-//      begin
-//        Result := Value;
-//        ShowMessage(Result);
-//      end)
-//    .&Catch(
-//      procedure (E: Exception)
-//      begin
-//        Display(TutorialHub, E.Message);
-//      end);
 ```
 
 <br>

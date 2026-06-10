@@ -1,4 +1,4 @@
-unit GenAI.API.Tests;
+﻿unit GenAI.API.Tests;
 
 (*
   To execute unit tests proceed as follows :
@@ -62,7 +62,7 @@ type
     property Kind: string read FKind write FKind;
   end;
 
-  TTestMetadata = class(TObject)
+  TTestMetadata = class(TJSONFingerPrint)
   private
     FId: string;
     FName: string;
@@ -94,7 +94,7 @@ begin
   var Deserializer := TTestTApiDeserializer.Create;
   var JsonInput := '{"name":"test_model","id":"123","kind":"object"}';
   try
-    DeserializedObj := Deserializer.Deserialize<TTestModel>(200, JsonInput);
+    DeserializedObj := Deserializer.Deserialize<TTestModel>(200, JsonInput, JsonInput, True);
     Assert.IsNotNull(DeserializedObj, 'The deserialized object is null.');
     Assert.AreEqual('test_model', DeserializedObj.Name, 'The Name field is incorrect.');
     Assert.AreEqual('123', DeserializedObj.Id, 'The Id field is incorrect.');
@@ -113,11 +113,11 @@ begin
   var Deserializer := TTestTApiDeserializer.Create;
   var JsonInput := '{"name":"test_model","id":"123","metadata":{"key":"value"}}';
   try
-    DeserializedObj := Deserializer.Deserialize<TTestMetadata>(200, JsonInput);
+    DeserializedObj := Deserializer.Deserialize<TTestMetadata>(200, JsonInput, JsonInput);
     Assert.IsNotNull(DeserializedObj, 'The deserialized object is null.');
     Assert.AreEqual('test_model', DeserializedObj.Name, 'The Name field is incorrect.');
     Assert.AreEqual('123', DeserializedObj.Id, 'The Id field is incorrect.');
-    Assert.AreEqual('{"key":"value"}', DeserializedObj.Metadata, 'The Kind field is incorrect.');
+    Assert.AreEqual('{"key":"value"}', DeserializedObj.Metadata, 'The Metadata field is incorrect.');
   finally
     DeserializedObj.Free;
     Deserializer.Free;
@@ -131,7 +131,7 @@ begin
   try
     Assert.WillRaise(
       procedure begin
-        Deserializer.Deserialize<TTestModel>(200, '');
+        Deserializer.Deserialize<TTestModel>(200, '', '');
       end,
       TGenAIInvalidResponseError,
       'No exception thrown for empty response.'

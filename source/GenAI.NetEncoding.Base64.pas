@@ -1,4 +1,4 @@
-unit GenAI.NetEncoding.Base64;
+﻿unit GenAI.NetEncoding.Base64;
 
 {-------------------------------------------------------------------------------
 
@@ -255,7 +255,7 @@ uses
 implementation
 
 uses
-  System.StrUtils;
+  System.StrUtils, GenAI.Net.MediaCodec;
 
 function EncodeBase64(FileLocation : string): string;
 begin
@@ -305,7 +305,7 @@ end;
 function GetUrlOrEncodeBase64(const Value: string): string;
 begin
    if Value.StartsWith('data:', True) then
-    Exit(Value);
+    Exit(Value.Replace(#13, '', [rfReplaceAll]).Replace(#10, '', [rfReplaceAll]));
 
   if Value.StartsWith('http') then
     Exit(Value);
@@ -319,7 +319,7 @@ begin
   if not AcceptedMimeType then
     raise Exception.CreateFmt('Unsupported mime type: %s', [MimeType]);
 
-  Result :=  Format('data:%s;base64,%s', [MimeType, EncodeBase64(Value)]);
+  Result := TMediaCodec.EncodeDataUri(Value, MimeType, True);
 end;
 
 function BytesToBase64(const Value: TBytes): String;

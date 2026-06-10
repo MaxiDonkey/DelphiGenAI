@@ -14,8 +14,8 @@ Convert a text into an audio file. Refer to [official documentation](https://pla
   TutorialHub.JSONRequestClear;
   TutorialHub.FileName := 'Speech.mp3';
 
-  //Asynchronous example
-  Client.Audio.AsynSpeech(
+  //Asynchronous promise example
+  var Promise := Client.Audio.AsyncAwaitSpeech(
     procedure (Params: TSpeechParams)
     begin
       Params.Model('gpt-4o-mini-tts');
@@ -23,13 +23,20 @@ Convert a text into an audio file. Refer to [official documentation](https://pla
       Params.Voice('fable');
       Params.ResponseFormat(TSpeechFormat.mp3);
       TutorialHub.JSONRequest := Params.ToFormat();
-    end,
-    function : TAsynSpeechResult
-    begin
-      Result.Sender := TutorialHub;
-      Result.OnSuccess := Display;
-      Result.OnError := Display;
     end);
+
+  Promise
+    .&Then<TSpeechResult>(
+      function (Value: TSpeechResult): TSpeechResult
+      begin
+        Result := Value;
+        Display(TutorialHub, Value);
+      end)
+    .&Catch(
+      procedure (E: Exception)
+      begin
+        Display(TutorialHub, E.Message);
+      end);
 
   //Synchronous example
 //  var Value := Client.Audio.Speech(
@@ -46,30 +53,6 @@ Convert a text into an audio file. Refer to [official documentation](https://pla
 //  finally
 //    Value.Free;
 //  end;  
-
-  //Asynchronous promise example
-//  var Promise := Client.Audio.AsyncAwaitSpeech(
-//    procedure (Params: TSpeechParams)
-//    begin
-//      Params.Model('gpt-4o-mini-tts');
-//      Params.Input('Hi! what are you doing ?');
-//      Params.Voice('fable');
-//      Params.ResponseFormat(TSpeechFormat.mp3);
-//      TutorialHub.JSONRequest := Params.ToFormat();
-//    end);
-//
-//  Promise
-//    .&Then<TSpeechResult>(
-//      function (Value: TSpeechResult): TSpeechResult
-//      begin
-//        Result := Value;
-//        Display(TutorialHub, Value);
-//      end)
-//    .&Catch(
-//      procedure (E: Exception)
-//      begin
-//        Display(TutorialHub, E.Message);
-//      end);
 ```
 
 <br>
@@ -109,21 +92,26 @@ Convert data audio into a text. Refer to [official documentation](https://platfo
 
   TutorialHub.JSONRequest := 'multipart';
 
-  //Asynchronous example
-  Client.Audio.AsynTranscription(
+  //Asynchronous promise example
+  var Promise := Client.Audio.AsyncAwaitTranscription(
     procedure (Params: TTranscriptionParams)
     begin
       Params.&File('SpeechRecorded.wav');
-      Params.Model('whisper-1');
-      Params.ResponseFormat(TTranscriptionResponseFormat.verbose_json);
-    end,
-    function : TAsynTranscription
-    begin
-      Result.Sender := TutorialHub;
-      Result.OnStart := Start;
-      Result.OnSuccess := Display;
-      Result.OnError := Display;
+      Params.Model('gpt-4o-transcribe');
     end);
+
+  Promise
+    .&Then<TTranscription>(
+      function (Value: TTranscription): TTranscription
+      begin
+        Result := Value;
+        Display(TutorialHub, Value);
+      end)
+    .&Catch(
+      procedure (E: Exception)
+      begin
+        Display(TutorialHub, E.Message);
+      end);
 
   //Synchronous example
 //  var Value := Client.Audio.Transcription(
@@ -137,25 +125,4 @@ Convert data audio into a text. Refer to [official documentation](https://platfo
 //  finally
 //    Value.Free;
 //  end;
-
-  //Asynchronous promise example
-//  var Promise := Client.Audio.AsyncAwaitTranscription(
-//    procedure (Params: TTranscriptionParams)
-//    begin
-//      Params.&File('SpeechRecorded.wav');
-//      Params.Model('gpt-4o-transcribe');
-//    end);
-//
-//  Promise
-//    .&Then<TTranscription>(
-//      function (Value: TTranscription): TTranscription
-//      begin
-//        Result := Value;
-//        Display(TutorialHub, Value);
-//      end)
-//    .&Catch(
-//      procedure (E: Exception)
-//      begin
-//        Display(TutorialHub, E.Message);
-//      end);
 ```

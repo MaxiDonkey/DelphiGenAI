@@ -1,0 +1,466 @@
+﻿{
+  "lang": "zh-CN",
+  "input": {
+    "placeholder": {
+      "askQuestion": "提出一个问题..."
+    },
+    "menu": {
+      "endpoint": "端点",
+      "webResearch": "网络搜索",
+      "thinking": "推理",
+      "attachFiles": "附加文件",
+      "knowledgeSearch": "知识搜索",
+      "vision": "视觉",
+      "deepResearch": "深度研究",
+      "integration": "集成",
+      "media": "媒体",
+      "custom": "自定义",
+      "settings": "设置",
+      "model": "模型",
+      "project": "项目"
+    },
+    "thinking": {
+      "low": "低",
+      "medium": "中",
+      "high": "高"
+    },
+    "endpoint": {
+      "chatCompletion": "v1/chat/completions",
+      "chatResponse": "v1/chat/responses",
+      "message": "v1/message",
+      "generateContent": ":generateContent",
+      "interactions": "v1/interactions",
+      "conversation": "v1/conversation",
+      "provider": {
+        "chatCompletion": "OpenAI, DeepSeek, MistralAI",
+        "chatResponse": "OpenAI",
+        "message": "Claude",
+        "generateContent": "Gemini",
+        "interactions": "Gemini",
+        "conversation": "MistralAI"
+      }
+    },
+    "integration": {
+      "function": "函数",
+      "mcp": "MCP",
+      "jsCodeSandbox": "JS 沙盒",
+      "skills": "技能",
+      "agents": "智能体"
+    },
+    "media": {
+      "createImage": "创建图像",
+      "createVideo": "创建视频",
+      "createAudio": "创建音频",
+      "speechToText": "语音转文本",
+      "textToSpeech": "文本转语音"
+    },
+    "project": {
+      "add": "添加项目",
+      "none": "无",
+      "noneUsed": "未使用项目",
+      "delete": "删除"
+    },
+    "chips": {
+      "endpoint": "端点:{title}",
+      "webResearch": "网络搜索",
+      "thinking": "推理:{title}",
+      "knowledgeSearch": "知识搜索({count})",
+      "deepResearch": "深度研究",
+      "filesAttached": "已附加文件({count})",
+      "vision": "视觉({count})",
+      "integrationFunction": "集成:函数({count})",
+      "integrationMcp": "集成:MCP({count})",
+      "integrationJsCodeSandbox": "集成:JS 沙盒({count})",
+      "integrationSkills": "集成:技能({count})",
+      "integrationAgents": "集成:智能体({count})",
+      "mediaCreateImage": "媒体:创建图像",
+      "mediaCreateVideo": "媒体:创建视频",
+      "mediaCreateAudio": "媒体:创建音频",
+      "speechToText": "语音转文本({count})",
+      "mediaTextToSpeech": "媒体:文本转语音",
+      "custom": "自定义({count})"
+    }
+  },
+  "requestParams": {
+    "panel": {
+      "title": "设置",
+      "close": "关闭",
+      "theme": {
+        "light": "浅色",
+        "dark": "深色"
+      }
+    },
+    "summary": {
+      "alwaysAvailable": "始终可用",
+      "enabled": "已启用",
+      "disabled": "已禁用",
+      "enabledDisabled": "已启用 {enabled} / 已禁用 {disabled}"
+    },
+    "categories": {
+      "appSettings": {
+        "title": "应用程序设置",
+        "subtitle": "常规",
+        "panelSubtitle": ""
+      },
+      "systemPrompt": {
+        "title": "系统提示词"
+      },
+      "settings": {
+        "title": "常规设置"
+      },
+      "sampling": {
+        "title": "采样"
+      },
+      "structuredOutput": {
+        "title": "结构化输出"
+      },
+      "vendorSettings": {
+        "title": "供应商选项"
+      }
+    },
+    "items": {
+      "appSettings": {
+        "lookAndFeel": {
+          "label": "外观"
+        },
+        "language": {
+          "label": "语言",
+          "placeholder": "选择语言"
+        },
+        "scrollButtons": {
+          "label": "滚动按钮"
+        }
+      },
+      "systemPrompt": {
+        "systemPrompt": {
+          "label": "系统提示词",
+          "labelWhenDisabled": "已禁用",
+          "labelWhenEnabled": "已启用",
+          "placeholder": "输入系统提示词"
+        }
+      },
+      "settings": {
+        "temperature": {
+          "label": "温度"
+        },
+        "maxTokens": {
+          "label": "最大令牌数"
+        },
+        "stopStrings": {
+          "label": "停止字符串",
+          "placeholder": "每行一个停止字符串"
+        }
+      },
+      "sampling": {
+        "topK": {
+          "label": "Top-k"
+        },
+        "topP": {
+          "label": "Top-p"
+        },
+        "presencePenalty": {
+          "label": "存在惩罚"
+        },
+        "randomSeed": {
+          "label": "随机种子"
+        }
+      },
+      "structuredOutput": {
+        "jsonSchema": {
+          "label": "JSON 架构",
+          "labelWhenDisabled": "已禁用",
+          "labelWhenEnabled": "已启用",
+          "placeholder": "输入 JSON 架构",
+          "invalidJsonMessage": "无效的 JSON"
+        }
+      },
+      "vendorSettings": {
+        "parallelToolCalls": {
+          "label": "并行工具调用"
+        },
+        "backgroundResponse": {
+          "label": "后台响应"
+        },
+        "usingPreviousId": {
+          "label": "使用上一个 ID"
+        },
+        "store": {
+          "label": "存储"
+        }
+      }
+    }
+  },
+  "filesDrawer": {
+    "aria": {
+      "leftPanel": "左侧面板"
+    },
+    "actions": {
+      "openPanel": "打开面板",
+      "newSession": "新建会话",
+      "closePanel": "关闭面板",
+      "nextPage": "下一页",
+      "more": "更多",
+      "rename": "重命名",
+      "delete": "删除"
+    }
+  },
+  "scroll": {
+    "top": "滚动到顶部",
+    "bottom": "滚动到底部"
+  },
+  "selector": {
+    "branchAfterMessage": "在此消息后创建分支",
+    "copyMessage": "复制消息",
+    "deleteMessage": "删除消息"
+  },
+  "confirmation": {
+    "title": "确认",
+    "question": "请确认。",
+    "yes": "是",
+    "no": "否"
+  },
+  "inputString": {
+    "title": "输入",
+    "message": "请输入一个值。",
+    "ok": "确定",
+    "cancel": "取消"
+  },
+  "webDecisionDlg": {
+    "title": "确认",
+    "message": "请确认。",
+    "ok": "确定",
+    "cancel": "取消",
+    "close": "关闭"
+  },
+  "displayFile": {
+    "fallbackName": "文件 {index}",
+    "badge": {
+      "pdf": "PDF",
+      "sheet": "XLS",
+      "doc": "DOC",
+      "slide": "PPT",
+      "text": "TXT",
+      "pascal": "PAS",
+      "code": "</>",
+      "file": "文件"
+    },
+    "status": {
+      "file": "文件"
+    },
+    "debug": {
+      "error": "DisplayFile 错误:{error}"
+    }
+  },
+  "displayImage": {
+    "action": {
+      "close": "关闭"
+    },
+    "error": {
+      "unavailable": "图像不可用"
+    },
+    "alt": {
+      "imageIndex": "图像 {index}"
+    },
+    "debug": {
+      "error": "DisplayImages 错误:{error}"
+    }
+  },
+  "display": {
+    "reasoning": {
+      "title": "推理"
+    },
+    "toolGroup": {
+      "label": "使用的工具"
+    },
+    "code": {
+      "copy": "复制",
+      "copied": "已复制",
+      "copyToClipboard": "复制到剪贴板"
+    }
+  },
+  "errors": {
+    "aria": {
+      "systemMessages": "系统消息"
+    },
+    "action": {
+      "close": "关闭"
+    }
+  },
+  "promptFile": {
+    "debug": {
+      "error": "PromptFile 错误:{error}"
+    }
+  },
+  "displayVideo": {
+    "fallbackName": "视频 {index}",
+    "fallbackNameWithExtension": "视频 {index}.{ext}",
+    "action": {
+      "open": "打开",
+      "close": "关闭"
+    },
+    "debug": {
+      "error": "DisplayVideo 错误:{error}"
+    }
+  },
+  "displayAudio": {
+    "fallbackName": "音频 {index}",
+    "fallbackNameWithExtension": "音频 {index}.{ext}",
+    "status": {
+      "stop": "停止",
+      "loading": "加载中",
+      "unavailable": "不可用",
+      "pause": "暂停",
+      "playing": "播放中"
+    },
+    "debug": {
+      "error": "DisplayAudio 错误:{error}"
+    }
+  },
+  "modelSelector": {
+    "panel": {
+      "title": "选择默认模型",
+      "aria": {
+        "dialog": "选择默认模型"
+      }
+    },
+    "actions": {
+      "close": "关闭"
+    },
+    "defaults": {
+      "title": "默认模型",
+      "empty": "此类别没有默认模型。"
+    },
+    "status": {
+      "notAssigned": "未分配",
+      "noDefaultModel": "没有默认模型"
+    },
+    "categories": {
+      "allModels": {
+        "label": "模型列表"
+      },
+      "textGeneration": {
+        "label": "文本生成"
+      },
+      "imageCreation": {
+        "label": "图像创建"
+      },
+      "videoCreation": {
+        "label": "视频创建"
+      },
+      "audioCreation": {
+        "label": "音频创建"
+      },
+      "textToSpeech": {
+        "label": "文本转语音"
+      },
+      "deepResearch": {
+        "label": "深度研究"
+      }
+    },
+    "features": {
+      "webResearch": "网络搜索",
+      "thinking": "推理",
+      "attachFiles": "附加文件",
+      "vision": "视觉",
+      "createImage": "创建图像",
+      "createVideo": "创建视频",
+      "createAudio": "创建音频",
+      "speechToText": "语音转文本",
+      "textToSpeech": "文本转语音",
+      "deepResearch": "深度研究"
+    }
+  },
+  "cardSelector": {
+    "panel": {
+      "title": "选择一个项目",
+      "ariaLabel": "选择一个项目",
+      "selectDialogTitle": "{selectPrefix} {dialogLabel}"
+    },
+    "actions": {
+      "selectPrefix": "选择",
+      "close": "关闭",
+      "edit": "编辑",
+      "settings": "设置",
+      "cancel": "取消",
+      "select": "选择"
+    },
+    "messages": {
+      "empty": "没有可用的项目。",
+      "noComment": ""
+    },
+    "dialogs": {
+      "function": {
+        "label": "函数"
+      },
+      "mcp": {
+        "label": "MCP"
+      },
+      "skills": {
+        "label": "技能"
+      },
+      "agents": {
+        "label": "智能体"
+      },
+      "custom": {
+        "label": "自定义"
+      }
+    }
+  },
+  "prompt": {
+    "toggleCollapse": "折叠或展开提示词",
+    "summary": {
+      "open": "打开提示词摘要",
+      "close": "关闭提示词摘要"
+    }
+  },
+  "more": {
+    "delete_qa": "请确认删除当前问题和答案,以及所有后续条目。",
+    "delete_chat_session": "您确定吗? #10#10此操作不可逆,将删除此对话中的所有消息。",
+    "aborted": "操作已中止...",
+    "aborted_operation": "操作已中止",
+    "model_file_not_found": "%s:文件已创建。#10请打开此文件并指定可用模型的列表。",
+    "batch_begin_error": "无法启用批量显示渲染。",
+    "batch_end_error": "无法释放批量渲染。",
+    "focus_error": "输入气泡无法获得焦点。",
+    "stop_audio_media_error": "无法停止音频媒体。",
+    "stop_video_media_error": "无法停止视频媒体。",
+    "internal_theme_error": "无法更新页面主题。",
+    "deserialization_error": "反序列化错误:无效的 JSON 输入 %s",
+    "welcome": "欢迎使用您的工作区",
+    "structured_output_error": "结构化输出无效:请在设置中编辑其值。",
+    "card_json_file_not_found": "没有 JSON 文件支持 %s",
+    "models_categories_count_error": "请为默认模型定义类别",
+    "invalid_categories_file_error": "类别的 JSON 文件无效",
+    "text_generation_cant_handled_error": "没有默认模型:无法处理文本生成",
+    "image_creation_aborted_error": "未配置默认模型:图像创建已中止",
+    "video_creation_aborted_error": "未配置默认模型:视频创建已中止",
+    "audio_creation_aborted_error": "未配置默认模型:音频创建已中止",
+    "stt_operation_aborted_error": "未配置默认模型:STT 操作已中止",
+    "tts_operation_aborted_error": "未配置默认模型:TTS 操作已中止",
+    "deep_research_operation_aborted_error": "未配置默认模型:深度研究操作已中止",
+    "missing_default_models_error": "某些类别缺少默认模型。#10 请检查模型设置",
+    "api_key_empty_name_error": "密钥名称不能为空。",
+    "api_key_enter_dialog_prompt": "请输入 %s 的 API 密钥值",
+    "api_key_not_found": "%s:未找到 API 密钥",
+    "api_key_deleted": "%s:API 密钥已删除",
+    "api_key_exists": "%s:API 密钥已存在",
+    "api_key_modified": "%s:API 密钥已修改。",
+    "api_key_inserted": "%s:API 密钥已插入",
+    "web_decision_dlg_title": "确认",
+    "web_decision_dlg_message": "请确认。",
+    "web_decision_dlg_ok": "确定",
+    "web_decision_dlg_cancel": "取消",
+    "web_decision_dlg_close": "关闭",
+    "demo_anthropic_tool_confirmation_title": "确认",
+    "demo_anthropic_tool_allow": "允许",
+    "demo_anthropic_tool_deny": "拒绝",
+    "demo_anthropic_tool_allow_call": "允许此工具调用吗？",
+    "demo_anthropic_interrupted_by_user": "已被用户中断。",
+    "command_plugin_not_be_null": "插件不能为空",
+    "command_unknown": "未知命令:/%s",
+    "command_action_unknown": "未知操作:/%s %s",
+    "command_missing_action": "/%s 缺少操作",
+    "command_incorrect_number_of_arguments": "/%s %s 的参数数量不正确(收到 %d 个)",
+    "command_no_plugin_for": "/%s 没有插件"
+  }
+}

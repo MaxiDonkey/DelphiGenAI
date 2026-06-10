@@ -1,0 +1,14 @@
+﻿{
+  "type": "card-selection-dialog-set-data",
+  "dialog": "function",
+  "cards": [
+    {
+      "id": "DE5FE16B-F37F-47E2-A22F-55E45AE09E10",
+      "name": "Define a name",
+      "commentaire": "Edit the -function-cards.json file to define function available list",
+      "badge": "\uE2AD",
+      "content": ""
+    }
+  ],
+  "selectedId": "DE5FE16B-F37F-47E2-A22F-55E45AE09E10"
+}

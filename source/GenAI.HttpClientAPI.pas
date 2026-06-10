@@ -1,4 +1,4 @@
-unit GenAI.HttpClientAPI;
+ï»¿unit GenAI.HttpClientAPI;
 
 {-------------------------------------------------------------------------------
 
@@ -101,7 +101,7 @@ type
     /// </returns>
     /// <remarks>
     /// <para>
-    /// The HTTP client’s automatic redirect handling is disabled to allow explicit control of
+    /// The HTTP client's automatic redirect handling is disabled to allow explicit control of
     /// header propagation. Redirects are followed manually until a non-redirect status is received
     /// or the limit defined by <paramref name="MaxRedirects"/> is reached.
     /// </para>
@@ -171,6 +171,29 @@ type
     /// The HTTP status code returned by the server.
     /// </returns>
     function Post(const URL: string; Body: TMultipartFormData; Response: TStringStream; const Headers: TNetHeaders): Integer; overload;
+
+    /// <summary>
+    /// Sends an HTTP POST request with multipart form data and handles streamed responses.
+    /// </summary>
+    /// <param name="URL">
+    /// The endpoint URL to send the POST request to.
+    /// </param>
+    /// <param name="Body">
+    /// The multipart form data to include in the POST request.
+    /// </param>
+    /// <param name="Response">
+    /// A stream to capture the response content.
+    /// </param>
+    /// <param name="Headers">
+    /// A list of HTTP headers to include in the request.
+    /// </param>
+    /// <param name="OnReceiveData">
+    /// A callback procedure to handle data as it is received during the streaming process.
+    /// </param>
+    /// <returns>
+    /// The HTTP status code returned by the server.
+    /// </returns>
+    function Post(const URL: string; Body: TMultipartFormData; Response: TStream; const Headers: TNetHeaders; OnReceiveData: TReceiveDataCallback): Integer; overload;
 
     /// <summary>
     /// Sends an HTTP POST request with a JSON body to the specified URL and handles streamed responses.
@@ -481,6 +504,19 @@ begin
   Result := FHttpClient.Post(URL, Body, Response, Headers).StatusCode;
 end;
 
+function THttpClientAPI.Post(const URL: string; Body: TMultipartFormData;
+  Response: TStream; const Headers: TNetHeaders;
+  OnReceiveData: TReceiveDataCallback): Integer;
+begin
+  CheckAPISettings;
+  FHttpClient.ReceiveDataCallback := OnReceiveData;
+  try
+    Result := FHttpClient.Post(URL, Body, Response, Headers).StatusCode;
+  finally
+    FHttpClient.ReceiveDataCallback := nil;
+  end;
+end;
+
 function THttpClientAPI.Post(const URL: string; Response: TStringStream;
   const Headers: TNetHeaders): Integer;
 begin
@@ -498,7 +534,8 @@ begin
   {--- Query always encoded in explicit UTF-8 }
   var Bytes := TEncoding.UTF8.GetBytes(Body.ToJSON);
   var Req   := TMemoryStream.Create;
-  Req.WriteBuffer(Bytes, Length(Bytes));
+  if Length(Bytes) > 0 then
+    Req.WriteBuffer(Bytes[0], Length(Bytes));
   Req.Position := 0;
 
   FHttpClient.ReceiveDataCallback := OnReceiveData;

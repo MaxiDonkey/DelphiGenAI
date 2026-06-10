@@ -1,3 +1,76 @@
+#### 2026, June 9 version 2.0.0
+
+**Helpers**
+
+- Added `GenAI.Helpers.pas`, a fluent layer over `GenAI.Responses.InputParams` (reached through the `Generation` facade) that simplifies writing `v1/responses` payloads and rebuilding a session context — multi-turn input with replayed assistant messages.
+
+<br>
+
+**Skills API**
+
+- Added `GenAI.Skills.pas`: full coverage of the OpenAI Skills API through `Client.Skills` (create, list, retrieve, update the default version, delete, download the bundle) and `Client.Skills.Versions` (create, list, retrieve, delete and download immutable skill versions).
+
+<br>
+
+**Responses API**
+
+- Extended the `v1/responses` coverage with new request parameters: `PromptCacheRetention` (`in_memory` / `24h` extended prompt caching) and `ContextManagement` (automatic `compaction` driven by a `compact_threshold`).
+- Added the `Compact` / `AsynCompact` / `AsyncAwaitCompact` operation (`responses/compact`) returning a `TResponseCompaction` for stateless context-window compaction.
+- Added support for new built-in tools: local/function shell, apply patch, skills, tool search, namespace, web search filters, file-search ranking options, `allowed_tools` tool choice, and Code Interpreter container network policy.
+
+<br>
+
+**Containers API**
+
+- Aligned `GenAI.Containers.pas` and `GenAI.ContainerFiles.pas` with the latest OpenAI Containers API: new container creation parameters (`MemoryLimit`, `NetworkPolicy` with allowlist and domain secrets, `Skills`), additional container fields (`memory_limit`, `network_policy`, `last_active_at`), and a `SaveToFile` method on container file content.
+
+<br>
+
+**Architecture & low-level layers** (details in the [Version 2.0.0 — what changed under the hood](guides/Version2News.md) guide)
+
+- Realigned the low-level layers on the Anthropic SDK design so both SDKs share the same deserialization, type and streaming model.
+- Reworked deserialization into a two-step pass with a rehydration phase: the raw JSON is bound to every `TJSONFingerprint` and each DTO rebuilds its polymorphic content in `AfterDeserialize` (the legacy path-based `GenAI.API.Normalizer` is removed).
+- Hardened metadata handling for robustness and safety with `GenAI.API.JSONShield` (shields free-form protected fields), `GenAI.Types.Rtti` (safe RTTI member access) and a bounded graph traversal in the fingerprint binder.
+- Rewrote the type layer on top of `GenAI.Types.EnumWire`: centralized enum ↔ wire conversion with an `sdk_unknown` fallback, so unknown server-side values no longer break deserialization.
+- Improved polymorphic handling of `v1/responses` payloads in `GenAI.Responses.OutputParams.pas` (polymorphic fields excluded from default marshalling and rebuilt from the raw JSON).
+- Added event-level streaming for `v1/responses`: `GenAI.Responses.StreamCallbacks.pas` (per-event callbacks + aggregation buffer) and `GenAI.Responses.StreamEngine.pas` (event engine/dispatcher), alongside the existing session/progress callback.
+- Added `GenAI.Net.MediaCodec.pas` for unified base64 / data URI / MIME handling (encode/decode with safe `Try*` variants, MIME resolution, URL fetch).
+
+<br>
+
+**Removal of the Assistants API units**
+
+Deprecated since version 1.3.0 (following OpenAI's August 26, 2025 deprecation announcement), the Assistants API units are now **removed** from the wrapper:
+
+- `GenAI.Assistants.pas`
+- `GenAI.Messages.pas`
+- `GenAI.Threads.pas`
+- `GenAI.Runs.pas`
+- `GenAI.RunSteps.pas`
+
+Migrate any remaining integrations to the `v1/conversations` and `v1/responses` endpoints, which supersede this API.
+The last release shipping these units is **1.4.3**; their sources remain available there for reference and backward compatibility.
+
+<br>
+
+**Removal of the Sora video API**
+
+The `v1/videos` endpoint (Sora text-to-video / image-to-video generation) introduced in 1.3.0 is now **removed**:
+
+- `GenAI.Video.pas`
+
+<br>
+
+**Documentation**
+
+- Removed the *Deprecated* (Assistants, Threads, Messages, Runs, Run steps) and *Videos* guides from the `guides` folder.
+- Updated the README functional coverage table and endpoint references accordingly.
+- Refreshed the *Containers* guide to document the new container parameters, fields and the `SaveToFile` helper.
+- Refreshed the *Responses* guide to document prompt cache retention, context management / compaction and the new 2.0.0 tools.
+- Added a *Skills* guide covering skill and skill-version management.
+
+<br>
+
 #### 2026, January 11 version 1.4.3
 
 Added explicit support for multiple **OpenAI-compatible third-party providers** through dedicated factory methods and a configurable external endpoint.

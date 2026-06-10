@@ -1,4 +1,4 @@
-unit GenAI.HttpClientInterface;
+ï»¿unit GenAI.HttpClientInterface;
 
 {-------------------------------------------------------------------------------
 
@@ -199,7 +199,7 @@ type
     /// </returns>
     /// <remarks>
     /// <para>
-    /// The HTTP client’s automatic redirect handling is disabled to allow explicit control of
+    /// The HTTP client's automatic redirect handling is disabled to allow explicit control of
     /// header propagation. Redirects are followed manually until a non-redirect status is received
     /// or the limit defined by <paramref name="MaxRedirects"/> is reached.
     /// </para>
@@ -269,6 +269,29 @@ type
     /// The HTTP status code returned by the server.
     /// </returns>
     function Post(const URL: string; Body: TMultipartFormData; Response: TStringStream; const Headers: TNetHeaders): Integer; overload;
+
+    /// <summary>
+    /// Sends an HTTP POST request with multipart form data and handles streamed responses.
+    /// </summary>
+    /// <param name="URL">
+    /// The endpoint URL to send the POST request to.
+    /// </param>
+    /// <param name="Body">
+    /// The multipart form data to include in the POST request.
+    /// </param>
+    /// <param name="Response">
+    /// A stream where the response will be written.
+    /// </param>
+    /// <param name="Headers">
+    /// A list of HTTP headers to include in the request.
+    /// </param>
+    /// <param name="OnReceiveData">
+    /// A callback procedure to handle data as it is received during the streaming process.
+    /// </param>
+    /// <returns>
+    /// The HTTP status code returned by the server.
+    /// </returns>
+    function Post(const URL: string; Body: TMultipartFormData; Response: TStream; const Headers: TNetHeaders; OnReceiveData: TReceiveDataCallback): Integer; overload;
 
     /// <summary>
     /// Sends an HTTP POST request with a JSON body to the specified URL and handles streamed responses.

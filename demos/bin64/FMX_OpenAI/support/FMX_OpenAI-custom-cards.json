@@ -1,0 +1,50 @@
+﻿{
+  "type": "card-selection-dialog-set-data",
+  "dialog": "custom",
+  "cards": [
+    {
+      "id": "reasoning-summarized",
+      "name": "summarized",
+      "commentaire": "With 5 model series, display the reasoning if it is active. By default, \"omited\" hides the reasoning.",
+      "badge": "\uE2AD",
+      "content": ""
+    },
+    {
+      "id": "image-creation-background",
+      "name": "transparent background",
+      "commentaire": "Enable a transparent background when generating an image (only with gtp-image-1.5.)",
+      "badge": "\uE158",
+      "content": ""
+    },
+
+    {
+      "id": "image-creation-quality-high",
+      "name": "image high quality",
+      "commentaire": "Provide the images in high quality",
+      "badge": "\uE158",
+      "content": ""
+    },
+    {
+      "id": "image-creation-full-size",
+      "name": "full size",
+      "commentaire": "Provide the image in full size",
+      "badge": "\uE158",
+      "content": ""
+    },
+    {
+      "id": "image-creation-portrait-orientation",
+      "name": "portrait orientation",
+      "commentaire": "Provide the images in portrait orientation (1:3).",
+      "badge": "\uE158",
+      "content": ""
+    },
+    {
+      "id": "image-creation-landscape-orientation",
+      "name": "landscape orientation",
+      "commentaire": "Provide the images in landscape orientation (3:1).",
+      "badge": "\uE158",
+      "content": ""
+    }
+  ],
+  "selectedId": "DE5FE16B-F37F-47E2-A22F-55E45AE09E10"
+}

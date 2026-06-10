@@ -40,8 +40,8 @@ Now create the batch as follow :
     .AddPair('customer_id', 'user_123456789')
     .AddPair('batch_description', 'Nightly eval job');
 
-  //Asynchronous example
-  Client.Batch.AsynCreate(
+  //Synchronous example
+  var Value := Client.Batch.Create(
     procedure (Params: TBatchCreateParams)
     begin
       Params.InputFileId(TutorialHub.Id);
@@ -49,31 +49,12 @@ Now create the batch as follow :
       Params.CompletionWindow('24h');
       Params.Metadata(MetaData);
       TutorialHub.JSONRequest := Params.ToFormat();
-    end,
-    function : TAsynBatch
-    begin
-      Result.Sender := TutorialHub;
-      Result.OnStart := Start;
-      Result.OnSuccess := Display;
-      Result.OnError := Display;
     end);
-
-
-  //Synchronous example
-//  var Value := Client.Batch.Create(
-//    procedure (Params: TBatchCreateParams)
-//    begin
-//      Params.InputFileId(TutorialHub.Id);
-//      Params.Endpoint('/v1/chat/completions');
-//      Params.CompletionWindow('24h');
-//      Params.Metadata(MetaData);
-//      TutorialHub.JSONRequest := Params.ToFormat();
-//    end);
-//  try
-//    Display(TutorialHub, Value);
-//  finally
-//    Value.Free;
-//  end;
+  try
+    Display(TutorialHub, Value);
+  finally
+    Value.Free;
+  end;
 ```
 
 >[!TIP]
@@ -89,31 +70,17 @@ List your organization's batches.
 ```pascal
 //uses GenAI, GenAI.Types, GenAI.Tutorial.VCL;
 
-  //Asynchronous example
-  Client.Batch.AsynList(
+  //Synchronous example
+  var Value := Client.Batch.List(
     procedure (Params: TUrlPaginationParams)
     begin
       Params.Limit(4);
-    end,
-    function : TAsynBatches
-    begin
-      Result.Sender := TutorialHub;
-      Result.OnStart := Start;
-      Result.OnSuccess := Display;
-      Result.OnError := Display;
     end);
-
-  //Synchronous example
-//  var Value := Client.Batch.List(
-//    procedure (Params: TUrlPaginationParams)
-//    begin
-//      Params.Limit(4);
-//    end);
-//  try
-//    Display(TutorialHub, Value);
-//  finally
-//    Value.Free;
-//  end;
+  try
+    Display(TutorialHub, Value);
+  finally
+    Value.Free;
+  end;
 ```
 
 With out request parameters
@@ -121,23 +88,13 @@ With out request parameters
 ```pascal
 //uses GenAI, GenAI.Types, GenAI.Tutorial.VCL;
 
-  //Asynchronous example
-  Client.Batch.AsynList(
-    function : TAsynBatches
-    begin
-      Result.Sender := TutorialHub;
-      Result.OnStart := Start;
-      Result.OnSuccess := Display;
-      Result.OnError := Display;
-    end);
-
   //Synchronous example
-//  var Value := Client.Batch.List;
-//  try
-//    Display(TutorialHub, Value);
-//  finally
-//    Value.Free;
-//  end;
+  var Value := Client.Batch.List;
+  try
+    Display(TutorialHub, Value);
+  finally
+    Value.Free;
+  end;
 ```
 
 Refer to [parameters documentation](https://platform.openai.com/docs/api-reference/batch/list).
@@ -153,23 +110,13 @@ Retrieves a batch using its ID.
 
   TutorialHub.Id := '...Id of batch to retrieve...';
 
-  //Asynchronous example
-  Client.Batch.AsynRetrieve(TutorialHub.Id,
-    function : TAsynBatch
-    begin
-      Result.Sender := TutorialHub;
-      Result.OnStart := Start;
-      Result.OnSuccess := Display;
-      Result.OnError := Display;
-    end);
-
   //Synchronous example
-//  var Value := Client.Batch.Retrieve(TutorialHub.Id);
-//  try
-//    Display(TutorialHub, Value);
-//  finally
-//    Value.Free;
-//  end;
+  var Value := Client.Batch.Retrieve(TutorialHub.Id);
+  try
+    Display(TutorialHub, Value);
+  finally
+    Value.Free;
+  end;
 ```
 
 <br/>
@@ -183,23 +130,13 @@ Cancels an in-progress batch. The batch will be in status `cancelling` for up to
 
   TutorialHub.Id := '...Id of batch to cancel...';
 
-  //Asynchronous example
-  Client.Batch.AsynCancel(TutorialHub.Id,
-    function : TAsynBatch
-    begin
-      Result.Sender := TutorialHub;
-      Result.OnStart := Start;
-      Result.OnSuccess := Display;
-      Result.OnError := Display;
-    end);
-
   //Synchronous example
-//  var Value := Client.Batch.Cancel(TutorialHub.Id);
-//  try
-//    Display(TutorialHub, Value);
-//  finally
-//    Value.Free;
-//  end;
+  var Value := Client.Batch.Cancel(TutorialHub.Id);
+  try
+    Display(TutorialHub, Value);
+  finally
+    Value.Free;
+  end;
 ```
 
 <br/>

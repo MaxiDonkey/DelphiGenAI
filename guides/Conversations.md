@@ -58,30 +58,6 @@ You can also refer to the wrapper’s internal documentation, for example at thi
         Display(TutorialHub, E.Message);
       end);
 
-  //Asynchronous example
-//  Client.Conversations.AsynCreate(
-//    procedure (Params: TConversationsParams)
-//    begin
-//      Params.Metadata(
-//        TJSONObject.Create
-//          .AddPair('topic', 'demo')
-//      );
-//      Params.Items([
-//        TInputMessage.New
-//          .&Type()
-//          .Role('user')
-//          .Content('Hello!')
-//      ]);
-//      TutorialHub.JSONRequest := Params.ToFormat();
-//    end,
-//    function : TAsynConversations
-//    begin
-//      Result.Sender := TutorialHub;
-//      Result.OnStart := Start;
-//      Result.OnSuccess := Display;
-//      Result.OnError := Display;
-//    end);
-
   //Synchronous example
 //  var Value := Client.Conversations.Create(
 //    procedure (Params: TConversationsParams)
@@ -149,17 +125,6 @@ Result
         Display(TutorialHub, E.Message);
       end);
 
-
-  //Asynchronous example
-//  Client.Conversations.AsynDelete(ConvId,
-//    function : TAsynConversationsDeleted
-//    begin
-//      Result.Sender := TutorialHub;
-//      Result.OnStart := Start;
-//      Result.OnSuccess := Display;
-//      Result.OnError := Display;
-//    end);
-
   //Synchronous example
 //  var Value := Client.Conversations.Delete(ConvId);
 //  try
@@ -205,16 +170,6 @@ Result
       begin
         Display(TutorialHub, E.Message);
       end);
-
-  //Asynchronous example
-//  Client.Conversations.AsynRetrieve(ConvId,
-//    function : TAsynConversations
-//    begin
-//      Result.Sender := TutorialHub;
-//      Result.OnStart := Start;
-//      Result.OnSuccess := Display;
-//      Result.OnError := Display;
-//    end);
 
   //Synchronous example
 //  var Value := Client.Conversations.Retrieve(ConvId);
@@ -273,24 +228,6 @@ Result
       begin
         Display(TutorialHub, E.Message);
       end);
-
-  //Asynchronous example
-//  Client.Conversations.AsynUpdate(ConvId,
-//    procedure (Params: TUpdateConversationsParams)
-//    begin
-//      Params.Metadata(
-//        TJSONObject.Create
-//          .AddPair('topic', 'the new topic')
-//      );
-//      TutorialHub.JSONRequest := Params.ToFormat();
-//    end,
-//    function : TAsynConversations
-//    begin
-//      Result.Sender := TutorialHub;
-//      Result.OnStart := Start;
-//      Result.OnSuccess := Display;
-//      Result.OnError := Display;
-//    end);
 
   //Synchronous example
 //  var Value := Client.Conversations.Update(ConvId,
@@ -354,21 +291,6 @@ Result
       begin
         Display(TutorialHub, E.Message);
       end);
-
-  //Asynchronous example
-//  Client.Conversations.AsynList(ConvId,
-//    procedure (Params: TUrlListItemsParams)
-//    begin
-//      Params.Limit(50);
-//      Params.Order('asc');
-//    end,
-//    function : TAsynConversationList
-//    begin
-//      Result.Sender := TutorialHub;
-//      Result.OnStart := Start;
-//      Result.OnSuccess := Display;
-//      Result.OnError := Display;
-//    end);
 
   //Synchronous example
 //  var Value := Client.Conversations.List(ConvId,
@@ -446,26 +368,6 @@ Result
       begin
         Display(TutorialHub, E.Message);
       end);
-
-  //Asynchronous example
-//  Client.Conversations.AsynCreateItem(ConvId,
-//    procedure (Params: TConversationsItemParams)
-//    begin
-//      Params.Items([
-//        TInputMessage.New
-//          .&Type()
-//          .Role('assistant')
-//          .Content('C''est bien alors !!')
-//      ]);
-//      TutorialHub.JSONRequest := Params.ToFormat();
-//    end,
-//    function : TAsynConversationList
-//    begin
-//      Result.Sender := TutorialHub;
-//      Result.OnStart := Start;
-//      Result.OnSuccess := Display;
-//      Result.OnError := Display;
-//    end);
 
   //Synchronous example
 //  var Value := Client.Conversations.CreateItem(ConvId,
@@ -577,16 +479,6 @@ If you run [List Item](#list-items) again, you will get the following result:
         Display(TutorialHub, E.Message);
       end);
 
-  //Asynchronous example
-//  Client.Conversations.AsynRetrieveItem(ConvId, MsgId,
-//    function : TAsynConversationsItem
-//    begin
-//      Result.Sender := TutorialHub;
-//      Result.OnStart := Start;
-//      Result.OnSuccess := Display;
-//      Result.OnError := Display;
-//    end);
-
   //Synchronous example
 //  var Value := Client.Conversations.RetrieveItem(ConvId, MsgId);
 //  try
@@ -641,16 +533,6 @@ Result
       begin
         Display(TutorialHub, E.Message);
       end);
-
-  //Asynchronous example
-//  Client.Conversations.AsynDeleteItem(ConvId, MsgId,
-//    function : TAsynConversations
-//    begin
-//      Result.Sender := TutorialHub;
-//      Result.OnStart := Start;
-//      Result.OnSuccess := Display;
-//      Result.OnError := Display;
-//    end);
 
   //Synchronous example
 //  var Value := Client.Conversations.DeleteItem(ConvId, MsgId);

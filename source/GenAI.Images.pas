@@ -1,4 +1,4 @@
-unit GenAI.Images;
+﻿unit GenAI.Images;
 
 {-------------------------------------------------------------------------------
 
@@ -16,15 +16,6 @@ uses
   GenAI.Async.Promise;
 
 type
-  /// <summary>
-  /// Represents a parameter class for creating images through the OpenAI API, enabling
-  /// the configuration of prompts, models, and other settings for image generation.
-  /// </summary>
-  /// <remarks>
-  /// This class provides methods to specify various parameters required for generating images,
-  /// such as the text prompt, model, output size, and response format. It is designed
-  /// for use with the image creation API to streamline the construction of requests.
-  /// </remarks>
   TImageCreateParams = class(TJSONParam)
   public
     /// <summary>
@@ -176,7 +167,18 @@ type
     /// <returns>
     /// Returns an instance of <c>TImageCreateParams</c> with the updated quality setting.
     /// </returns>
-    function Quality(const Value: string): TImageCreateParams;
+    function Quality(const Value: string): TImageCreateParams; overload;
+
+    /// <summary>
+    /// Sets the quality of the generated images using a predefined quality type.
+    /// </summary>
+    /// <param name="Value">
+    /// A <c>TImageQualityType</c>, such as TImageQualityType.high, TImageQualityType.medium, or TImageQualityType.low.
+    /// </param>
+    /// <returns>
+    /// Returns an instance of <c>TImageCreateParams</c> with the updated quality setting.
+    /// </returns>
+    function Quality(const Value: TImageQualityType): TImageCreateParams; overload;
 
     /// <summary>
     /// Specifies the response format for the generated image(s).
@@ -277,15 +279,6 @@ type
     function User(const Value: string): TImageCreateParams;
   end;
 
-  /// <summary>
-  /// Represents a parameter class for editing images through the OpenAI API, enabling
-  /// the configuration of images, masks, prompts, and other settings for image editing.
-  /// </summary>
-  /// <remarks>
-  /// This class provides methods to specify various parameters required for editing images,
-  /// such as the image file, mask, text prompt, model, output size, and response format.
-  /// It is designed for use with the image editing API to streamline the construction of requests.
-  /// </remarks>
   TImageEditParams = class(TMultipartFormData)
   public
     constructor Create; reintroduce;
@@ -314,6 +307,39 @@ type
     /// Returns an instance of <c>TImageEditParams</c> with the specified image stream.
     /// </returns>
     function Image(const Value: TStream; const FileName: string): TImageEditParams; overload;
+
+    /// <summary>
+    /// Specifies multiple images to be edited using a list of file paths.
+    /// </summary>
+    /// <param name="Value">
+    /// An array of strings, each representing the file path of an image to be edited.
+    /// </param>
+    /// <returns>
+    /// Returns an instance of <c>TImageEditParams</c> with the specified image files.
+    /// </returns>
+    /// <remarks>
+    /// For gpt-image models, up to 16 images can be provided. Each image should be a png, webp,
+    /// or jpg file less than 50MB. Sent as the multipart field <c>image[]</c>.
+    /// </remarks>
+    function Image(const Value: TArray<string>): TImageEditParams; overload;
+
+    /// <summary>
+    /// Specifies multiple images to be edited using a list of streams.
+    /// </summary>
+    /// <param name="Value">
+    /// An array of <c>TStream</c> objects, each containing the image data.
+    /// </param>
+    /// <param name="FileNames">
+    /// An array of strings representing the file names associated with each stream, used for reference purposes.
+    /// </param>
+    /// <returns>
+    /// Returns an instance of <c>TImageEditParams</c> with the specified image streams.
+    /// </returns>
+    /// <remarks>
+    /// For gpt-image models, up to 16 images can be provided. The <c>Value</c> and <c>FileNames</c>
+    /// arrays must have the same length. Sent as the multipart field <c>image[]</c>.
+    /// </remarks>
+    function Image(const Value: TArray<TStream>; const FileNames: TArray<string>): TImageEditParams; overload;
 
     /// <summary>
     /// Allows to set transparency for the background of the generated image(s). This parameter is only
@@ -348,6 +374,107 @@ type
     /// Returns an instance of <c>TImageCreateParams</c> with the updated response format.
     /// </returns>
     function BackGround(const Value: string): TImageEditParams; overload;
+
+    /// <summary>
+    /// Controls how much effort the model will exert to match the style and features, especially
+    /// facial features, of input images. This parameter is only supported for gpt-image-1 and gpt-image-1-mini.
+    /// </summary>
+    /// <param name="Value">
+    /// A TImageInputFidelity such as TImageInputFidelity.high or TImageInputFidelity.low.
+    /// </param>
+    /// <returns>
+    /// Returns an instance of <c>TImageEditParams</c> with the updated input fidelity setting.
+    /// </returns>
+    /// <remarks>
+    /// Supports high and low. Defaults to low.
+    /// </remarks>
+    function InputFidelity(const Value: TImageInputFidelity): TImageEditParams; overload;
+
+    /// <summary>
+    /// Controls how much effort the model will exert to match the style and features, especially
+    /// facial features, of input images. This parameter is only supported for gpt-image-1 and gpt-image-1-mini.
+    /// </summary>
+    /// <param name="Value">
+    /// A string such as 'high' or 'low' describing the TImageInputFidelity.
+    /// </param>
+    /// <returns>
+    /// Returns an instance of <c>TImageEditParams</c> with the updated input fidelity setting.
+    /// </returns>
+    /// <remarks>
+    /// Supports high and low. Defaults to low.
+    /// </remarks>
+    function InputFidelity(const Value: string): TImageEditParams; overload;
+
+    /// <summary>
+    /// Control the content-moderation level for images generated by gpt-image-1.
+    /// </summary>
+    /// <param name="Value">
+    /// A TImageModerationType e.g. TImageModerationType.low or TImageModerationType.auto.
+    /// </param>
+    /// <returns>
+    /// Returns an instance of <c>TImageEditParams</c> with the specified moderation level.
+    /// </returns>
+    /// <remarks>
+    /// Must be either low for less restrictive filtering or auto (default value).
+    /// </remarks>
+    function Moderation(const Value: TImageModerationType): TImageEditParams; overload;
+
+    /// <summary>
+    /// Control the content-moderation level for images generated by gpt-image-1.
+    /// </summary>
+    /// <param name="Value">
+    /// A string as 'low' or 'auto' to describe the TImageModerationType.
+    /// </param>
+    /// <returns>
+    /// Returns an instance of <c>TImageEditParams</c> with the specified moderation level.
+    /// </returns>
+    /// <remarks>
+    /// Must be either low for less restrictive filtering or auto (default value).
+    /// </remarks>
+    function Moderation(const Value: string): TImageEditParams; overload;
+
+    /// <summary>
+    /// The format in which the generated images are returned.
+    /// </summary>
+    /// <param name="Value">
+    /// A TOutputFormatType e.g. TOutputFormatType.png, TOutputFormatType.jpeg or TOutputFormatType.webp.
+    /// </param>
+    /// <returns>
+    /// Returns an instance of <c>TImageEditParams</c> with the specified output format.
+    /// </returns>
+    /// <remarks>
+    /// This parameter is only supported for gpt-image-1. Must be one of png, jpeg, or webp.
+    /// </remarks>
+    function OutputFormat(const Value: TOutputFormatType): TImageEditParams; overload;
+
+    /// <summary>
+    /// The format in which the generated images are returned.
+    /// </summary>
+    /// <param name="Value">
+    /// A string e.g. 'png', 'jpeg' or 'webp' for the TOutputFormatType.
+    /// </param>
+    /// <returns>
+    /// Returns an instance of <c>TImageEditParams</c> with the specified output format.
+    /// </returns>
+    /// <remarks>
+    /// This parameter is only supported for gpt-image-1. Must be one of png, jpeg, or webp.
+    /// </remarks>
+    function OutputFormat(const Value: string): TImageEditParams; overload;
+
+    /// <summary>
+    /// The compression level (0-100%) for the generated images.
+    /// </summary>
+    /// <param name="Value">
+    /// An integer between 0 and 100. (defaults to 100)
+    /// </param>
+    /// <returns>
+    /// Returns an instance of <c>TImageEditParams</c> with the specified compression level.
+    /// </returns>
+    /// <remarks>
+    /// This parameter is only supported for gpt-image-1 with the webp or jpeg output formats,
+    /// and defaults to 100.
+    /// </remarks>
+    function OutputCompression(const Value: Integer): TImageEditParams;
 
     /// <summary>
     /// Sets the text prompt for the image editing process.
@@ -501,15 +628,6 @@ type
     function User(const Value: string): TImageEditParams;
   end;
 
-  /// <summary>
-  /// Represents a parameter class for creating image variations through the OpenAI API, enabling
-  /// the configuration of images, models, and other settings for variation generation.
-  /// </summary>
-  /// <remarks>
-  /// This class provides methods to specify various parameters required for generating image variations,
-  /// such as the base image, model, output size, and response format. It is designed
-  /// for use with the image variation API to streamline the construction of requests.
-  /// </remarks>
   TImageVariationParams = class(TMultipartFormData)
   public
     constructor Create; reintroduce;
@@ -618,13 +736,6 @@ type
     function User(const Value: string): TImageVariationParams;
   end;
 
-  /// <summary>
-  /// Represents the data object for an image created through the OpenAI API.
-  /// </summary>
-  /// <remarks>
-  /// This class contains the properties of the generated image, including its URL,
-  /// base64-encoded content, and the revised prompt (if applicable).
-  /// </remarks>
   TImageCreateData = class
   private
     [JsonNameAttribute('b64_json')]
@@ -665,15 +776,6 @@ type
     property RevisedPrompt: string read FRevisedPrompt write FRevisedPrompt;
   end;
 
-  /// <summary>
-  /// Represents a part of the generated image, extending the <c>TImageCreateData</c> class
-  /// to include file management functionality.
-  /// </summary>
-  /// <remarks>
-  /// This class provides additional methods for handling the generated image, such as
-  /// saving it to a file or retrieving it as a stream. It is designed for scenarios where
-  /// the generated image needs to be manipulated or stored locally.
-  /// </remarks>
   TImagePart = class(TImageCreateData)
   private
     FFileName: string;
@@ -744,6 +846,24 @@ type
     property TextTokens: Int64 read FTextTokens write FTextTokens;
   end;
 
+  TOutputTokensDetails = class
+  private
+    [JsonNameAttribute('image_tokens')]
+    FImageTokens: Int64;
+    [JsonNameAttribute('text_tokens')]
+    FTextTokens: Int64;
+  public
+    /// <summary>
+    /// The number of image tokens in the output image.
+    /// </summary>
+    property ImageTokens: Int64 read FImageTokens write FImageTokens;
+
+    /// <summary>
+    /// The number of text tokens in the output image.
+    /// </summary>
+    property TextTokens: Int64 read FTextTokens write FTextTokens;
+  end;
+
   /// <summary>
   /// For gpt-image-1 only, the token usage information for the image generation.
   /// </summary>
@@ -755,6 +875,8 @@ type
     FInputTokensDetails: TInputTokensDetails;
     [JsonNameAttribute('output_tokens')]
     FOutputTokens: Int64;
+    [JsonNameAttribute('output_tokens_details')]
+    FOutputTokensDetails: TOutputTokensDetails;
     [JsonNameAttribute('total_tokens')]
     FTotalTokens: Int64;
   public
@@ -774,6 +896,11 @@ type
     property OutputTokens: Int64 read FOutputTokens write FOutputTokens;
 
     /// <summary>
+    /// The output tokens detailed information for the image generation.
+    /// </summary>
+    property OutputTokensDetails: TOutputTokensDetails read FOutputTokensDetails write FOutputTokensDetails;
+
+    /// <summary>
     /// The total number of tokens (images and text) used for the image generation.
     /// </summary>
     property TotalTokens: Int64 read FTotalTokens write FTotalTokens;
@@ -781,24 +908,28 @@ type
     destructor Destroy; override;
   end;
 
-  /// <summary>
-  /// Represents the response object containing a collection of generated images
-  /// and metadata about the creation process.
-  /// </summary>
-  /// <remarks>
-  /// This class encapsulates the data returned by the OpenAI API for image generation,
-  /// including the timestamp of creation and the list of generated images. It provides
-  /// functionality for managing the lifecycle of these objects.
-  /// </remarks>
   TGeneratedImages = class(TJSONFingerprint)
   private
-    FCreated: TInt64OrNull;
+    FBackground: string;
+    FCreated: Int64;
     FData: TArray<TImagePart>;
+    [JsonNameAttribute('output_format')]
+    FOutputFormat: string;
+    FQuality: string;
+    FSize: string;
     FUsage: TGenerateImageUsage;
   private
     function GetCreatedAsString: string;
     function GetCreated: Int64;
   public
+    /// <summary>
+    /// The background parameter used for the image generation. Either transparent or opaque.
+    /// </summary>
+    /// <remarks>
+    /// For gpt-image models only.
+    /// </remarks>
+    property Background: string read FBackground write FBackground;
+
     /// <summary>
     /// Gets the timestamp indicating when the images were created.
     /// </summary>
@@ -813,6 +944,30 @@ type
     /// Gets or sets the collection of generated images.
     /// </summary>
     property Data: TArray<TImagePart> read FData write FData;
+
+    /// <summary>
+    /// The output format of the image generation. Either png, webp, or jpeg.
+    /// </summary>
+    /// <remarks>
+    /// For gpt-image models only.
+    /// </remarks>
+    property OutputFormat: string read FOutputFormat write FOutputFormat;
+
+    /// <summary>
+    /// The quality of the image generated. Either low, medium, or high.
+    /// </summary>
+    /// <remarks>
+    /// For gpt-image models only.
+    /// </remarks>
+    property Quality: string read FQuality write FQuality;
+
+    /// <summary>
+    /// The size of the image generated. Either 1024x1024, 1024x1536, or 1536x1024.
+    /// </summary>
+    /// <remarks>
+    /// For gpt-image models only.
+    /// </remarks>
+    property Size: string read FSize write FSize;
 
     /// <summary>
     /// For gpt-image-1 only, the token usage information for the image generation.
@@ -841,15 +996,25 @@ type
   /// </remarks>
   TPromiseGeneratedImages = TPromiseCallBack<TGeneratedImages>;
 
-  /// <summary>
-  /// Represents the route handler for image-related operations using the OpenAI API.
-  /// </summary>
-  /// <remarks>
-  /// This class provides methods for creating, editing, and generating variations of images.
-  /// It supports both synchronous and asynchronous operations, making it suitable for
-  /// diverse use cases involving image generation and manipulation.
-  /// </remarks>
-  TImagesRoute = class(TGenAIRoute)
+  TImagesAbstractSupport = class(TGenAIRoute)
+  protected
+    function Create(const ParamProc: TProc<TImageCreateParams>): TGeneratedImages; virtual; abstract;
+    function Edit(const ParamProc: TProc<TImageEditParams>): TGeneratedImages; virtual; abstract;
+    function Variation(const ParamProc: TProc<TImageVariationParams>): TGeneratedImages; virtual; abstract;
+  end;
+
+  TImagesAsynchronousSupport = class(TImagesAbstractSupport)
+  public
+    procedure AsynCreate(const ParamProc: TProc<TImageCreateParams>;
+      const CallBacks: TFunc<TAsynGeneratedImages>);
+    procedure AsynEdit(const ParamProc: TProc<TImageEditParams>;
+      const CallBacks: TFunc<TAsynGeneratedImages>);
+    procedure AsynVariation(const ParamProc: TProc<TImageVariationParams>;
+      const CallBacks: TFunc<TAsynGeneratedImages>);
+  end;
+
+  TImagesRoute = class(TImagesAsynchronousSupport)
+  public
     /// <summary>
     /// Initiates an asynchronous image creation request and returns a promise that resolves with the generated images.
     /// </summary>
@@ -889,6 +1054,25 @@ type
       const CallBacks: TFunc<TPromiseGeneratedImages> = nil): TPromise<TGeneratedImages>;
 
     /// <summary>
+    /// Initiates an asynchronous image variation request and returns a promise that resolves with the image variations.
+    /// </summary>
+    /// <param name="ParamProc">
+    /// A procedure to configure the image variation parameters via a <see cref="TImageVariationParams"/> instance.
+    /// </param>
+    /// <param name="CallBacks">
+    /// An optional function providing <see cref="TPromiseGeneratedImages"/> callbacks for start, success, and error handling.
+    /// </param>
+    /// <returns>
+    /// A <c>TPromise&lt;TGeneratedImages&gt;</c> that completes when the image variation operation succeeds or fails.
+    /// </returns>
+    /// <remarks>
+    /// Wraps the <see cref="AsynVariation"/> method to enable promise-based workflows for image variations.
+    /// If <paramref name="CallBacks"/> is omitted, the promise will only handle resolution and rejection.
+    /// </remarks>
+    function AsyncAwaitVariation(const ParamProc: TProc<TImageVariationParams>;
+      const CallBacks: TFunc<TPromiseGeneratedImages> = nil): TPromise<TGeneratedImages>;
+
+    /// <summary>
     /// Creates an image synchronously based on the provided parameters.
     /// </summary>
     /// <param name="ParamProc">
@@ -897,7 +1081,7 @@ type
     /// <returns>
     /// A <c>TGeneratedImages</c> object containing the created images and metadata.
     /// </returns>
-    function Create(const ParamProc: TProc<TImageCreateParams>): TGeneratedImages;
+    function Create(const ParamProc: TProc<TImageCreateParams>): TGeneratedImages; override;
 
     /// <summary>
     /// Edits an image synchronously based on the provided parameters.
@@ -908,7 +1092,7 @@ type
     /// <returns>
     /// A <c>TGeneratedImages</c> object containing the edited images and metadata.
     /// </returns>
-    function Edit(const ParamProc: TProc<TImageEditParams>): TGeneratedImages;
+    function Edit(const ParamProc: TProc<TImageEditParams>): TGeneratedImages; override;
 
     /// <summary>
     /// Generates variations of an image synchronously based on the provided parameters.
@@ -919,49 +1103,20 @@ type
     /// <returns>
     /// A <c>TGeneratedImages</c> object containing the image variations and metadata.
     /// </returns>
-    function Variation(const ParamProc: TProc<TImageVariationParams>): TGeneratedImages;
-
-    /// <summary>
-    /// Initiates an asynchronous image creation process.
-    /// </summary>
-    /// <param name="ParamProc">
-    /// A procedure that configures the parameters for the image creation request.
-    /// </param>
-    /// <param name="CallBacks">
-    /// A function that defines the callbacks for handling success, error, and completion states.
-    /// </param>
-    procedure AsynCreate(const ParamProc: TProc<TImageCreateParams>;
-      const CallBacks: TFunc<TAsynGeneratedImages>);
-
-    /// <summary>
-    /// Initiates an asynchronous image editing process.
-    /// </summary>
-    /// <param name="ParamProc">
-    /// A procedure that configures the parameters for the image editing request.
-    /// </param>
-    /// <param name="CallBacks">
-    /// A function that defines the callbacks for handling success, error, and completion states.
-    /// </param>
-    procedure AsynEdit(const ParamProc: TProc<TImageEditParams>;
-      const CallBacks: TFunc<TAsynGeneratedImages>);
-
-    /// <summary>
-    /// Initiates an asynchronous process for generating variations of an image.
-    /// </summary>
-    /// <param name="ParamProc">
-    /// A procedure that configures the parameters for the image variation request.
-    /// </param>
-    /// <param name="CallBacks">
-    /// A function that defines the callbacks for handling success, error, and completion states.
-    /// </param>
-    procedure AsynVariation(const ParamProc: TProc<TImageVariationParams>;
-      const CallBacks: TFunc<TAsynGeneratedImages>);
+    function Variation(const ParamProc: TProc<TImageVariationParams>): TGeneratedImages; override;
   end;
 
 implementation
 
 uses
-  GenAI.Httpx, GenAI.NetEncoding.Base64;
+  System.DateUtils, GenAI.Httpx, GenAI.NetEncoding.Base64;
+
+function ImagesUnixToUtc(const Value: Int64): string;
+begin
+  if Value <= 0 then
+    Exit(EmptyStr);
+  Result := FormatDateTime('yyyy-mm-dd"T"hh:nn:ss"Z"', UnixToDateTime(Value, True));
+end;
 
 { TImageCreateParams }
 
@@ -1023,6 +1178,11 @@ end;
 function TImageCreateParams.Quality(const Value: string): TImageCreateParams;
 begin
   Result := TImageCreateParams(Add('quality', Value));
+end;
+
+function TImageCreateParams.Quality(const Value: TImageQualityType): TImageCreateParams;
+begin
+  Result := TImageCreateParams(Add('quality', Value.ToString));
 end;
 
 function TImageCreateParams.ResponseFormat(
@@ -1140,7 +1300,21 @@ begin
     CallBacks);
 end;
 
-procedure TImagesRoute.AsynCreate(const ParamProc: TProc<TImageCreateParams>;
+function TImagesRoute.AsyncAwaitVariation(
+  const ParamProc: TProc<TImageVariationParams>;
+  const CallBacks: TFunc<TPromiseGeneratedImages>): TPromise<TGeneratedImages>;
+begin
+  Result := TAsyncAwaitHelper.WrapAsyncAwait<TGeneratedImages>(
+    procedure(const CallBackParams: TFunc<TAsynGeneratedImages>)
+    begin
+      AsynVariation(ParamProc, CallBackParams);
+    end,
+    CallBacks);
+end;
+
+{ TImagesAsynchronousSupport }
+
+procedure TImagesAsynchronousSupport.AsynCreate(const ParamProc: TProc<TImageCreateParams>;
   const CallBacks: TFunc<TAsynGeneratedImages>);
 begin
   with TAsynCallBackExec<TAsynGeneratedImages, TGeneratedImages>.Create(CallBacks) do
@@ -1159,7 +1333,7 @@ begin
   end;
 end;
 
-procedure TImagesRoute.AsynEdit(const ParamProc: TProc<TImageEditParams>;
+procedure TImagesAsynchronousSupport.AsynEdit(const ParamProc: TProc<TImageEditParams>;
   const CallBacks: TFunc<TAsynGeneratedImages>);
 begin
   with TAsynCallBackExec<TAsynGeneratedImages, TGeneratedImages>.Create(CallBacks) do
@@ -1178,7 +1352,7 @@ begin
   end;
 end;
 
-procedure TImagesRoute.AsynVariation(
+procedure TImagesAsynchronousSupport.AsynVariation(
   const ParamProc: TProc<TImageVariationParams>;
   const CallBacks: TFunc<TAsynGeneratedImages>);
 begin
@@ -1197,6 +1371,8 @@ begin
     Free;
   end;
 end;
+
+{ TImagesRoute }
 
 function TImagesRoute.Create(const ParamProc: TProc<TImageCreateParams>): TGeneratedImages;
 begin
@@ -1228,12 +1404,12 @@ end;
 
 function TGeneratedImages.GetCreated: Int64;
 begin
-  Result := TInt64OrNull(FCreated).ToInteger;
+  Result := FCreated;
 end;
 
 function TGeneratedImages.GetCreatedAsString: string;
 begin
-  Result := TInt64OrNull(FCreated).ToUtcDateString;
+  Result := ImagesUnixToUtc(FCreated);
 end;
 
 { TImageEditParams }
@@ -1241,6 +1417,27 @@ end;
 function TImageEditParams.Image(const Value: string): TImageEditParams;
 begin
   AddFile('image', Value);
+  Result := Self;
+end;
+
+function TImageEditParams.Image(const Value: TArray<string>): TImageEditParams;
+begin
+  for var Item in Value do
+    AddFile('image[]', Item);
+  Result := Self;
+end;
+
+function TImageEditParams.Image(const Value: TArray<TStream>;
+  const FileNames: TArray<string>): TImageEditParams;
+begin
+  if Length(Value) <> Length(FileNames) then
+    raise Exception.Create('Image: the Value and FileNames arrays must have the same length.');
+  for var I := 0 to High(Value) do
+    {$IF RTLVersion > 35.0}
+      AddStream('image[]', Value[I], True, FileNames[I]);
+    {$ELSE}
+      AddStream('image[]', Value[I], FileNames[I]);
+    {$ENDIF}
   Result := Self;
 end;
 
@@ -1254,6 +1451,52 @@ function TImageEditParams.BackGround(
   const Value: TBackGroundType): TImageEditParams;
 begin
   AddField('background', Value.ToString);
+  Result := Self;
+end;
+
+function TImageEditParams.InputFidelity(
+  const Value: TImageInputFidelity): TImageEditParams;
+begin
+  AddField('input_fidelity', Value.ToString);
+  Result := Self;
+end;
+
+function TImageEditParams.InputFidelity(const Value: string): TImageEditParams;
+begin
+  AddField('input_fidelity', TImageInputFidelity.Create(Value).ToString);
+  Result := Self;
+end;
+
+function TImageEditParams.Moderation(
+  const Value: TImageModerationType): TImageEditParams;
+begin
+  AddField('moderation', Value.ToString);
+  Result := Self;
+end;
+
+function TImageEditParams.Moderation(const Value: string): TImageEditParams;
+begin
+  AddField('moderation', TImageModerationType.Create(Value).ToString);
+  Result := Self;
+end;
+
+function TImageEditParams.OutputFormat(
+  const Value: TOutputFormatType): TImageEditParams;
+begin
+  AddField('output_format', Value.ToString);
+  Result := Self;
+end;
+
+function TImageEditParams.OutputFormat(const Value: string): TImageEditParams;
+begin
+  AddField('output_format', TOutputFormatType.Create(Value).ToString);
+  Result := Self;
+end;
+
+function TImageEditParams.OutputCompression(
+  const Value: Integer): TImageEditParams;
+begin
+  AddField('output_compression', Value.ToString);
   Result := Self;
 end;
 
@@ -1427,6 +1670,8 @@ destructor TGenerateImageUsage.Destroy;
 begin
   if Assigned(FInputTokensDetails) then
     FInputTokensDetails.Free;
+  if Assigned(FOutputTokensDetails) then
+    FOutputTokensDetails.Free;
   inherited;
 end;
 

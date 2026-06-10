@@ -1,0 +1,21 @@
+﻿{
+  "type": "card-selection-dialog-set-data",
+  "dialog": "mcp",
+  "cards": [
+    {
+      "id": "weather_service",
+      "name": "Weather service",
+      "commentaire": "Example of retrieving weather data provided by Gemini",
+      "content": "{\"type\": \"mcp\", \"server_url\": \"https:\/\/gemini-api-demos.uc.r.appspot.com\/mcp\", \"server_label\": \"Weather service\", \"require_approval\": \"never\"}"
+    },
+    {
+      "id": "github",
+      "name": "Github",
+      "commentaire": "GitHub access via PAT to be provided",
+      "badge": "\uE186",
+      "content": "{\"type\":\"mcp\",\"server_url\":\"https:\/\/api.githubcopilot.com\/mcp\/\",\"server_label\":\"Github\",\"authorization\":\"%s\",\"require_approval\":\"never\"}",
+      "pat": "your_github_pat"
+    }
+  ],
+  "selectedId": "weather_service"
+}

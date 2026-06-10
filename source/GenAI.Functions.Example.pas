@@ -1,4 +1,4 @@
-unit GenAI.Functions.Example;
+﻿unit GenAI.Functions.Example;
 
 {-------------------------------------------------------------------------------
 

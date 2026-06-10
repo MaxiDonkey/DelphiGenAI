@@ -1,0 +1,466 @@
+﻿{
+  "lang": "ko-KR",
+  "input": {
+    "placeholder": {
+      "askQuestion": "질문하세요..."
+    },
+    "menu": {
+      "endpoint": "엔드포인트",
+      "webResearch": "웹 검색",
+      "thinking": "추론",
+      "attachFiles": "파일 첨부",
+      "knowledgeSearch": "지식 검색",
+      "vision": "비전",
+      "deepResearch": "심층 조사",
+      "integration": "통합",
+      "media": "미디어",
+      "custom": "사용자 지정",
+      "settings": "설정",
+      "model": "모델",
+      "project": "프로젝트"
+    },
+    "thinking": {
+      "low": "낮음",
+      "medium": "중간",
+      "high": "높음"
+    },
+    "endpoint": {
+      "chatCompletion": "v1/chat/completions",
+      "chatResponse": "v1/chat/responses",
+      "message": "v1/message",
+      "generateContent": ":generateContent",
+      "interactions": "v1/interactions",
+      "conversation": "v1/conversation",
+      "provider": {
+        "chatCompletion": "OpenAI, DeepSeek, MistralAI",
+        "chatResponse": "OpenAI",
+        "message": "Claude",
+        "generateContent": "Gemini",
+        "interactions": "Gemini",
+        "conversation": "MistralAI"
+      }
+    },
+    "integration": {
+      "function": "함수",
+      "mcp": "MCP",
+      "jsCodeSandbox": "JS 샌드박스",
+      "skills": "기술",
+      "agents": "에이전트"
+    },
+    "media": {
+      "createImage": "이미지 만들기",
+      "createVideo": "동영상 만들기",
+      "createAudio": "오디오 만들기",
+      "speechToText": "음성을 텍스트로",
+      "textToSpeech": "텍스트를 음성으로"
+    },
+    "project": {
+      "add": "프로젝트 추가",
+      "none": "없음",
+      "noneUsed": "사용된 프로젝트 없음",
+      "delete": "삭제"
+    },
+    "chips": {
+      "endpoint": "엔드포인트: {title}",
+      "webResearch": "웹 검색",
+      "thinking": "추론: {title}",
+      "knowledgeSearch": "지식 검색 ({count})",
+      "deepResearch": "심층 조사",
+      "filesAttached": "첨부된 파일 ({count})",
+      "vision": "비전 ({count})",
+      "integrationFunction": "통합: 함수 ({count})",
+      "integrationMcp": "통합: MCP ({count})",
+      "integrationJsCodeSandbox": "통합: JS 샌드박스 ({count})",
+      "integrationSkills": "통합: 기술 ({count})",
+      "integrationAgents": "통합: 에이전트 ({count})",
+      "mediaCreateImage": "미디어: 이미지 만들기",
+      "mediaCreateVideo": "미디어: 동영상 만들기",
+      "mediaCreateAudio": "미디어: 오디오 만들기",
+      "speechToText": "음성을 텍스트로 ({count})",
+      "mediaTextToSpeech": "미디어: 텍스트를 음성으로",
+      "custom": "사용자 지정 ({count})"
+    }
+  },
+  "requestParams": {
+    "panel": {
+      "title": "설정",
+      "close": "닫기",
+      "theme": {
+        "light": "밝게",
+        "dark": "어둡게"
+      }
+    },
+    "summary": {
+      "alwaysAvailable": "항상 사용 가능",
+      "enabled": "사용함",
+      "disabled": "사용 안 함",
+      "enabledDisabled": "사용함 {enabled}개 / 사용 안 함 {disabled}개"
+    },
+    "categories": {
+      "appSettings": {
+        "title": "애플리케이션 설정",
+        "subtitle": "일반",
+        "panelSubtitle": ""
+      },
+      "systemPrompt": {
+        "title": "시스템 프롬프트"
+      },
+      "settings": {
+        "title": "일반 설정"
+      },
+      "sampling": {
+        "title": "샘플링"
+      },
+      "structuredOutput": {
+        "title": "구조화된 출력"
+      },
+      "vendorSettings": {
+        "title": "공급업체 옵션"
+      }
+    },
+    "items": {
+      "appSettings": {
+        "lookAndFeel": {
+          "label": "모양"
+        },
+        "language": {
+          "label": "언어",
+          "placeholder": "언어를 선택하세요"
+        },
+        "scrollButtons": {
+          "label": "스크롤 버튼"
+        }
+      },
+      "systemPrompt": {
+        "systemPrompt": {
+          "label": "시스템 프롬프트",
+          "labelWhenDisabled": "사용 안 함",
+          "labelWhenEnabled": "사용함",
+          "placeholder": "시스템 프롬프트를 입력하세요"
+        }
+      },
+      "settings": {
+        "temperature": {
+          "label": "온도"
+        },
+        "maxTokens": {
+          "label": "최대 토큰 수"
+        },
+        "stopStrings": {
+          "label": "중지 문자열",
+          "placeholder": "한 줄에 중지 문자열 하나씩"
+        }
+      },
+      "sampling": {
+        "topK": {
+          "label": "Top-k"
+        },
+        "topP": {
+          "label": "Top-p"
+        },
+        "presencePenalty": {
+          "label": "존재 페널티"
+        },
+        "randomSeed": {
+          "label": "랜덤 시드"
+        }
+      },
+      "structuredOutput": {
+        "jsonSchema": {
+          "label": "JSON 스키마",
+          "labelWhenDisabled": "사용 안 함",
+          "labelWhenEnabled": "사용함",
+          "placeholder": "JSON 스키마를 입력하세요",
+          "invalidJsonMessage": "잘못된 JSON"
+        }
+      },
+      "vendorSettings": {
+        "parallelToolCalls": {
+          "label": "병렬 도구 호출"
+        },
+        "backgroundResponse": {
+          "label": "백그라운드 응답"
+        },
+        "usingPreviousId": {
+          "label": "이전 ID 사용"
+        },
+        "store": {
+          "label": "저장"
+        }
+      }
+    }
+  },
+  "filesDrawer": {
+    "aria": {
+      "leftPanel": "왼쪽 사이드 패널"
+    },
+    "actions": {
+      "openPanel": "패널 열기",
+      "newSession": "새 세션",
+      "closePanel": "패널 닫기",
+      "nextPage": "다음 페이지",
+      "more": "더 보기",
+      "rename": "이름 바꾸기",
+      "delete": "삭제"
+    }
+  },
+  "scroll": {
+    "top": "맨 위로 스크롤",
+    "bottom": "맨 아래로 스크롤"
+  },
+  "selector": {
+    "branchAfterMessage": "이 메시지 이후 분기 만들기",
+    "copyMessage": "메시지 복사",
+    "deleteMessage": "메시지 삭제"
+  },
+  "confirmation": {
+    "title": "확인",
+    "question": "확인해 주세요.",
+    "yes": "예",
+    "no": "아니요"
+  },
+  "inputString": {
+    "title": "입력",
+    "message": "값을 입력해 주세요.",
+    "ok": "확인",
+    "cancel": "취소"
+  },
+  "webDecisionDlg": {
+    "title": "확인",
+    "message": "확인해 주세요.",
+    "ok": "확인",
+    "cancel": "취소",
+    "close": "닫기"
+  },
+  "displayFile": {
+    "fallbackName": "파일 {index}",
+    "badge": {
+      "pdf": "PDF",
+      "sheet": "XLS",
+      "doc": "DOC",
+      "slide": "PPT",
+      "text": "TXT",
+      "pascal": "PAS",
+      "code": "</>",
+      "file": "파일"
+    },
+    "status": {
+      "file": "파일"
+    },
+    "debug": {
+      "error": "DisplayFile 오류: {error}"
+    }
+  },
+  "displayImage": {
+    "action": {
+      "close": "닫기"
+    },
+    "error": {
+      "unavailable": "이미지를 사용할 수 없음"
+    },
+    "alt": {
+      "imageIndex": "이미지 {index}"
+    },
+    "debug": {
+      "error": "DisplayImages 오류: {error}"
+    }
+  },
+  "display": {
+    "reasoning": {
+      "title": "추론"
+    },
+    "toolGroup": {
+      "label": "사용된 도구"
+    },
+    "code": {
+      "copy": "복사",
+      "copied": "복사됨",
+      "copyToClipboard": "클립보드에 복사"
+    }
+  },
+  "errors": {
+    "aria": {
+      "systemMessages": "시스템 메시지"
+    },
+    "action": {
+      "close": "닫기"
+    }
+  },
+  "promptFile": {
+    "debug": {
+      "error": "PromptFile 오류: {error}"
+    }
+  },
+  "displayVideo": {
+    "fallbackName": "동영상 {index}",
+    "fallbackNameWithExtension": "동영상 {index}.{ext}",
+    "action": {
+      "open": "열기",
+      "close": "닫기"
+    },
+    "debug": {
+      "error": "DisplayVideo 오류: {error}"
+    }
+  },
+  "displayAudio": {
+    "fallbackName": "오디오 {index}",
+    "fallbackNameWithExtension": "오디오 {index}.{ext}",
+    "status": {
+      "stop": "중지",
+      "loading": "로딩 중",
+      "unavailable": "사용할 수 없음",
+      "pause": "일시 중지",
+      "playing": "재생 중"
+    },
+    "debug": {
+      "error": "DisplayAudio 오류: {error}"
+    }
+  },
+  "modelSelector": {
+    "panel": {
+      "title": "기본 모델 선택",
+      "aria": {
+        "dialog": "기본 모델 선택"
+      }
+    },
+    "actions": {
+      "close": "닫기"
+    },
+    "defaults": {
+      "title": "기본 모델",
+      "empty": "이 카테고리에는 기본 모델이 없습니다."
+    },
+    "status": {
+      "notAssigned": "할당되지 않음",
+      "noDefaultModel": "기본 모델 없음"
+    },
+    "categories": {
+      "allModels": {
+        "label": "모델 목록"
+      },
+      "textGeneration": {
+        "label": "텍스트 생성"
+      },
+      "imageCreation": {
+        "label": "이미지 생성"
+      },
+      "videoCreation": {
+        "label": "동영상 생성"
+      },
+      "audioCreation": {
+        "label": "오디오 생성"
+      },
+      "textToSpeech": {
+        "label": "텍스트를 음성으로"
+      },
+      "deepResearch": {
+        "label": "심층 조사"
+      }
+    },
+    "features": {
+      "webResearch": "웹 검색",
+      "thinking": "추론",
+      "attachFiles": "파일 첨부",
+      "vision": "비전",
+      "createImage": "이미지 만들기",
+      "createVideo": "동영상 만들기",
+      "createAudio": "오디오 만들기",
+      "speechToText": "음성을 텍스트로",
+      "textToSpeech": "텍스트를 음성으로",
+      "deepResearch": "심층 조사"
+    }
+  },
+  "cardSelector": {
+    "panel": {
+      "title": "항목 선택",
+      "ariaLabel": "항목 선택",
+      "selectDialogTitle": "{selectPrefix} {dialogLabel}"
+    },
+    "actions": {
+      "selectPrefix": "선택",
+      "close": "닫기",
+      "edit": "편집",
+      "settings": "설정",
+      "cancel": "취소",
+      "select": "선택"
+    },
+    "messages": {
+      "empty": "사용 가능한 항목이 없습니다.",
+      "noComment": ""
+    },
+    "dialogs": {
+      "function": {
+        "label": "함수"
+      },
+      "mcp": {
+        "label": "MCP"
+      },
+      "skills": {
+        "label": "기술"
+      },
+      "agents": {
+        "label": "에이전트"
+      },
+      "custom": {
+        "label": "사용자 지정"
+      }
+    }
+  },
+  "prompt": {
+    "toggleCollapse": "프롬프트 접기/펼치기",
+    "summary": {
+      "open": "프롬프트 요약 열기",
+      "close": "프롬프트 요약 닫기"
+    }
+  },
+  "more": {
+    "delete_qa": "현재 질문과 답변, 그리고 이후의 모든 항목을 삭제할 것을 확인해 주세요.",
+    "delete_chat_session": "확실합니까? #10#10이 작업은 되돌릴 수 없으며 이 대화의 모든 메시지가 삭제됩니다.",
+    "aborted": "작업이 중단되었습니다...",
+    "aborted_operation": "작업이 중단되었습니다",
+    "model_file_not_found": "%s: 파일이 생성되었습니다. #10이 파일을 열고 사용 가능한 모델 목록을 지정하세요.",
+    "batch_begin_error": "일괄 렌더링을 활성화하지 못했습니다.",
+    "batch_end_error": "일괄 렌더링을 해제하지 못했습니다.",
+    "focus_error": "입력 풍선이 포커스를 받지 못했습니다.",
+    "stop_audio_media_error": "오디오 미디어를 중지하지 못했습니다.",
+    "stop_video_media_error": "동영상 미디어를 중지하지 못했습니다.",
+    "internal_theme_error": "페이지 테마를 업데이트할 수 없습니다.",
+    "deserialization_error": "역직렬화 오류: 잘못된 JSON 입력 %s",
+    "welcome": "작업 공간에 오신 것을 환영합니다",
+    "structured_output_error": "구조화된 출력이 잘못되었습니다. 설정에서 값을 편집하세요.",
+    "card_json_file_not_found": "%s을(를) 지원하는 JSON 파일이 없습니다",
+    "models_categories_count_error": "기본 모델에 대한 카테고리를 정의하세요",
+    "invalid_categories_file_error": "카테고리에 대한 JSON 파일이 잘못되었습니다",
+    "text_generation_cant_handled_error": "기본 모델 없음: 텍스트 생성을 처리할 수 없습니다",
+    "image_creation_aborted_error": "기본 모델이 구성되지 않음: 이미지 생성이 중단되었습니다",
+    "video_creation_aborted_error": "기본 모델이 구성되지 않음: 동영상 생성이 중단되었습니다",
+    "audio_creation_aborted_error": "기본 모델이 구성되지 않음: 오디오 생성이 중단되었습니다",
+    "stt_operation_aborted_error": "기본 모델이 구성되지 않음: STT 작업이 중단되었습니다",
+    "tts_operation_aborted_error": "기본 모델이 구성되지 않음: TTS 작업이 중단되었습니다",
+    "deep_research_operation_aborted_error": "기본 모델이 구성되지 않음: 심층 조사가 중단되었습니다",
+    "missing_default_models_error": "일부 카테고리에 기본 모델이 누락되었습니다. #10 모델 설정을 확인하세요",
+    "api_key_empty_name_error": "키 이름은 비워 둘 수 없습니다.",
+    "api_key_enter_dialog_prompt": "%s의 API 키 값을 입력하세요",
+    "api_key_not_found": "%s: API 키를 찾을 수 없습니다",
+    "api_key_deleted": "%s: API 키가 삭제되었습니다",
+    "api_key_exists": "%s: API 키가 존재합니다",
+    "api_key_modified": "%s: API 키가 수정되었습니다.",
+    "api_key_inserted": "%s: API 키가 삽입되었습니다",
+    "web_decision_dlg_title": "확인",
+    "web_decision_dlg_message": "확인해 주세요.",
+    "web_decision_dlg_ok": "확인",
+    "web_decision_dlg_cancel": "취소",
+    "web_decision_dlg_close": "닫기",
+    "demo_anthropic_tool_confirmation_title": "확인",
+    "demo_anthropic_tool_allow": "허용",
+    "demo_anthropic_tool_deny": "거부",
+    "demo_anthropic_tool_allow_call": "이 도구 호출을 허용하시겠습니까?",
+    "demo_anthropic_interrupted_by_user": "사용자가 중단했습니다.",
+    "command_plugin_not_be_null": "플러그인은 null일 수 없습니다",
+    "command_unknown": "알 수 없는 명령: /%s",
+    "command_action_unknown": "알 수 없는 작업: /%s %s",
+    "command_missing_action": "/%s에 대한 작업 누락",
+    "command_incorrect_number_of_arguments": "/%s %s의 인수 개수가 잘못되었습니다 (받음 %d개)",
+    "command_no_plugin_for": "/%s에 대한 플러그인이 없습니다"
+  }
+}

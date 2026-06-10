@@ -1,4 +1,4 @@
-unit GenAI.Audio;
+﻿unit GenAI.Audio;
 
 {-------------------------------------------------------------------------------
 
@@ -10,17 +10,30 @@ unit GenAI.Audio;
 interface
 
 uses
-  System.SysUtils, System.Classes, System.Threading, REST.Json.Types, System.Net.Mime,
-  GenAI.API.Params, GenAI.API, GenAI.Types, GenAI.Async.Support, GenAI.Async.Promise;
+  System.SysUtils, System.Classes, System.Threading, System.Net.Mime, System.JSON,
+  System.Generics.Collections,
+  REST.Json.Types,
+  GenAI.API.Params, GenAI.API, GenAI.Types, GenAI.Async.Support, GenAI.Async.Promise,
+  GenAI.Audio.Stream;
 
 type
-  /// <summary>
-  /// Represents the parameters required to generate speech from text using the OpenAI API.
-  /// </summary>
-  /// <remarks>
-  /// This class encapsulates the settings that can be configured for the speech synthesis request,
-  /// including the model to use, the text input, the voice type, the response format, and the speed of speech.
-  /// </remarks>
+  TSpeechVoiceParams = class(TJSONParam)
+  public
+    /// <summary>
+    /// Creates a custom voice payload initialized with a voice identifier.
+    /// </summary>
+    /// <param name="Value">The custom voice identifier, such as <c>voice_...</c>.</param>
+    /// <returns>Returns a <see cref="TSpeechVoiceParams"/> instance configured with the specified voice id.</returns>
+    class function New(const Value: string): TSpeechVoiceParams;
+
+    /// <summary>
+    /// Sets the custom voice identifier to use for speech synthesis.
+    /// </summary>
+    /// <param name="Value">The custom voice identifier, such as <c>voice_...</c>.</param>
+    /// <returns>Returns an instance of <see cref="TSpeechVoiceParams"/> configured with the specified id.</returns>
+    function Id(const Value: string): TSpeechVoiceParams;
+  end;
+
   TSpeechParams = class(TJSONParam)
   public
     /// <summary>
@@ -52,6 +65,27 @@ type
     function Voice(const Value: string): TSpeechParams; overload;
 
     /// <summary>
+    /// Sets a custom voice object to be used for speech synthesis.
+    /// </summary>
+    /// <param name="Value">A custom voice payload containing a voice identifier.</param>
+    /// <returns>Returns an instance of <see cref="TSpeechParams"/> configured with the specified custom voice.</returns>
+    function Voice(const Value: TSpeechVoiceParams): TSpeechParams; overload;
+
+    /// <summary>
+    /// Sets a custom voice identifier to be used for speech synthesis.
+    /// </summary>
+    /// <param name="Value">The custom voice identifier, such as <c>voice_...</c>.</param>
+    /// <returns>Returns an instance of <see cref="TSpeechParams"/> configured with the specified custom voice id.</returns>
+    function VoiceId(const Value: string): TSpeechParams;
+
+    /// <summary>
+    /// Provides instructions that control the voice style for compatible speech models.
+    /// </summary>
+    /// <param name="Value">Natural-language instructions for the generated voice.</param>
+    /// <returns>Returns an instance of <see cref="TSpeechParams"/> configured with the specified instructions.</returns>
+    function Instructions(const Value: string): TSpeechParams;
+
+    /// <summary>
     /// Sets the response format of the audio output.
     /// </summary>
     /// <param name="Value">The desired audio format, such as 'mp3', 'wav', etc.</param>
@@ -66,6 +100,20 @@ type
     function ResponseFormat(const Value: string): TSpeechParams; overload;
 
     /// <summary>
+    /// Sets the streaming format for the speech response.
+    /// </summary>
+    /// <param name="Value">A value of <see cref="TSpeechStreamFormat"/> specifying how the stream is returned.</param>
+    /// <returns>Returns an instance of <see cref="TSpeechParams"/> configured with the specified stream format.</returns>
+    function StreamFormat(const Value: TSpeechStreamFormat): TSpeechParams; overload;
+
+    /// <summary>
+    /// Sets the streaming format for the speech response.
+    /// </summary>
+    /// <param name="Value">The stream format, such as <c>audio</c> or <c>sse</c>.</param>
+    /// <returns>Returns an instance of <see cref="TSpeechParams"/> configured with the specified stream format.</returns>
+    function StreamFormat(const Value: string): TSpeechParams; overload;
+
+    /// <summary>
     /// Sets the speed of the generated speech.
     /// </summary>
     /// <param name="Value">The speed multiplier for the speech, ranging from 0.25 to 4.0.</param>
@@ -73,13 +121,6 @@ type
     function Speed(const Value: Double): TSpeechParams;
   end;
 
-  /// <summary>
-  /// Represents the result of a speech synthesis request.
-  /// </summary>
-  /// <remarks>
-  /// This class handles the response from the OpenAI API after a speech generation request,
-  /// providing methods to access the generated audio content either as a stream or by saving it to a file.
-  /// </remarks>
   TSpeechResult = class(TJSONFingerprint)
   private
     FFileName: string;
@@ -132,13 +173,74 @@ type
     property FileName: string read FFileName write FFileName;
   end;
 
-  /// <summary>
-  /// Represents the parameters required for transcribing audio into text using the OpenAI API.
-  /// </summary>
-  /// <remarks>
-  /// This class encapsulates the settings that can be configured for the audio transcription request,
-  /// such as the audio file, model to use, language of the audio, optional prompt, response format, and transcription temperature.
-  /// </remarks>
+  TTranscriptionServerVadParams = class(TJSONParam)
+  public
+    /// <summary>
+    /// Creates server-side voice activity detection parameters.
+    /// </summary>
+    /// <returns>Returns a new <see cref="TTranscriptionServerVadParams"/> instance.</returns>
+    class function New: TTranscriptionServerVadParams;
+
+    /// <summary>
+    /// Sets the amount of audio to include before detected speech.
+    /// </summary>
+    /// <param name="Value">The prefix padding in milliseconds.</param>
+    /// <returns>Returns an instance configured with the specified prefix padding.</returns>
+    function PrefixPaddingMs(const Value: Integer): TTranscriptionServerVadParams;
+
+    /// <summary>
+    /// Sets the silence duration used to detect the end of a speech segment.
+    /// </summary>
+    /// <param name="Value">The silence duration in milliseconds.</param>
+    /// <returns>Returns an instance configured with the specified silence duration.</returns>
+    function SilenceDurationMs(const Value: Integer): TTranscriptionServerVadParams;
+
+    /// <summary>
+    /// Sets the voice activity detection threshold.
+    /// </summary>
+    /// <param name="Value">The server VAD threshold.</param>
+    /// <returns>Returns an instance configured with the specified threshold.</returns>
+    function Threshold(const Value: Double): TTranscriptionServerVadParams;
+  end;
+
+  TTranscriptionChunkingStrategyParams = class(TJSONParam)
+  public
+    /// <summary>
+    /// Creates a chunking strategy payload initialized with a type.
+    /// </summary>
+    /// <param name="Value">The chunking strategy type.</param>
+    /// <returns>Returns a new <see cref="TTranscriptionChunkingStrategyParams"/> instance.</returns>
+    class function New(const Value: TTranscriptionChunkingStrategyType): TTranscriptionChunkingStrategyParams; overload;
+
+    /// <summary>
+    /// Creates a chunking strategy payload initialized with a type.
+    /// </summary>
+    /// <param name="Value">The chunking strategy type name.</param>
+    /// <returns>Returns a new <see cref="TTranscriptionChunkingStrategyParams"/> instance.</returns>
+    class function New(const Value: string): TTranscriptionChunkingStrategyParams; overload;
+
+    /// <summary>
+    /// Sets the chunking strategy type.
+    /// </summary>
+    /// <param name="Value">The chunking strategy type.</param>
+    /// <returns>Returns an instance configured with the specified type.</returns>
+    function &Type(const Value: TTranscriptionChunkingStrategyType): TTranscriptionChunkingStrategyParams; overload;
+
+    /// <summary>
+    /// Sets the chunking strategy type.
+    /// </summary>
+    /// <param name="Value">The chunking strategy type name.</param>
+    /// <returns>Returns an instance configured with the specified type.</returns>
+    function &Type(const Value: string): TTranscriptionChunkingStrategyParams; overload;
+
+    /// <summary>
+    /// Sets the server-side VAD options for the chunking strategy.
+    /// </summary>
+    /// <param name="Value">The server VAD parameter payload.</param>
+    /// <returns>Returns an instance configured with the specified server VAD options.</returns>
+    function ServerVad(const Value: TTranscriptionServerVadParams): TTranscriptionChunkingStrategyParams;
+  end;
+
   TTranscriptionParams = class(TMultipartFormData)
   public
     constructor Create; reintroduce;
@@ -180,6 +282,90 @@ type
     function Prompt(const Value: string): TTranscriptionParams;
 
     /// <summary>
+    /// Sets the chunking strategy used to process the audio.
+    /// </summary>
+    /// <param name="Value">The chunking strategy type.</param>
+    /// <returns>Returns an instance of <see cref="TTranscriptionParams"/> configured with the specified chunking strategy.</returns>
+    function ChunkingStrategy(const Value: TTranscriptionChunkingStrategyType): TTranscriptionParams; overload;
+
+    /// <summary>
+    /// Sets the chunking strategy used to process the audio.
+    /// </summary>
+    /// <param name="Value">The chunking strategy type name.</param>
+    /// <returns>Returns an instance of <see cref="TTranscriptionParams"/> configured with the specified chunking strategy.</returns>
+    function ChunkingStrategy(const Value: string): TTranscriptionParams; overload;
+
+    /// <summary>
+    /// Sets the chunking strategy used to process the audio.
+    /// </summary>
+    /// <param name="Value">The chunking strategy payload.</param>
+    /// <returns>Returns an instance of <see cref="TTranscriptionParams"/> configured with the specified chunking strategy.</returns>
+    function ChunkingStrategy(const Value: TTranscriptionChunkingStrategyParams): TTranscriptionParams; overload;
+
+    /// <summary>
+    /// Adds an optional field to include in the transcription response.
+    /// </summary>
+    /// <param name="Value">The optional response field to include.</param>
+    /// <returns>Returns an instance of <see cref="TTranscriptionParams"/> configured with the specified include option.</returns>
+    function Include(const Value: TTranscriptionInclude): TTranscriptionParams; overload;
+
+    /// <summary>
+    /// Adds an optional field to include in the transcription response.
+    /// </summary>
+    /// <param name="Value">The optional response field name to include.</param>
+    /// <returns>Returns an instance of <see cref="TTranscriptionParams"/> configured with the specified include option.</returns>
+    function Include(const Value: string): TTranscriptionParams; overload;
+
+    /// <summary>
+    /// Adds optional fields to include in the transcription response.
+    /// </summary>
+    /// <param name="Value">The optional response field names to include.</param>
+    /// <returns>Returns an instance of <see cref="TTranscriptionParams"/> configured with the specified include options.</returns>
+    function Include(const Value: TArray<string>): TTranscriptionParams; overload;
+
+    /// <summary>
+    /// Adds optional fields to include in the transcription response.
+    /// </summary>
+    /// <param name="Value">The optional response fields to include.</param>
+    /// <returns>Returns an instance of <see cref="TTranscriptionParams"/> configured with the specified include options.</returns>
+    function Include(const Value: TArray<TTranscriptionInclude>): TTranscriptionParams; overload;
+
+    /// <summary>
+    /// Requests token log probabilities in the transcription response.
+    /// </summary>
+    /// <returns>Returns an instance of <see cref="TTranscriptionParams"/> configured to include log probabilities.</returns>
+    function IncludeLogprobs: TTranscriptionParams;
+
+    /// <summary>
+    /// Adds speaker names to use when diarizing the transcription.
+    /// </summary>
+    /// <param name="Value">The known speaker names.</param>
+    /// <returns>Returns an instance of <see cref="TTranscriptionParams"/> configured with the specified speaker names.</returns>
+    function KnownSpeakerNames(const Value: TArray<string>): TTranscriptionParams;
+
+    /// <summary>
+    /// Adds a known speaker reference audio file to use when diarizing the transcription.
+    /// </summary>
+    /// <param name="FileName">The known speaker reference audio file.</param>
+    /// <returns>Returns an instance of <see cref="TTranscriptionParams"/> configured with the specified speaker reference.</returns>
+    function KnownSpeakerReference(const FileName: string): TTranscriptionParams; overload;
+
+    /// <summary>
+    /// Adds a known speaker reference audio stream to use when diarizing the transcription.
+    /// </summary>
+    /// <param name="Stream">The stream containing the speaker reference audio.</param>
+    /// <param name="FileName">The name of the file represented by the stream.</param>
+    /// <returns>Returns an instance of <see cref="TTranscriptionParams"/> configured with the specified speaker reference.</returns>
+    function KnownSpeakerReference(const Stream: TStream; const FileName: string): TTranscriptionParams; overload;
+
+    /// <summary>
+    /// Adds known speaker reference audio files to use when diarizing the transcription.
+    /// </summary>
+    /// <param name="Value">The known speaker reference audio files.</param>
+    /// <returns>Returns an instance of <see cref="TTranscriptionParams"/> configured with the specified speaker references.</returns>
+    function KnownSpeakerReferences(const Value: TArray<string>): TTranscriptionParams;
+
+    /// <summary>
     /// Sets the format of the transcription output.
     /// </summary>
     /// <param name="Value">The desired output format, such as 'json', 'text', or 'srt'.</param>
@@ -194,6 +380,47 @@ type
     function ResponseFormat(const Value: string): TTranscriptionParams; overload;
 
     /// <summary>
+    /// Sets the response format to diarized JSON.
+    /// </summary>
+    /// <returns>Returns an instance of <see cref="TTranscriptionParams"/> configured for diarized JSON.</returns>
+    function DiarizedJson: TTranscriptionParams;
+
+    /// <summary>
+    /// Adds a timestamp granularity to request in verbose transcription responses.
+    /// </summary>
+    /// <param name="Value">The timestamp granularity to request.</param>
+    /// <returns>Returns an instance of <see cref="TTranscriptionParams"/> configured with the specified granularity.</returns>
+    function TimestampGranularity(const Value: TTimestampGranularity): TTranscriptionParams; overload;
+
+    /// <summary>
+    /// Adds a timestamp granularity to request in verbose transcription responses.
+    /// </summary>
+    /// <param name="Value">The timestamp granularity name to request.</param>
+    /// <returns>Returns an instance of <see cref="TTranscriptionParams"/> configured with the specified granularity.</returns>
+    function TimestampGranularity(const Value: string): TTranscriptionParams; overload;
+
+    /// <summary>
+    /// Adds timestamp granularities to request in verbose transcription responses.
+    /// </summary>
+    /// <param name="Value">The timestamp granularity names to request.</param>
+    /// <returns>Returns an instance of <see cref="TTranscriptionParams"/> configured with the specified granularities.</returns>
+    function TimestampGranularities(const Value: TArray<string>): TTranscriptionParams; overload;
+
+    /// <summary>
+    /// Adds timestamp granularities to request in verbose transcription responses.
+    /// </summary>
+    /// <param name="Value">The timestamp granularities to request.</param>
+    /// <returns>Returns an instance of <see cref="TTranscriptionParams"/> configured with the specified granularities.</returns>
+    function TimestampGranularities(const Value: TArray<TTimestampGranularity>): TTranscriptionParams; overload;
+
+    /// <summary>
+    /// Enables or disables streaming events for the transcription request.
+    /// </summary>
+    /// <param name="Value">When <c>True</c>, the API returns transcription events incrementally.</param>
+    /// <returns>Returns an instance of <see cref="TTranscriptionParams"/> configured with the specified streaming flag.</returns>
+    function Stream(const Value: Boolean = True): TTranscriptionParams;
+
+    /// <summary>
     /// Optionally sets the transcription temperature to control the randomness of the output.
     /// </summary>
     /// <param name="Value">A value between 0 and 1, where higher values result in more randomness.</param>
@@ -201,14 +428,6 @@ type
     function Temperature(const Value: Double): TTranscriptionParams;
   end;
 
-  /// <summary>
-  /// Represents a single word from the transcription result with its corresponding timestamps.
-  /// </summary>
-  /// <remarks>
-  /// This class provides detailed information about the timing of each word in the transcribed text,
-  /// including the start and end times, which are useful for applications requiring precise synchronization
-  /// between the audio and its transcription.
-  /// </remarks>
   TTranscriptionWord = class
   private
     FWord: string;
@@ -240,13 +459,6 @@ type
     property &End: Double read FEnd write FEnd;
   end;
 
-  /// <summary>
-  /// Represents a segment of the transcription, providing details such as segment text and its corresponding timing.
-  /// </summary>
-  /// <remarks>
-  /// This class details each segment of the transcribed audio, offering a deeper level of granularity for applications
-  /// that need to break down the transcription into smaller pieces for analysis or display.
-  /// </remarks>
   TTranscriptionSegment = class
   private
     FId: Int64;
@@ -317,22 +529,163 @@ type
     property NoSpeechProb: Double read FNoSpeechProb write FNoSpeechProb;
   end;
 
-  /// <summary>
-  /// Represents the full transcription result returned by the OpenAI audio transcription API.
-  /// </summary>
-  /// <remarks>
-  /// This class encapsulates the complete transcription of an audio file, including the language,
-  /// duration, and detailed segments and words with their corresponding timestamps.
-  /// It serves as a comprehensive container for all the transcription details necessary for further processing
-  /// or analysis in applications.
-  /// </remarks>
+  TTranscriptionDiarizedSegment = class
+  private
+    FId: string;
+    FStart: Double;
+    FEnd: Double;
+    FSpeaker: string;
+    FText: string;
+    FType: string;
+  public
+    /// <summary>
+    /// Unique identifier for the diarized segment.
+    /// </summary>
+    property Id: string read FId write FId;
+
+    /// <summary>
+    /// The start time of the segment in the audio stream, measured in seconds.
+    /// </summary>
+    property Start: Double read FStart write FStart;
+
+    /// <summary>
+    /// The end time of the segment in the audio stream, measured in seconds.
+    /// </summary>
+    property &End: Double read FEnd write FEnd;
+
+    /// <summary>
+    /// Speaker label associated with the segment.
+    /// </summary>
+    property Speaker: string read FSpeaker write FSpeaker;
+
+    /// <summary>
+    /// The text of the diarized segment.
+    /// </summary>
+    property Text: string read FText write FText;
+
+    /// <summary>
+    /// The event or segment type returned by the API.
+    /// </summary>
+    property &Type: string read FType write FType;
+  end;
+
+  TTranscriptionLogprob = class
+  private
+    FToken: string;
+    FBytes: TArray<Integer>;
+    FLogprob: Double;
+  public
+    /// <summary>
+    /// The token associated with this log probability entry.
+    /// </summary>
+    property Token: string read FToken write FToken;
+
+    /// <summary>
+    /// The UTF-8 bytes associated with the token.
+    /// </summary>
+    property Bytes: TArray<Integer> read FBytes write FBytes;
+
+    /// <summary>
+    /// The log probability of the token.
+    /// </summary>
+    property Logprob: Double read FLogprob write FLogprob;
+  end;
+
+  TTranscriptionInputTokenDetails = class
+  private
+    [JsonNameAttribute('audio_tokens')]
+    FAudioTokens: Int64;
+    [JsonNameAttribute('text_tokens')]
+    FTextTokens: Int64;
+  public
+    /// <summary>
+    /// Number of audio tokens billed for the request.
+    /// </summary>
+    property AudioTokens: Int64 read FAudioTokens write FAudioTokens;
+
+    /// <summary>
+    /// Number of text tokens billed for the request.
+    /// </summary>
+    property TextTokens: Int64 read FTextTokens write FTextTokens;
+  end;
+
+  TTranscriptionUsage = class
+  private
+    FType: string;
+    [JsonNameAttribute('input_tokens')]
+    FInputTokens: Int64;
+    [JsonNameAttribute('output_tokens')]
+    FOutputTokens: Int64;
+    [JsonNameAttribute('total_tokens')]
+    FTotalTokens: Int64;
+    [JsonNameAttribute('input_token_details')]
+    FInputTokenDetails: TTranscriptionInputTokenDetails;
+    FSeconds: Double;
+  public
+    /// <summary>
+    /// Releases nested usage details.
+    /// </summary>
+    destructor Destroy; override;
+
+    /// <summary>
+    /// The usage variant type, such as <c>tokens</c> or <c>duration</c>.
+    /// </summary>
+    property &Type: string read FType write FType;
+
+    /// <summary>
+    /// Number of input tokens billed for this request.
+    /// </summary>
+    property InputTokens: Int64 read FInputTokens write FInputTokens;
+
+    /// <summary>
+    /// Number of output tokens generated.
+    /// </summary>
+    property OutputTokens: Int64 read FOutputTokens write FOutputTokens;
+
+    /// <summary>
+    /// Total number of tokens used.
+    /// </summary>
+    property TotalTokens: Int64 read FTotalTokens write FTotalTokens;
+
+    /// <summary>
+    /// Details about the input tokens billed for this request.
+    /// </summary>
+    property InputTokenDetails: TTranscriptionInputTokenDetails read FInputTokenDetails write FInputTokenDetails;
+
+    /// <summary>
+    /// Duration of the input audio in seconds for duration-billed models.
+    /// </summary>
+    property Seconds: Double read FSeconds write FSeconds;
+  end;
+
   TTranscription = class(TJSONFingerprint)
   private
     FLanguage: string;
+    [JSONMarshalled(False)]
     FDuration: string;
+    [JSONMarshalled(False)]
+    FDurationSeconds: Double;
     FText: string;
+    FTask: string;
     FWords: TArray<TTranscriptionWord>;
+    [JSONMarshalled(False)]
     FSegments: TArray<TTranscriptionSegment>;
+    [JSONMarshalled(False)]
+    FDiarizedSegments: TArray<TTranscriptionDiarizedSegment>;
+    [JSONMarshalled(False)]
+    FLogprobs: TArray<TTranscriptionLogprob>;
+    [JSONMarshalled(False)]
+    FUsage: TTranscriptionUsage;
+  protected
+    /// <summary>
+    /// Rebuilds response fields that can have multiple shapes depending on the response format.
+    /// </summary>
+    procedure ContentUpdate; override;
+
+    /// <summary>
+    /// Finalizes deserialization after the raw JSON response has been attached.
+    /// </summary>
+    procedure AfterDeserialize; override;
   public
     /// <summary>
     /// The language of the audio that was transcribed.
@@ -353,6 +706,11 @@ type
     property Duration: string read FDuration write FDuration;
 
     /// <summary>
+    /// The duration of the audio that was transcribed, measured in seconds.
+    /// </summary>
+    property DurationSeconds: Double read FDurationSeconds write FDurationSeconds;
+
+    /// <summary>
     /// The complete transcribed text of the audio file.
     /// </summary>
     /// <remarks>
@@ -360,6 +718,11 @@ type
     /// providing a comprehensive view of the spoken content.
     /// </remarks>
     property Text: string read FText write FText;
+
+    /// <summary>
+    /// The task that was run for diarized transcription responses.
+    /// </summary>
+    property Task: string read FTask write FTask;
 
     /// <summary>
     /// A collection of words extracted from the transcription, each associated with specific timestamps.
@@ -381,6 +744,21 @@ type
     property Segments: TArray<TTranscriptionSegment> read FSegments write FSegments;
 
     /// <summary>
+    /// Speaker-annotated transcript segments returned by diarized JSON responses.
+    /// </summary>
+    property DiarizedSegments: TArray<TTranscriptionDiarizedSegment> read FDiarizedSegments write FDiarizedSegments;
+
+    /// <summary>
+    /// Token log probabilities returned when requested through the include parameter.
+    /// </summary>
+    property Logprobs: TArray<TTranscriptionLogprob> read FLogprobs write FLogprobs;
+
+    /// <summary>
+    /// Token or duration usage statistics for the transcription request.
+    /// </summary>
+    property Usage: TTranscriptionUsage read FUsage write FUsage;
+
+    /// <summary>
     /// Destructor for TTranscription, ensures proper cleanup of resources.
     /// </summary>
     /// <remarks>
@@ -390,13 +768,6 @@ type
     destructor Destroy; override;
   end;
 
-  /// <summary>
-  /// Represents the parameters required for translating audio into English using the OpenAI API.
-  /// </summary>
-  /// <remarks>
-  /// This class encapsulates settings for audio translation requests, including the audio file,
-  /// the translation model, optional guiding prompt, response format, and translation temperature.
-  /// </remarks>
   TTranslationParams = class(TMultipartFormData)
   public
     constructor Create; reintroduce;
@@ -435,7 +806,14 @@ type
     /// </summary>
     /// <param name="Value">The desired output format, such as 'json', 'text', or 'srt'.</param>
     /// <returns>Returns an instance of <see cref="TTranslationParams"/> configured with the specified response format.</returns>
-    function ResponseFormat(const Value: TTranscriptionResponseFormat): TTranslationParams;
+    function ResponseFormat(const Value: TTranscriptionResponseFormat): TTranslationParams; overload;
+
+    /// <summary>
+    /// Sets the format of the translation output.
+    /// </summary>
+    /// <param name="Value">A value of <see cref="TTranscriptionResponseFormat"/> specifying the desired response format.</param>
+    /// <returns>Returns an instance of <see cref="TTranslationParams"/> configured with the specified response format.</returns>
+    function ResponseFormat(const Value: string): TTranslationParams; overload;
 
     /// <summary>
     /// Optionally sets the translation temperature to control the randomness of the output.
@@ -445,17 +823,23 @@ type
     function Temperature(const Value: Double): TTranslationParams;
   end;
 
-  /// <summary>
-  /// Represents the translation result returned by the OpenAI audio translation API.
-  /// </summary>
-  /// <remarks>
-  /// This class encapsulates the result of translating audio into English, containing the translated text.
-  /// It is used to provide a straightforward interface to access the textual translation of spoken content.
-  /// </remarks>
   TTranslation = class(TJSONFingerprint)
   private
+    FLanguage: string;
+    FDuration: Double;
     FText: string;
+    FSegments: TArray<TTranscriptionSegment>;
   public
+    /// <summary>
+    /// The language of the output translation.
+    /// </summary>
+    property Language: string read FLanguage write FLanguage;
+
+    /// <summary>
+    /// The duration of the input audio in seconds.
+    /// </summary>
+    property Duration: Double read FDuration write FDuration;
+
     /// <summary>
     /// The translated text from the audio file.
     /// </summary>
@@ -464,6 +848,16 @@ type
     /// providing the English translation of the spoken content.
     /// </remarks>
     property Text: string read FText write FText;
+
+    /// <summary>
+    /// Segments of the translated text and their corresponding details.
+    /// </summary>
+    property Segments: TArray<TTranscriptionSegment> read FSegments write FSegments;
+
+    /// <summary>
+    /// Destructor for TTranslation, ensures segment resources are released.
+    /// </summary>
+    destructor Destroy; override;
   end;
 
   /// <summary>
@@ -532,15 +926,26 @@ type
   /// </remarks>
   TPromiseTranslation = TPromiseCallBack<TTranslation>;
 
-  /// <summary>
-  /// Provides routes to handle audio-related requests including speech generation, transcription, and translation.
-  /// </summary>
-  /// <remarks>
-  /// This class offers a set of methods to interact with OpenAI's API for generating speech from text,
-  /// transcribing audio into text, and translating audio into English. It supports both synchronous and asynchronous
-  /// operations to accommodate different application needs.
-  /// </remarks>
-  TAudioRoute = class(TGenAIRoute)
+  TAudioAbstractSupport = class(TGenAIRoute)
+  protected
+    function Speech(const ParamProc: TProc<TSpeechParams>): TSpeechResult; virtual; abstract;
+    function SpeechStream(const ParamProc: TProc<TSpeechParams>; const Event: TSpeechStreamEvent): Boolean; virtual; abstract;
+    function Transcription(const ParamProc: TProc<TTranscriptionParams>): TTranscription; virtual; abstract;
+    function TranscriptionStream(const ParamProc: TProc<TTranscriptionParams>; const Event: TTranscriptionStreamEvent): Boolean; virtual; abstract;
+    function TranslatingIntoEnglish(const ParamProc: TProc<TTranslationParams>): TTranslation; virtual; abstract;
+  end;
+
+  TAudioAsynchronousSupport = class(TAudioAbstractSupport)
+  public
+    procedure AsynSpeech(const ParamProc: TProc<TSpeechParams>; const CallBacks: TFunc<TAsynSpeechResult>);
+    procedure AsynSpeechStream(const ParamProc: TProc<TSpeechParams>; const CallBacks: TFunc<TAsynSpeechStream>);
+    procedure AsynTranscription(const ParamProc: TProc<TTranscriptionParams>; const CallBacks: TFunc<TAsynTranscription>);
+    procedure AsynTranscriptionStream(const ParamProc: TProc<TTranscriptionParams>; const CallBacks: TFunc<TAsynTranscriptionStream>);
+    procedure AsynTranslatingIntoEnglish(const ParamProc: TProc<TTranslationParams>; const CallBacks: TFunc<TAsynTranslation>);
+  end;
+
+  TAudioRoute = class(TAudioAsynchronousSupport)
+  public
     /// <summary>
     /// Initiates an asynchronous speech synthesis request and returns a promise that resolves with the generated speech result.
     /// </summary>
@@ -561,6 +966,12 @@ type
       const CallBacks: TFunc<TPromiseSpeechResult> = nil): TPromise<TSpeechResult>;
 
     /// <summary>
+    /// Initiates an asynchronous streamed speech request and returns the aggregated audio stream result.
+    /// </summary>
+    function AsyncAwaitSpeechStream(const ParamProc: TProc<TSpeechParams>;
+      const CallBacks: TFunc<TPromiseSpeechStream>): TPromise<TSpeechStreamResult>;
+
+    /// <summary>
     /// Initiates an asynchronous audio transcription request and returns a promise that resolves with the transcription result.
     /// </summary>
     /// <param name="ParamProc">
@@ -578,6 +989,12 @@ type
     /// </remarks>
     function AsyncAwaitTranscription(const ParamProc: TProc<TTranscriptionParams>;
       const CallBacks: TFunc<TPromiseTranscription> = nil): TPromise<TTranscription>;
+
+    /// <summary>
+    /// Initiates an asynchronous streamed transcription request and returns the aggregated transcription stream result.
+    /// </summary>
+    function AsyncAwaitTranscriptionStream(const ParamProc: TProc<TTranscriptionParams>;
+      const CallBacks: TFunc<TPromiseTranscriptionStream>): TPromise<TTranscriptionStreamResult>;
 
     /// <summary>
     /// Initiates an asynchronous audio translation into English request and returns a promise that resolves with the translation result.
@@ -606,7 +1023,12 @@ type
     /// <remarks>
     /// This method allows for synchronous speech synthesis, suitable for situations where immediate response from the API is required.
     /// </remarks>
-    function Speech(const ParamProc: TProc<TSpeechParams>): TSpeechResult;
+    function Speech(const ParamProc: TProc<TSpeechParams>): TSpeechResult; override;
+
+    /// <summary>
+    /// Streams generated speech chunks as they are received from the API.
+    /// </summary>
+    function SpeechStream(const ParamProc: TProc<TSpeechParams>; const Event: TSpeechStreamEvent): Boolean; override;
 
     /// <summary>
     /// Synchronously transcribes audio into text using the specified parameters.
@@ -616,7 +1038,12 @@ type
     /// <remarks>
     /// This method allows for synchronous audio transcription, appropriate for applications requiring immediate text output from audio.
     /// </remarks>
-    function Transcription(const ParamProc: TProc<TTranscriptionParams>): TTranscription;
+    function Transcription(const ParamProc: TProc<TTranscriptionParams>): TTranscription; override;
+
+    /// <summary>
+    /// Streams transcription events as they are received from the API.
+    /// </summary>
+    function TranscriptionStream(const ParamProc: TProc<TTranscriptionParams>; const Event: TTranscriptionStreamEvent): Boolean; override;
 
     /// <summary>
     /// Synchronously translates audio into English using the specified parameters.
@@ -626,48 +1053,64 @@ type
     /// <remarks>
     /// This method allows for synchronous audio translation, ideal for scenarios where an immediate textual translation is needed.
     /// </remarks>
-    function TranslatingIntoEnglish(const ParamProc: TProc<TTranslationParams>): TTranslation;
-
-     /// <summary>
-    /// Asynchronously generates speech from text using the specified parameters.
-    /// </summary>
-    /// <param name="ParamProc">A procedure that accepts a TSpeechParams instance to set the parameters for the speech request.</param>
-    /// <param name="CallBacks">A function that returns a callback mechanism for handling the result.</param>
-    /// <remarks>
-    /// This method provides asynchronous handling of speech synthesis, allowing the application to remain responsive
-    /// while processing large or multiple speech synthesis requests.
-    /// </remarks>
-    procedure AsynSpeech(const ParamProc: TProc<TSpeechParams>; const CallBacks: TFunc<TAsynSpeechResult>);
-
-    /// <summary>
-    /// Asynchronously transcribes audio into text using the specified parameters.
-    /// </summary>
-    /// <param name="ParamProc">A procedure that accepts a TTranscriptionParams instance to set the parameters for the transcription request.</param>
-    /// <param name="CallBacks">A function that returns a callback mechanism for handling the transcription result.</param>
-    /// <remarks>
-    /// This method provides asynchronous handling of audio transcription, which is useful for applications that need
-    /// to process audio files or streams without blocking the main application thread.
-    /// </remarks>
-    procedure AsynTranscription(const ParamProc: TProc<TTranscriptionParams>; const CallBacks: TFunc<TAsynTranscription>);
-
-    /// <summary>
-    /// Asynchronously translates audio into English using the specified parameters.
-    /// </summary>
-    /// <param name="ParamProc">A procedure that accepts a TTranslationParams instance to set the parameters for the translation request.</param>
-    /// <param name="CallBacks">A function that returns a callback mechanism for handling the translation result.</param>
-    /// <remarks>
-    /// This method provides asynchronous handling of audio translation, facilitating the processing of non-English audio
-    /// into English text without interrupting the user interface.
-    /// </remarks>
-    procedure AsynTranslatingIntoEnglish(const ParamProc: TProc<TTranslationParams>; const CallBacks: TFunc<TAsynTranslation>);
+    function TranslatingIntoEnglish(const ParamProc: TProc<TTranslationParams>): TTranslation; override;
   end;
 
 implementation
 
 uses
-  GenAI.NetEncoding.Base64;
+  GenAI.NetEncoding.Base64, GenAI.API.JsonSafeReader, GenAI.Async.Params,
+  GenAI.API.Streams, GenAI.API.SSEDecoder;
+
+type
+  TAudioJsonReader = record
+    class function IntegerArrayOf(const Value: TJSONValue): TArray<Integer>; static;
+    class function Int64ArrayOf(const Value: TJSONValue): TArray<Int64>; static;
+  end;
+
+class function TAudioJsonReader.IntegerArrayOf(
+  const Value: TJSONValue): TArray<Integer>;
+begin
+  Result := [];
+  if not (Value is TJSONArray) then
+    Exit;
+
+  var Items := TJSONArray(Value);
+  for var Index := 0 to Items.Count - 1 do
+    Result := Result + [StrToIntDef(Items.Items[Index].Value, 0)];
+end;
+
+class function TAudioJsonReader.Int64ArrayOf(
+  const Value: TJSONValue): TArray<Int64>;
+begin
+  Result := [];
+  if not (Value is TJSONArray) then
+    Exit;
+
+  var Items := TJSONArray(Value);
+  for var Index := 0 to Items.Count - 1 do
+    Result := Result + [StrToInt64Def(Items.Items[Index].Value, 0)];
+end;
+
+{ TSpeechVoiceParams }
+
+function TSpeechVoiceParams.Id(const Value: string): TSpeechVoiceParams;
+begin
+  Result := TSpeechVoiceParams(Add('id', Value));
+end;
+
+class function TSpeechVoiceParams.New(const Value: string): TSpeechVoiceParams;
+begin
+  Result := TSpeechVoiceParams.Create;
+  Result.Id(Value);
+end;
 
 { TSpeechParams }
+
+function TSpeechParams.Instructions(const Value: string): TSpeechParams;
+begin
+  Result := TSpeechParams(Add('instructions', Value));
+end;
 
 function TSpeechParams.Input(const Value: string): TSpeechParams;
 begin
@@ -681,7 +1124,7 @@ end;
 
 function TSpeechParams.ResponseFormat(const Value: string): TSpeechParams;
 begin
-  Result := TSpeechParams(Add('response_format', TSpeechFormat.Create(Value).ToString));
+  Result := ResponseFormat(TSpeechFormat.Parse(Value));
 end;
 
 function TSpeechParams.ResponseFormat(
@@ -695,14 +1138,35 @@ begin
   Result := TSpeechParams(Add('speed', Value));
 end;
 
+function TSpeechParams.StreamFormat(
+  const Value: TSpeechStreamFormat): TSpeechParams;
+begin
+  Result := TSpeechParams(Add('stream_format', Value.ToString));
+end;
+
+function TSpeechParams.StreamFormat(const Value: string): TSpeechParams;
+begin
+  Result := StreamFormat(TSpeechStreamFormat.Parse(Value));
+end;
+
 function TSpeechParams.Voice(const Value: string): TSpeechParams;
 begin
-  Result := TSpeechParams(Add('voice', TAudioVoice.Create(Value).ToString));
+  Result := Voice(TAudioVoice.Parse(Value));
 end;
 
 function TSpeechParams.Voice(const Value: TAudioVoice): TSpeechParams;
 begin
   Result := TSpeechParams(Add('voice', Value.ToString));
+end;
+
+function TSpeechParams.Voice(const Value: TSpeechVoiceParams): TSpeechParams;
+begin
+  Result := TSpeechParams(Add('voice', Value.Detach));
+end;
+
+function TSpeechParams.VoiceId(const Value: string): TSpeechParams;
+begin
+  Result := Voice(TSpeechVoiceParams.New(Value));
 end;
 
 { TAudioRoute }
@@ -718,6 +1182,68 @@ begin
     CallBacks);
 end;
 
+function TAudioRoute.AsyncAwaitSpeechStream(const ParamProc: TProc<TSpeechParams>;
+  const CallBacks: TFunc<TPromiseSpeechStream>): TPromise<TSpeechStreamResult>;
+begin
+  Result := TPromise<TSpeechStreamResult>.Create(
+    procedure(Resolve: TProc<TSpeechStreamResult>; Reject: TProc<Exception>)
+    var
+      Buffer: TSpeechStreamResult;
+      PromiseCallbacks: TPromiseSpeechStream;
+    begin
+      Buffer := TSpeechStreamResult.Empty;
+      var CallBackParams := TUseParamsFactory<TPromiseSpeechStream>.CreateInstance(CallBacks);
+      PromiseCallbacks := CallBackParams.Param;
+
+      AsynSpeechStream(ParamProc,
+        function: TAsynSpeechStream
+        begin
+          Result.Sender := PromiseCallbacks.Sender;
+          Result.OnStart := PromiseCallbacks.OnStart;
+
+          Result.OnProgress :=
+            procedure(Sender: TObject; Chunk: TSpeechStreamChunk)
+            begin
+              Buffer.Aggregate(Chunk);
+              if Assigned(PromiseCallbacks.OnProgress) then
+                PromiseCallbacks.OnProgress(Sender, Chunk);
+            end;
+
+          Result.OnSuccess :=
+            procedure(Sender: TObject)
+            begin
+              Resolve(Buffer);
+            end;
+
+          Result.OnError :=
+            procedure(Sender: TObject; Error: string)
+            begin
+              if Assigned(PromiseCallbacks.OnError) then
+                Error := PromiseCallbacks.OnError(Sender, Error);
+              Reject(Exception.Create(Error));
+            end;
+
+          Result.OnDoCancel :=
+            function: Boolean
+            begin
+              if Assigned(PromiseCallbacks.OnDoCancel) then
+                Result := PromiseCallbacks.OnDoCancel()
+              else
+                Result := False;
+            end;
+
+          Result.OnCancellation :=
+            procedure(Sender: TObject)
+            begin
+              var Error := 'aborted';
+              if Assigned(PromiseCallbacks.OnCancellation) then
+                Error := PromiseCallbacks.OnCancellation(Sender);
+              Reject(Exception.Create(Error));
+            end;
+        end);
+    end);
+end;
+
 function TAudioRoute.AsyncAwaitTranscription(
   const ParamProc: TProc<TTranscriptionParams>;
   const CallBacks: TFunc<TPromiseTranscription>): TPromise<TTranscription>;
@@ -728,6 +1254,72 @@ begin
       AsynTranscription(ParamProc, CallBackParams);
     end,
     CallBacks);
+end;
+
+function TAudioRoute.AsyncAwaitTranscriptionStream(
+  const ParamProc: TProc<TTranscriptionParams>;
+  const CallBacks: TFunc<TPromiseTranscriptionStream>): TPromise<TTranscriptionStreamResult>;
+begin
+  Result := TPromise<TTranscriptionStreamResult>.Create(
+    procedure(Resolve: TProc<TTranscriptionStreamResult>; Reject: TProc<Exception>)
+    var
+      Buffer: TTranscriptionStreamResult;
+      PromiseCallbacks: TPromiseTranscriptionStream;
+    begin
+      Buffer := TTranscriptionStreamResult.Empty;
+      var CallBackParams := TUseParamsFactory<TPromiseTranscriptionStream>.CreateInstance(CallBacks);
+      PromiseCallbacks := CallBackParams.Param;
+
+      AsynTranscriptionStream(ParamProc,
+        function: TAsynTranscriptionStream
+        begin
+          Result.Sender := PromiseCallbacks.Sender;
+          Result.OnStart := PromiseCallbacks.OnStart;
+
+          Result.OnProgress :=
+            procedure(Sender: TObject; Event: TTranscriptionStream)
+            begin
+              Buffer.Aggregate(Event);
+              if Assigned(PromiseCallbacks.OnProgress) then
+                PromiseCallbacks.OnProgress(Sender, Event);
+
+              if Assigned(Event) and Event.IsError then
+                Reject(Exception.Create(Format('(%s) %s', [Event.Code, Event.Message])));
+            end;
+
+          Result.OnSuccess :=
+            procedure(Sender: TObject)
+            begin
+              Resolve(Buffer);
+            end;
+
+          Result.OnError :=
+            procedure(Sender: TObject; Error: string)
+            begin
+              if Assigned(PromiseCallbacks.OnError) then
+                Error := PromiseCallbacks.OnError(Sender, Error);
+              Reject(Exception.Create(Error));
+            end;
+
+          Result.OnDoCancel :=
+            function: Boolean
+            begin
+              if Assigned(PromiseCallbacks.OnDoCancel) then
+                Result := PromiseCallbacks.OnDoCancel()
+              else
+                Result := False;
+            end;
+
+          Result.OnCancellation :=
+            procedure(Sender: TObject)
+            begin
+              var Error := 'aborted';
+              if Assigned(PromiseCallbacks.OnCancellation) then
+                Error := PromiseCallbacks.OnCancellation(Sender);
+              Reject(Exception.Create(Error));
+            end;
+        end);
+    end);
 end;
 
 function TAudioRoute.AsyncAwaitTranslatingIntoEnglish(
@@ -742,7 +1334,9 @@ begin
     CallBacks);
 end;
 
-procedure TAudioRoute.AsynSpeech(const ParamProc: TProc<TSpeechParams>;
+{ TAudioAsynchronousSupport }
+
+procedure TAudioAsynchronousSupport.AsynSpeech(const ParamProc: TProc<TSpeechParams>;
   const CallBacks: TFunc<TAsynSpeechResult>);
 begin
   with TAsynCallBackExec<TAsynSpeechResult, TSpeechResult>.Create(CallBacks) do
@@ -761,7 +1355,112 @@ begin
   end;
 end;
 
-procedure TAudioRoute.AsynTranscription(const ParamProc: TProc<TTranscriptionParams>;
+procedure TAudioAsynchronousSupport.AsynSpeechStream(
+  const ParamProc: TProc<TSpeechParams>;
+  const CallBacks: TFunc<TAsynSpeechStream>);
+begin
+  var CallBackParams := TUseParamsFactory<TAsynSpeechStream>.CreateInstance(CallBacks);
+
+  var Sender := CallBackParams.Param.Sender;
+  var OnStart := CallBackParams.Param.OnStart;
+  var OnSuccess := CallBackParams.Param.OnSuccess;
+  var OnProgress := CallBackParams.Param.OnProgress;
+  var OnError := CallBackParams.Param.OnError;
+  var OnCancellation := CallBackParams.Param.OnCancellation;
+  var OnDoCancel := CallBackParams.Param.OnDoCancel;
+  var CancelTag := 0;
+
+  var Task: ITask := TTask.Create(
+    procedure()
+    begin
+      if not Assigned(Sender) then
+        Sender := Self;
+
+      if Assigned(OnStart) then
+        TThread.Queue(nil,
+          procedure
+          begin
+            OnStart(Sender);
+          end);
+      try
+        var Stop := False;
+
+        SpeechStream(ParamProc,
+          procedure(var Chunk: TSpeechStreamChunk; IsDone: Boolean; var Cancel: Boolean)
+          begin
+            if Assigned(OnDoCancel) and (CancelTag = 0) then
+              TThread.Queue(nil,
+                procedure
+                begin
+                  Stop := OnDoCancel();
+                  if Stop then
+                    Inc(CancelTag);
+                end);
+
+            if Stop then
+              begin
+                if (CancelTag = 1) and Assigned(OnCancellation) then
+                  TThread.Queue(nil,
+                    procedure
+                    begin
+                      OnCancellation(Sender);
+                    end);
+                Inc(CancelTag);
+                Cancel := True;
+                Exit;
+              end;
+
+            if Assigned(Chunk) then
+              begin
+                var LocalChunk := Chunk;
+                Chunk := nil;
+
+                if Assigned(OnProgress) then
+                  TThread.Synchronize(TThread.Current,
+                    procedure
+                    begin
+                      try
+                        OnProgress(Sender, LocalChunk);
+                      finally
+                        LocalChunk.Free;
+                      end;
+                    end)
+                else
+                  LocalChunk.Free;
+              end
+            else
+            if IsDone then
+              begin
+                if Assigned(OnSuccess) then
+                  TThread.Queue(nil,
+                    procedure
+                    begin
+                      OnSuccess(Sender);
+                    end);
+              end;
+          end);
+      except
+        on E: Exception do
+          begin
+            var Error := AcquireExceptionObject;
+            try
+              var ErrorMsg := (Error as Exception).Message;
+              if Assigned(OnError) then
+                TThread.Queue(nil,
+                  procedure
+                  begin
+                    OnError(Sender, ErrorMsg);
+                  end);
+            finally
+              Error.Free;
+            end;
+          end;
+      end;
+    end);
+  Task.Start;
+end;
+
+procedure TAudioAsynchronousSupport.AsynTranscription(const ParamProc: TProc<TTranscriptionParams>;
   const CallBacks: TFunc<TAsynTranscription>);
 begin
   with TAsynCallBackExec<TAsynTranscription, TTranscription>.Create(CallBacks) do
@@ -780,7 +1479,112 @@ begin
   end;
 end;
 
-procedure TAudioRoute.AsynTranslatingIntoEnglish(
+procedure TAudioAsynchronousSupport.AsynTranscriptionStream(
+  const ParamProc: TProc<TTranscriptionParams>;
+  const CallBacks: TFunc<TAsynTranscriptionStream>);
+begin
+  var CallBackParams := TUseParamsFactory<TAsynTranscriptionStream>.CreateInstance(CallBacks);
+
+  var Sender := CallBackParams.Param.Sender;
+  var OnStart := CallBackParams.Param.OnStart;
+  var OnSuccess := CallBackParams.Param.OnSuccess;
+  var OnProgress := CallBackParams.Param.OnProgress;
+  var OnError := CallBackParams.Param.OnError;
+  var OnCancellation := CallBackParams.Param.OnCancellation;
+  var OnDoCancel := CallBackParams.Param.OnDoCancel;
+  var CancelTag := 0;
+
+  var Task: ITask := TTask.Create(
+    procedure()
+    begin
+      if not Assigned(Sender) then
+        Sender := Self;
+
+      if Assigned(OnStart) then
+        TThread.Queue(nil,
+          procedure
+          begin
+            OnStart(Sender);
+          end);
+      try
+        var Stop := False;
+
+        TranscriptionStream(ParamProc,
+          procedure(var Event: TTranscriptionStream; IsDone: Boolean; var Cancel: Boolean)
+          begin
+            if Assigned(OnDoCancel) and (CancelTag = 0) then
+              TThread.Queue(nil,
+                procedure
+                begin
+                  Stop := OnDoCancel();
+                  if Stop then
+                    Inc(CancelTag);
+                end);
+
+            if Stop then
+              begin
+                if (CancelTag = 1) and Assigned(OnCancellation) then
+                  TThread.Queue(nil,
+                    procedure
+                    begin
+                      OnCancellation(Sender);
+                    end);
+                Inc(CancelTag);
+                Cancel := True;
+                Exit;
+              end;
+
+            if Assigned(Event) then
+              begin
+                var LocalEvent := Event;
+                Event := nil;
+
+                if Assigned(OnProgress) then
+                  TThread.Synchronize(TThread.Current,
+                    procedure
+                    begin
+                      try
+                        OnProgress(Sender, LocalEvent);
+                      finally
+                        LocalEvent.Free;
+                      end;
+                    end)
+                else
+                  LocalEvent.Free;
+              end
+            else
+            if IsDone then
+              begin
+                if Assigned(OnSuccess) then
+                  TThread.Queue(nil,
+                    procedure
+                    begin
+                      OnSuccess(Sender);
+                    end);
+              end;
+          end);
+      except
+        on E: Exception do
+          begin
+            var Error := AcquireExceptionObject;
+            try
+              var ErrorMsg := (Error as Exception).Message;
+              if Assigned(OnError) then
+                TThread.Queue(nil,
+                  procedure
+                  begin
+                    OnError(Sender, ErrorMsg);
+                  end);
+            finally
+              Error.Free;
+            end;
+          end;
+      end;
+    end);
+  Task.Start;
+end;
+
+procedure TAudioAsynchronousSupport.AsynTranslatingIntoEnglish(
   const ParamProc: TProc<TTranslationParams>;
   const CallBacks: TFunc<TAsynTranslation>);
 begin
@@ -806,10 +1610,307 @@ begin
   Result := API.Post<TSpeechResult, TSpeechParams>('audio/speech', ParamProc, 'Data');
 end;
 
+function TAudioRoute.SpeechStream(const ParamProc: TProc<TSpeechParams>;
+  const Event: TSpeechStreamEvent): Boolean;
+var
+  Response: TLockedMemoryStream;
+  RetPos: Int64;
+  Decoder: TSSEDecoder;
+  DoneSent: Boolean;
+  AbortFlag: Boolean;
+  StreamFormat: TSpeechStreamFormat;
+begin
+  Response := TLockedMemoryStream.Create;
+  try
+    RetPos := 0;
+    DoneSent := False;
+    AbortFlag := False;
+    StreamFormat := TSpeechStreamFormat.audio;
+
+    var EmitDone :=
+      procedure(var AAbort: Boolean)
+      var
+        Chunk: TSpeechStreamChunk;
+      begin
+        if DoneSent then
+          Exit;
+
+        DoneSent := True;
+        Chunk := nil;
+        if Assigned(Event) then
+          Event(Chunk, True, AAbort);
+      end;
+
+    Decoder := TSSEDecoder.Create(
+      procedure(const EventName, Data: string; var AAbort: Boolean)
+      var
+        Chunk: TSpeechStreamChunk;
+        Payload: string;
+      begin
+        Chunk := nil;
+        Payload := Data;
+
+        if AAbort or DoneSent then
+          Exit;
+
+        if Payload.Trim.IsEmpty then
+          Exit;
+
+        if SameText(Payload.Trim, '[DONE]') then
+          begin
+            EmitDone(AAbort);
+            Exit;
+          end;
+
+        try
+          Chunk := TSpeechStreamChunk.Create(EventName, Payload);
+          if Assigned(Event) then
+            Event(Chunk, False, AAbort);
+        finally
+          Chunk.Free;
+        end;
+      end
+    );
+
+    var Drain :=
+      procedure(var Abort: Boolean)
+      var
+        Bytes: TBytes;
+        Snap: Int64;
+      begin
+        Snap := RetPos;
+        try
+          while Response.ExtractDelta(RetPos, Bytes) do
+            begin
+              if Length(Bytes) = 0 then
+                Continue;
+
+              if StreamFormat = TSpeechStreamFormat.sse then
+                Decoder.Feed(Bytes, Abort)
+              else
+                begin
+                  var Chunk := TSpeechStreamChunk.Create(Bytes);
+                  try
+                    if Assigned(Event) then
+                      Event(Chunk, False, Abort);
+                  finally
+                    Chunk.Free;
+                  end;
+                end;
+
+              if Abort then
+                Exit;
+            end;
+        except
+          RetPos := Snap;
+          raise;
+        end;
+      end;
+
+    try
+      Result := API.Post<TSpeechParams>(
+        'audio/speech',
+        procedure(Params: TSpeechParams)
+        begin
+          if Assigned(ParamProc) then
+            ParamProc(Params);
+
+          var Reader := TJsonReader.Parse(Params.ToJsonString);
+          if Reader.IsValid then
+            begin
+              var Value := Reader.AsString('stream_format');
+              if not Value.IsEmpty then
+                begin
+                  var ParsedFormat: TSpeechStreamFormat;
+                  if TSpeechStreamFormat.TryToParse(Value, ParsedFormat) then
+                    StreamFormat := ParsedFormat;
+                end;
+            end;
+        end,
+        Response,
+        procedure(const Sender: TObject; AContentLength: Int64; AReadCount: Int64; var AAbort: Boolean)
+        begin
+          if DoneSent then
+            begin
+              AAbort := True;
+              Exit;
+            end;
+
+          Drain(AAbort);
+
+          if AAbort then
+            AbortFlag := True;
+        end
+      );
+    finally
+      if not DoneSent and not AbortFlag then
+        begin
+          Drain(AbortFlag);
+          if StreamFormat = TSpeechStreamFormat.sse then
+            Decoder.Flush(AbortFlag);
+        end;
+
+      if not DoneSent and not AbortFlag then
+        EmitDone(AbortFlag);
+
+      Decoder.Free;
+      Drain := nil;
+      EmitDone := nil;
+    end;
+  finally
+    Response.Free;
+  end;
+end;
+
 function TAudioRoute.Transcription(
   const ParamProc: TProc<TTranscriptionParams>): TTranscription;
 begin
   Result := API.PostForm<TTranscription, TTranscriptionParams>('audio/transcriptions', ParamProc);
+end;
+
+function TAudioRoute.TranscriptionStream(
+  const ParamProc: TProc<TTranscriptionParams>;
+  const Event: TTranscriptionStreamEvent): Boolean;
+var
+  Response: TLockedMemoryStream;
+  RetPos: Int64;
+  Decoder: TSSEDecoder;
+  DoneSent: Boolean;
+  AbortFlag: Boolean;
+begin
+  Response := TLockedMemoryStream.Create;
+  try
+    RetPos := 0;
+    DoneSent := False;
+    AbortFlag := False;
+
+    var EmitDone :=
+      procedure(var AAbort: Boolean)
+      var
+        Content: TTranscriptionStream;
+      begin
+        if DoneSent then
+          Exit;
+
+        DoneSent := True;
+        Content := nil;
+        if Assigned(Event) then
+          Event(Content, True, AAbort);
+      end;
+
+    Decoder := TSSEDecoder.Create(
+      procedure(const Data: string; var AAbort: Boolean)
+      var
+        Line: string;
+        Content: TTranscriptionStream;
+        IsTerminal: Boolean;
+      begin
+        Content := nil;
+
+        if AAbort or DoneSent then
+          Exit;
+
+        Line := Data.Trim;
+        if Line.IsEmpty then
+          Exit;
+
+        if SameText(Line, '[DONE]') then
+          begin
+            EmitDone(AAbort);
+            Exit;
+          end;
+
+        try
+          try
+            Content := TApiDeserializer.Parse<TTranscriptionStream>(Line);
+          except
+            Content := nil;
+          end;
+
+          if Assigned(Content) then
+            begin
+              IsTerminal := Content.IsDone or Content.IsError;
+
+              if Assigned(Event) then
+                Event(Content, IsTerminal, AAbort);
+
+              if Content.IsError and not AAbort then
+                AAbort := True
+              else
+              if Content.IsDone and not AAbort then
+                EmitDone(AAbort);
+            end;
+        finally
+          Content.Free;
+        end;
+      end
+    );
+
+    var Drain :=
+      procedure(var Abort: Boolean)
+      var
+        Bytes: TBytes;
+        Snap: Int64;
+      begin
+        Snap := RetPos;
+        try
+          while Response.ExtractDelta(RetPos, Bytes) do
+            begin
+              if Length(Bytes) = 0 then
+                Continue;
+
+              Decoder.Feed(Bytes, Abort);
+
+              if Abort then
+                Exit;
+            end;
+        except
+          RetPos := Snap;
+          raise;
+        end;
+      end;
+
+    try
+      Result := API.PostForm<TTranscriptionParams>(
+        'audio/transcriptions',
+        procedure(Params: TTranscriptionParams)
+        begin
+          if Assigned(ParamProc) then
+            ParamProc(Params);
+          Params.Stream(True);
+        end,
+        Response,
+        procedure(const Sender: TObject; AContentLength: Int64; AReadCount: Int64; var AAbort: Boolean)
+        begin
+          if DoneSent then
+            begin
+              AAbort := True;
+              Exit;
+            end;
+
+          Drain(AAbort);
+
+          if AAbort then
+            AbortFlag := True;
+        end
+      );
+    finally
+      if not DoneSent and not AbortFlag then
+        begin
+          Drain(AbortFlag);
+          Decoder.Flush(AbortFlag);
+        end;
+
+      if not DoneSent and not AbortFlag then
+        EmitDone(AbortFlag);
+
+      Decoder.Free;
+      Drain := nil;
+      EmitDone := nil;
+    end;
+  finally
+    Response.Free;
+  end;
 end;
 
 function TAudioRoute.TranslatingIntoEnglish(
@@ -853,6 +1954,65 @@ begin
   end;
 end;
 
+{ TTranscriptionServerVadParams }
+
+class function TTranscriptionServerVadParams.New: TTranscriptionServerVadParams;
+begin
+  Result := TTranscriptionServerVadParams.Create;
+end;
+
+function TTranscriptionServerVadParams.PrefixPaddingMs(
+  const Value: Integer): TTranscriptionServerVadParams;
+begin
+  Result := TTranscriptionServerVadParams(Add('prefix_padding_ms', Value));
+end;
+
+function TTranscriptionServerVadParams.SilenceDurationMs(
+  const Value: Integer): TTranscriptionServerVadParams;
+begin
+  Result := TTranscriptionServerVadParams(Add('silence_duration_ms', Value));
+end;
+
+function TTranscriptionServerVadParams.Threshold(
+  const Value: Double): TTranscriptionServerVadParams;
+begin
+  Result := TTranscriptionServerVadParams(Add('threshold', Value));
+end;
+
+{ TTranscriptionChunkingStrategyParams }
+
+class function TTranscriptionChunkingStrategyParams.New(
+  const Value: string): TTranscriptionChunkingStrategyParams;
+begin
+  Result := TTranscriptionChunkingStrategyParams.Create;
+  Result.&Type(Value);
+end;
+
+class function TTranscriptionChunkingStrategyParams.New(
+  const Value: TTranscriptionChunkingStrategyType): TTranscriptionChunkingStrategyParams;
+begin
+  Result := TTranscriptionChunkingStrategyParams.Create;
+  Result.&Type(Value);
+end;
+
+function TTranscriptionChunkingStrategyParams.ServerVad(
+  const Value: TTranscriptionServerVadParams): TTranscriptionChunkingStrategyParams;
+begin
+  Result := TTranscriptionChunkingStrategyParams(Add('server_vad', Value.Detach));
+end;
+
+function TTranscriptionChunkingStrategyParams.&Type(
+  const Value: string): TTranscriptionChunkingStrategyParams;
+begin
+  Result := &Type(TTranscriptionChunkingStrategyType.Parse(Value));
+end;
+
+function TTranscriptionChunkingStrategyParams.&Type(
+  const Value: TTranscriptionChunkingStrategyType): TTranscriptionChunkingStrategyParams;
+begin
+  Result := TTranscriptionChunkingStrategyParams(Add('type', Value.ToString));
+end;
+
 { TTranscriptionParams }
 
 function TTranscriptionParams.&File(
@@ -860,6 +2020,31 @@ function TTranscriptionParams.&File(
 begin
   AddFile('file', FileName);
   Result := Self;
+end;
+
+function TTranscriptionParams.ChunkingStrategy(
+  const Value: string): TTranscriptionParams;
+begin
+  Result := ChunkingStrategy(TTranscriptionChunkingStrategyType.Parse(Value));
+end;
+
+function TTranscriptionParams.ChunkingStrategy(
+  const Value: TTranscriptionChunkingStrategyParams): TTranscriptionParams;
+begin
+  AddField('chunking_strategy', Value.ToJsonString(True));
+  Result := Self;
+end;
+
+function TTranscriptionParams.ChunkingStrategy(
+  const Value: TTranscriptionChunkingStrategyType): TTranscriptionParams;
+begin
+  AddField('chunking_strategy', Value.ToString);
+  Result := Self;
+end;
+
+function TTranscriptionParams.DiarizedJson: TTranscriptionParams;
+begin
+  Result := ResponseFormat(TTranscriptionResponseFormat.diarized_json);
 end;
 
 function TTranscriptionParams.Model(const Value: string): TTranscriptionParams;
@@ -874,17 +2059,124 @@ begin
   Result := Self;
 end;
 
+function TTranscriptionParams.Include(
+  const Value: TArray<string>): TTranscriptionParams;
+begin
+  for var Item in Value do
+    Include(Item);
+  Result := Self;
+end;
+
+function TTranscriptionParams.Include(
+  const Value: TArray<TTranscriptionInclude>): TTranscriptionParams;
+begin
+  for var Item in Value do
+    Include(Item);
+  Result := Self;
+end;
+
+function TTranscriptionParams.Include(
+  const Value: string): TTranscriptionParams;
+begin
+  AddField('include[]', Value);
+  Result := Self;
+end;
+
+function TTranscriptionParams.Include(
+  const Value: TTranscriptionInclude): TTranscriptionParams;
+begin
+  Result := Include(Value.ToString);
+end;
+
+function TTranscriptionParams.IncludeLogprobs: TTranscriptionParams;
+begin
+  Result := Include(TTranscriptionInclude.logprobs);
+end;
+
+function TTranscriptionParams.KnownSpeakerNames(
+  const Value: TArray<string>): TTranscriptionParams;
+begin
+  for var Item in Value do
+    AddField('known_speaker_names[]', Item);
+  Result := Self;
+end;
+
+function TTranscriptionParams.KnownSpeakerReference(
+  const FileName: string): TTranscriptionParams;
+begin
+  AddFile('known_speaker_references[]', FileName);
+  Result := Self;
+end;
+
+function TTranscriptionParams.KnownSpeakerReference(const Stream: TStream;
+  const FileName: string): TTranscriptionParams;
+begin
+  {$IF RTLVersion > 35.0}
+    AddStream('known_speaker_references[]', Stream, True, FileName);
+  {$ELSE}
+    AddStream('known_speaker_references[]', Stream, FileName);
+  {$ENDIF}
+  Result := Self;
+end;
+
+function TTranscriptionParams.KnownSpeakerReferences(
+  const Value: TArray<string>): TTranscriptionParams;
+begin
+  for var Item in Value do
+    KnownSpeakerReference(Item);
+  Result := Self;
+end;
+
 function TTranscriptionParams.ResponseFormat(
   const Value: string): TTranscriptionParams;
 begin
-  AddField('response_format', TTranscriptionResponseFormat.Create(Value).ToString);
-  Result := Self;
+  Result := ResponseFormat(TTranscriptionResponseFormat.Parse(Value));
 end;
 
 function TTranscriptionParams.ResponseFormat(
   const Value: TTranscriptionResponseFormat): TTranscriptionParams;
 begin
   AddField('response_format', Value.ToString);
+  Result := Self;
+end;
+
+function TTranscriptionParams.TimestampGranularities(
+  const Value: TArray<string>): TTranscriptionParams;
+begin
+  for var Item in Value do
+    TimestampGranularity(Item);
+  Result := Self;
+end;
+
+function TTranscriptionParams.TimestampGranularities(
+  const Value: TArray<TTimestampGranularity>): TTranscriptionParams;
+begin
+  for var Item in Value do
+    TimestampGranularity(Item);
+  Result := Self;
+end;
+
+function TTranscriptionParams.TimestampGranularity(
+  const Value: string): TTranscriptionParams;
+begin
+  Result := TimestampGranularity(TTimestampGranularity.Parse(Value));
+end;
+
+function TTranscriptionParams.TimestampGranularity(
+  const Value: TTimestampGranularity): TTranscriptionParams;
+begin
+  AddField('timestamp_granularities[]', Value.ToString);
+  Result := Self;
+end;
+
+function TTranscriptionParams.Stream(const Value: Boolean): TTranscriptionParams;
+begin
+  case Value of
+    True:
+      AddField('stream', 'true');
+    False:
+      AddField('stream', 'false');
+  end;
   Result := Self;
 end;
 
@@ -918,13 +2210,130 @@ begin
   Result := Self;
 end;
 
+{ TTranscriptionUsage }
+
+destructor TTranscriptionUsage.Destroy;
+begin
+  FInputTokenDetails.Free;
+  inherited;
+end;
+
 { TTranscription }
+
+procedure TTranscription.AfterDeserialize;
+begin
+  inherited;
+  ContentUpdate;
+end;
+
+procedure TTranscription.ContentUpdate;
+begin
+  inherited;
+
+  if JSONResponse.Trim.IsEmpty then
+    Exit;
+
+  var Reader := TJsonReader.Parse(JSONResponse);
+  if not Reader.IsValid then
+    Exit;
+
+  FDuration := Reader.AsString('duration');
+  FDurationSeconds := Reader.AsDouble('duration');
+  FTask := Reader.AsString('task');
+
+  FUsage.Free;
+  FUsage := nil;
+  if Reader.IsObjectNode('usage') then
+    begin
+      FUsage := TTranscriptionUsage.Create;
+      FUsage.&Type := Reader.AsString('usage.type');
+      FUsage.InputTokens := Reader.AsInt64('usage.input_tokens');
+      FUsage.OutputTokens := Reader.AsInt64('usage.output_tokens');
+      FUsage.TotalTokens := Reader.AsInt64('usage.total_tokens');
+      FUsage.Seconds := Reader.AsDouble('usage.seconds');
+
+      if Reader.IsObjectNode('usage.input_token_details') then
+        begin
+          FUsage.InputTokenDetails := TTranscriptionInputTokenDetails.Create;
+          FUsage.InputTokenDetails.AudioTokens := Reader.AsInt64('usage.input_token_details.audio_tokens');
+          FUsage.InputTokenDetails.TextTokens := Reader.AsInt64('usage.input_token_details.text_tokens');
+        end;
+    end;
+
+  for var Item in FLogprobs do
+    Item.Free;
+  FLogprobs := [];
+  if Reader.Value('logprobs') is TJSONArray then
+    begin
+      var LogprobsArray := TJSONArray(Reader.Value('logprobs'));
+      for var Index := 0 to LogprobsArray.Count - 1 do
+        if LogprobsArray.Items[Index] is TJSONObject then
+          begin
+            var LogprobObj := TJSONObject(LogprobsArray.Items[Index]);
+            var Logprob := TTranscriptionLogprob.Create;
+            Logprob.Token := LogprobObj.GetPathString('token');
+            Logprob.Bytes := TAudioJsonReader.IntegerArrayOf(LogprobObj.GetPathValue('bytes'));
+            Logprob.Logprob := LogprobObj.GetPathDouble('logprob');
+            FLogprobs := FLogprobs + [Logprob];
+          end;
+    end;
+
+  for var Item in FSegments do
+    Item.Free;
+  FSegments := [];
+  for var Item in FDiarizedSegments do
+    Item.Free;
+  FDiarizedSegments := [];
+
+  if Reader.Value('segments') is TJSONArray then
+    begin
+      var SegmentsArray := TJSONArray(Reader.Value('segments'));
+      for var Index := 0 to SegmentsArray.Count - 1 do
+        if SegmentsArray.Items[Index] is TJSONObject then
+          begin
+            var SegmentObj := TJSONObject(SegmentsArray.Items[Index]);
+
+            if Assigned(SegmentObj.GetPathValue('speaker')) or
+               SameText(SegmentObj.GetPathString('type'), 'transcript.text.segment') then
+              begin
+                var Segment := TTranscriptionDiarizedSegment.Create;
+                Segment.Id := SegmentObj.GetPathString('id');
+                Segment.Start := SegmentObj.GetPathDouble('start');
+                Segment.&End := SegmentObj.GetPathDouble('end');
+                Segment.Speaker := SegmentObj.GetPathString('speaker');
+                Segment.Text := SegmentObj.GetPathString('text');
+                Segment.&Type := SegmentObj.GetPathString('type');
+                FDiarizedSegments := FDiarizedSegments + [Segment];
+              end
+            else
+              begin
+                var Segment := TTranscriptionSegment.Create;
+                Segment.Id := SegmentObj.GetPathInt64('id');
+                Segment.Seek := SegmentObj.GetPathInt64('seek');
+                Segment.Start := SegmentObj.GetPathDouble('start');
+                Segment.&End := SegmentObj.GetPathDouble('end');
+                Segment.Text := SegmentObj.GetPathString('text');
+                Segment.Tokens := TAudioJsonReader.Int64ArrayOf(SegmentObj.GetPathValue('tokens'));
+                Segment.Temperature := SegmentObj.GetPathDouble('temperature');
+                Segment.AvgLogprob := SegmentObj.GetPathDouble('avg_logprob');
+                Segment.CompressionRatio := SegmentObj.GetPathDouble('compression_ratio');
+                Segment.NoSpeechProb := SegmentObj.GetPathDouble('no_speech_prob');
+                FSegments := FSegments + [Segment];
+              end;
+          end;
+    end;
+end;
 
 destructor TTranscription.Destroy;
 begin
+  FUsage.Free;
+  for var Item in FLogprobs do
+    Item.Free;
   for var Item in FWords do
     Item.Free;
   for var Item in FSegments do
+    Item.Free;
+  for var Item in FDiarizedSegments do
     Item.Free;
   inherited;
 end;
@@ -966,6 +2375,12 @@ begin
 end;
 
 function TTranslationParams.ResponseFormat(
+  const Value: string): TTranslationParams;
+begin
+  Result := ResponseFormat(TTranscriptionResponseFormat.Parse(Value));
+end;
+
+function TTranslationParams.ResponseFormat(
   const Value: TTranscriptionResponseFormat): TTranslationParams;
 begin
   AddField('response_format', Value.ToString);
@@ -977,6 +2392,15 @@ function TTranslationParams.Temperature(
 begin
   AddField('temperature', Value.ToString);
   Result := Self;
+end;
+
+{ TTranslation }
+
+destructor TTranslation.Destroy;
+begin
+  for var Item in FSegments do
+    Item.Free;
+  inherited;
 end;
 
 end.

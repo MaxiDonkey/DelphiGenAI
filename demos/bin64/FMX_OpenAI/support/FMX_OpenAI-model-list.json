@@ -1,0 +1,91 @@
+﻿{
+  "type": "model-selector-set-data",
+  "models": [
+    {
+      "id": "gpt-5.5",
+      "label": "GPT-5.5",
+      "capabilityLabels": [ "Thinking", "Vision", "Attach files", "Web research", "Create Image" ],
+      "categoryId": "textGeneration"
+    },
+    {
+      "id": "gpt-5.4",
+      "label": "GPT-5.4",
+      "capabilityLabels": [ "Thinking", "Vision", "Attach files", "Web research", "Create Image" ],
+      "categoryId": "textGeneration"
+    },
+    {
+      "id": "gpt-5.4-mini",
+      "label": "GPT-5.4 mini",
+      "capabilityLabels": [ "Thinking", "Vision", "Attach files", "Web research", "Create Image" ],
+      "categoryId": "textGeneration"
+    },
+    {
+      "id": "gpt-5.4-nano",
+      "label": "GPT-5.4 nano",
+      "capabilityLabels": [ "Thinking", "Vision", "Attach files", "Web research", "Create Image" ],
+      "categoryId": "textGeneration"
+    },
+    {
+      "id": "gpt-4.1",
+      "label": "GPT-4.1 - Smartest",
+      "capabilityLabels": [ "Vision", "Attach files", "Web research", "Create Image" ],
+      "categoryId": "textGeneration"
+    },
+    {
+      "id": "gpt-image-2",
+      "label": "GPT Image 2 - generation, edition",
+      "capabilityLabels": [ "Create Image" ],
+      "categoryId": "imageCreation"
+    },
+    {
+      "id": "gpt-image-1.5",
+      "label": "GPT Image 1.5 - generation, edition",
+      "capabilityLabels": [ "Create Image" ],
+      "categoryId": "imageCreation"
+    },
+    {
+      "id": "gpt-4o-mini-tts",
+      "label": "GPT-4o mini TTS - Text-to-speech",
+      "capabilityLabels": [ "Create Audio", "Text to speech" ],
+      "categoryId": "textToSpeech"
+    },
+    {
+      "id": "tts-1-hd",
+      "label": "TTS-1 HD - Text-to-speech",
+      "capabilityLabels": [ "Create Audio", "Text to speech" ],
+      "categoryId": "textToSpeech"
+    },
+    {
+      "id": "tts-1",
+      "label": "TTS-1 - Text-to-speech",
+      "capabilityLabels": [ "Create Audio", "Text to speech" ],
+      "categoryId": "textToSpeech"
+    },
+    {
+      "id": "gpt-4o-transcribe",
+      "label": "GPT-4o Transcribe - audio transcription",
+      "capabilityLabels": [ "Speech to text" ],
+      "categoryId": "speechToText"
+    },
+    {
+      "id": "gpt-4o-mini-transcribe",
+      "label": "GPT-4o mini Transcribe - audio transcription",
+      "capabilityLabels": [ "Speech to text" ],
+      "categoryId": "speechToText"
+    },
+    {
+      "id": "whisper-1",
+      "label": "Whisper - audio transcription",
+      "capabilityLabels": [ "Speech to text" ],
+      "categoryId": "speechToText"
+    },
+    {
+      "id": "gpt-5.5",
+      "label": "GPT-5.5",
+      "capabilityLabels": [ "Thinking", "Vision", "Attach files", "Web research", "Create Image" ],
+      "categoryId": "deepResearch"
+    }
+  ],
+  "activeCategoryId": "allModels",
+  "selectedModelId": ""
+}

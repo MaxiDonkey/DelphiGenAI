@@ -1,0 +1,466 @@
+﻿{
+  "lang": "el-GR",
+  "input": {
+    "placeholder": {
+      "askQuestion": "Κάντε μια ερώτηση..."
+    },
+    "menu": {
+      "endpoint": "Τελικό σημείο",
+      "webResearch": "Αναζήτηση στον ιστό",
+      "thinking": "Συλλογισμός",
+      "attachFiles": "Επισύναψη αρχείων",
+      "knowledgeSearch": "Αναζήτηση γνώσης",
+      "vision": "Όραση",
+      "deepResearch": "Εις βάθος έρευνα",
+      "integration": "Ενσωμάτωση",
+      "media": "Πολυμέσα",
+      "custom": "Προσαρμοσμένο",
+      "settings": "Ρυθμίσεις",
+      "model": "Μοντέλο",
+      "project": "Έργο"
+    },
+    "thinking": {
+      "low": "Χαμηλός",
+      "medium": "Μεσαίος",
+      "high": "Υψηλός"
+    },
+    "endpoint": {
+      "chatCompletion": "v1/chat/completions",
+      "chatResponse": "v1/chat/responses",
+      "message": "v1/message",
+      "generateContent": ":generateContent",
+      "interactions": "v1/interactions",
+      "conversation": "v1/conversation",
+      "provider": {
+        "chatCompletion": "OpenAI, DeepSeek, MistralAI",
+        "chatResponse": "OpenAI",
+        "message": "Claude",
+        "generateContent": "Gemini",
+        "interactions": "Gemini",
+        "conversation": "MistralAI"
+      }
+    },
+    "integration": {
+      "function": "Συνάρτηση",
+      "mcp": "MCP",
+      "jsCodeSandbox": "JS Sandbox",
+      "skills": "Δεξιότητες",
+      "agents": "Πράκτορες"
+    },
+    "media": {
+      "createImage": "Δημιουργία εικόνας",
+      "createVideo": "Δημιουργία βίντεο",
+      "createAudio": "Δημιουργία ήχου",
+      "speechToText": "Ομιλία σε κείμενο",
+      "textToSpeech": "Κείμενο σε ομιλία"
+    },
+    "project": {
+      "add": "Προσθήκη έργου",
+      "none": "κανένα",
+      "noneUsed": "Δεν χρησιμοποιείται κανένα έργο",
+      "delete": "Διαγραφή"
+    },
+    "chips": {
+      "endpoint": "Τελικό σημείο: {title}",
+      "webResearch": "Αναζήτηση στον ιστό",
+      "thinking": "Συλλογισμός: {title}",
+      "knowledgeSearch": "Αναζήτηση γνώσης ({count})",
+      "deepResearch": "Εις βάθος έρευνα",
+      "filesAttached": "Επισυναπτόμενα αρχεία ({count})",
+      "vision": "Όραση ({count})",
+      "integrationFunction": "Ενσωμάτωση: Συνάρτηση ({count})",
+      "integrationMcp": "Ενσωμάτωση: MCP ({count})",
+      "integrationJsCodeSandbox": "Ενσωμάτωση: JS Sandbox ({count})",
+      "integrationSkills": "Ενσωμάτωση: Δεξιότητες ({count})",
+      "integrationAgents": "Ενσωμάτωση: Πράκτορες ({count})",
+      "mediaCreateImage": "Πολυμέσα: Δημιουργία εικόνας",
+      "mediaCreateVideo": "Πολυμέσα: Δημιουργία βίντεο",
+      "mediaCreateAudio": "Πολυμέσα: Δημιουργία ήχου",
+      "speechToText": "Ομιλία σε κείμενο ({count})",
+      "mediaTextToSpeech": "Πολυμέσα: Κείμενο σε ομιλία",
+      "custom": "Προσαρμοσμένο ({count})"
+    }
+  },
+  "requestParams": {
+    "panel": {
+      "title": "Ρυθμίσεις",
+      "close": "Κλείσιμο",
+      "theme": {
+        "light": "Φωτεινό",
+        "dark": "Σκοτεινό"
+      }
+    },
+    "summary": {
+      "alwaysAvailable": "Πάντα διαθέσιμο",
+      "enabled": "Ενεργοποιημένο",
+      "disabled": "Απενεργοποιημένο",
+      "enabledDisabled": "{enabled} ενεργοποιημένα / {disabled} απενεργοποιημένα"
+    },
+    "categories": {
+      "appSettings": {
+        "title": "Ρυθμίσεις εφαρμογής",
+        "subtitle": "Γενικά",
+        "panelSubtitle": ""
+      },
+      "systemPrompt": {
+        "title": "Προτροπή συστήματος"
+      },
+      "settings": {
+        "title": "Γενικές ρυθμίσεις"
+      },
+      "sampling": {
+        "title": "Δειγματοληψία"
+      },
+      "structuredOutput": {
+        "title": "Δομημένη έξοδος"
+      },
+      "vendorSettings": {
+        "title": "Επιλογές προμηθευτή"
+      }
+    },
+    "items": {
+      "appSettings": {
+        "lookAndFeel": {
+          "label": "Εμφάνιση"
+        },
+        "language": {
+          "label": "Γλώσσα",
+          "placeholder": "Επιλέξτε μια γλώσσα"
+        },
+        "scrollButtons": {
+          "label": "Κουμπιά κύλισης"
+        }
+      },
+      "systemPrompt": {
+        "systemPrompt": {
+          "label": "Προτροπή συστήματος",
+          "labelWhenDisabled": "Απενεργοποιημένη",
+          "labelWhenEnabled": "Ενεργοποιημένη",
+          "placeholder": "Εισαγάγετε την προτροπή συστήματος"
+        }
+      },
+      "settings": {
+        "temperature": {
+          "label": "Θερμοκρασία"
+        },
+        "maxTokens": {
+          "label": "Μέγιστα tokens"
+        },
+        "stopStrings": {
+          "label": "Συμβολοσειρές διακοπής",
+          "placeholder": "Μία συμβολοσειρά διακοπής ανά γραμμή"
+        }
+      },
+      "sampling": {
+        "topK": {
+          "label": "Top-k"
+        },
+        "topP": {
+          "label": "Top-p"
+        },
+        "presencePenalty": {
+          "label": "Ποινή παρουσίας"
+        },
+        "randomSeed": {
+          "label": "Τυχαίος σπόρος"
+        }
+      },
+      "structuredOutput": {
+        "jsonSchema": {
+          "label": "Σχήμα JSON",
+          "labelWhenDisabled": "Απενεργοποιημένο",
+          "labelWhenEnabled": "Ενεργοποιημένο",
+          "placeholder": "Εισαγάγετε το σχήμα JSON",
+          "invalidJsonMessage": "Μη έγκυρο JSON"
+        }
+      },
+      "vendorSettings": {
+        "parallelToolCalls": {
+          "label": "Παράλληλες κλήσεις εργαλείων"
+        },
+        "backgroundResponse": {
+          "label": "Απάντηση παρασκηνίου"
+        },
+        "usingPreviousId": {
+          "label": "Χρήση προηγούμενου ID"
+        },
+        "store": {
+          "label": "Αποθήκευση"
+        }
+      }
+    }
+  },
+  "filesDrawer": {
+    "aria": {
+      "leftPanel": "Αριστερό πλευρικό παράθυρο"
+    },
+    "actions": {
+      "openPanel": "Άνοιγμα παραθύρου",
+      "newSession": "Νέα συνεδρία",
+      "closePanel": "Κλείσιμο παραθύρου",
+      "nextPage": "Επόμενη σελίδα",
+      "more": "Περισσότερα",
+      "rename": "Μετονομασία",
+      "delete": "Διαγραφή"
+    }
+  },
+  "scroll": {
+    "top": "Κύλιση στην κορυφή",
+    "bottom": "Κύλιση στο τέλος"
+  },
+  "selector": {
+    "branchAfterMessage": "Δημιουργία κλάδου μετά από αυτό το μήνυμα",
+    "copyMessage": "Αντιγραφή μηνύματος",
+    "deleteMessage": "Διαγραφή μηνύματος"
+  },
+  "confirmation": {
+    "title": "Επιβεβαίωση",
+    "question": "Παρακαλώ επιβεβαιώστε.",
+    "yes": "Ναι",
+    "no": "Όχι"
+  },
+  "inputString": {
+    "title": "Εισαγωγή",
+    "message": "Παρακαλώ εισαγάγετε μια τιμή.",
+    "ok": "OK",
+    "cancel": "Ακύρωση"
+  },
+  "webDecisionDlg": {
+    "title": "Επιβεβαίωση",
+    "message": "Παρακαλώ επιβεβαιώστε.",
+    "ok": "OK",
+    "cancel": "Ακύρωση",
+    "close": "Κλείσιμο"
+  },
+  "displayFile": {
+    "fallbackName": "Αρχείο {index}",
+    "badge": {
+      "pdf": "PDF",
+      "sheet": "XLS",
+      "doc": "DOC",
+      "slide": "PPT",
+      "text": "TXT",
+      "pascal": "PAS",
+      "code": "</>",
+      "file": "ΑΡΧΕΙΟ"
+    },
+    "status": {
+      "file": "ΑΡΧΕΙΟ"
+    },
+    "debug": {
+      "error": "Σφάλμα DisplayFile: {error}"
+    }
+  },
+  "displayImage": {
+    "action": {
+      "close": "Κλείσιμο"
+    },
+    "error": {
+      "unavailable": "Η εικόνα δεν είναι διαθέσιμη"
+    },
+    "alt": {
+      "imageIndex": "Εικόνα {index}"
+    },
+    "debug": {
+      "error": "Σφάλμα DisplayImages: {error}"
+    }
+  },
+  "display": {
+    "reasoning": {
+      "title": "Συλλογισμός"
+    },
+    "toolGroup": {
+      "label": "Εργαλεία που χρησιμοποιήθηκαν"
+    },
+    "code": {
+      "copy": "Αντιγραφή",
+      "copied": "Αντιγράφηκε",
+      "copyToClipboard": "Αντιγραφή στο πρόχειρο"
+    }
+  },
+  "errors": {
+    "aria": {
+      "systemMessages": "Μηνύματα συστήματος"
+    },
+    "action": {
+      "close": "Κλείσιμο"
+    }
+  },
+  "promptFile": {
+    "debug": {
+      "error": "Σφάλμα PromptFile: {error}"
+    }
+  },
+  "displayVideo": {
+    "fallbackName": "Βίντεο {index}",
+    "fallbackNameWithExtension": "Βίντεο {index}.{ext}",
+    "action": {
+      "open": "Άνοιγμα",
+      "close": "Κλείσιμο"
+    },
+    "debug": {
+      "error": "Σφάλμα DisplayVideo: {error}"
+    }
+  },
+  "displayAudio": {
+    "fallbackName": "Ήχος {index}",
+    "fallbackNameWithExtension": "Ήχος {index}.{ext}",
+    "status": {
+      "stop": "Διακοπή",
+      "loading": "Φόρτωση",
+      "unavailable": "Μη διαθέσιμο",
+      "pause": "Παύση",
+      "playing": "Αναπαραγωγή"
+    },
+    "debug": {
+      "error": "Σφάλμα DisplayAudio: {error}"
+    }
+  },
+  "modelSelector": {
+    "panel": {
+      "title": "Επιλογή προεπιλεγμένων μοντέλων",
+      "aria": {
+        "dialog": "Επιλογή προεπιλεγμένων μοντέλων"
+      }
+    },
+    "actions": {
+      "close": "Κλείσιμο"
+    },
+    "defaults": {
+      "title": "Προεπιλεγμένο μοντέλο",
+      "empty": "Δεν υπάρχει προεπιλεγμένο μοντέλο για αυτή την κατηγορία."
+    },
+    "status": {
+      "notAssigned": "Μη εκχωρημένο",
+      "noDefaultModel": "Κανένα προεπιλεγμένο μοντέλο"
+    },
+    "categories": {
+      "allModels": {
+        "label": "Λίστα μοντέλων"
+      },
+      "textGeneration": {
+        "label": "Δημιουργία κειμένου"
+      },
+      "imageCreation": {
+        "label": "Δημιουργία εικόνας"
+      },
+      "videoCreation": {
+        "label": "Δημιουργία βίντεο"
+      },
+      "audioCreation": {
+        "label": "Δημιουργία ήχου"
+      },
+      "textToSpeech": {
+        "label": "Κείμενο σε ομιλία"
+      },
+      "deepResearch": {
+        "label": "Εις βάθος έρευνα"
+      }
+    },
+    "features": {
+      "webResearch": "Αναζήτηση στον ιστό",
+      "thinking": "Συλλογισμός",
+      "attachFiles": "Επισύναψη αρχείων",
+      "vision": "Όραση",
+      "createImage": "Δημιουργία εικόνας",
+      "createVideo": "Δημιουργία βίντεο",
+      "createAudio": "Δημιουργία ήχου",
+      "speechToText": "Ομιλία σε κείμενο",
+      "textToSpeech": "Κείμενο σε ομιλία",
+      "deepResearch": "Εις βάθος έρευνα"
+    }
+  },
+  "cardSelector": {
+    "panel": {
+      "title": "Επιλογή στοιχείου",
+      "ariaLabel": "Επιλογή στοιχείου",
+      "selectDialogTitle": "{selectPrefix} {dialogLabel}"
+    },
+    "actions": {
+      "selectPrefix": "Επιλέξτε",
+      "close": "Κλείσιμο",
+      "edit": "Επεξεργασία",
+      "settings": "Ρυθμίσεις",
+      "cancel": "Ακύρωση",
+      "select": "Επιλογή"
+    },
+    "messages": {
+      "empty": "Δεν υπάρχουν διαθέσιμα στοιχεία.",
+      "noComment": ""
+    },
+    "dialogs": {
+      "function": {
+        "label": "Συνάρτηση"
+      },
+      "mcp": {
+        "label": "MCP"
+      },
+      "skills": {
+        "label": "Δεξιότητες"
+      },
+      "agents": {
+        "label": "Πράκτορες"
+      },
+      "custom": {
+        "label": "Προσαρμοσμένο"
+      }
+    }
+  },
+  "prompt": {
+    "toggleCollapse": "Σύμπτυξη ή ανάπτυξη της προτροπής",
+    "summary": {
+      "open": "Άνοιγμα περίληψης προτροπής",
+      "close": "Κλείσιμο περίληψης προτροπής"
+    }
+  },
+  "more": {
+    "delete_qa": "Παρακαλώ επιβεβαιώστε τη διαγραφή της τρέχουσας ερώτησης και απάντησης, καθώς και όλων των επόμενων καταχωρίσεων.",
+    "delete_chat_session": "Είστε σίγουροι; #10#10Αυτή η ενέργεια είναι μη αναστρέψιμη και θα διαγράψει όλα τα μηνύματα αυτής της συνομιλίας.",
+    "aborted": "Η λειτουργία διακόπηκε...",
+    "aborted_operation": "Η λειτουργία διακόπηκε",
+    "model_file_not_found": "%s: το αρχείο δημιουργήθηκε. #10Παρακαλώ ανοίξτε αυτό το αρχείο και δηλώστε τη λίστα των διαθέσιμων μοντέλων.",
+    "batch_begin_error": "Απέτυχε η ενεργοποίηση της απόδοσης παρτίδας.",
+    "batch_end_error": "Απέτυχε η απελευθέρωση της απόδοσης παρτίδας.",
+    "focus_error": "Η φυσαλίδα εισαγωγής δεν μπόρεσε να λάβει εστίαση.",
+    "stop_audio_media_error": "Απέτυχε η διακοπή του μέσου ήχου.",
+    "stop_video_media_error": "Απέτυχε η διακοπή του μέσου βίντεο.",
+    "internal_theme_error": "Αδυναμία ενημέρωσης του θέματος της σελίδας.",
+    "deserialization_error": "Σφάλμα αποσειριοποίησης: μη έγκυρη είσοδος JSON %s",
+    "welcome": "Καλώς ήρθατε στον χώρο εργασίας σας",
+    "structured_output_error": "Η δομημένη έξοδος δεν είναι έγκυρη: παρακαλώ επεξεργαστείτε την τιμή της στις ρυθμίσεις.",
+    "card_json_file_not_found": "Κανένα αρχείο JSON δεν υποστηρίζει το %s",
+    "models_categories_count_error": "Παρακαλώ ορίστε κατηγορίες για τα προεπιλεγμένα μοντέλα",
+    "invalid_categories_file_error": "Μη έγκυρο αρχείο JSON για τις κατηγορίες",
+    "text_generation_cant_handled_error": "Κανένα προεπιλεγμένο μοντέλο: η δημιουργία κειμένου δεν μπορεί να επεξεργαστεί",
+    "image_creation_aborted_error": "Δεν έχει διαμορφωθεί προεπιλεγμένο μοντέλο: η δημιουργία εικόνας διακόπηκε",
+    "video_creation_aborted_error": "Δεν έχει διαμορφωθεί προεπιλεγμένο μοντέλο: η δημιουργία βίντεο διακόπηκε",
+    "audio_creation_aborted_error": "Δεν έχει διαμορφωθεί προεπιλεγμένο μοντέλο: η δημιουργία ήχου διακόπηκε",
+    "stt_operation_aborted_error": "Δεν έχει διαμορφωθεί προεπιλεγμένο μοντέλο: η λειτουργία STT διακόπηκε",
+    "tts_operation_aborted_error": "Δεν έχει διαμορφωθεί προεπιλεγμένο μοντέλο: η λειτουργία TTS διακόπηκε",
+    "deep_research_operation_aborted_error": "Δεν έχει διαμορφωθεί προεπιλεγμένο μοντέλο: η εις βάθος έρευνα διακόπηκε",
+    "missing_default_models_error": "Λείπουν προεπιλεγμένα μοντέλα για ορισμένες κατηγορίες. #10 Ελέγξτε τις ρυθμίσεις μοντέλων",
+    "api_key_empty_name_error": "Το όνομα του κλειδιού δεν μπορεί να είναι κενό.",
+    "api_key_enter_dialog_prompt": "Παρακαλώ εισαγάγετε την τιμή του κλειδιού API για %s",
+    "api_key_not_found": "%s: Το κλειδί API δεν βρέθηκε",
+    "api_key_deleted": "%s: Το κλειδί API διαγράφηκε",
+    "api_key_exists": "%s: Το κλειδί API υπάρχει",
+    "api_key_modified": "%s: Το κλειδί API τροποποιήθηκε.",
+    "api_key_inserted": "%s: Το κλειδί API εισήχθη",
+    "web_decision_dlg_title": "Επιβεβαίωση",
+    "web_decision_dlg_message": "Παρακαλώ επιβεβαιώστε.",
+    "web_decision_dlg_ok": "OK",
+    "web_decision_dlg_cancel": "Ακύρωση",
+    "web_decision_dlg_close": "Κλείσιμο",
+    "demo_anthropic_tool_confirmation_title": "Επιβεβαίωση",
+    "demo_anthropic_tool_allow": "Επιτρέψτε",
+    "demo_anthropic_tool_deny": "Απόρριψη",
+    "demo_anthropic_tool_allow_call": "Να επιτραπεί αυτή η κλήση εργαλείου;",
+    "demo_anthropic_interrupted_by_user": "Διακόπηκε από τον χρήστη.",
+    "command_plugin_not_be_null": "Το πρόσθετο δεν μπορεί να είναι κενό",
+    "command_unknown": "Άγνωστη εντολή: /%s",
+    "command_action_unknown": "Άγνωστη ενέργεια: /%s %s",
+    "command_missing_action": "Λείπει ενέργεια για /%s",
+    "command_incorrect_number_of_arguments": "Λανθασμένος αριθμός ορισμάτων για /%s %s (ελήφθησαν %d)",
+    "command_no_plugin_for": "Κανένα πρόσθετο για /%s"
+  }
+}

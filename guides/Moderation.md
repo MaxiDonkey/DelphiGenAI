@@ -21,21 +21,27 @@ Refer to the [official documentation](https://platform.openai.com/docs/guides/mo
 ```pascal
 //uses GenAI, GenAI.Types, GenAI.Tutorial.VCL;
 
-  //Asynchronous example
-  Client.Moderation.AsynEvaluate(
+  //Asynchronous promise example
+  var Promise := Client.Moderation.AsyncAwaitEvaluate(
     procedure (Params: TModerationParams)
     begin
       Params.Input('...text to classify goes here...');
       Params.Model('omni-moderation-latest');
       TutorialHub.JSONRequest := Params.ToFormat();
-    end,
-    function : TAsynModeration
-    begin
-      Result.Sender := TutorialHub;
-      Result.OnStart := Start;
-      Result.OnSuccess := Display;
-      Result.OnError := Display;
     end);
+
+  Promise
+    .&Then<TModeration>(
+       function (Value: TModeration): TModeration
+       begin
+         Display(TutorialHub, Value);
+         Result := Value;
+       end)
+    .&Catch(
+       procedure (E: Exception)
+       begin
+         Display(TutorialHub, E.Message);
+       end);
 
   //Synchronous example
 //  var Value := Client.Moderation.Evaluate(
@@ -51,28 +57,6 @@ Refer to the [official documentation](https://platform.openai.com/docs/guides/mo
 //  finally
 //    Value.Free;
 //  end;
-
-  //Asynchronous promise example
-//  var Promise := Client.Moderation.AsyncAwaitEvaluate(
-//    procedure (Params: TModerationParams)
-//    begin
-//      Params.Input('...text to classify goes here...');
-//      Params.Model('omni-moderation-latest');
-//      TutorialHub.JSONRequest := Params.ToFormat();
-//    end);
-//
-//  Promise
-//    .&Then<TModeration>(
-//       function (Value: TModeration): TModeration
-//       begin
-//         Display(TutorialHub, Value);
-//         Result := Value;
-//       end)
-//    .&Catch(
-//       procedure (E: Exception)
-//       begin
-//         Display(TutorialHub, E.Message);
-//       end);
 ```
 
 <br>
@@ -84,21 +68,27 @@ Refer to the [official documentation](https://platform.openai.com/docs/guides/mo
 
   var Ref := 'https://example.com/image.png';
 
-  //Asynchronous example
-  Client.Moderation.AsynEvaluate(
+  //Asynchronous promise example
+  var Promise := Client.Moderation.AsyncAwaitEvaluate(
     procedure (Params: TModerationParams)
     begin
       Params.Input(['...text to classify goes here...', Ref]);
       Params.Model('omni-moderation-latest');
       TutorialHub.JSONRequest := Params.ToFormat();
-    end,
-    function : TAsynModeration
-    begin
-      Result.Sender := TutorialHub;
-      Result.OnStart := Start;
-      Result.OnSuccess := Display;
-      Result.OnError := Display;
     end);
+
+  Promise
+    .&Then<TModeration>(
+       function (Value: TModeration): TModeration
+       begin
+         Display(TutorialHub, Value);
+         Result := Value;
+       end)
+    .&Catch(
+       procedure (E: Exception)
+       begin
+         Display(TutorialHub, E.Message);
+       end);
 
   //Synchronous example
 //  var Value := Client.Moderation.Evaluate(
@@ -114,28 +104,6 @@ Refer to the [official documentation](https://platform.openai.com/docs/guides/mo
 //  finally
 //    Value.Free;
 //  end;
-
-  //Asynchronous promise example
-//  var Promise := Client.Moderation.AsyncAwaitEvaluate(
-//    procedure (Params: TModerationParams)
-//    begin
-//      Params.Input(['...text to classify goes here...', Ref]);
-//      Params.Model('omni-moderation-latest');
-//      TutorialHub.JSONRequest := Params.ToFormat();
-//    end);
-//
-//  Promise
-//    .&Then<TModeration>(
-//       function (Value: TModeration): TModeration
-//       begin
-//         Display(TutorialHub, Value);
-//         Result := Value;
-//       end)
-//    .&Catch(
-//       procedure (E: Exception)
-//       begin
-//         Display(TutorialHub, E.Message);
-//       end);
 ```
 <br>
 

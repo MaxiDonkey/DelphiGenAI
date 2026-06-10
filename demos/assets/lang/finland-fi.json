@@ -1,0 +1,466 @@
+﻿{
+  "lang": "fi-FI",
+  "input": {
+    "placeholder": {
+      "askQuestion": "Esitä kysymys..."
+    },
+    "menu": {
+      "endpoint": "Päätepiste",
+      "webResearch": "Verkkohaku",
+      "thinking": "Päättely",
+      "attachFiles": "Liitä tiedostoja",
+      "knowledgeSearch": "Tietohaku",
+      "vision": "Näkö",
+      "deepResearch": "Syvähaku",
+      "integration": "Integrointi",
+      "media": "Media",
+      "custom": "Mukautettu",
+      "settings": "Asetukset",
+      "model": "Malli",
+      "project": "Projekti"
+    },
+    "thinking": {
+      "low": "Matala",
+      "medium": "Keskitaso",
+      "high": "Korkea"
+    },
+    "endpoint": {
+      "chatCompletion": "v1/chat/completions",
+      "chatResponse": "v1/chat/responses",
+      "message": "v1/message",
+      "generateContent": ":generateContent",
+      "interactions": "v1/interactions",
+      "conversation": "v1/conversation",
+      "provider": {
+        "chatCompletion": "OpenAI, DeepSeek, MistralAI",
+        "chatResponse": "OpenAI",
+        "message": "Claude",
+        "generateContent": "Gemini",
+        "interactions": "Gemini",
+        "conversation": "MistralAI"
+      }
+    },
+    "integration": {
+      "function": "Funktio",
+      "mcp": "MCP",
+      "jsCodeSandbox": "JS-hiekkalaatikko",
+      "skills": "Taidot",
+      "agents": "Agentit"
+    },
+    "media": {
+      "createImage": "Luo kuva",
+      "createVideo": "Luo video",
+      "createAudio": "Luo ääni",
+      "speechToText": "Puhe tekstiksi",
+      "textToSpeech": "Teksti puheeksi"
+    },
+    "project": {
+      "add": "Lisää projekti",
+      "none": "ei mitään",
+      "noneUsed": "Projektia ei ole käytössä",
+      "delete": "Poista"
+    },
+    "chips": {
+      "endpoint": "Päätepiste: {title}",
+      "webResearch": "Verkkohaku",
+      "thinking": "Päättely: {title}",
+      "knowledgeSearch": "Tietohaku ({count})",
+      "deepResearch": "Syvähaku",
+      "filesAttached": "Liitetyt tiedostot ({count})",
+      "vision": "Näkö ({count})",
+      "integrationFunction": "Integrointi: Funktio ({count})",
+      "integrationMcp": "Integrointi: MCP ({count})",
+      "integrationJsCodeSandbox": "Integrointi: JS-hiekkalaatikko ({count})",
+      "integrationSkills": "Integrointi: Taidot ({count})",
+      "integrationAgents": "Integrointi: Agentit ({count})",
+      "mediaCreateImage": "Media: Luo kuva",
+      "mediaCreateVideo": "Media: Luo video",
+      "mediaCreateAudio": "Media: Luo ääni",
+      "speechToText": "Puhe tekstiksi ({count})",
+      "mediaTextToSpeech": "Media: Teksti puheeksi",
+      "custom": "Mukautettu ({count})"
+    }
+  },
+  "requestParams": {
+    "panel": {
+      "title": "Asetukset",
+      "close": "Sulje",
+      "theme": {
+        "light": "Vaalea",
+        "dark": "Tumma"
+      }
+    },
+    "summary": {
+      "alwaysAvailable": "Aina saatavilla",
+      "enabled": "Käytössä",
+      "disabled": "Pois käytöstä",
+      "enabledDisabled": "{enabled} käytössä / {disabled} pois käytöstä"
+    },
+    "categories": {
+      "appSettings": {
+        "title": "Sovelluksen asetukset",
+        "subtitle": "Yleiset",
+        "panelSubtitle": ""
+      },
+      "systemPrompt": {
+        "title": "Järjestelmäkehote"
+      },
+      "settings": {
+        "title": "Yleiset asetukset"
+      },
+      "sampling": {
+        "title": "Näytteenotto"
+      },
+      "structuredOutput": {
+        "title": "Rakenteinen tulos"
+      },
+      "vendorSettings": {
+        "title": "Toimittajan asetukset"
+      }
+    },
+    "items": {
+      "appSettings": {
+        "lookAndFeel": {
+          "label": "Ulkoasu"
+        },
+        "language": {
+          "label": "Kieli",
+          "placeholder": "Valitse kieli"
+        },
+        "scrollButtons": {
+          "label": "Vierityspainikkeet"
+        }
+      },
+      "systemPrompt": {
+        "systemPrompt": {
+          "label": "Järjestelmäkehote",
+          "labelWhenDisabled": "Pois käytöstä",
+          "labelWhenEnabled": "Käytössä",
+          "placeholder": "Syötä järjestelmäkehote"
+        }
+      },
+      "settings": {
+        "temperature": {
+          "label": "Lämpötila"
+        },
+        "maxTokens": {
+          "label": "Enimmäistokenit"
+        },
+        "stopStrings": {
+          "label": "Pysäytysmerkkijonot",
+          "placeholder": "Yksi pysäytysmerkkijono per rivi"
+        }
+      },
+      "sampling": {
+        "topK": {
+          "label": "Top-k"
+        },
+        "topP": {
+          "label": "Top-p"
+        },
+        "presencePenalty": {
+          "label": "Läsnäolosakko"
+        },
+        "randomSeed": {
+          "label": "Satunnaissiemen"
+        }
+      },
+      "structuredOutput": {
+        "jsonSchema": {
+          "label": "JSON-skeema",
+          "labelWhenDisabled": "Pois käytöstä",
+          "labelWhenEnabled": "Käytössä",
+          "placeholder": "Syötä JSON-skeema",
+          "invalidJsonMessage": "Virheellinen JSON"
+        }
+      },
+      "vendorSettings": {
+        "parallelToolCalls": {
+          "label": "Rinnakkaiset työkalukutsut"
+        },
+        "backgroundResponse": {
+          "label": "Taustavastaus"
+        },
+        "usingPreviousId": {
+          "label": "Käytä edellistä tunnusta"
+        },
+        "store": {
+          "label": "Tallenna"
+        }
+      }
+    }
+  },
+  "filesDrawer": {
+    "aria": {
+      "leftPanel": "Vasen sivupaneeli"
+    },
+    "actions": {
+      "openPanel": "Avaa paneeli",
+      "newSession": "Uusi istunto",
+      "closePanel": "Sulje paneeli",
+      "nextPage": "Seuraava sivu",
+      "more": "Lisää",
+      "rename": "Nimeä uudelleen",
+      "delete": "Poista"
+    }
+  },
+  "scroll": {
+    "top": "Vieritä ylös",
+    "bottom": "Vieritä alas"
+  },
+  "selector": {
+    "branchAfterMessage": "Luo haara tämän viestin jälkeen",
+    "copyMessage": "Kopioi viesti",
+    "deleteMessage": "Poista viesti"
+  },
+  "confirmation": {
+    "title": "Vahvistus",
+    "question": "Vahvista.",
+    "yes": "Kyllä",
+    "no": "Ei"
+  },
+  "inputString": {
+    "title": "Syöte",
+    "message": "Anna arvo.",
+    "ok": "OK",
+    "cancel": "Peruuta"
+  },
+  "webDecisionDlg": {
+    "title": "Vahvistus",
+    "message": "Vahvista.",
+    "ok": "OK",
+    "cancel": "Peruuta",
+    "close": "Sulje"
+  },
+  "displayFile": {
+    "fallbackName": "Tiedosto {index}",
+    "badge": {
+      "pdf": "PDF",
+      "sheet": "XLS",
+      "doc": "DOC",
+      "slide": "PPT",
+      "text": "TXT",
+      "pascal": "PAS",
+      "code": "</>",
+      "file": "TIEDOSTO"
+    },
+    "status": {
+      "file": "TIEDOSTO"
+    },
+    "debug": {
+      "error": "DisplayFile-virhe: {error}"
+    }
+  },
+  "displayImage": {
+    "action": {
+      "close": "Sulje"
+    },
+    "error": {
+      "unavailable": "Kuva ei ole saatavilla"
+    },
+    "alt": {
+      "imageIndex": "Kuva {index}"
+    },
+    "debug": {
+      "error": "DisplayImages-virhe: {error}"
+    }
+  },
+  "display": {
+    "reasoning": {
+      "title": "Päättely"
+    },
+    "toolGroup": {
+      "label": "Käytetyt työkalut"
+    },
+    "code": {
+      "copy": "Kopioi",
+      "copied": "Kopioitu",
+      "copyToClipboard": "Kopioi leikepöydälle"
+    }
+  },
+  "errors": {
+    "aria": {
+      "systemMessages": "Järjestelmäviestit"
+    },
+    "action": {
+      "close": "Sulje"
+    }
+  },
+  "promptFile": {
+    "debug": {
+      "error": "PromptFile-virhe: {error}"
+    }
+  },
+  "displayVideo": {
+    "fallbackName": "Video {index}",
+    "fallbackNameWithExtension": "Video {index}.{ext}",
+    "action": {
+      "open": "Avaa",
+      "close": "Sulje"
+    },
+    "debug": {
+      "error": "DisplayVideo-virhe: {error}"
+    }
+  },
+  "displayAudio": {
+    "fallbackName": "Ääni {index}",
+    "fallbackNameWithExtension": "Ääni {index}.{ext}",
+    "status": {
+      "stop": "Pysäytä",
+      "loading": "Ladataan",
+      "unavailable": "Ei saatavilla",
+      "pause": "Tauko",
+      "playing": "Toistetaan"
+    },
+    "debug": {
+      "error": "DisplayAudio-virhe: {error}"
+    }
+  },
+  "modelSelector": {
+    "panel": {
+      "title": "Valitse oletusmallit",
+      "aria": {
+        "dialog": "Valitse oletusmallit"
+      }
+    },
+    "actions": {
+      "close": "Sulje"
+    },
+    "defaults": {
+      "title": "Oletusmalli",
+      "empty": "Tälle luokalle ei ole oletusmallia."
+    },
+    "status": {
+      "notAssigned": "Ei määritetty",
+      "noDefaultModel": "Ei oletusmallia"
+    },
+    "categories": {
+      "allModels": {
+        "label": "Malliluettelo"
+      },
+      "textGeneration": {
+        "label": "Tekstin luonti"
+      },
+      "imageCreation": {
+        "label": "Kuvan luonti"
+      },
+      "videoCreation": {
+        "label": "Videon luonti"
+      },
+      "audioCreation": {
+        "label": "Äänen luonti"
+      },
+      "textToSpeech": {
+        "label": "Teksti puheeksi"
+      },
+      "deepResearch": {
+        "label": "Syvähaku"
+      }
+    },
+    "features": {
+      "webResearch": "Verkkohaku",
+      "thinking": "Päättely",
+      "attachFiles": "Liitä tiedostoja",
+      "vision": "Näkö",
+      "createImage": "Luo kuva",
+      "createVideo": "Luo video",
+      "createAudio": "Luo ääni",
+      "speechToText": "Puhe tekstiksi",
+      "textToSpeech": "Teksti puheeksi",
+      "deepResearch": "Syvähaku"
+    }
+  },
+  "cardSelector": {
+    "panel": {
+      "title": "Valitse kohde",
+      "ariaLabel": "Valitse kohde",
+      "selectDialogTitle": "{selectPrefix} {dialogLabel}"
+    },
+    "actions": {
+      "selectPrefix": "Valitse",
+      "close": "Sulje",
+      "edit": "Muokkaa",
+      "settings": "Asetukset",
+      "cancel": "Peruuta",
+      "select": "Valitse"
+    },
+    "messages": {
+      "empty": "Ei saatavilla olevia kohteita.",
+      "noComment": ""
+    },
+    "dialogs": {
+      "function": {
+        "label": "Funktio"
+      },
+      "mcp": {
+        "label": "MCP"
+      },
+      "skills": {
+        "label": "Taidot"
+      },
+      "agents": {
+        "label": "Agentit"
+      },
+      "custom": {
+        "label": "Mukautettu"
+      }
+    }
+  },
+  "prompt": {
+    "toggleCollapse": "Tiivistä tai laajenna kehote",
+    "summary": {
+      "open": "Avaa kehotteen yhteenveto",
+      "close": "Sulje kehotteen yhteenveto"
+    }
+  },
+  "more": {
+    "delete_qa": "Vahvista nykyisen kysymyksen ja vastauksen sekä kaikkien seuraavien merkintöjen poistaminen.",
+    "delete_chat_session": "Oletko varma? #10#10Tämä toiminto on peruuttamaton ja poistaa kaikki tämän keskustelun viestit.",
+    "aborted": "Toiminto keskeytetty...",
+    "aborted_operation": "Toiminto keskeytetty",
+    "model_file_not_found": "%s: tiedosto luotu. #10Avaa tämä tiedosto ja ilmoita käytettävissä olevien mallien luettelo.",
+    "batch_begin_error": "Erän näyttämisen käyttöönotto epäonnistui.",
+    "batch_end_error": "Erän näyttämisen vapauttaminen epäonnistui.",
+    "focus_error": "Syötekupla ei voinut vastaanottaa kohdistusta.",
+    "stop_audio_media_error": "Äänimedian pysäyttäminen epäonnistui.",
+    "stop_video_media_error": "Videomedian pysäyttäminen epäonnistui.",
+    "internal_theme_error": "Sivun teeman päivittäminen ei onnistu.",
+    "deserialization_error": "Deserialisointivirhe: virheellinen JSON-syöte %s",
+    "welcome": "Tervetuloa työtilaasi",
+    "structured_output_error": "Rakenteinen tulos on virheellinen: muokkaa sen arvoa asetuksissa.",
+    "card_json_file_not_found": "Mikään JSON-tiedosto ei tue kohdetta %s",
+    "models_categories_count_error": "Määritä luokat oletusmalleille",
+    "invalid_categories_file_error": "Virheellinen JSON-tiedosto luokille",
+    "text_generation_cant_handled_error": "Ei oletusmallia: tekstin luontia ei voida käsitellä",
+    "image_creation_aborted_error": "Oletusmallia ei ole määritetty: kuvan luonti keskeytetty",
+    "video_creation_aborted_error": "Oletusmallia ei ole määritetty: videon luonti keskeytetty",
+    "audio_creation_aborted_error": "Oletusmallia ei ole määritetty: äänen luonti keskeytetty",
+    "stt_operation_aborted_error": "Oletusmallia ei ole määritetty: STT-toiminto keskeytetty",
+    "tts_operation_aborted_error": "Oletusmallia ei ole määritetty: TTS-toiminto keskeytetty",
+    "deep_research_operation_aborted_error": "Oletusmallia ei ole määritetty: syvähaku keskeytetty",
+    "missing_default_models_error": "Joistakin luokista puuttuu oletusmalli. #10 Tarkista malliasetukset",
+    "api_key_empty_name_error": "Avaimen nimi ei voi olla tyhjä.",
+    "api_key_enter_dialog_prompt": "Anna API-avaimen arvo kohteelle %s",
+    "api_key_not_found": "%s: API-avainta ei löytynyt",
+    "api_key_deleted": "%s: API-avain on poistettu",
+    "api_key_exists": "%s: API-avain on olemassa",
+    "api_key_modified": "%s: API-avainta on muutettu.",
+    "api_key_inserted": "%s: API-avain on lisätty",
+    "web_decision_dlg_title": "Vahvistus",
+    "web_decision_dlg_message": "Vahvista.",
+    "web_decision_dlg_ok": "OK",
+    "web_decision_dlg_cancel": "Peruuta",
+    "web_decision_dlg_close": "Sulje",
+    "demo_anthropic_tool_confirmation_title": "Vahvistus",
+    "demo_anthropic_tool_allow": "Salli",
+    "demo_anthropic_tool_deny": "Estä",
+    "demo_anthropic_tool_allow_call": "Sallitaanko tämä työkalukutsu?",
+    "demo_anthropic_interrupted_by_user": "Käyttäjä keskeytti.",
+    "command_plugin_not_be_null": "Laajennus ei voi olla tyhjä",
+    "command_unknown": "Tuntematon komento: /%s",
+    "command_action_unknown": "Tuntematon toiminto: /%s %s",
+    "command_missing_action": "Puuttuva toiminto komennolle /%s",
+    "command_incorrect_number_of_arguments": "Virheellinen argumenttien määrä komennolle /%s %s (saatu %d)",
+    "command_no_plugin_for": "Ei laajennusta komennolle /%s"
+  }
+}

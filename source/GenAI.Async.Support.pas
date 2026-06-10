@@ -1,4 +1,4 @@
-unit GenAI.Async.Support;
+﻿unit GenAI.Async.Support;
 
 {-------------------------------------------------------------------------------
 
@@ -9,7 +9,7 @@ unit GenAI.Async.Support;
 
 interface
 
-{$REGION  'Dev notes : GenAI.Async.Support'}
+{$REGION  'Dev notest'}
 
 (*
       Unit containing  records for managing  asynchronous events related to
@@ -667,6 +667,23 @@ type
       const CallBacks: TFunc<TPromiseCallBack<T>>): TPromise<T>; static;
   end;
 
+  TDelayPolicy = reference to function(Attempt: Integer; CurrentDelayMs: Cardinal): Cardinal;
+
+  TAsynchronousHelper = class
+  public
+    class function Delay(const Ms: Cardinal): TPromise<Boolean>; static;
+
+    class function DefaultBackoff(const CurrentDelayMs, MaxDelayMs: Cardinal): Cardinal; static;
+
+    class function PollUntil<TSnap, TResult>(
+      const GetSnapshot: TFunc<TPromise<TSnap>>;
+      const IsDone: TFunc<TSnap, Boolean>;
+      const Extract: TFunc<TSnap, TResult>;
+      const FirstDelayMs: Cardinal;
+      const MaxTries: Integer;
+      const DelayPolicy: TDelayPolicy): TPromise<TResult>; static;
+  end;
+
 implementation
 
 { TAsynCallBackExec<T, U> }
@@ -792,4 +809,151 @@ begin
     end);
 end;
 
+{ TAsynchronousHelper }
+
+class function TAsynchronousHelper.DefaultBackoff(const CurrentDelayMs,
+  MaxDelayMs: Cardinal): Cardinal;
+var
+  Next: Cardinal;
+begin
+  Next := CurrentDelayMs * 2;
+  if Next > MaxDelayMs then
+    Next := MaxDelayMs;
+  Result := Next;
+end;
+
+class function TAsynchronousHelper.Delay(
+  const Ms: Cardinal): TPromise<Boolean>;
+begin
+  Result := TPromise<Boolean>.Create(
+    procedure(Resolve: TProc<Boolean>; Reject: TProc<Exception>)
+    begin
+      TTask.Run(
+        procedure
+        begin
+          try
+            TThread.Sleep(Ms);
+            TThread.Queue(nil, procedure
+              begin
+                Resolve(True);
+              end);
+          except
+            on E: Exception do
+              TThread.Queue(nil, procedure
+                begin
+                  Reject(E);
+                end);
+          end;
+        end);
+    end);
+end;
+
+class function TAsynchronousHelper.PollUntil<TSnap, TResult>(
+  const GetSnapshot: TFunc<TPromise<TSnap>>;
+  const IsDone: TFunc<TSnap, Boolean>; const Extract: TFunc<TSnap, TResult>;
+  const FirstDelayMs: Cardinal; const MaxTries: Integer;
+  const DelayPolicy: TDelayPolicy): TPromise<TResult>;
+begin
+  Result := TPromise<TResult>.Create(
+    procedure(Resolve: TProc<TResult>; Reject: TProc<Exception>)
+    var
+      Step: TProc<Cardinal, Integer, Integer>;
+      ReleaseState: TProc;
+
+      GetSnapshotFn: TFunc<TPromise<TSnap>>;
+      IsDoneFn: TFunc<TSnap, Boolean>;
+      ExtractFn: TFunc<TSnap, TResult>;
+      NextDelayFn: TDelayPolicy;
+
+      Complete: TProc<TResult>;
+      Fail: TProc<Exception>;
+    begin
+      GetSnapshotFn := GetSnapshot;
+      IsDoneFn := IsDone;
+      ExtractFn := Extract;
+      NextDelayFn := DelayPolicy;
+
+      Complete := Resolve;
+      Fail := Reject;
+
+      ReleaseState :=
+        procedure
+        begin
+          Step := nil;
+          ReleaseState := nil;
+
+          GetSnapshotFn := nil;
+          IsDoneFn := nil;
+          ExtractFn := nil;
+          NextDelayFn := nil;
+
+          Complete := nil;
+          Fail := nil;
+        end;
+
+      Step :=
+        procedure(DelayMs: Cardinal; TriesLeft: Integer; Attempt: Integer)
+        begin
+          GetSnapshotFn()
+            .&Then(
+              procedure(Snap: TSnap)
+              var
+                NextDelay: Cardinal;
+                Value: TResult;
+                CompleteNow: TProc<TResult>;
+                FailNow: TProc<Exception>;
+              begin
+                if IsDoneFn(Snap) then
+                  begin
+                    Value := ExtractFn(Snap);
+
+                    CompleteNow := Complete;
+                    ReleaseState;
+                    CompleteNow(Value);
+                    Exit;
+                  end;
+
+                if TriesLeft <= 0 then
+                  begin
+                    FailNow := Fail;
+                    ReleaseState;
+                    FailNow(Exception.Create('Timeout: operation not completed'));
+                    Exit;
+                  end;
+
+                NextDelay := NextDelayFn(Attempt, DelayMs);
+
+                Delay(DelayMs)
+                  .&Then(
+                    procedure
+                    begin
+                      if Assigned(Step) then
+                        Step(NextDelay, TriesLeft - 1, Attempt + 1);
+                    end)
+                  .&Catch(
+                    procedure(E: Exception)
+                    var
+                      FailNow: TProc<Exception>;
+                    begin
+                      FailNow := Fail;
+                      ReleaseState;
+                      FailNow(E);
+                    end);
+              end)
+            .&Catch(
+              procedure(E: Exception)
+              var
+                FailNow: TProc<Exception>;
+              begin
+                FailNow := Fail;
+                ReleaseState;
+                FailNow(E);
+              end);
+        end;
+
+      Step(FirstDelayMs, MaxTries, 1);
+    end);
+end;
+
 end.
+

@@ -18,8 +18,8 @@ Refer to [official documentation](https://platform.openai.com/docs/guides/embedd
 
   TutorialHub.JSONRequestClear;
 
-  //Asynchronous example
-  Client.Embeddings.ASynCreate(
+  //Asynchronous promise example
+  var Promise := Client.Embeddings.AsyncAwaitCreate(
     procedure (Params: TEmbeddingsParams)
     begin
       Params.Input(['Hello', 'how', 'are you?']);
@@ -27,14 +27,23 @@ Refer to [official documentation](https://platform.openai.com/docs/guides/embedd
       Params.Dimensions(5);
       Params.EncodingFormat(TEncodingFormat.float);
       TutorialHub.JSONRequest := Params.ToFormat();
-    end,
-    function : TAsynEmbeddings
-    begin
-      Result.Sender := TutorialHub;
-      Result.OnStart := Start;
-      Result.OnSuccess := Display;
-      Result.OnError := Display;
-    end);
+    end
+  );
+
+  Promise
+    .&Then<TArray<TArray<Double>>>(
+       function (Value: TEmbeddings): TArray<TArray<Double>>
+       begin
+         Display(TutorialHub, Value);
+         for var Item in Value.Data do
+           Result := Result + [Item.Embedding];
+         ShowMessage(Result[2][3].ToString(ffNumber, 2, 3));
+       end)
+    .&Catch(
+       procedure (E: Exception)
+       begin
+         Display(TutorialHub, E.Message);
+       end);
 
   //Synchronous example
 //  var Value := Client.Embeddings.Create(
@@ -50,31 +59,4 @@ Refer to [official documentation](https://platform.openai.com/docs/guides/embedd
 //  finally
 //    Value.Free;
 //  end;
-
-  //Asynchronous promise example
-//  var Promise := Client.Embeddings.AsyncAwaitCreate(
-//    procedure (Params: TEmbeddingsParams)
-//    begin
-//      Params.Input(['Hello', 'how', 'are you?']);
-//      Params.Model('text-embedding-3-large');
-//      Params.Dimensions(5);
-//      Params.EncodingFormat(TEncodingFormat.float);
-//      TutorialHub.JSONRequest := Params.ToFormat();
-//    end
-//  );
-//
-//  Promise
-//    .&Then<TArray<TArray<Double>>>(
-//       function (Value: TEmbeddings): TArray<TArray<Double>>
-//       begin
-//         Display(TutorialHub, Value);
-//         for var Item in Value.Data do
-//           Result := Result + [Item.Embedding];
-//         ShowMessage(Result[2][3].ToString(ffNumber, 2, 3));
-//       end)
-//    .&Catch(
-//       procedure (E: Exception)
-//       begin
-//         Display(TutorialHub, E.Message);
-//       end);
 ```

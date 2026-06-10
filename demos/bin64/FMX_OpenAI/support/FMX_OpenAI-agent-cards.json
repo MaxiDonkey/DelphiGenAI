@@ -1,0 +1,47 @@
+{
+  "type": "card-selection-dialog-set-data",
+  "dialog": "agents",
+  "cards": [
+    {
+      "id": "openai-research-analyst",
+      "name": "Research Analyst",
+      "version": "1.0.0",
+      "commentaire": "Simple OpenAI agent: sourced, multi-step web research",
+      "badge": "\uE721",
+      "content": "{\"schema\":\"pythia.openai.agent-card.v1\",\"kind\":\"single\",\"runtime\":{\"orchestration\":\"single_response\",\"responses\":{\"store\":false,\"parallel_tool_calls\":false,\"max_tool_calls\":8},\"workspace\":{\"requires_selected_project\":false,\"mode\":\"none\"},\"confirmations\":{\"provider\":\"pythia\"}},\"agent\":{\"ref\":\"self\",\"name\":\"Research Analyst\",\"model\":\"gpt-5\",\"instructions\":\"You are a research analyst. Produce concise, factual, well-sourced briefings. Use OpenAI web_search to find current information before answering. Always cite sources with their URLs, group findings by theme, and flag uncertainty explicitly.\",\"tools\":{\"hosted\":[{\"name\":\"web_search\",\"enabled\":true,\"policy\":\"always_allow\"}],\"project\":[]}},\"session\":{\"title\":\"Veille Pythia\"}}"
+    },
+    {
+      "id": "openai-local-project-review",
+      "name": "Local Project Review",
+      "version": "1.0.0",
+      "commentaire": "OpenAI agent service: selected project, lightweight code review",
+      "badge": "\uE9D9",
+      "content": "{\"schema\":\"pythia.openai.agent-card.v1\",\"kind\":\"multiagent\",\"runtime\":{\"orchestration\":\"delphi_sequential\",\"responses\":{\"store\":false,\"parallel_tool_calls\":false,\"max_tool_calls\":10},\"workspace\":{\"requires_selected_project\":true,\"mode\":\"pythia_project_tools\"},\"confirmations\":{\"provider\":\"pythia\"}},\"subagents\":[{\"ref\":\"code-inspector\",\"name\":\"Code Inspector\",\"model\":\"gpt-5\",\"instructions\":\"You inspect a small project selected in Pythia. Use only the project tools read, glob and grep. Do not attempt to write, create, edit or save any file. Inspect at most 12 files and report concrete findings, each citing a concrete file path, back to the coordinator as text.\",\"tools\":{\"hosted\":[],\"project\":[{\"name\":\"read\",\"enabled\":true,\"policy\":\"always_allow\"},{\"name\":\"glob\",\"enabled\":true,\"policy\":\"always_allow\"},{\"name\":\"grep\",\"enabled\":true,\"policy\":\"always_allow\"}]}}],\"coordinator\":{\"ref\":\"coordinator\",\"name\":\"Local Review Coordinator\",\"model\":\"gpt-5\",\"instructions\":\"You coordinate a lightweight review of a small local project selected in Pythia. Ask the code-inspector sub-agent to inspect the source once, wait for its findings, then produce the review yourself. You have no file-writing tools: never attempt to create, write, edit or save a file. Deliver the report as your final text response, with three sections: Findings, Severity, Recommendations. Each finding must cite a concrete file path. Keep the run short.\",\"roster\":[\"code-inspector\"],\"tools\":{\"hosted\":[],\"project\":[]}},\"session\":{\"title\":\"Revue projet local\"}}"
+    },
+    {
+      "id": "openai-supervised-exploration",
+      "name": "Supervised Exploration",
+      "version": "1.0.0",
+      "commentaire": "OpenAI agent service: confirmation-driven inventory of a selected project",
+      "badge": "\uE8D7",
+      "content": "{\"schema\":\"pythia.openai.agent-card.v1\",\"kind\":\"multiagent\",\"runtime\":{\"orchestration\":\"delphi_sequential\",\"responses\":{\"store\":false,\"parallel_tool_calls\":false,\"max_tool_calls\":6},\"workspace\":{\"requires_selected_project\":true,\"mode\":\"pythia_project_tools\"},\"confirmations\":{\"provider\":\"pythia\"}},\"subagents\":[{\"ref\":\"explorer\",\"name\":\"Explorer\",\"model\":\"gpt-5\",\"instructions\":\"You explore a small project selected in Pythia. Perform only a handful of targeted operations: one glob to list the files, then read at most 3 of the most relevant files, and at most one grep for a keyword. Do not write, create, edit or save any file. Report what you found back to the coordinator as text. Keep it short.\",\"tools\":{\"hosted\":[],\"project\":[{\"name\":\"glob\",\"enabled\":true,\"policy\":\"always_ask\"},{\"name\":\"read\",\"enabled\":true,\"policy\":\"always_ask\"},{\"name\":\"grep\",\"enabled\":true,\"policy\":\"always_ask\"}]}}],\"coordinator\":{\"ref\":\"coordinator\",\"name\":\"Supervised Exploration Coordinator\",\"model\":\"gpt-5\",\"instructions\":\"You coordinate a quick supervised inventory of a small local project selected in Pythia. Ask the explorer sub-agent to inspect the project once, wait for its findings, then produce a short plain-text summary: what the project is and its notable files. You have no file-writing tools: never attempt to create, write, edit or save a file. Deliver the summary as your final text response. Keep it short.\",\"roster\":[\"explorer\"],\"tools\":{\"hosted\":[],\"project\":[]}},\"session\":{\"title\":\"Exploration supervisee\"}}"
+    },
+    {
+      "id": "openai-safe-code-patch",
+      "name": "Safe Code Patch",
+      "version": "1.0.0",
+      "commentaire": "Markdown-defined OpenAI multi-agent demo: inspect a selected local project and propose a small code change as a unified diff",
+      "badge": "\uE8A5",
+      "md_path": "..\\openai-safe-code-patch-agent.md"
+    },
+    {
+      "id": "openai-sandbox-to-local-code-edit",
+      "name": "Sandbox To Local Code Edit",
+      "version": "1.0.0",
+      "commentaire": "Markdown-defined OpenAI multi-agent demo: edit a controlled workspace copy and return a local apply manifest plus a unified diff",
+      "badge": "\uE70F",
+      "md_path": "..\\openai-sandbox-to-local-code-edit-agent.md"
+    }
+  ],
+  "selectedId": ""
+}

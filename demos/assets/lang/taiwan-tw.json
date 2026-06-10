@@ -1,0 +1,466 @@
+﻿{
+  "lang": "zh-TW",
+  "input": {
+    "placeholder": {
+      "askQuestion": "提出一個問題..."
+    },
+    "menu": {
+      "endpoint": "端點",
+      "webResearch": "網路搜尋",
+      "thinking": "推理",
+      "attachFiles": "附加檔案",
+      "knowledgeSearch": "知識搜尋",
+      "vision": "視覺",
+      "deepResearch": "深度研究",
+      "integration": "整合",
+      "media": "媒體",
+      "custom": "自訂",
+      "settings": "設定",
+      "model": "模型",
+      "project": "專案"
+    },
+    "thinking": {
+      "low": "低",
+      "medium": "中",
+      "high": "高"
+    },
+    "endpoint": {
+      "chatCompletion": "v1/chat/completions",
+      "chatResponse": "v1/chat/responses",
+      "message": "v1/message",
+      "generateContent": ":generateContent",
+      "interactions": "v1/interactions",
+      "conversation": "v1/conversation",
+      "provider": {
+        "chatCompletion": "OpenAI, DeepSeek, MistralAI",
+        "chatResponse": "OpenAI",
+        "message": "Claude",
+        "generateContent": "Gemini",
+        "interactions": "Gemini",
+        "conversation": "MistralAI"
+      }
+    },
+    "integration": {
+      "function": "函式",
+      "mcp": "MCP",
+      "jsCodeSandbox": "JS 沙箱",
+      "skills": "技能",
+      "agents": "代理"
+    },
+    "media": {
+      "createImage": "建立圖片",
+      "createVideo": "建立影片",
+      "createAudio": "建立音訊",
+      "speechToText": "語音轉文字",
+      "textToSpeech": "文字轉語音"
+    },
+    "project": {
+      "add": "新增專案",
+      "none": "無",
+      "noneUsed": "未使用專案",
+      "delete": "刪除"
+    },
+    "chips": {
+      "endpoint": "端點:{title}",
+      "webResearch": "網路搜尋",
+      "thinking": "推理:{title}",
+      "knowledgeSearch": "知識搜尋({count})",
+      "deepResearch": "深度研究",
+      "filesAttached": "已附加檔案({count})",
+      "vision": "視覺({count})",
+      "integrationFunction": "整合:函式({count})",
+      "integrationMcp": "整合:MCP({count})",
+      "integrationJsCodeSandbox": "整合:JS 沙箱({count})",
+      "integrationSkills": "整合:技能({count})",
+      "integrationAgents": "整合:代理({count})",
+      "mediaCreateImage": "媒體:建立圖片",
+      "mediaCreateVideo": "媒體:建立影片",
+      "mediaCreateAudio": "媒體:建立音訊",
+      "speechToText": "語音轉文字({count})",
+      "mediaTextToSpeech": "媒體:文字轉語音",
+      "custom": "自訂({count})"
+    }
+  },
+  "requestParams": {
+    "panel": {
+      "title": "設定",
+      "close": "關閉",
+      "theme": {
+        "light": "淺色",
+        "dark": "深色"
+      }
+    },
+    "summary": {
+      "alwaysAvailable": "永遠可用",
+      "enabled": "已啟用",
+      "disabled": "已停用",
+      "enabledDisabled": "已啟用 {enabled} 個 / 已停用 {disabled} 個"
+    },
+    "categories": {
+      "appSettings": {
+        "title": "應用程式設定",
+        "subtitle": "一般",
+        "panelSubtitle": ""
+      },
+      "systemPrompt": {
+        "title": "系統提示詞"
+      },
+      "settings": {
+        "title": "一般設定"
+      },
+      "sampling": {
+        "title": "取樣"
+      },
+      "structuredOutput": {
+        "title": "結構化輸出"
+      },
+      "vendorSettings": {
+        "title": "供應商選項"
+      }
+    },
+    "items": {
+      "appSettings": {
+        "lookAndFeel": {
+          "label": "外觀"
+        },
+        "language": {
+          "label": "語言",
+          "placeholder": "選擇語言"
+        },
+        "scrollButtons": {
+          "label": "捲動按鈕"
+        }
+      },
+      "systemPrompt": {
+        "systemPrompt": {
+          "label": "系統提示詞",
+          "labelWhenDisabled": "已停用",
+          "labelWhenEnabled": "已啟用",
+          "placeholder": "輸入系統提示詞"
+        }
+      },
+      "settings": {
+        "temperature": {
+          "label": "溫度"
+        },
+        "maxTokens": {
+          "label": "最大權杖數"
+        },
+        "stopStrings": {
+          "label": "停止字串",
+          "placeholder": "每行一個停止字串"
+        }
+      },
+      "sampling": {
+        "topK": {
+          "label": "Top-k"
+        },
+        "topP": {
+          "label": "Top-p"
+        },
+        "presencePenalty": {
+          "label": "存在懲罰"
+        },
+        "randomSeed": {
+          "label": "隨機種子"
+        }
+      },
+      "structuredOutput": {
+        "jsonSchema": {
+          "label": "JSON 結構描述",
+          "labelWhenDisabled": "已停用",
+          "labelWhenEnabled": "已啟用",
+          "placeholder": "輸入 JSON 結構描述",
+          "invalidJsonMessage": "無效的 JSON"
+        }
+      },
+      "vendorSettings": {
+        "parallelToolCalls": {
+          "label": "平行工具呼叫"
+        },
+        "backgroundResponse": {
+          "label": "背景回應"
+        },
+        "usingPreviousId": {
+          "label": "使用先前的 ID"
+        },
+        "store": {
+          "label": "儲存"
+        }
+      }
+    }
+  },
+  "filesDrawer": {
+    "aria": {
+      "leftPanel": "左側面板"
+    },
+    "actions": {
+      "openPanel": "開啟面板",
+      "newSession": "新工作階段",
+      "closePanel": "關閉面板",
+      "nextPage": "下一頁",
+      "more": "更多",
+      "rename": "重新命名",
+      "delete": "刪除"
+    }
+  },
+  "scroll": {
+    "top": "捲動至頂部",
+    "bottom": "捲動至底部"
+  },
+  "selector": {
+    "branchAfterMessage": "在此訊息後建立分支",
+    "copyMessage": "複製訊息",
+    "deleteMessage": "刪除訊息"
+  },
+  "confirmation": {
+    "title": "確認",
+    "question": "請確認。",
+    "yes": "是",
+    "no": "否"
+  },
+  "inputString": {
+    "title": "輸入",
+    "message": "請輸入一個值。",
+    "ok": "確定",
+    "cancel": "取消"
+  },
+  "webDecisionDlg": {
+    "title": "確認",
+    "message": "請確認。",
+    "ok": "確定",
+    "cancel": "取消",
+    "close": "關閉"
+  },
+  "displayFile": {
+    "fallbackName": "檔案 {index}",
+    "badge": {
+      "pdf": "PDF",
+      "sheet": "XLS",
+      "doc": "DOC",
+      "slide": "PPT",
+      "text": "TXT",
+      "pascal": "PAS",
+      "code": "</>",
+      "file": "檔案"
+    },
+    "status": {
+      "file": "檔案"
+    },
+    "debug": {
+      "error": "DisplayFile 錯誤:{error}"
+    }
+  },
+  "displayImage": {
+    "action": {
+      "close": "關閉"
+    },
+    "error": {
+      "unavailable": "圖片無法使用"
+    },
+    "alt": {
+      "imageIndex": "圖片 {index}"
+    },
+    "debug": {
+      "error": "DisplayImages 錯誤:{error}"
+    }
+  },
+  "display": {
+    "reasoning": {
+      "title": "推理"
+    },
+    "toolGroup": {
+      "label": "使用的工具"
+    },
+    "code": {
+      "copy": "複製",
+      "copied": "已複製",
+      "copyToClipboard": "複製到剪貼簿"
+    }
+  },
+  "errors": {
+    "aria": {
+      "systemMessages": "系統訊息"
+    },
+    "action": {
+      "close": "關閉"
+    }
+  },
+  "promptFile": {
+    "debug": {
+      "error": "PromptFile 錯誤:{error}"
+    }
+  },
+  "displayVideo": {
+    "fallbackName": "影片 {index}",
+    "fallbackNameWithExtension": "影片 {index}.{ext}",
+    "action": {
+      "open": "開啟",
+      "close": "關閉"
+    },
+    "debug": {
+      "error": "DisplayVideo 錯誤:{error}"
+    }
+  },
+  "displayAudio": {
+    "fallbackName": "音訊 {index}",
+    "fallbackNameWithExtension": "音訊 {index}.{ext}",
+    "status": {
+      "stop": "停止",
+      "loading": "載入中",
+      "unavailable": "無法使用",
+      "pause": "暫停",
+      "playing": "播放中"
+    },
+    "debug": {
+      "error": "DisplayAudio 錯誤:{error}"
+    }
+  },
+  "modelSelector": {
+    "panel": {
+      "title": "選擇預設模型",
+      "aria": {
+        "dialog": "選擇預設模型"
+      }
+    },
+    "actions": {
+      "close": "關閉"
+    },
+    "defaults": {
+      "title": "預設模型",
+      "empty": "此類別沒有預設模型。"
+    },
+    "status": {
+      "notAssigned": "未指派",
+      "noDefaultModel": "沒有預設模型"
+    },
+    "categories": {
+      "allModels": {
+        "label": "模型清單"
+      },
+      "textGeneration": {
+        "label": "文字生成"
+      },
+      "imageCreation": {
+        "label": "圖片建立"
+      },
+      "videoCreation": {
+        "label": "影片建立"
+      },
+      "audioCreation": {
+        "label": "音訊建立"
+      },
+      "textToSpeech": {
+        "label": "文字轉語音"
+      },
+      "deepResearch": {
+        "label": "深度研究"
+      }
+    },
+    "features": {
+      "webResearch": "網路搜尋",
+      "thinking": "推理",
+      "attachFiles": "附加檔案",
+      "vision": "視覺",
+      "createImage": "建立圖片",
+      "createVideo": "建立影片",
+      "createAudio": "建立音訊",
+      "speechToText": "語音轉文字",
+      "textToSpeech": "文字轉語音",
+      "deepResearch": "深度研究"
+    }
+  },
+  "cardSelector": {
+    "panel": {
+      "title": "選擇一個項目",
+      "ariaLabel": "選擇一個項目",
+      "selectDialogTitle": "{selectPrefix} {dialogLabel}"
+    },
+    "actions": {
+      "selectPrefix": "選擇",
+      "close": "關閉",
+      "edit": "編輯",
+      "settings": "設定",
+      "cancel": "取消",
+      "select": "選擇"
+    },
+    "messages": {
+      "empty": "沒有可用的項目。",
+      "noComment": ""
+    },
+    "dialogs": {
+      "function": {
+        "label": "函式"
+      },
+      "mcp": {
+        "label": "MCP"
+      },
+      "skills": {
+        "label": "技能"
+      },
+      "agents": {
+        "label": "代理"
+      },
+      "custom": {
+        "label": "自訂"
+      }
+    }
+  },
+  "prompt": {
+    "toggleCollapse": "摺疊或展開提示詞",
+    "summary": {
+      "open": "開啟提示詞摘要",
+      "close": "關閉提示詞摘要"
+    }
+  },
+  "more": {
+    "delete_qa": "請確認刪除目前的問題和答案,以及所有後續項目。",
+    "delete_chat_session": "您確定嗎? #10#10此操作無法還原,將刪除此對話中的所有訊息。",
+    "aborted": "操作已中止...",
+    "aborted_operation": "操作已中止",
+    "model_file_not_found": "%s:檔案已建立。#10請開啟此檔案並指定可用模型的清單。",
+    "batch_begin_error": "無法啟用批次顯示轉譯。",
+    "batch_end_error": "無法釋放批次轉譯。",
+    "focus_error": "輸入泡泡無法取得焦點。",
+    "stop_audio_media_error": "無法停止音訊媒體。",
+    "stop_video_media_error": "無法停止影片媒體。",
+    "internal_theme_error": "無法更新頁面主題。",
+    "deserialization_error": "還原序列化錯誤:無效的 JSON 輸入 %s",
+    "welcome": "歡迎使用您的工作區",
+    "structured_output_error": "結構化輸出無效:請在設定中編輯其值。",
+    "card_json_file_not_found": "沒有 JSON 檔案支援 %s",
+    "models_categories_count_error": "請為預設模型定義類別",
+    "invalid_categories_file_error": "類別的 JSON 檔案無效",
+    "text_generation_cant_handled_error": "沒有預設模型:無法處理文字生成",
+    "image_creation_aborted_error": "未設定預設模型:圖片建立已中止",
+    "video_creation_aborted_error": "未設定預設模型:影片建立已中止",
+    "audio_creation_aborted_error": "未設定預設模型:音訊建立已中止",
+    "stt_operation_aborted_error": "未設定預設模型:STT 作業已中止",
+    "tts_operation_aborted_error": "未設定預設模型:TTS 作業已中止",
+    "deep_research_operation_aborted_error": "未設定預設模型:深度研究操作已中止",
+    "missing_default_models_error": "某些類別缺少預設模型。#10 請檢查模型設定",
+    "api_key_empty_name_error": "金鑰名稱不可為空。",
+    "api_key_enter_dialog_prompt": "請輸入 %s 的 API 金鑰值",
+    "api_key_not_found": "%s:找不到 API 金鑰",
+    "api_key_deleted": "%s:API 金鑰已刪除",
+    "api_key_exists": "%s:API 金鑰已存在",
+    "api_key_modified": "%s:API 金鑰已修改。",
+    "api_key_inserted": "%s:API 金鑰已插入",
+    "web_decision_dlg_title": "確認",
+    "web_decision_dlg_message": "請確認。",
+    "web_decision_dlg_ok": "確定",
+    "web_decision_dlg_cancel": "取消",
+    "web_decision_dlg_close": "關閉",
+    "demo_anthropic_tool_confirmation_title": "確認",
+    "demo_anthropic_tool_allow": "允許",
+    "demo_anthropic_tool_deny": "拒絕",
+    "demo_anthropic_tool_allow_call": "允許此工具呼叫嗎?",
+    "demo_anthropic_interrupted_by_user": "已由使用者中斷。",
+    "command_plugin_not_be_null": "外掛程式不可為空",
+    "command_unknown": "未知的指令:/%s",
+    "command_action_unknown": "未知的動作:/%s %s",
+    "command_missing_action": "/%s 缺少動作",
+    "command_incorrect_number_of_arguments": "/%s %s 的引數數量不正確(收到 %d 個)",
+    "command_no_plugin_for": "/%s 沒有外掛程式"
+  }
+}

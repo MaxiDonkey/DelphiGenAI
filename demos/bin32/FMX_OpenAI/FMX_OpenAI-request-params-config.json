@@ -1,0 +1,47 @@
+﻿{
+    "systemPrompt": {
+        "systemPrompt": "",
+        "enabled": false
+    },
+    "settings": {
+        "temperature": 0.8,
+        "maxToken": {
+            "maxToken": 10000,
+            "enabled": true
+        },
+        "stopString": {
+            "stopString": [
+            ],
+            "enabled": false
+        }
+    },
+    "sampling": {
+        "topK": {
+            "topK": 20,
+            "enabled": false
+        },
+        "presencePenalty": {
+            "presencePenalty": 0,
+            "enabled": false
+        },
+        "topP": {
+            "topP": 0,
+            "enabled": false
+        },
+        "seed": {
+            "seed": 0,
+            "enabled": false
+        }
+    },
+    "structuredOutput": {
+        "jsonSchema": "",
+        "enabled": false
+    },
+    "vendorSettings": {
+        "parallelToolCalls": false,
+        "backgroundResponse": false,
+        "usingPreviousId": false,
+        "store": false
+    },
+    "type": "request-initialization"
+}

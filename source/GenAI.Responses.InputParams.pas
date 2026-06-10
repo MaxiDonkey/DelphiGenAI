@@ -1,4 +1,4 @@
-unit GenAI.Responses.InputParams;
+﻿unit GenAI.Responses.InputParams;
 
 {-------------------------------------------------------------------------------
 
@@ -10,12 +10,17 @@ unit GenAI.Responses.InputParams;
 interface
 
 uses
-  System.SysUtils, System.Classes, System.Threading, System.JSON, REST.Json.Types,
-  REST.JsonReflect,
-  GenAI.API.Params, GenAI.API, GenAI.Consts, GenAI.Schema, GenAI.Types, GenAI.Assistants,
+  System.SysUtils, System.Classes, System.Threading, System.JSON,
+  REST.Json.Types, REST.JsonReflect,
+  GenAI.API.Params, GenAI.API, GenAI.Consts, GenAI.Schema, GenAI.Types,
   GenAI.Functions.Core;
 
 type
+  TRankingOptionsParams = class(TJSONParam)
+    function Ranker(const Value: string): TRankingOptionsParams;
+    function ScoreThreshold(const Value: Double): TRankingOptionsParams;
+  end;
+
   {$REGION 'output top logprobs'}
 
   TOutputTopLogprobs  = class(TJSONParam)
@@ -39,6 +44,24 @@ type
     function Id(const Value: string): TConversationParams;
 
     class function New(const Value: string): TConversationParams;
+  end;
+
+  {$ENDREGION}
+
+  {$REGION 'context management'}
+
+  TContextManagementParams = class(TJSONParam)
+    /// <summary>
+    /// The context management entry type. Currently only compaction is supported.
+    /// </summary>
+    function &Type(const Value: string = 'compaction'): TContextManagementParams;
+
+    /// <summary>
+    /// Token threshold at which compaction should be triggered for this entry.
+    /// </summary>
+    function CompactThreshold(const Value: Integer): TContextManagementParams;
+
+    class function New: TContextManagementParams;
   end;
 
   {$ENDREGION}
@@ -303,6 +326,27 @@ type
   /// <para>
   /// - TInputItemReference
   /// </para>
+  /// <para>
+  /// - TCompactionItemParams
+  /// </para>
+  /// <para>
+  /// - TShellCallParams
+  /// </para>
+  /// <para>
+  /// - TShellCallOutputParams
+  /// </para>
+  /// <para>
+  /// - TApplyPatchCallParams
+  /// </para>
+  /// <para>
+  /// - TApplyPatchCallOutputParams
+  /// </para>
+  /// <para>
+  /// - TToolSearchCallParams
+  /// </para>
+  /// <para>
+  /// - TToolSearchOutputParams
+  /// </para>
   /// </summary>
   TInputListItem = class(TJSONParam);
 
@@ -466,7 +510,13 @@ type
     /// <summary>
     /// The annotations of the text output.
     /// </summary>
-    function Annotations(const Value: TArray<TOutputNotation>): TOutputMessageContent;
+    function Annotations(const Value: TArray<TOutputNotation>): TOutputMessageContent; overload;
+
+    /// <summary>
+    /// The annotations of the text output, supplied as a raw JSON array string.
+    /// The string must be a valid JSON array.
+    /// </summary>
+    function Annotations(const Value: string): TOutputMessageContent; overload;
 
     /// <summary>
     /// The refusal explanationfrom the model.
@@ -476,7 +526,13 @@ type
     /// <summary>
     /// Sets the log probabilities for the generated tokens.
     /// </summary>
-    function Logprobs(const Value: TArray<TOutputLogprobs>): TOutputMessageContent;
+    function Logprobs(const Value: TArray<TOutputLogprobs>): TOutputMessageContent; overload;
+
+    /// <summary>
+    /// Sets the log probabilities for the generated tokens, supplied as a raw JSON
+    /// array string. The string must be a valid JSON array.
+    /// </summary>
+    function Logprobs(const Value: string): TOutputMessageContent; overload;
 
     /// <summary>
     /// A text output from the model.
@@ -545,7 +601,15 @@ type
     /// Keys are strings with a maximum length of 64 characters. Values are strings with a maximum length of
     /// 512 characters, booleans, or numbers.
     /// </summary>
-    function Attributes(const Value: TJSONObject): TFileSearchToolCallResult;
+    function Attributes(const Value: TJSONObject): TFileSearchToolCallResult; overload;
+
+    /// <summary>
+    /// Set of 16 key-value pairs that can be attached to an object. This can be useful for storing additional
+    /// information about the object in a structured format, and querying for objects via API or the dashboard.
+    /// Keys are strings with a maximum length of 64 characters. Values are strings with a maximum length of
+    /// 512 characters, booleans, or numbers.
+    /// </summary>
+    function Attributes(const Value: string): TFileSearchToolCallResult; overload;
 
     /// <summary>
     /// The unique ID of the file.
@@ -601,7 +665,12 @@ type
     /// <summary>
     /// The results of the file search tool call.
     /// </summary>
-    function Results(const Value: TArray<TFileSearchToolCallResult>): TFileSearchToolCall;
+    function Results(const Value: TArray<TFileSearchToolCallResult>): TFileSearchToolCall; overload;
+
+    /// <summary>
+    /// The results of the file search tool call.
+    /// </summary>
+    function Results(const Value: string): TFileSearchToolCall; overload;
 
     class function New: TFileSearchToolCall;
   end;
@@ -707,7 +776,13 @@ type
     /// An array of coordinates representing the path of the drag action. Coordinates will appear
     /// as an array of point objects.
     /// </summary>
-    function Path(const Value: TArray<TComputerDragPoint>): TComputerDrag;
+    function Path(const Value: TArray<TComputerDragPoint>): TComputerDrag;  overload;
+
+    /// <summary>
+    /// An array of coordinates representing the path of the drag action. Coordinates will appear
+    /// as an array of point objects.
+    /// </summary>
+    function Path(const Value: string): TComputerDrag; overload;
 
     class function New: TComputerDrag;
   end;
@@ -838,7 +913,18 @@ type
     /// TComputerClick, TComputerDoubleClick, TComputerDragPoint, TComputerDrag, TComputerKeyPressed, TComputerMove, TComputerScreenshot, TComputerScroll, TComputerType or TComputerWait
     /// </para>
     /// </remarks>
-    function Action(const Value: TComputerToolCallAction): TComputerToolCall;
+    function Action(const Value: TComputerToolCallAction): TComputerToolCall; overload;
+
+    /// <summary>
+    /// The computer action.
+    /// </summary>
+    /// <remarks>
+    /// Value is TComputerToolCallAction class or his descendant e.g.
+    /// <para>
+    /// TComputerClick, TComputerDoubleClick, TComputerDragPoint, TComputerDrag, TComputerKeyPressed, TComputerMove, TComputerScreenshot, TComputerScroll, TComputerType or TComputerWait
+    /// </para>
+    /// </remarks>
+    function Action(const Value: string): TComputerToolCall; overload;
 
     /// <summary>
     /// An identifier used when responding to the tool call with output.
@@ -853,7 +939,12 @@ type
     /// <summary>
     /// The pending safety checks for the computer call.
     /// </summary>
-    function PendingSafetyChecks(const Value: TArray<TPendingSafetyCheck>): TComputerToolCall;
+    function PendingSafetyChecks(const Value: TArray<TPendingSafetyCheck>): TComputerToolCall; overload;
+
+    /// <summary>
+    /// The pending safety checks for the computer call.
+    /// </summary>
+    function PendingSafetyChecks(const Value: string): TComputerToolCall; overload;
 
     /// <summary>
     /// The status of the item. One of in_progress, completed, or incomplete. Populated when items are returned via API.
@@ -904,7 +995,12 @@ type
     /// <summary>
     /// acknowledged safety checks for computer tool call outpu
     /// </summary>
-    function AcknowledgedSafetyChecks(const Value: TArray<TAcknowledgedSafetyCheckParams>): TComputerToolCallOutput;
+    function AcknowledgedSafetyChecks(const Value: TArray<TAcknowledgedSafetyCheckParams>): TComputerToolCallOutput; overload;
+
+    /// <summary>
+    /// acknowledged safety checks for computer tool call outpu
+    /// </summary>
+    function AcknowledgedSafetyChecks(const Value: string): TComputerToolCallOutput; overload;
 
     /// <summary>
     /// The ID of the computer tool call that produced the output.
@@ -919,7 +1015,12 @@ type
     /// <summary>
     /// The output of a computer tool call.
     /// </summary>
-    function Output(const Value: TComputerToolCallOutputObject): TComputerToolCallOutput;
+    function Output(const Value: TComputerToolCallOutputObject): TComputerToolCallOutput; overload;
+
+    /// <summary>
+    /// The output of a computer tool call.
+    /// </summary>
+    function Output(const Value: string): TComputerToolCallOutput; overload;
 
     /// <summary>
     /// The status of the file search tool call. One of in_progress, searching, incomplete or failed
@@ -947,18 +1048,18 @@ type
 
     {$REGION 'Web search actions'}
 
-  TSearchActionSource = class(TJSONParam)
+  TSearchActionSourceParam = class(TJSONParam)
     /// <summary>
     /// The type of source. Always url.
     /// </summary>
-    function &Type(const Value: string = 'url'): TSearchActionSource;
+    function &Type(const Value: string = 'url'): TSearchActionSourceParam;
 
     /// <summary>
     /// The URL of the source.
     /// </summary>
-    function Url(const Value: string): TSearchActionSource;
+    function Url(const Value: string): TSearchActionSourceParam;
 
-    class function New: TSearchActionSource;
+    class function New: TSearchActionSourceParam;
   end;
 
   TSearchAction = class(TWebSearchAction)
@@ -975,7 +1076,7 @@ type
     /// <summary>
     /// The sources used in the search.
     /// </summary>
-    function Sources(const Value: TArray<TSearchActionSource>): TSearchAction;
+    function Sources(const Value: TArray<TSearchActionSourceParam>): TSearchAction;
   end;
 
   TOpenPageAction = class(TWebSearchAction)
@@ -1016,7 +1117,15 @@ type
     /// <remarks>
     /// For more information, see https://platform.openai.com/docs/guides/tools-web-search
     /// </remarks>
-    function Action(const Value: TWebSearchAction): TWebSearchToolCall;
+    function Action(const Value: TWebSearchAction): TWebSearchToolCall; overload;
+
+    /// <summary>
+    /// The results of a web search tool call.
+    /// </summary>
+    /// <remarks>
+    /// For more information, see https://platform.openai.com/docs/guides/tools-web-search
+    /// </remarks>
+    function Action(const Value: string): TWebSearchToolCall; overload;
 
     /// <summary>
     /// The unique ID of the web search tool call.
@@ -1247,7 +1356,12 @@ type
     /// <summary>
     /// Reasoning text contents.
     /// </summary>
-    function Summary(const Value: TArray<TReasoningTextContent>): TReasoningObject;
+    function Summary(const Value: TArray<TReasoningTextContent>): TReasoningObject; overload;
+
+    /// <summary>
+    /// Reasoning text contents.
+    /// </summary>
+    function Summary(const Value: string): TReasoningObject; overload;
 
     /// <summary>
     /// The encrypted content of the reasoning item - populated when a response is generated with
@@ -1348,7 +1462,13 @@ type
     /// <summary>
     /// The outputs generated by the code interpreter, such as logs or images. Can be null if no outputs are available.
     /// </summary>
-    function Outputs(const Value: TArray<TCodeInterpreterOutputs>): TCodeInterpreterToolCall;
+    function Outputs(const Value: TArray<TCodeInterpreterOutputs>): TCodeInterpreterToolCall; overload;
+
+    /// <summary>
+    /// The outputs generated by the code interpreter, supplied as a raw JSON array string.
+    /// The string must be a valid JSON array.
+    /// </summary>
+    function Outputs(const Value: string): TCodeInterpreterToolCall; overload;
 
     /// <summary>
     /// The status of the item. One of in_progress, completed, or incomplete. Populated when items are returned via API.
@@ -1419,7 +1539,12 @@ type
     /// <summary>
     /// Execute a shell command on the server.
     /// </summary>
-    function Action(const Value: TLocalShellCallAction): TLocalShellCall;
+    function Action(const Value: TLocalShellCallAction): TLocalShellCall; overload;
+
+    /// <summary>
+    /// Execute a shell command on the server.
+    /// </summary>
+    function Action(const Value: string): TLocalShellCall; overload;
 
     /// <summary>
     /// The unique ID of the local shell tool call generated by the model.
@@ -1538,7 +1663,13 @@ type
     /// <summary>
     /// The tools available on the server.
     /// </summary>
-    function Tools(const Value: TArray<TMCPTools>): TMCPListTools;
+    function Tools(const Value: TArray<TMCPTools>): TMCPListTools; overload;
+
+    /// <summary>
+    /// The tools available on the server, supplied as a raw JSON array string.
+    /// The string must be a valid JSON array.
+    /// </summary>
+    function Tools(const Value: string): TMCPListTools; overload;
 
     /// <summary>
     /// The type of the item. Always mcp_list_tools.
@@ -1766,7 +1897,13 @@ type
     /// Optional map of values to substitute in for variables in your prompt. The substitution values
     /// can either be strings, or other Response input types like images or files.
     /// </summary>
-    function Variables(const Value: TJSONObject): TPromptParams;
+    function Variables(const Value: TJSONObject): TPromptParams; overload;
+
+    /// <summary>
+    /// Optional map of values to substitute in for variables in your prompt, supplied
+    /// as a raw JSON object string. The string must be a valid JSON object.
+    /// </summary>
+    function Variables(const Value: string): TPromptParams; overload;
 
     /// <summary>
     /// Optional version of the prompt template.
@@ -1894,7 +2031,9 @@ type
     /// is valid JSON. Using json_schema is preferred for models that support it.
     /// </para>
     /// </summary>
-    function Format(const Value: TTextFormatParams): TTextParams;
+    function Format(const Value: TTextFormatParams): TTextParams; overload;
+
+    function Format(const Value: string): TTextParams; overload;
 
     /// <summary>
     /// Constrains the verbosity of the model's response. Lower values will result in more concise responses, while higher values will result in more verbose responses.
@@ -2056,6 +2195,11 @@ type
     function Strict(const Value: Boolean): TResponseFunctionParams;
 
     /// <summary>
+    /// Whether the tool definition should be deferred and loaded on demand by the model.
+    /// </summary>
+    function DeferLoading(const Value: Boolean): TResponseFunctionParams;
+
+    /// <summary>
     /// The type of the function tool. Always function.
     /// </summary>
     function &Type(const Value: string = 'function'): TResponseFunctionParams;
@@ -2198,7 +2342,15 @@ type
     /// <remarks>
     /// Value is TFileSearchFilters or his descendant e.g. TComparisonFilter, TCompoundFilter
     /// </remarks>
-    function Filters(const Value: TFileSearchFilters): TResponseFileSearchParams;
+    function Filters(const Value: TFileSearchFilters): TResponseFileSearchParams; overload;
+
+    /// <summary>
+    /// A filter to apply based on file attributes.
+    /// </summary>
+    /// <remarks>
+    /// Value is TFileSearchFilters or his descendant e.g. TComparisonFilter, TCompoundFilter
+    /// </remarks>
+    function Filters(const Value: string): TResponseFileSearchParams; overload;
 
     /// <summary>
     /// The maximum number of results to return. This number should be between 1 and 50 inclusive
@@ -2208,7 +2360,12 @@ type
     /// <summary>
     /// Ranking options for search.
     /// </summary>
-    function RankingOptions(const Value: TRankingOptionsParams): TResponseFileSearchParams;
+    function RankingOptions(const Value: TRankingOptionsParams): TResponseFileSearchParams; overload;
+
+    /// <summary>
+    /// Ranking options for search.
+    /// </summary>
+    function RankingOptions(const Value: string): TResponseFileSearchParams; overload;
 
     /// <summary>
     /// The type of the file search tool. Always file_search.
@@ -2279,6 +2436,16 @@ type
     class function New: TResponseUserLocationParams;
   end;
 
+  TWebSearchFiltersParams = class(TJSONParam)
+    /// <summary>
+    /// Allowed domains for the search. If not provided, all domains are allowed. Subdomains of the
+    /// provided domains are allowed as well.
+    /// </summary>
+    function AllowedDomains(const Value: TArray<string>): TWebSearchFiltersParams;
+
+    class function New: TWebSearchFiltersParams;
+  end;
+
   TResponseWebSearchParams = class(TResponseToolParams)
     /// <summary>
     /// High level guidance for the amount of context window space to use for the search.
@@ -2295,7 +2462,22 @@ type
     /// <summary>
     /// Approximate location parameters for the search.
     /// </summary>
-    function UserLocation(const Value: TResponseUserLocationParams): TResponseWebSearchParams;
+    function UserLocation(const Value: TResponseUserLocationParams): TResponseWebSearchParams; overload;
+
+    /// <summary>
+    /// Approximate location parameters for the search.
+    /// </summary>
+    function UserLocation(const Value: string): TResponseWebSearchParams; overload;
+
+    /// <summary>
+    /// Filters for the search.
+    /// </summary>
+    function Filters(const Value: TWebSearchFiltersParams): TResponseWebSearchParams; overload;
+
+    /// <summary>
+    /// Filters for the search.
+    /// </summary>
+    function Filters(const Value: string): TResponseWebSearchParams; overload;
 
     /// <summary>
     /// The type of the web search tool. One of:
@@ -2340,6 +2522,12 @@ type
     /// List of tools
     /// </summary>
     function ToolNames(const Value: TArray<string>): TMCPAllowedToolsParams;
+
+    /// <summary>
+    /// Indicates whether or not a tool modifies data or is read-only. If an MCP server is
+    /// annotated with the read-only hint, it will be ignored unless this is set to false.
+    /// </summary>
+    function ReadOnly(const Value: Boolean): TMCPAllowedToolsParams;
   end;
 
   TMCPRequireApprovalParams = class(TJSONParam)
@@ -2392,7 +2580,12 @@ type
     /// <summary>
     /// Optional HTTP headers to send to the MCP server. Use for authentication or other purposes.
     /// </summary>
-    function Headers(const Value: TJSONObject): TResponseMCPToolParams;
+    function Headers(const Value: TJSONObject): TResponseMCPToolParams; overload;
+
+    /// <summary>
+    /// Optional HTTP headers to send to the MCP server. Use for authentication or other purposes.
+    /// </summary>
+    function Headers(const Value: string): TResponseMCPToolParams; overload;
 
     /// <summary>
     /// Specify which of the MCP server's tools require approval.
@@ -2412,6 +2605,34 @@ type
     /// Optional description of the MCP server, used to provide more context.
     /// </summary>
     function ServerDescription(const Value: string): TResponseMCPToolParams;
+
+    /// <summary>
+    /// An OAuth access token that can be used with a remote MCP server, either with a custom MCP
+    /// server URL or a service connector. Your application must handle the OAuth authorization flow
+    /// and provide the token here.
+    /// </summary>
+    function Authorization(const Value: string): TResponseMCPToolParams;
+
+    /// <summary>
+    /// Identifier for service connectors, like those available in ChatGPT. One of server_url or
+    /// connector_id must be provided.
+    /// </summary>
+    /// <remarks>
+    /// Learn more about service connectors here: https://platform.openai.com/docs/guides/tools-remote-mcp#connectors
+    /// </remarks>
+    function ConnectorId(const Value: TMCPConnectorType): TResponseMCPToolParams; overload;
+
+    /// <summary>
+    /// Identifier for service connectors, like those available in ChatGPT. One of server_url or
+    /// connector_id must be provided.
+    /// </summary>
+    function ConnectorId(const Value: string): TResponseMCPToolParams; overload;
+
+    /// <summary>
+    /// Whether the tool definitions exposed by this MCP server should be deferred and loaded on
+    /// demand by the model rather than eagerly listed.
+    /// </summary>
+    function DeferLoading(const Value: Boolean): TResponseMCPToolParams;
 
     class function New: TResponseMCPToolParams;
   end;
@@ -2480,6 +2701,16 @@ type
     function &Type(const Value: string = 'image_generation'): TResponseImageGenerationParams;
 
     /// <summary>
+    /// The image action to perform. One of generate, edit, or auto. Default: auto.
+    /// </summary>
+    function Action(const Value: TImageGenActionType): TResponseImageGenerationParams; overload;
+
+    /// <summary>
+    /// The image action to perform. One of generate, edit, or auto. Default: auto.
+    /// </summary>
+    function Action(const Value: string): TResponseImageGenerationParams; overload;
+
+    /// <summary>
     /// Background type for the generated image. One of transparent, opaque, or auto. Default: auto.
     /// </summary>
     function Background(const Value: string): TResponseImageGenerationParams; overload;
@@ -2504,7 +2735,12 @@ type
     /// <summary>
     /// Optional mask for inpainting. Contains image_url (string, optional) and file_id (string, optional).
     /// </summary>
-    function InputImageMask(const Value: TInputImageMaskParams): TResponseImageGenerationParams;
+    function InputImageMask(const Value: TInputImageMaskParams): TResponseImageGenerationParams; overload;
+
+    /// <summary>
+    /// Optional mask for inpainting. Contains image_url (string, optional) and file_id (string, optional).
+    /// </summary>
+    function InputImageMask(const Value: string): TResponseImageGenerationParams; overload;
 
     /// <summary>
     /// The image generation model to use. Default: gpt-image-1.
@@ -2625,7 +2861,12 @@ type
     /// <summary>
     /// The input format for the custom tool. Default is unconstrained text.
     /// </summary>
-    function Format(const Value: TToolParamsFormatParams): TCustomToolParams;
+    function Format(const Value: TToolParamsFormatParams): TCustomToolParams; overload;
+
+    /// <summary>
+    /// The input format for the custom tool. Default is unconstrained text.
+    /// </summary>
+    function Format(const Value: string): TCustomToolParams; overload;
 
     class function New: TCustomToolParams;
   end;
@@ -2650,7 +2891,12 @@ type
     /// <summary>
     /// The user's location.
     /// </summary>
-    function UserLocation(const Value: TResponseUserLocationParams): TWebSearchPreviewParams;
+    function UserLocation(const Value: TResponseUserLocationParams): TWebSearchPreviewParams; overload;
+
+    /// <summary>
+    /// The user's location.
+    /// </summary>
+    function UserLocation(const Value: string): TWebSearchPreviewParams; overload;
 
     /// <summary>
     /// The type of the web search tool. One of web_search_preview or web_search_preview_2025_03_11
@@ -2666,6 +2912,568 @@ type
   end;
 
     {$ENDREGION}
+
+    {$REGION 'Apply patch tool'}
+
+  TApplyPatchToolParams = class(TResponseToolParams)
+    /// <summary>
+    /// The type of the apply patch tool. Always apply_patch.
+    /// </summary>
+    function &Type(const Value: string = 'apply_patch'): TApplyPatchToolParams;
+
+    class function New: TApplyPatchToolParams;
+  end;
+
+    {$ENDREGION}
+
+    {$REGION 'Tool search tool'}
+
+  TToolSearchToolParams = class(TResponseToolParams)
+    /// <summary>
+    /// The type of the tool. Always tool_search.
+    /// </summary>
+    function &Type(const Value: string = 'tool_search'): TToolSearchToolParams;
+
+    /// <summary>
+    /// Optional description of the tool search tool.
+    /// </summary>
+    function Description(const Value: string): TToolSearchToolParams;
+
+    /// <summary>
+    /// Where the tool search is executed. One of server or client.
+    /// </summary>
+    function Execution(const Value: TToolSearchExecution): TToolSearchToolParams; overload;
+
+    /// <summary>
+    /// Where the tool search is executed. One of server or client.
+    /// </summary>
+    function Execution(const Value: string): TToolSearchToolParams; overload;
+
+    /// <summary>
+    /// A JSON schema object describing the parameters of the tool search.
+    /// </summary>
+    function Parameters(const Value: TSchemaParams): TToolSearchToolParams; overload;
+
+    /// <summary>
+    /// A JSON schema object describing the parameters of the tool search.
+    /// </summary>
+    function Parameters(const Value: TJSONObject): TToolSearchToolParams; overload;
+
+    /// <summary>
+    /// A JSON schema object describing the parameters of the tool search.
+    /// </summary>
+    function Parameters(const Value: string): TToolSearchToolParams; overload;
+
+    class function New: TToolSearchToolParams;
+  end;
+
+    {$ENDREGION}
+
+    {$REGION 'Namespace tool'}
+
+  TNamespaceToolParams = class(TResponseToolParams)
+    /// <summary>
+    /// The type of the namespace tool. Always namespace.
+    /// </summary>
+    function &Type(const Value: string = 'namespace'): TNamespaceToolParams;
+
+    /// <summary>
+    /// The name of the namespace, used to group the contained tools.
+    /// </summary>
+    function Name(const Value: string): TNamespaceToolParams;
+
+    /// <summary>
+    /// The description of the namespace, used to provide more context.
+    /// </summary>
+    function Description(const Value: string): TNamespaceToolParams;
+
+    /// <summary>
+    /// The tools contained in the namespace. Each item is a function or custom tool definition.
+    /// </summary>
+    /// <remarks>
+    /// Value items are TResponseToolParams descendants, typically TResponseFunctionParams or
+    /// TCustomToolParams.
+    /// </remarks>
+    function Tools(const Value: TArray<TResponseToolParams>): TNamespaceToolParams; overload;
+
+    /// <summary>
+    /// The tools contained in the namespace. Each item is a function or custom tool definition.
+    /// </summary>
+    function Tools(const Value: TJSONArray): TNamespaceToolParams; overload;
+
+    function Tools(const Value: string): TNamespaceToolParams; overload;
+
+    class function New: TNamespaceToolParams;
+  end;
+
+    {$ENDREGION}
+
+    {$REGION 'Shell tool'}
+
+      {$REGION 'Shell environment utils'}
+
+  TContainerNetworkPolicyDomainSecretParams = class(TJSONParam)
+    /// <summary>
+    /// The domain associated with the secret.
+    /// </summary>
+    function Domain(const Value: string): TContainerNetworkPolicyDomainSecretParams;
+
+    /// <summary>
+    /// The name of the secret to inject for the domain.
+    /// </summary>
+    function Name(const Value: string): TContainerNetworkPolicyDomainSecretParams;
+
+    /// <summary>
+    /// The secret value to inject for the domain.
+    /// </summary>
+    function Value(const Value: string): TContainerNetworkPolicyDomainSecretParams;
+
+    class function New: TContainerNetworkPolicyDomainSecretParams;
+  end;
+
+  /// <summary>
+  /// Value is TContainerNetworkPolicyParams or his descendant e.g. TContainerNetworkPolicyDisabledParams,
+  /// TContainerNetworkPolicyAllowlistParams
+  /// </summary>
+  TContainerNetworkPolicyParams = class(TJSONParam);
+
+  TContainerNetworkPolicyDisabledParams = class(TContainerNetworkPolicyParams)
+    /// <summary>
+    /// Disable outbound network access. Always disabled.
+    /// </summary>
+    function &Type(const Value: string = 'disabled'): TContainerNetworkPolicyDisabledParams;
+
+    class function New: TContainerNetworkPolicyDisabledParams;
+  end;
+
+  TContainerNetworkPolicyAllowlistParams = class(TContainerNetworkPolicyParams)
+    /// <summary>
+    /// Allow outbound network access only to specified domains. Always allowlist.
+    /// </summary>
+    function &Type(const Value: string = 'allowlist'): TContainerNetworkPolicyAllowlistParams;
+
+    /// <summary>
+    /// A list of allowed domains when type is allowlist.
+    /// </summary>
+    function AllowedDomains(const Value: TArray<string>): TContainerNetworkPolicyAllowlistParams;
+
+    /// <summary>
+    /// Optional domain-scoped secrets for allowlisted domains.
+    /// </summary>
+    function DomainSecrets(const Value: TArray<TContainerNetworkPolicyDomainSecretParams>): TContainerNetworkPolicyAllowlistParams; overload;
+
+    /// <summary>
+    /// Optional domain-scoped secrets for allowlisted domains.
+    /// </summary>
+    function DomainSecrets(const Value: string): TContainerNetworkPolicyAllowlistParams; overload;
+
+    class function New: TContainerNetworkPolicyAllowlistParams;
+  end;
+
+  TInlineSkillSourceParams = class(TJSONParam)
+    /// <summary>
+    /// The type of the inline skill source. Must be base64.
+    /// </summary>
+    function &Type(const Value: string = 'base64'): TInlineSkillSourceParams;
+
+    /// <summary>
+    /// The media type of the inline skill payload. Must be application/zip.
+    /// </summary>
+    function MediaType(const Value: string = 'application/zip'): TInlineSkillSourceParams;
+
+    /// <summary>
+    /// Base64-encoded skill zip bundle.
+    /// </summary>
+    function Data(const Value: string): TInlineSkillSourceParams;
+
+    class function New: TInlineSkillSourceParams;
+  end;
+
+  /// <summary>
+  /// Value is TContainerSkillParams or his descendant e.g. TSkillReferenceParams, TInlineSkillParams
+  /// </summary>
+  TContainerSkillParams = class(TJSONParam);
+
+  TSkillReferenceParams = class(TContainerSkillParams)
+    /// <summary>
+    /// References a skill created with the /v1/skills endpoint. Always skill_reference.
+    /// </summary>
+    function &Type(const Value: string = 'skill_reference'): TSkillReferenceParams;
+
+    /// <summary>
+    /// The ID of the referenced skill.
+    /// </summary>
+    function SkillId(const Value: string): TSkillReferenceParams;
+
+    /// <summary>
+    /// Optional skill version. Use a positive integer or latest. Omit for default.
+    /// </summary>
+    function Version(const Value: string): TSkillReferenceParams;
+
+    class function New: TSkillReferenceParams;
+  end;
+
+  TInlineSkillParams = class(TContainerSkillParams)
+    /// <summary>
+    /// The type of the skill. Always inline.
+    /// </summary>
+    function &Type(const Value: string = 'inline'): TInlineSkillParams;
+
+    /// <summary>
+    /// The name of the skill.
+    /// </summary>
+    function Name(const Value: string): TInlineSkillParams;
+
+    /// <summary>
+    /// The description of the skill.
+    /// </summary>
+    function Description(const Value: string): TInlineSkillParams;
+
+    /// <summary>
+    /// The inline source of the skill.
+    /// </summary>
+    function Source(const Value: TInlineSkillSourceParams): TInlineSkillParams;
+
+    class function New: TInlineSkillParams;
+  end;
+
+  TLocalSkillParams = class(TJSONParam)
+    /// <summary>
+    /// The name of the skill.
+    /// </summary>
+    function Name(const Value: string): TLocalSkillParams;
+
+    /// <summary>
+    /// The description of the skill.
+    /// </summary>
+    function Description(const Value: string): TLocalSkillParams;
+
+    /// <summary>
+    /// The path to the directory containing the skill.
+    /// </summary>
+    function Path(const Value: string): TLocalSkillParams;
+
+    class function New: TLocalSkillParams;
+  end;
+
+      {$ENDREGION}
+
+  /// <summary>
+  /// Value is TShellEnvironmentParams or his descendant e.g. TShellContainerReferenceParams,
+  /// TShellLocalEnvironmentParams, TShellContainerAutoParams
+  /// </summary>
+  TShellEnvironmentParams = class(TJSONParam);
+
+  TShellContainerReferenceParams = class(TShellEnvironmentParams)
+    /// <summary>
+    /// References a container created with the /v1/containers endpoint. Always container_reference.
+    /// </summary>
+    function &Type(const Value: string = 'container_reference'): TShellContainerReferenceParams;
+
+    /// <summary>
+    /// The ID of the referenced container.
+    /// </summary>
+    function ContainerId(const Value: string): TShellContainerReferenceParams;
+
+    class function New: TShellContainerReferenceParams;
+  end;
+
+  TShellLocalEnvironmentParams = class(TShellEnvironmentParams)
+    /// <summary>
+    /// Use a local computer environment. Always local.
+    /// </summary>
+    function &Type(const Value: string = 'local'): TShellLocalEnvironmentParams;
+
+    /// <summary>
+    /// An optional list of skills.
+    /// </summary>
+    function Skills(const Value: TArray<TLocalSkillParams>): TShellLocalEnvironmentParams; overload;
+
+    /// <summary>
+    /// An optional list of skills.
+    /// </summary>
+    function Skills(const Value: string): TShellLocalEnvironmentParams; overload;
+
+    class function New: TShellLocalEnvironmentParams;
+  end;
+
+  TShellContainerAutoParams = class(TShellEnvironmentParams)
+    /// <summary>
+    /// Automatically creates a container for this request. Always container_auto.
+    /// </summary>
+    function &Type(const Value: string = 'container_auto'): TShellContainerAutoParams;
+
+    /// <summary>
+    /// An optional list of uploaded files to make available to your code.
+    /// </summary>
+    function FileIds(const Value: TArray<string>): TShellContainerAutoParams;
+
+    /// <summary>
+    /// The memory limit for the container. One of 1g, 4g, 16g, or 64g.
+    /// </summary>
+    function MemoryLimit(const Value: TContainerMemoryLimit): TShellContainerAutoParams; overload;
+
+    /// <summary>
+    /// The memory limit for the container. One of 1g, 4g, 16g, or 64g.
+    /// </summary>
+    function MemoryLimit(const Value: string): TShellContainerAutoParams; overload;
+
+    /// <summary>
+    /// Network access policy for the container.
+    /// </summary>
+    /// <remarks>
+    /// Value is TContainerNetworkPolicyParams or his descendant e.g. TContainerNetworkPolicyDisabledParams,
+    /// TContainerNetworkPolicyAllowlistParams
+    /// </remarks>
+    function NetworkPolicy(const Value: TContainerNetworkPolicyParams): TShellContainerAutoParams; overload;
+
+    /// <summary>
+    /// Network access policy for the container.
+    /// </summary>
+    /// <remarks>
+    /// Value is TContainerNetworkPolicyParams or his descendant e.g. TContainerNetworkPolicyDisabledParams,
+    /// TContainerNetworkPolicyAllowlistParams
+    /// </remarks>
+    function NetworkPolicy(const Value: string): TShellContainerAutoParams; overload;
+
+    /// <summary>
+    /// An optional list of skills referenced by id or inline data.
+    /// </summary>
+    /// <remarks>
+    /// Value items are TContainerSkillParams descendants e.g. TSkillReferenceParams, TInlineSkillParams
+    /// </remarks>
+    function Skills(const Value: TArray<TContainerSkillParams>): TShellContainerAutoParams; overload;
+
+    /// <summary>
+    /// An optional list of skills referenced by id or inline data.
+    /// </summary>
+    /// <remarks>
+    /// Value items are TContainerSkillParams descendants e.g. TSkillReferenceParams, TInlineSkillParams
+    /// </remarks>
+    function Skills(const Value: string): TShellContainerAutoParams; overload;
+
+    class function New: TShellContainerAutoParams;
+  end;
+
+  TFunctionShellToolParams = class(TResponseToolParams)
+    /// <summary>
+    /// The type of the shell tool. Always shell.
+    /// </summary>
+    function &Type(const Value: string = 'shell'): TFunctionShellToolParams;
+
+    /// <summary>
+    /// The execution environment for the shell tool.
+    /// </summary>
+    /// <remarks>
+    /// Value is TShellEnvironmentParams or his descendant e.g. TShellContainerReferenceParams,
+    /// TShellLocalEnvironmentParams, TShellContainerAutoParams
+    /// </remarks>
+    function Environment(const Value: TShellEnvironmentParams): TFunctionShellToolParams; overload;
+
+    /// <summary>
+    /// The execution environment for the shell tool.
+    /// </summary>
+    /// <remarks>
+    /// Value is TShellEnvironmentParams or his descendant e.g. TShellContainerReferenceParams,
+    /// TShellLocalEnvironmentParams, TShellContainerAutoParams
+    /// </remarks>
+    function Environment(const Value: string): TFunctionShellToolParams; overload;
+
+    class function New: TFunctionShellToolParams;
+  end;
+
+    {$ENDREGION}
+
+  {$ENDREGION}
+
+  {$REGION 'tool_choice (allowed_tools)'}
+
+  /// <summary>
+  /// Constrains the tools available to the model to a pre-defined set. Declared after the tools
+  /// region because its typed overload references TResponseToolParams.
+  /// </summary>
+  TAllowedToolsChoiceParams = class(TResponseToolChoiceParams)
+    /// <summary>
+    /// Allowed tool configuration type. Always allowed_tools.
+    /// </summary>
+    function &Type(const Value: string = 'allowed_tools'): TAllowedToolsChoiceParams;
+
+    /// <summary>
+    /// Constrains the tools available to the model to a pre-defined set.
+    /// <para>
+    /// - auto allows the model to pick from among the allowed tools and generate a message.
+    /// </para>
+    /// <para>
+    /// - required requires the model to call one or more of the allowed tools.
+    /// </para>
+    /// </summary>
+    function Mode(const Value: TAllowedToolsMode): TAllowedToolsChoiceParams; overload;
+
+    /// <summary>
+    /// Constrains the tools available to the model to a pre-defined set.
+    /// </summary>
+    function Mode(const Value: string): TAllowedToolsChoiceParams; overload;
+
+    /// <summary>
+    /// A list of tool definitions that the model should be allowed to call.
+    /// </summary>
+    /// <remarks>
+    /// Value items are TResponseToolParams descendants.
+    /// </remarks>
+    function Tools(const Value: TArray<TResponseToolParams>): TAllowedToolsChoiceParams; overload;
+
+    /// <summary>
+    /// A list of tool definitions that the model should be allowed to call.
+    /// </summary>
+    function Tools(const Value: TJSONArray): TAllowedToolsChoiceParams; overload;
+
+    /// <summary>
+    /// A list of tool definitions, supplied as a raw JSON array string.
+    /// The string must be a valid JSON array.
+    /// </summary>
+    function Tools(const Value: string): TAllowedToolsChoiceParams; overload;
+
+    class function New: TAllowedToolsChoiceParams;
+  end;
+
+  {$ENDREGION}
+
+  {$REGION 'agentic input items'}
+
+  TShellCallActionParams = class(TJSONParam)
+    function Commands(const Value: TArray<string>): TShellCallActionParams;
+    function TimeoutMs(const Value: Int64): TShellCallActionParams;
+    function MaxOutputLength(const Value: Int64): TShellCallActionParams;
+    class function New: TShellCallActionParams;
+  end;
+
+  TShellCallParams = class(TInputListItem)
+    function Id(const Value: string): TShellCallParams;
+    function CallId(const Value: string): TShellCallParams;
+    function CreatedBy(const Value: string): TShellCallParams;
+    function Action(const Value: TShellCallActionParams): TShellCallParams; overload;
+    function Action(const Value: string): TShellCallParams; overload;
+    function Status(const Value: TMessageStatus): TShellCallParams; overload;
+    function Status(const Value: string): TShellCallParams; overload;
+    function &Type(const Value: string = 'shell_call'): TShellCallParams;
+    class function New: TShellCallParams;
+  end;
+
+  TApplyPatchOperationParams = class(TJSONParam)
+    function Diff(const Value: string): TApplyPatchOperationParams;
+    function Path(const Value: string): TApplyPatchOperationParams;
+    function &Type(const Value: string): TApplyPatchOperationParams;
+    class function New: TApplyPatchOperationParams;
+  end;
+
+  TApplyPatchCallParams = class(TInputListItem)
+    function Id(const Value: string): TApplyPatchCallParams;
+    function CallId(const Value: string): TApplyPatchCallParams;
+    function CreatedBy(const Value: string): TApplyPatchCallParams;
+    function Operation(const Value: TApplyPatchOperationParams): TApplyPatchCallParams; overload;
+    function Operation(const Value: string): TApplyPatchCallParams; overload;
+    function Status(const Value: TMessageStatus): TApplyPatchCallParams; overload;
+    function Status(const Value: string): TApplyPatchCallParams; overload;
+    function &Type(const Value: string = 'apply_patch_call'): TApplyPatchCallParams;
+    class function New: TApplyPatchCallParams;
+  end;
+
+  TToolSearchCallParams = class(TInputListItem)
+    function Id(const Value: string): TToolSearchCallParams;
+    function CallId(const Value: string): TToolSearchCallParams;
+    function CallIdNull: TToolSearchCallParams;
+    function CreatedBy(const Value: string): TToolSearchCallParams;
+    function Execution(const Value: TToolSearchExecution): TToolSearchCallParams; overload;
+    function Execution(const Value: string): TToolSearchCallParams; overload;
+    function Arguments(const Value: TJSONObject): TToolSearchCallParams; overload;
+    function Arguments(const Value: string): TToolSearchCallParams; overload;
+    function Status(const Value: TMessageStatus): TToolSearchCallParams; overload;
+    function Status(const Value: string): TToolSearchCallParams; overload;
+    function &Type(const Value: string = 'tool_search_call'): TToolSearchCallParams;
+    class function New: TToolSearchCallParams;
+  end;
+
+  /// <summary>
+  /// An opaque compaction item returned by the responses compact endpoint.
+  /// Preserve it unchanged when replaying a compacted context.
+  /// </summary>
+  TCompactionItemParams = class(TInputListItem)
+    function Id(const Value: string): TCompactionItemParams;
+    function CreatedBy(const Value: string): TCompactionItemParams;
+    function EncryptedContent(const Value: string): TCompactionItemParams;
+    function &Type(const Value: string = 'compaction'): TCompactionItemParams;
+    class function New: TCompactionItemParams;
+  end;
+
+  TShellCallOutputOutcomeParams = class(TJSONParam)
+    function &Type(const Value: string): TShellCallOutputOutcomeParams;
+    function ExitCode(const Value: Int64): TShellCallOutputOutcomeParams;
+    class function NewExit(const ExitCode: Int64): TShellCallOutputOutcomeParams;
+    class function NewTimeout: TShellCallOutputOutcomeParams;
+  end;
+
+  TShellCallOutputContentParams = class(TJSONParam)
+    function CreatedBy(const Value: string): TShellCallOutputContentParams;
+    function Stdout(const Value: string): TShellCallOutputContentParams;
+    function Stderr(const Value: string): TShellCallOutputContentParams;
+    function Outcome(const Value: TShellCallOutputOutcomeParams): TShellCallOutputContentParams;
+    class function New: TShellCallOutputContentParams;
+  end;
+
+  TShellCallOutputParams = class(TInputListItem)
+    function Id(const Value: string): TShellCallOutputParams;
+    function CallId(const Value: string): TShellCallOutputParams;
+    function CreatedBy(const Value: string): TShellCallOutputParams;
+    function MaxOutputLength(const Value: Int64): TShellCallOutputParams;
+    function Output(const Value: TArray<TShellCallOutputContentParams>): TShellCallOutputParams; overload;
+    function Output(const Value: TJSONArray): TShellCallOutputParams; overload;
+    function Output(const Value: string): TShellCallOutputParams; overload;
+    function Status(const Value: string): TShellCallOutputParams;
+    function &Type(const Value: string = 'shell_call_output'): TShellCallOutputParams;
+    class function New: TShellCallOutputParams;
+  end;
+
+  TApplyPatchCallOutputParams = class(TInputListItem)
+    function Id(const Value: string): TApplyPatchCallOutputParams;
+    function CallId(const Value: string): TApplyPatchCallOutputParams;
+    function CreatedBy(const Value: string): TApplyPatchCallOutputParams;
+    function Output(const Value: string): TApplyPatchCallOutputParams;
+    function Status(const Value: string): TApplyPatchCallOutputParams;
+    function &Type(const Value: string = 'apply_patch_call_output'): TApplyPatchCallOutputParams;
+    class function New: TApplyPatchCallOutputParams;
+  end;
+
+  TToolSearchOutputParams = class(TInputListItem)
+    function Id(const Value: string): TToolSearchOutputParams;
+    function CallId(const Value: string): TToolSearchOutputParams;
+    function CallIdNull: TToolSearchOutputParams;
+    function CreatedBy(const Value: string): TToolSearchOutputParams;
+    function Execution(const Value: TToolSearchExecution): TToolSearchOutputParams; overload;
+    function Execution(const Value: string): TToolSearchOutputParams; overload;
+    function Status(const Value: string): TToolSearchOutputParams;
+    function Tools(const Value: TArray<TResponseToolParams>): TToolSearchOutputParams; overload;
+    function Tools(const Value: TJSONArray): TToolSearchOutputParams; overload;
+    function Tools(const Value: string): TToolSearchOutputParams; overload;
+    function &Type(const Value: string = 'tool_search_output'): TToolSearchOutputParams;
+    class function New: TToolSearchOutputParams;
+  end;
+
+  /// <summary>
+  /// Parameters accepted by POST /responses/compact.
+  /// </summary>
+  TResponseCompactParams = class(TJSONParam)
+    function Model(const Value: string): TResponseCompactParams;
+    function Input(const Value: string): TResponseCompactParams; overload;
+    function Input(const Value: TJSONArray): TResponseCompactParams; overload;
+    function Input(const Value: TArray<TInputListItem>): TResponseCompactParams; overload;
+    function Instructions(const Value: string): TResponseCompactParams;
+    function PreviousResponseId(const Value: string): TResponseCompactParams;
+    function PromptCacheKey(const Value: string): TResponseCompactParams;
+    function PromptCacheRetention(const Value: TPromptCacheRetention): TResponseCompactParams; overload;
+    function PromptCacheRetention(const Value: string): TResponseCompactParams; overload;
+    function ServiceTier(const Value: TServiceTier): TResponseCompactParams; overload;
+    function ServiceTier(const Value: string): TResponseCompactParams; overload;
+  end;
 
   {$ENDREGION}
 
@@ -2688,6 +3496,12 @@ type
     /// are automatically added to this conversation after this response completes.
     /// </summary>
     function Conversation(const Value: TConversationParams): TResponsesParams; overload;
+
+    /// <summary>
+    /// Configuration for context management. A list of entries describing how the model should manage
+    /// the context window, such as compaction.
+    /// </summary>
+    function ContextManagement(const Value: TArray<TContextManagementParams>): TResponsesParams;
 
     /// <summary>
     /// Specify additional output data to include in the model response. Currently supported values are:
@@ -2816,6 +3630,18 @@ type
     function PromptCacheKey(const Value: string): TResponsesParams;
 
     /// <summary>
+    /// The retention policy for the prompt cache. Set to 24h to enable extended prompt caching, which
+    /// keeps cached prefixes active for longer, up to a maximum of 24 hours. One of in_memory or 24h.
+    /// </summary>
+    function PromptCacheRetention(const Value: TPromptCacheRetention): TResponsesParams; overload;
+
+    /// <summary>
+    /// The retention policy for the prompt cache. Set to 24h to enable extended prompt caching, which
+    /// keeps cached prefixes active for longer, up to a maximum of 24 hours. One of in_memory or 24h.
+    /// </summary>
+    function PromptCacheRetention(const Value: string): TResponsesParams; overload;
+
+    /// <summary>
     /// o-series models only. Configuration options for reasoning models.
     /// </summary>
     function Reasoning(const Value: TReasoningParams): TResponsesParams; overload;
@@ -2858,7 +3684,18 @@ type
     /// </para>
     /// When this parameter is set, the response body will include the service_tier utilized.
     /// </summary>
-    function ServiceTier(const Value: string): TResponsesParams;
+    /// <remarks>
+    /// One of auto, default, flex, scale or priority.
+    /// </remarks>
+    function ServiceTier(const Value: TServiceTier): TResponsesParams; overload;
+
+    /// <summary>
+    /// Specifies the latency tier to use for processing the request.
+    /// </summary>
+    /// <remarks>
+    /// One of auto, default, flex, scale or priority.
+    /// </remarks>
+    function ServiceTier(const Value: string): TResponsesParams; overload;
 
     /// <summary>
     /// Whether to store the generated model response for later retrieval via API.
@@ -2993,6 +3830,13 @@ type
     function Tools(const Value: TArray<TResponseToolParams>): TResponsesParams; overload;
 
     /// <summary>
+    /// An array of tools the model may call, supplied as a raw JSON array string.
+    /// Convenient for quick tests or when the tool definitions are already
+    /// available as JSON. The string must be a valid JSON array.
+    /// </summary>
+    function Tools(const Value: string): TResponsesParams; overload;
+
+    /// <summary>
     /// An integer between 0 and 20 specifying the number of most likely tokens to return at each token
     /// position, each with an associated log probability.
     /// </summary>
@@ -3044,10 +3888,27 @@ type
     function User(const Value: string): TResponsesParams;
   end;
 
+  TResponsesParamsProc = TProc<TResponsesParams>;
+
 implementation
 
 uses
-  System.StrUtils, GenAI.NetEncoding.Base64, GenAI.Responses.Helpers, GenAI.Httpx;
+  System.StrUtils, GenAI.NetEncoding.Base64, GenAI.Responses.Helpers, GenAI.Httpx,
+  GenAI.Exceptions;
+
+{ TRankingOptionsParams }
+
+function TRankingOptionsParams.Ranker(
+  const Value: string): TRankingOptionsParams;
+begin
+  Result := TRankingOptionsParams(Add('ranker', Value));
+end;
+
+function TRankingOptionsParams.ScoreThreshold(
+  const Value: Double): TRankingOptionsParams;
+begin
+  Result := TRankingOptionsParams(Add('score_threshold', Value));
+end;
 
 { TItemContent }
 
@@ -3200,7 +4061,14 @@ end;
 { TInputMessage }
 
 function TInputMessage.Content(const Value: string): TInputMessage;
+var
+  JSONArray: TJSONArray;
 begin
+  {--- Content may be a plain text string or a JSON array of content blocks:
+       if the string is a JSON array, treat it as such; otherwise send it as text. }
+  if TJSONHelper.TryGetArray(Value, JSONArray) then
+    Exit(TInputMessage(Add('content', JSONArray)));
+
   Result := TInputMessage(Add('content', Value));
 end;
 
@@ -3342,7 +4210,7 @@ end;
 
 function TItemOutputMessage.Status(const Value: string): TItemOutputMessage;
 begin
-  Result := TItemOutputMessage(Add('status', TMessageStatus.Create(Value).ToString));
+  Result := Status(TMessageStatus.Create(Value));
 end;
 
 function TItemOutputMessage.Status(
@@ -3366,6 +4234,28 @@ begin
   for var Item in Value do
     JSONArray.Add(Item.Detach);
   Result := TOutputMessageContent(Add('annotations', JSONArray));
+end;
+
+function TOutputMessageContent.Annotations(
+  const Value: string): TOutputMessageContent;
+var
+  JSONArray: TJSONArray;
+begin
+  if TJSONHelper.TryGetArray(Value, JSONArray) then
+    Exit(TOutputMessageContent(Add('annotations', JSONArray)));
+
+  raise TGenAIAPIException.Create('Invalid JSON Array');
+end;
+
+function TOutputMessageContent.Logprobs(
+  const Value: string): TOutputMessageContent;
+var
+  JSONArray: TJSONArray;
+begin
+  if TJSONHelper.TryGetArray(Value, JSONArray) then
+    Exit(TOutputMessageContent(Add('logprobs', JSONArray)));
+
+  raise TGenAIAPIException.Create('Invalid JSON Array');
 end;
 
 function TOutputMessageContent.Logprobs(
@@ -3473,6 +4363,16 @@ begin
   Result := TFileSearchToolCall(Add('queries', Value));
 end;
 
+function TFileSearchToolCall.Results(const Value: string): TFileSearchToolCall;
+var
+  JSONArray: TJSONArray;
+begin
+  if TJSONHelper.TryGetArray(Value, JSONArray) then
+    Exit(TFileSearchToolCall(Add('results', JSONArray)));
+
+  raise TGenAIAPIException.Create('Invalid JSON Array');
+end;
+
 function TFileSearchToolCall.Results(
   const Value: TArray<TFileSearchToolCallResult>): TFileSearchToolCall;
 begin
@@ -3484,7 +4384,7 @@ end;
 
 function TFileSearchToolCall.Status(const Value: string): TFileSearchToolCall;
 begin
-  Result := TFileSearchToolCall(Add('status', TFileSearchToolCallType.Create(Value).ToString));
+  Result := Status(TFileSearchToolCallType.Create(Value));
 end;
 
 function TFileSearchToolCall.Status(
@@ -3499,6 +4399,17 @@ function TFileSearchToolCallResult.Attributes(
   const Value: TJSONObject): TFileSearchToolCallResult;
 begin
   Result := TFileSearchToolCallResult(Add('attributes', Value));
+end;
+
+function TFileSearchToolCallResult.Attributes(
+  const Value: string): TFileSearchToolCallResult;
+var
+  JSONObject: TJSONObject;
+begin
+  if TJSONHelper.TryGetObject(Value, JSONObject) then
+    Exit(TFileSearchToolCallResult(Add('attributes', JSONObject)));
+
+  raise TGenAIAPIException.Create('Invalid JSON Object');
 end;
 
 function TFileSearchToolCallResult.FileId(
@@ -3538,6 +4449,16 @@ begin
   Result := TComputerToolCall(Add('action', Value.Detach));
 end;
 
+function TComputerToolCall.Action(const Value: string): TComputerToolCall;
+var
+  JSONObject: TJSONObject;
+begin
+  if TJSONHelper.TryGetObject(Value, JSONObject) then
+    Exit(TComputerToolCall(Add('action', JSONObject)));
+
+  raise TGenAIAPIException.Create('Invalid JSON Object');
+end;
+
 function TComputerToolCall.CallId(const Value: string): TComputerToolCall;
 begin
   Result := TComputerToolCall(Add('call_id', Value));
@@ -3551,6 +4472,17 @@ end;
 class function TComputerToolCall.New: TComputerToolCall;
 begin
   Result := TComputerToolCall.Create.&Type();
+end;
+
+function TComputerToolCall.PendingSafetyChecks(
+  const Value: string): TComputerToolCall;
+var
+  JSONArray: TJSONArray;
+begin
+  if TJSONHelper.TryGetArray(Value, JSONArray) then
+    Exit(TComputerToolCall(Add('pending_safety_checks', JSONArray)));
+
+  raise TGenAIAPIException.Create('Invalid JSON Array');
 end;
 
 function TComputerToolCall.PendingSafetyChecks(
@@ -3609,7 +4541,7 @@ end;
 
 function TComputerClick.Button(const Value: string): TComputerClick;
 begin
-  Result := TComputerClick(Add('button', TMouseButton.Create(Value).ToString));
+  Result := Button(TMouseButton.Create(Value));
 end;
 
 class function TComputerClick.New: TComputerClick;
@@ -3667,6 +4599,17 @@ begin
   Result := TComputerToolCallOutput(Add('acknowledged_safety_checks', JSONArray));
 end;
 
+function TComputerToolCallOutput.AcknowledgedSafetyChecks(
+  const Value: string): TComputerToolCallOutput;
+var
+  JSONArray: TJSONArray;
+begin
+  if TJSONHelper.TryGetArray(Value, JSONArray) then
+    Exit(TComputerToolCallOutput(Add('acknowledged_safety_checks', JSONArray)));
+
+  raise TGenAIAPIException.Create('Invalid JSON Array');
+end;
+
 function TComputerToolCallOutput.CallId(
   const Value: string): TComputerToolCallOutput;
 begin
@@ -3682,6 +4625,17 @@ end;
 class function TComputerToolCallOutput.New: TComputerToolCallOutput;
 begin
   Result := TComputerToolCallOutput.Create.&Type();
+end;
+
+function TComputerToolCallOutput.Output(
+  const Value: string): TComputerToolCallOutput;
+var
+  JSONObject: TJSONObject;
+begin
+  if TJSONHelper.TryGetObject(Value, JSONObject) then
+    Exit(TComputerToolCallOutput(Add('output', JSONObject)));
+
+  raise TGenAIAPIException.Create('Invalid JSON Object');
 end;
 
 function TComputerToolCallOutput.Output(
@@ -3758,6 +4712,16 @@ function TWebSearchToolCall.Action(
   const Value: TWebSearchAction): TWebSearchToolCall;
 begin
   Result := TWebSearchToolCall(Add('action', Value.Detach));
+end;
+
+function TWebSearchToolCall.Action(const Value: string): TWebSearchToolCall;
+var
+  JSONObject: TJSONObject;
+begin
+  if TJSONHelper.TryGetObject(Value, JSONObject) then
+    Exit(TWebSearchToolCall(Add('action', JSONObject)));
+
+  raise TGenAIAPIException.Create('Invalid JSON Object');
 end;
 
 function TWebSearchToolCall.Id(const Value: string): TWebSearchToolCall;
@@ -3866,7 +4830,12 @@ end;
 
 function TFunctionToolCalloutput.Output(
   const Value: string): TFunctionToolCalloutput;
+var
+  JSONObject: TJSONObject;
 begin
+  if TJSONHelper.TryGetObject(Value, JSONObject) then
+    Exit(TFunctionToolCalloutput(Add('output', JSONObject)));
+
   Result := TFunctionToolCalloutput(Add('output', Value));
 end;
 
@@ -3903,6 +4872,16 @@ end;
 function TReasoningObject.Status(const Value: string): TReasoningObject;
 begin
   Result := TReasoningObject(Add('status', TMessageStatus.Create(Value).ToString));
+end;
+
+function TReasoningObject.Summary(const Value: string): TReasoningObject;
+var
+  JSONArray: TJSONArray;
+begin
+  if TJSONHelper.TryGetArray(Value, JSONArray) then
+    Exit(TReasoningObject(Add('summary', JSONArray)));
+
+  raise TGenAIAPIException.Create('Invalid JSON Array');
 end;
 
 function TReasoningObject.Summary(
@@ -4001,6 +4980,16 @@ begin
   for var Item in Value do
     JSONArray.Add(Item.Detach);
   Result := TComputerDrag(Add('path', JSONArray));
+end;
+
+function TComputerDrag.Path(const Value: string): TComputerDrag;
+var
+  JSONArray: TJSONArray;
+begin
+  if TJSONHelper.TryGetArray(Value, JSONArray) then
+    Exit(TComputerDrag(Add('path', JSONArray)));
+
+  raise TGenAIAPIException.Create('Invalid JSON Array');
 end;
 
 function TComputerDrag.&Type(const Value: string): TComputerDrag;
@@ -4209,6 +5198,17 @@ begin
   Result := TCodeInterpreterToolCall(Add('outputs', JSONArray));
 end;
 
+function TCodeInterpreterToolCall.Outputs(
+  const Value: string): TCodeInterpreterToolCall;
+var
+  JSONArray: TJSONArray;
+begin
+  if TJSONHelper.TryGetArray(Value, JSONArray) then
+    Exit(TCodeInterpreterToolCall(Add('outputs', JSONArray)));
+
+  raise TGenAIAPIException.Create('Invalid JSON Array');
+end;
+
 function TCodeInterpreterToolCall.Status(
   const Value: string): TCodeInterpreterToolCall;
 begin
@@ -4251,6 +5251,16 @@ function TLocalShellCall.Action(
   const Value: TLocalShellCallAction): TLocalShellCall;
 begin
   Result := TLocalShellCall(Add('action', Value.Detach));
+end;
+
+function TLocalShellCall.Action(const Value: string): TLocalShellCall;
+var
+  JSONObject: TJSONObject;
+begin
+  if TJSONHelper.TryGetObject(Value, JSONObject) then
+    Exit(TLocalShellCall(Add('action', JSONObject)));
+
+  raise TGenAIAPIException.Create('Invalid JSON Object');
 end;
 
 function TLocalShellCall.CallId(const Value: string): TLocalShellCall;
@@ -4365,6 +5375,16 @@ begin
   Result := TMCPListTools(Add('tools', JSONArray));
 end;
 
+function TMCPListTools.Tools(const Value: string): TMCPListTools;
+var
+  JSONArray: TJSONArray;
+begin
+  if TJSONHelper.TryGetArray(Value, JSONArray) then
+    Exit(TMCPListTools(Add('tools', JSONArray)));
+
+  raise TGenAIAPIException.Create('Invalid JSON Array');
+end;
+
 function TMCPListTools.&Type(const Value: string): TMCPListTools;
 begin
   Result := TMCPListTools(Add('type', Value));
@@ -4404,8 +5424,13 @@ end;
 
 
 function TMCPTools.InputSchema(const Value: string): TMCPTools;
+var
+  JSONObject: TJSONObject;
 begin
-  Result := TMCPTools(Add('input_schema', Value));
+  if TJSONHelper.TryGetObject(Value, JSONObject) then
+    Exit(TMCPTools(Add('input_schema', JSONObject)));
+
+  raise TGenAIAPIException.Create('Invalid JSON Object');
 end;
 
 function TMCPTools.InputSchema(const Value: TSchemaParams): TMCPTools;
@@ -4547,17 +5572,17 @@ end;
 
 function TReasoningParams.Effort(const Value: string): TReasoningParams;
 begin
-  Result := TReasoningParams(Add('effort', TReasoningEffort.Create(Value).ToString));
-end;
-
-function TReasoningParams.Summary(const Value: string): TReasoningParams;
-begin
-  Result := TReasoningParams(Add('summary', TReasoningGenerateSummary.Create(Value).ToString));
+  Result := Effort(TReasoningEffort.Create(Value));
 end;
 
 class function TReasoningParams.New: TReasoningParams;
 begin
   Result := TReasoningParams.Create;
+end;
+
+function TReasoningParams.Summary(const Value: string): TReasoningParams;
+begin
+  Result := Summary(TReasoningGenerateSummary.Create(Value));
 end;
 
 function TReasoningParams.Summary(
@@ -4610,9 +5635,13 @@ end;
 
 function TTextJSONSchemaParams.Schema(
   const Value: string): TTextJSONSchemaParams;
+var
+  JSONObject: TJSONObject;
 begin
-  var JSON := TJSONObject.ParseJSONValue(Value.ToLower.Replace(sLineBreak, '').Replace(#10, '').Replace(#13, '')) as TJSONObject;
-  Result := TTextJSONSchemaParams(Add('schema', JSON));
+  if TJSONHelper.TryGetObject(Value, JSONObject) then
+    Exit(TTextJSONSchemaParams(Add('schema', JSONObject)));
+
+  raise TGenAIAPIException.Create('Invalid JSON Object');
 end;
 
 function TTextJSONSchemaParams.Strict(
@@ -4639,6 +5668,16 @@ end;
 function TTextParams.Format(const Value: TTextFormatParams): TTextParams;
 begin
   Result := TTextParams(Add('format', Value.Detach));
+end;
+
+function TTextParams.Format(const Value: string): TTextParams;
+var
+  JSONObject: TJSONObject;
+begin
+  if TJSONHelper.TryGetObject(Value, JSONObject) then
+    Exit(TTextParams(Add('format', JSONObject)));
+
+  raise TGenAIAPIException.Create('Invalid JSON Object');
 end;
 
 function TTextParams.Verbosity(const Value: TVerbosityType): TTextParams;
@@ -4810,6 +5849,17 @@ begin
   Result := TResponseFileSearchParams(Add('filters', Value.Detach));
 end;
 
+function TResponseFileSearchParams.Filters(
+  const Value: string): TResponseFileSearchParams;
+var
+  JSONObject: TJSONObject;
+begin
+  if TJSONHelper.TryGetObject(Value, JSONObject) then
+    Exit(TResponseFileSearchParams(Add('filters', JSONObject)));
+
+  raise TGenAIAPIException.Create('Invalid JSON Object');
+end;
+
 function TResponseFileSearchParams.MaxNumResults(
   const Value: Integer): TResponseFileSearchParams;
 begin
@@ -4819,6 +5869,17 @@ end;
 class function TResponseFileSearchParams.New: TResponseFileSearchParams;
 begin
   Result := TResponseFileSearchParams.Create.&Type();
+end;
+
+function TResponseFileSearchParams.RankingOptions(
+  const Value: string): TResponseFileSearchParams;
+var
+  JSONObject: TJSONObject;
+begin
+  if TJSONHelper.TryGetObject(Value, JSONObject) then
+    Exit(TResponseFileSearchParams(Add('ranking_options', JSONObject)));
+
+  raise TGenAIAPIException.Create('Invalid JSON Object');
 end;
 
 function TResponseFileSearchParams.RankingOptions(
@@ -4872,9 +5933,13 @@ end;
 
 function TResponseFunctionParams.Parameters(
   const Value: string): TResponseFunctionParams;
+var
+  JSONObject: TJSONObject;
 begin
-  var JSON := TJSONObject.ParseJSONValue(Value.ToLower.Replace(sLineBreak, '').Replace(#10, '').Replace(#13, '')) as TJSONObject;
-  Result := TResponseFunctionParams(Add('parameters', JSON));
+  if TJSONHelper.TryGetObject(Value, JSONObject) then
+    Exit(TResponseFunctionParams(Add('parameters', JSONObject)));
+
+  raise TGenAIAPIException.Create('Invalid JSON Object');
 end;
 
 function TResponseFunctionParams.Parameters(
@@ -4887,6 +5952,12 @@ function TResponseFunctionParams.Strict(
   const Value: Boolean): TResponseFunctionParams;
 begin
   Result := TResponseFunctionParams(Add('strict', Value));
+end;
+
+function TResponseFunctionParams.DeferLoading(
+  const Value: Boolean): TResponseFunctionParams;
+begin
+  Result := TResponseFunctionParams(Add('defer_loading', Value));
 end;
 
 { TResponseComputerUseParams }
@@ -4972,6 +6043,17 @@ begin
 end;
 
 function TResponseWebSearchParams.UserLocation(
+  const Value: string): TResponseWebSearchParams;
+var
+  JSONObject: TJSONObject;
+begin
+  if TJSONHelper.TryGetObject(Value, JSONObject) then
+    Exit(TResponseWebSearchParams(Add('user_location', JSONObject)));
+
+  raise TGenAIAPIException.Create('Invalid JSON Object');
+end;
+
+function TResponseWebSearchParams.UserLocation(
   const Value: TResponseUserLocationParams): TResponseWebSearchParams;
 begin
   Result := TResponseWebSearchParams(Add('user_location', Value.Detach));
@@ -4981,6 +6063,23 @@ function TResponseWebSearchParams.SearchContextSize(
   const Value: TSearchWebOptions): TResponseWebSearchParams;
 begin
   Result := TResponseWebSearchParams(Add('search_context_size', Value.ToString));
+end;
+
+function TResponseWebSearchParams.Filters(
+  const Value: string): TResponseWebSearchParams;
+var
+  JSONObject: TJSONObject;
+begin
+  if TJSONHelper.TryGetObject(Value, JSONObject) then
+    Exit(TResponseWebSearchParams(Add('filters', JSONObject)));
+
+  raise TGenAIAPIException.Create('Invalid JSON Object');
+end;
+
+function TResponseWebSearchParams.Filters(
+  const Value: TWebSearchFiltersParams): TResponseWebSearchParams;
+begin
+  Result := TResponseWebSearchParams(Add('filters', Value.Detach));
 end;
 
 class function TResponseWebSearchParams.New: TResponseWebSearchParams;
@@ -5007,6 +6106,12 @@ function TMCPAllowedToolsParams.ToolNames(
   const Value: TArray<string>): TMCPAllowedToolsParams;
 begin
   Result := TMCPAllowedToolsParams(Add('tool_names', Value));
+end;
+
+function TMCPAllowedToolsParams.ReadOnly(
+  const Value: Boolean): TMCPAllowedToolsParams;
+begin
+  Result := TMCPAllowedToolsParams(Add('read_only', Value));
 end;
 
 { TMCPRequireApprovalParams }
@@ -5063,6 +6168,17 @@ begin
   Result := TResponseMCPToolParams(Add('headers', Value));
 end;
 
+function TResponseMCPToolParams.Headers(
+  const Value: string): TResponseMCPToolParams;
+var
+  JSONObject: TJSONObject;
+begin
+  if TJSONHelper.TryGetObject(Value, JSONObject) then
+    Exit(TResponseMCPToolParams(Add('headers', JSONObject)));
+
+  raise TGenAIAPIException.Create('Invalid JSON Object');
+end;
+
 class function TResponseMCPToolParams.New: TResponseMCPToolParams;
 begin
   Result := TResponseMCPToolParams.Create.&Type();
@@ -5098,6 +6214,30 @@ begin
   Result := TResponseMCPToolParams(Add('server_url', Value));
 end;
 
+function TResponseMCPToolParams.Authorization(
+  const Value: string): TResponseMCPToolParams;
+begin
+  Result := TResponseMCPToolParams(Add('authorization', Value));
+end;
+
+function TResponseMCPToolParams.ConnectorId(
+  const Value: TMCPConnectorType): TResponseMCPToolParams;
+begin
+  Result := TResponseMCPToolParams(Add('connector_id', Value.ToString));
+end;
+
+function TResponseMCPToolParams.ConnectorId(
+  const Value: string): TResponseMCPToolParams;
+begin
+  Result := TResponseMCPToolParams(Add('connector_id', TMCPConnectorType.Create(Value).ToString));
+end;
+
+function TResponseMCPToolParams.DeferLoading(
+  const Value: Boolean): TResponseMCPToolParams;
+begin
+  Result := TResponseMCPToolParams(Add('defer_loading', Value));
+end;
+
 { TCodeInterpreterContainerAutoParams }
 
 function TCodeInterpreterContainerAutoParams.FileIds(
@@ -5122,20 +6262,25 @@ end;
 
 function TResponseCodeInterpreterParams.Container(
   const Value: string): TResponseCodeInterpreterParams;
+var
+  JSONObject: TJSONObject;
 begin
-  Result := TResponseCodeInterpreterParams(Add('container', TJSONObject.Create.AddPair('type', Value)));
-end;
+  if TJSONHelper.TryGetObject(Value, JSONObject) then
+    Exit(TResponseCodeInterpreterParams(Add('container', JSONObject)));
 
-function TResponseCodeInterpreterParams.&Type(
-  const Value: string): TResponseCodeInterpreterParams;
-begin
-  Result := TResponseCodeInterpreterParams(Add('type', Value));
+  raise TGenAIAPIException.Create('Invalid JSON Object');
 end;
 
 function TResponseCodeInterpreterParams.Container(
   const Value: TCodeInterpreterContainerAutoParams): TResponseCodeInterpreterParams;
 begin
   Result := TResponseCodeInterpreterParams(Add('container', Value.Detach));
+end;
+
+function TResponseCodeInterpreterParams.&Type(
+  const Value: string): TResponseCodeInterpreterParams;
+begin
+  Result := TResponseCodeInterpreterParams(Add('type', Value));
 end;
 
 class function TResponseCodeInterpreterParams.New: TResponseCodeInterpreterParams;
@@ -5154,6 +6299,600 @@ function TLocalShellToolParams.&Type(
   const Value: string): TLocalShellToolParams;
 begin
   Result := TLocalShellToolParams(Add('type', Value));
+end;
+
+{ TShellCallActionParams }
+
+function TShellCallActionParams.Commands(
+  const Value: TArray<string>): TShellCallActionParams;
+begin
+  Result := TShellCallActionParams(Add('commands', Value));
+end;
+
+function TShellCallActionParams.MaxOutputLength(
+  const Value: Int64): TShellCallActionParams;
+begin
+  Result := TShellCallActionParams(Add('max_output_length', Value));
+end;
+
+class function TShellCallActionParams.New: TShellCallActionParams;
+begin
+  Result := TShellCallActionParams.Create;
+end;
+
+function TShellCallActionParams.TimeoutMs(
+  const Value: Int64): TShellCallActionParams;
+begin
+  Result := TShellCallActionParams(Add('timeout_ms', Value));
+end;
+
+{ TShellCallParams }
+
+function TShellCallParams.Action(
+  const Value: TShellCallActionParams): TShellCallParams;
+begin
+  Result := TShellCallParams(Add('action', Value.Detach));
+end;
+
+function TShellCallParams.Action(const Value: string): TShellCallParams;
+var
+  JSONObject: TJSONObject;
+begin
+  if TJSONHelper.TryGetObject(Value, JSONObject) then
+    Exit(TShellCallParams(Add('action', JSONObject)));
+
+  raise TGenAIAPIException.Create('Invalid JSON Object');
+end;
+
+function TShellCallParams.CallId(const Value: string): TShellCallParams;
+begin
+  Result := TShellCallParams(Add('call_id', Value));
+end;
+
+function TShellCallParams.CreatedBy(const Value: string): TShellCallParams;
+begin
+  Result := TShellCallParams(Add('created_by', Value));
+end;
+
+function TShellCallParams.Id(const Value: string): TShellCallParams;
+begin
+  Result := TShellCallParams(Add('id', Value));
+end;
+
+class function TShellCallParams.New: TShellCallParams;
+begin
+  Result := TShellCallParams.Create.&Type();
+end;
+
+function TShellCallParams.Status(
+  const Value: TMessageStatus): TShellCallParams;
+begin
+  Result := TShellCallParams(Add('status', Value.ToString));
+end;
+
+function TShellCallParams.Status(const Value: string): TShellCallParams;
+begin
+  Result := Status(TMessageStatus.Create(Value));
+end;
+
+function TShellCallParams.&Type(const Value: string): TShellCallParams;
+begin
+  Result := TShellCallParams(Add('type', Value));
+end;
+
+{ TApplyPatchOperationParams }
+
+function TApplyPatchOperationParams.Diff(
+  const Value: string): TApplyPatchOperationParams;
+begin
+  Result := TApplyPatchOperationParams(Add('diff', Value));
+end;
+
+class function TApplyPatchOperationParams.New: TApplyPatchOperationParams;
+begin
+  Result := TApplyPatchOperationParams.Create;
+end;
+
+function TApplyPatchOperationParams.Path(
+  const Value: string): TApplyPatchOperationParams;
+begin
+  Result := TApplyPatchOperationParams(Add('path', Value));
+end;
+
+function TApplyPatchOperationParams.&Type(
+  const Value: string): TApplyPatchOperationParams;
+begin
+  Result := TApplyPatchOperationParams(Add('type', Value));
+end;
+
+{ TApplyPatchCallParams }
+
+function TApplyPatchCallParams.CallId(
+  const Value: string): TApplyPatchCallParams;
+begin
+  Result := TApplyPatchCallParams(Add('call_id', Value));
+end;
+
+function TApplyPatchCallParams.CreatedBy(
+  const Value: string): TApplyPatchCallParams;
+begin
+  Result := TApplyPatchCallParams(Add('created_by', Value));
+end;
+
+function TApplyPatchCallParams.Id(
+  const Value: string): TApplyPatchCallParams;
+begin
+  Result := TApplyPatchCallParams(Add('id', Value));
+end;
+
+class function TApplyPatchCallParams.New: TApplyPatchCallParams;
+begin
+  Result := TApplyPatchCallParams.Create.&Type();
+end;
+
+function TApplyPatchCallParams.Operation(
+  const Value: TApplyPatchOperationParams): TApplyPatchCallParams;
+begin
+  Result := TApplyPatchCallParams(Add('operation', Value.Detach));
+end;
+
+function TApplyPatchCallParams.Operation(
+  const Value: string): TApplyPatchCallParams;
+var
+  JSONObject: TJSONObject;
+begin
+  if TJSONHelper.TryGetObject(Value, JSONObject) then
+    Exit(TApplyPatchCallParams(Add('operation', JSONObject)));
+
+  raise TGenAIAPIException.Create('Invalid JSON Object');
+end;
+
+function TApplyPatchCallParams.Status(
+  const Value: TMessageStatus): TApplyPatchCallParams;
+begin
+  Result := TApplyPatchCallParams(Add('status', Value.ToString));
+end;
+
+function TApplyPatchCallParams.Status(
+  const Value: string): TApplyPatchCallParams;
+begin
+  Result := Status(TMessageStatus.Create(Value));
+end;
+
+function TApplyPatchCallParams.&Type(
+  const Value: string): TApplyPatchCallParams;
+begin
+  Result := TApplyPatchCallParams(Add('type', Value));
+end;
+
+{ TToolSearchCallParams }
+
+function TToolSearchCallParams.Arguments(
+  const Value: TJSONObject): TToolSearchCallParams;
+begin
+  Result := TToolSearchCallParams(Add('arguments', Value));
+end;
+
+function TToolSearchCallParams.Arguments(
+  const Value: string): TToolSearchCallParams;
+var
+  JSONObject: TJSONObject;
+begin
+  if TJSONHelper.TryGetObject(Value, JSONObject) then
+    Exit(TToolSearchCallParams(Add('arguments', JSONObject)));
+
+  raise TGenAIAPIException.Create('Invalid JSON Object');
+end;
+
+function TToolSearchCallParams.CallId(
+  const Value: string): TToolSearchCallParams;
+begin
+  Result := TToolSearchCallParams(Add('call_id', Value));
+end;
+
+function TToolSearchCallParams.CallIdNull: TToolSearchCallParams;
+begin
+  Result := TToolSearchCallParams(Add('call_id', TJSONNull.Create));
+end;
+
+function TToolSearchCallParams.CreatedBy(
+  const Value: string): TToolSearchCallParams;
+begin
+  Result := TToolSearchCallParams(Add('created_by', Value));
+end;
+
+function TToolSearchCallParams.Execution(
+  const Value: TToolSearchExecution): TToolSearchCallParams;
+begin
+  Result := TToolSearchCallParams(Add('execution', Value.ToString));
+end;
+
+function TToolSearchCallParams.Execution(
+  const Value: string): TToolSearchCallParams;
+begin
+  Result := Execution(TToolSearchExecution.Create(Value));
+end;
+
+function TToolSearchCallParams.Id(
+  const Value: string): TToolSearchCallParams;
+begin
+  Result := TToolSearchCallParams(Add('id', Value));
+end;
+
+class function TToolSearchCallParams.New: TToolSearchCallParams;
+begin
+  Result := TToolSearchCallParams.Create.&Type();
+end;
+
+function TToolSearchCallParams.Status(
+  const Value: TMessageStatus): TToolSearchCallParams;
+begin
+  Result := TToolSearchCallParams(Add('status', Value.ToString));
+end;
+
+function TToolSearchCallParams.Status(
+  const Value: string): TToolSearchCallParams;
+begin
+  Result := Status(TMessageStatus.Create(Value));
+end;
+
+function TToolSearchCallParams.&Type(
+  const Value: string): TToolSearchCallParams;
+begin
+  Result := TToolSearchCallParams(Add('type', Value));
+end;
+
+{ TCompactionItemParams }
+
+function TCompactionItemParams.CreatedBy(
+  const Value: string): TCompactionItemParams;
+begin
+  Result := TCompactionItemParams(Add('created_by', Value));
+end;
+
+function TCompactionItemParams.EncryptedContent(
+  const Value: string): TCompactionItemParams;
+begin
+  Result := TCompactionItemParams(Add('encrypted_content', Value));
+end;
+
+function TCompactionItemParams.Id(const Value: string): TCompactionItemParams;
+begin
+  Result := TCompactionItemParams(Add('id', Value));
+end;
+
+class function TCompactionItemParams.New: TCompactionItemParams;
+begin
+  Result := TCompactionItemParams.Create.&Type();
+end;
+
+function TCompactionItemParams.&Type(
+  const Value: string): TCompactionItemParams;
+begin
+  Result := TCompactionItemParams(Add('type', Value));
+end;
+
+{ TShellCallOutputOutcomeParams }
+
+function TShellCallOutputOutcomeParams.ExitCode(
+  const Value: Int64): TShellCallOutputOutcomeParams;
+begin
+  Result := TShellCallOutputOutcomeParams(Add('exit_code', Value));
+end;
+
+class function TShellCallOutputOutcomeParams.NewExit(
+  const ExitCode: Int64): TShellCallOutputOutcomeParams;
+begin
+  Result := TShellCallOutputOutcomeParams.Create.&Type('exit').ExitCode(ExitCode);
+end;
+
+class function TShellCallOutputOutcomeParams.NewTimeout: TShellCallOutputOutcomeParams;
+begin
+  Result := TShellCallOutputOutcomeParams.Create.&Type('timeout');
+end;
+
+function TShellCallOutputOutcomeParams.&Type(
+  const Value: string): TShellCallOutputOutcomeParams;
+begin
+  Result := TShellCallOutputOutcomeParams(Add('type', Value));
+end;
+
+{ TShellCallOutputContentParams }
+
+function TShellCallOutputContentParams.CreatedBy(
+  const Value: string): TShellCallOutputContentParams;
+begin
+  Result := TShellCallOutputContentParams(Add('created_by', Value));
+end;
+
+class function TShellCallOutputContentParams.New: TShellCallOutputContentParams;
+begin
+  Result := TShellCallOutputContentParams.Create;
+end;
+
+function TShellCallOutputContentParams.Outcome(
+  const Value: TShellCallOutputOutcomeParams): TShellCallOutputContentParams;
+begin
+  Result := TShellCallOutputContentParams(Add('outcome', Value.Detach));
+end;
+
+function TShellCallOutputContentParams.Stderr(
+  const Value: string): TShellCallOutputContentParams;
+begin
+  Result := TShellCallOutputContentParams(Add('stderr', Value));
+end;
+
+function TShellCallOutputContentParams.Stdout(
+  const Value: string): TShellCallOutputContentParams;
+begin
+  Result := TShellCallOutputContentParams(Add('stdout', Value));
+end;
+
+{ TShellCallOutputParams }
+
+function TShellCallOutputParams.CallId(
+  const Value: string): TShellCallOutputParams;
+begin
+  Result := TShellCallOutputParams(Add('call_id', Value));
+end;
+
+function TShellCallOutputParams.CreatedBy(
+  const Value: string): TShellCallOutputParams;
+begin
+  Result := TShellCallOutputParams(Add('created_by', Value));
+end;
+
+function TShellCallOutputParams.Id(const Value: string): TShellCallOutputParams;
+begin
+  Result := TShellCallOutputParams(Add('id', Value));
+end;
+
+function TShellCallOutputParams.MaxOutputLength(
+  const Value: Int64): TShellCallOutputParams;
+begin
+  Result := TShellCallOutputParams(Add('max_output_length', Value));
+end;
+
+class function TShellCallOutputParams.New: TShellCallOutputParams;
+begin
+  Result := TShellCallOutputParams.Create.&Type();
+end;
+
+function TShellCallOutputParams.Output(
+  const Value: TArray<TShellCallOutputContentParams>): TShellCallOutputParams;
+begin
+  var JSONArray := TJSONArray.Create;
+  for var Item in Value do
+    JSONArray.Add(Item.Detach);
+  Result := TShellCallOutputParams(Add('output', JSONArray));
+end;
+
+function TShellCallOutputParams.Output(
+  const Value: TJSONArray): TShellCallOutputParams;
+begin
+  Result := TShellCallOutputParams(Add('output', Value));
+end;
+
+function TShellCallOutputParams.Output(
+  const Value: string): TShellCallOutputParams;
+var
+  JSONArray: TJSONArray;
+begin
+  if TJSONHelper.TryGetArray(Value, JSONArray) then
+    Exit(TShellCallOutputParams(Add('output', JSONArray)));
+
+  raise TGenAIAPIException.Create('Invalid JSON Array');
+end;
+
+function TShellCallOutputParams.Status(
+  const Value: string): TShellCallOutputParams;
+begin
+  Result := TShellCallOutputParams(Add('status', Value));
+end;
+
+function TShellCallOutputParams.&Type(
+  const Value: string): TShellCallOutputParams;
+begin
+  Result := TShellCallOutputParams(Add('type', Value));
+end;
+
+{ TApplyPatchCallOutputParams }
+
+function TApplyPatchCallOutputParams.CallId(
+  const Value: string): TApplyPatchCallOutputParams;
+begin
+  Result := TApplyPatchCallOutputParams(Add('call_id', Value));
+end;
+
+function TApplyPatchCallOutputParams.CreatedBy(
+  const Value: string): TApplyPatchCallOutputParams;
+begin
+  Result := TApplyPatchCallOutputParams(Add('created_by', Value));
+end;
+
+function TApplyPatchCallOutputParams.Id(
+  const Value: string): TApplyPatchCallOutputParams;
+begin
+  Result := TApplyPatchCallOutputParams(Add('id', Value));
+end;
+
+class function TApplyPatchCallOutputParams.New: TApplyPatchCallOutputParams;
+begin
+  Result := TApplyPatchCallOutputParams.Create.&Type();
+end;
+
+function TApplyPatchCallOutputParams.Output(
+  const Value: string): TApplyPatchCallOutputParams;
+begin
+  Result := TApplyPatchCallOutputParams(Add('output', Value));
+end;
+
+function TApplyPatchCallOutputParams.Status(
+  const Value: string): TApplyPatchCallOutputParams;
+begin
+  Result := TApplyPatchCallOutputParams(Add('status', Value));
+end;
+
+function TApplyPatchCallOutputParams.&Type(
+  const Value: string): TApplyPatchCallOutputParams;
+begin
+  Result := TApplyPatchCallOutputParams(Add('type', Value));
+end;
+
+{ TToolSearchOutputParams }
+
+function TToolSearchOutputParams.CallId(
+  const Value: string): TToolSearchOutputParams;
+begin
+  Result := TToolSearchOutputParams(Add('call_id', Value));
+end;
+
+function TToolSearchOutputParams.CallIdNull: TToolSearchOutputParams;
+begin
+  Result := TToolSearchOutputParams(Add('call_id', TJSONNull.Create));
+end;
+
+function TToolSearchOutputParams.CreatedBy(
+  const Value: string): TToolSearchOutputParams;
+begin
+  Result := TToolSearchOutputParams(Add('created_by', Value));
+end;
+
+function TToolSearchOutputParams.Execution(
+  const Value: TToolSearchExecution): TToolSearchOutputParams;
+begin
+  Result := TToolSearchOutputParams(Add('execution', Value.ToString));
+end;
+
+function TToolSearchOutputParams.Execution(
+  const Value: string): TToolSearchOutputParams;
+begin
+  Result := Execution(TToolSearchExecution.Create(Value));
+end;
+
+function TToolSearchOutputParams.Id(
+  const Value: string): TToolSearchOutputParams;
+begin
+  Result := TToolSearchOutputParams(Add('id', Value));
+end;
+
+class function TToolSearchOutputParams.New: TToolSearchOutputParams;
+begin
+  Result := TToolSearchOutputParams.Create.&Type();
+end;
+
+function TToolSearchOutputParams.Status(
+  const Value: string): TToolSearchOutputParams;
+begin
+  Result := TToolSearchOutputParams(Add('status', Value));
+end;
+
+function TToolSearchOutputParams.Tools(
+  const Value: TArray<TResponseToolParams>): TToolSearchOutputParams;
+begin
+  var JSONArray := TJSONArray.Create;
+  for var Item in Value do
+    JSONArray.Add(Item.Detach);
+  Result := TToolSearchOutputParams(Add('tools', JSONArray));
+end;
+
+function TToolSearchOutputParams.Tools(
+  const Value: TJSONArray): TToolSearchOutputParams;
+begin
+  Result := TToolSearchOutputParams(Add('tools', Value));
+end;
+
+function TToolSearchOutputParams.Tools(
+  const Value: string): TToolSearchOutputParams;
+var
+  JSONArray: TJSONArray;
+begin
+  if TJSONHelper.TryGetArray(Value, JSONArray) then
+    Exit(TToolSearchOutputParams(Add('tools', JSONArray)));
+
+  raise TGenAIAPIException.Create('Invalid JSON Array');
+end;
+
+function TToolSearchOutputParams.&Type(
+  const Value: string): TToolSearchOutputParams;
+begin
+  Result := TToolSearchOutputParams(Add('type', Value));
+end;
+
+{ TResponseCompactParams }
+
+function TResponseCompactParams.Input(
+  const Value: TArray<TInputListItem>): TResponseCompactParams;
+begin
+  var JSONArray := TJSONArray.Create;
+  for var Item in Value do
+    JSONArray.Add(Item.Detach);
+  Result := TResponseCompactParams(Add('input', JSONArray));
+end;
+
+function TResponseCompactParams.Input(
+  const Value: TJSONArray): TResponseCompactParams;
+begin
+  Result := TResponseCompactParams(Add('input', Value));
+end;
+
+function TResponseCompactParams.Input(
+  const Value: string): TResponseCompactParams;
+var
+  JSONArray: TJSONArray;
+begin
+  if TJSONHelper.TryGetArray(Value, JSONArray) then
+    Exit(TResponseCompactParams(Add('input', JSONArray)));
+
+  Result := TResponseCompactParams(Add('input', Value));
+end;
+
+function TResponseCompactParams.Instructions(
+  const Value: string): TResponseCompactParams;
+begin
+  Result := TResponseCompactParams(Add('instructions', Value));
+end;
+
+function TResponseCompactParams.Model(
+  const Value: string): TResponseCompactParams;
+begin
+  Result := TResponseCompactParams(Add('model', Value));
+end;
+
+function TResponseCompactParams.PreviousResponseId(
+  const Value: string): TResponseCompactParams;
+begin
+  Result := TResponseCompactParams(Add('previous_response_id', Value));
+end;
+
+function TResponseCompactParams.PromptCacheKey(
+  const Value: string): TResponseCompactParams;
+begin
+  Result := TResponseCompactParams(Add('prompt_cache_key', Value));
+end;
+
+function TResponseCompactParams.PromptCacheRetention(
+  const Value: TPromptCacheRetention): TResponseCompactParams;
+begin
+  Result := TResponseCompactParams(Add('prompt_cache_retention', Value.ToString));
+end;
+
+function TResponseCompactParams.PromptCacheRetention(
+  const Value: string): TResponseCompactParams;
+begin
+  Result := PromptCacheRetention(TPromptCacheRetention.Create(Value));
+end;
+
+function TResponseCompactParams.ServiceTier(
+  const Value: TServiceTier): TResponseCompactParams;
+begin
+  Result := TResponseCompactParams(Add('service_tier', Value.ToString));
+end;
+
+function TResponseCompactParams.ServiceTier(
+  const Value: string): TResponseCompactParams;
+begin
+  Result := ServiceTier(TServiceTier.Create(Value));
 end;
 
 { TResponsesParams }
@@ -5235,7 +6974,14 @@ begin
 end;
 
 function TResponsesParams.Input(const Value: string): TResponsesParams;
+var
+  JSONArray: TJSONArray;
 begin
+  {--- If the string is a JSON array, treat it as a structured input list;
+       otherwise send it as a plain text prompt. }
+  if TJSONHelper.TryGetArray(Value, JSONArray) then
+    Exit(TResponsesParams(Add('input', JSONArray)));
+
   Result := TResponsesParams(Add('input', Value));
 end;
 
@@ -5361,6 +7107,18 @@ begin
   Result := TResponsesParams(Add('tools', JSONArray));
 end;
 
+function TResponsesParams.Tools(const Value: string): TResponsesParams;
+var
+  JSONArray: TJSONArray;
+begin
+  {--- The tools parameter is always a JSON array: parse the string as such,
+       otherwise reject it. }
+  if TJSONHelper.TryGetArray(Value, JSONArray) then
+    Exit(TResponsesParams(Add('tools', JSONArray)));
+
+  raise TGenAIAPIException.Create('Invalid JSON Array');
+end;
+
 function TResponsesParams.TopLogprobs(const Value: Integer): TResponsesParams;
 begin
   Result := TResponsesParams(Add('top_logprobs', Value));
@@ -5425,12 +7183,39 @@ begin
   Result := TResponsesParams(Add('text', Value.Detach));
 end;
 
+function TResponsesParams.ContextManagement(
+  const Value: TArray<TContextManagementParams>): TResponsesParams;
+begin
+  var JSONArray := TJSONArray.Create;
+  for var Item in Value do
+    JSONArray.Add(Item.Detach);
+  Result := TResponsesParams(Add('context_management', JSONArray));
+end;
+
+function TResponsesParams.PromptCacheRetention(
+  const Value: TPromptCacheRetention): TResponsesParams;
+begin
+  Result := TResponsesParams(Add('prompt_cache_retention', Value.ToString));
+end;
+
+function TResponsesParams.PromptCacheRetention(
+  const Value: string): TResponsesParams;
+begin
+  Result := TResponsesParams(Add('prompt_cache_retention', TPromptCacheRetention.Create(Value).ToString));
+end;
+
+function TResponsesParams.ServiceTier(
+  const Value: TServiceTier): TResponsesParams;
+begin
+  Result := TResponsesParams(Add('service_tier', Value.ToString));
+end;
+
 { TResponseImageGenerationParams }
 
 function TResponseImageGenerationParams.Background(
   const Value: string): TResponseImageGenerationParams;
 begin
-  Result := TResponseImageGenerationParams(Add('background', TBackGroundType.Create(Value).ToString));
+  Result := Background(TBackGroundType.Create(Value));
 end;
 
 function TResponseImageGenerationParams.Background(
@@ -5449,6 +7234,17 @@ function TResponseImageGenerationParams.InputFidelity(
   const Value: TFidelityType): TResponseImageGenerationParams;
 begin
   Result := TResponseImageGenerationParams(Add('input_fidelity', Value.ToString));
+end;
+
+function TResponseImageGenerationParams.InputImageMask(
+  const Value: string): TResponseImageGenerationParams;
+var
+  JSONObject: TJSONObject;
+begin
+  if TJSONHelper.TryGetObject(Value, JSONObject) then
+    Exit(TResponseImageGenerationParams(Add('input_image_mask', JSONObject)));
+
+  raise TGenAIAPIException.Create('Invalid JSON Object');
 end;
 
 function TResponseImageGenerationParams.InputImageMask(
@@ -5489,7 +7285,7 @@ end;
 function TResponseImageGenerationParams.OutputFormat(
   const Value: string): TResponseImageGenerationParams;
 begin
-  Result := TResponseImageGenerationParams(Add('output_format', TOutputFormatType.Create(Value).ToString));
+  Result := OutputFormat(TOutputFormatType.Create(Value));
 end;
 
 function TResponseImageGenerationParams.PartialImages(
@@ -5507,7 +7303,7 @@ end;
 function TResponseImageGenerationParams.Quality(
   const Value: string): TResponseImageGenerationParams;
 begin
-  Result := TResponseImageGenerationParams(Add('quality', TImageQualityType.Create(Value).ToString));
+  Result := Quality(TImageQualityType.Create(Value));
 end;
 
 function TResponseImageGenerationParams.Size(
@@ -5519,7 +7315,7 @@ end;
 function TResponseImageGenerationParams.Size(
   const Value: string): TResponseImageGenerationParams;
 begin
-  Result := TResponseImageGenerationParams(Add('size', TImageSize.Create(Value).ToString));
+  Result := Size(TImageSize.Create(Value));
 end;
 
 function TResponseImageGenerationParams.&Type(
@@ -5564,6 +7360,17 @@ begin
   Result := TPromptParams(Add('variables', Value));
 end;
 
+function TPromptParams.Variables(const Value: string): TPromptParams;
+var
+  JSONObject: TJSONObject;
+begin
+  {--- The variables parameter is always a JSON object. }
+  if TJSONHelper.TryGetObject(Value, JSONObject) then
+    Exit(TPromptParams(Add('variables', JSONObject)));
+
+  raise TGenAIAPIException.Create('Invalid JSON Object');
+end;
+
 function TPromptParams.Version(const Value: string): TPromptParams;
 begin
   Result := TPromptParams(Add('version', Value));
@@ -5587,6 +7394,15 @@ begin
   Result := TCustomToolParams(Add('format', Value.Detach));
 end;
 
+function TCustomToolParams.Format(const Value: string): TCustomToolParams;
+var
+  JSONObject: TJSONObject;
+begin
+  if TJSONHelper.TryGetObject(Value, JSONObject) then
+    Exit(TCustomToolParams(Add('format', JSONObject)));
+
+  raise TGenAIAPIException.Create('Invalid JSON Object');
+end;
 function TCustomToolParams.Name(const Value: string): TCustomToolParams;
 begin
   Result := TCustomToolParams(Add('name', Value));
@@ -5611,6 +7427,12 @@ begin
   Result := TToolParamsFormatParams(Add('syntax', Value.ToString));
 end;
 
+function TToolParamsFormatParams.Syntax(
+  const Value: string): TToolParamsFormatParams;
+begin
+  Result := Syntax(TSyntaxFormatType.Create(Value));
+end;
+
 class function TToolParamsFormatParams.New(
   const Value: TToolParamsFormatType): TToolParamsFormatParams;
 begin
@@ -5621,12 +7443,6 @@ class function TToolParamsFormatParams.New(
   const Value: string): TToolParamsFormatParams;
 begin
   Result := TToolParamsFormatParams.Create.&Type(Value);
-end;
-
-function TToolParamsFormatParams.Syntax(
-  const Value: string): TToolParamsFormatParams;
-begin
-  Result := TToolParamsFormatParams(Add('syntax', TSyntaxFormatType.Create(Value).ToString));
 end;
 
 function TToolParamsFormatParams.&Type(
@@ -5671,7 +7487,7 @@ end;
 { TSearchAction }
 
 function TSearchAction.Sources(
-  const Value: TArray<TSearchActionSource>): TSearchAction;
+  const Value: TArray<TSearchActionSourceParam>): TSearchAction;
 begin
   var JSONArray := TJSONArray.Create;
   for var Item in Value do
@@ -5690,21 +7506,21 @@ begin
   Result := TSearchAction(Add('query', Value));
 end;
 
-{ TSearchActionSource }
+{ TSearchActionSourceParam }
 
-class function TSearchActionSource.New: TSearchActionSource;
+class function TSearchActionSourceParam.New: TSearchActionSourceParam;
 begin
-  Result := TSearchActionSource.Create.&Type();
+  Result := TSearchActionSourceParam.Create.&Type();
 end;
 
-function TSearchActionSource.&Type(const Value: string): TSearchActionSource;
+function TSearchActionSourceParam.&Type(const Value: string): TSearchActionSourceParam;
 begin
-  Result := TSearchActionSource(Add('type', Value));
+  Result := TSearchActionSourceParam(Add('type', Value));
 end;
 
-function TSearchActionSource.Url(const Value: string): TSearchActionSource;
+function TSearchActionSourceParam.Url(const Value: string): TSearchActionSourceParam;
 begin
-  Result := TSearchActionSource(Add('url', Value));
+  Result := TSearchActionSourceParam(Add('url', Value));
 end;
 
 { TOpenPageAction }
@@ -5853,7 +7669,12 @@ end;
 
 function TCustomToolCallOutput.Output(
   const Value: string): TCustomToolCallOutput;
+var
+  JSONArray: TJSONArray;
 begin
+  if TJSONHelper.TryGetArray(Value, JSONArray) then
+    Exit(TCustomToolCallOutput(Add('output', JSONArray)));
+
   Result := TCustomToolCallOutput(Add('output', Value));
 end;
 
@@ -5931,6 +7752,17 @@ begin
 end;
 
 function TWebSearchPreviewParams.UserLocation(
+  const Value: string): TWebSearchPreviewParams;
+var
+  JSONObject: TJSONObject;
+begin
+  if TJSONHelper.TryGetObject(Value, JSONObject) then
+    Exit(TWebSearchPreviewParams(Add('user_location', JSONObject)));
+
+  raise TGenAIAPIException.Create('Invalid JSON Object');
+end;
+
+function TWebSearchPreviewParams.UserLocation(
   const Value: TResponseUserLocationParams): TWebSearchPreviewParams;
 begin
   Result := TWebSearchPreviewParams(Add('user_location', Value.Detach));
@@ -5942,17 +7774,16 @@ begin
   Result := TWebSearchPreviewParams(Add('search_context_size', Value.ToString));
 end;
 
+function TWebSearchPreviewParams.SearchContextSize(
+  const Value: string): TWebSearchPreviewParams;
+begin
+  Result := SearchContextSize(TSearchWebOptions.Create(Value));
+end;
+
 class function TWebSearchPreviewParams.New: TWebSearchPreviewParams;
 begin
   Result := TWebSearchPreviewParams.Create.&Type();
 end;
-
-function TWebSearchPreviewParams.SearchContextSize(
-  const Value: string): TWebSearchPreviewParams;
-begin
-  Result := TWebSearchPreviewParams(Add('search_context_size', TSearchWebOptions.Create(Value).ToString));
-end;
-
 
 { TMCPToolParams }
 
@@ -6052,6 +7883,547 @@ end;
 class operator TContent.Implicit(const Value: TContent): TArray<TItemContent>;
 begin
   Result := Copy(Value.FItems, 0, Value.FCount);
+end;
+
+{ TResponseImageGenerationParams }
+
+function TResponseImageGenerationParams.Action(
+  const Value: TImageGenActionType): TResponseImageGenerationParams;
+begin
+  Result := TResponseImageGenerationParams(Add('action', Value.ToString));
+end;
+
+function TResponseImageGenerationParams.Action(
+  const Value: string): TResponseImageGenerationParams;
+begin
+  Result := Action(TImageGenActionType.Create(Value));
+end;
+
+{ TContextManagementParams }
+
+function TContextManagementParams.&Type(
+  const Value: string): TContextManagementParams;
+begin
+  Result := TContextManagementParams(Add('type', Value));
+end;
+
+function TContextManagementParams.CompactThreshold(
+  const Value: Integer): TContextManagementParams;
+begin
+  Result := TContextManagementParams(Add('compact_threshold', Value));
+end;
+
+class function TContextManagementParams.New: TContextManagementParams;
+begin
+  Result := TContextManagementParams.Create.&Type();
+end;
+
+{ TWebSearchFiltersParams }
+
+function TWebSearchFiltersParams.AllowedDomains(
+  const Value: TArray<string>): TWebSearchFiltersParams;
+begin
+  Result := TWebSearchFiltersParams(Add('allowed_domains', Value));
+end;
+
+class function TWebSearchFiltersParams.New: TWebSearchFiltersParams;
+begin
+  Result := TWebSearchFiltersParams.Create;
+end;
+
+{ TApplyPatchToolParams }
+
+function TApplyPatchToolParams.&Type(
+  const Value: string): TApplyPatchToolParams;
+begin
+  Result := TApplyPatchToolParams(Add('type', Value));
+end;
+
+class function TApplyPatchToolParams.New: TApplyPatchToolParams;
+begin
+  Result := TApplyPatchToolParams.Create.&Type();
+end;
+
+{ TToolSearchToolParams }
+
+function TToolSearchToolParams.&Type(
+  const Value: string): TToolSearchToolParams;
+begin
+  Result := TToolSearchToolParams(Add('type', Value));
+end;
+
+function TToolSearchToolParams.Description(
+  const Value: string): TToolSearchToolParams;
+begin
+  Result := TToolSearchToolParams(Add('description', Value));
+end;
+
+function TToolSearchToolParams.Execution(
+  const Value: TToolSearchExecution): TToolSearchToolParams;
+begin
+  Result := TToolSearchToolParams(Add('execution', Value.ToString));
+end;
+
+function TToolSearchToolParams.Execution(
+  const Value: string): TToolSearchToolParams;
+begin
+  Result := Execution(TToolSearchExecution.Create(Value));
+end;
+
+function TToolSearchToolParams.Parameters(
+  const Value: TSchemaParams): TToolSearchToolParams;
+begin
+  Result := TToolSearchToolParams(Add('parameters', Value.Detach));
+end;
+
+function TToolSearchToolParams.Parameters(
+  const Value: TJSONObject): TToolSearchToolParams;
+begin
+  Result := TToolSearchToolParams(Add('parameters', Value));
+end;
+
+function TToolSearchToolParams.Parameters(
+  const Value: string): TToolSearchToolParams;
+var
+  JSONObject: TJSONObject;
+begin
+  if TJSONHelper.TryGetObject(Value, JSONObject) then
+    Exit(TToolSearchToolParams(Add('parameters', JSONObject)));
+
+  raise TGenAIAPIException.Create('Invalid JSON Object');
+end;
+
+class function TToolSearchToolParams.New: TToolSearchToolParams;
+begin
+  Result := TToolSearchToolParams.Create.&Type();
+end;
+
+{ TNamespaceToolParams }
+
+function TNamespaceToolParams.&Type(
+  const Value: string): TNamespaceToolParams;
+begin
+  Result := TNamespaceToolParams(Add('type', Value));
+end;
+
+function TNamespaceToolParams.Name(const Value: string): TNamespaceToolParams;
+begin
+  Result := TNamespaceToolParams(Add('name', Value));
+end;
+
+function TNamespaceToolParams.Description(
+  const Value: string): TNamespaceToolParams;
+begin
+  Result := TNamespaceToolParams(Add('description', Value));
+end;
+
+function TNamespaceToolParams.Tools(
+  const Value: TArray<TResponseToolParams>): TNamespaceToolParams;
+begin
+  var JSONArray := TJSONArray.Create;
+  for var Item in Value do
+    JSONArray.Add(Item.Detach);
+  Result := TNamespaceToolParams(Add('tools', JSONArray));
+end;
+
+function TNamespaceToolParams.Tools(
+  const Value: TJSONArray): TNamespaceToolParams;
+begin
+  Result := TNamespaceToolParams(Add('tools', Value));
+end;
+
+function TNamespaceToolParams.Tools(const Value: string): TNamespaceToolParams;
+var
+  JSONArray: TJSONArray;
+begin
+  if TJSONHelper.TryGetArray(Value, JSONArray) then
+    Exit(TNamespaceToolParams(Add('tools', JSONArray)));
+
+  raise TGenAIAPIException.Create('Invalid JSON Array');
+end;
+
+class function TNamespaceToolParams.New: TNamespaceToolParams;
+begin
+  Result := TNamespaceToolParams.Create.&Type();
+end;
+
+{ TContainerNetworkPolicyDomainSecretParams }
+
+function TContainerNetworkPolicyDomainSecretParams.Domain(
+  const Value: string): TContainerNetworkPolicyDomainSecretParams;
+begin
+  Result := TContainerNetworkPolicyDomainSecretParams(Add('domain', Value));
+end;
+
+function TContainerNetworkPolicyDomainSecretParams.Name(
+  const Value: string): TContainerNetworkPolicyDomainSecretParams;
+begin
+  Result := TContainerNetworkPolicyDomainSecretParams(Add('name', Value));
+end;
+
+function TContainerNetworkPolicyDomainSecretParams.Value(
+  const Value: string): TContainerNetworkPolicyDomainSecretParams;
+begin
+  Result := TContainerNetworkPolicyDomainSecretParams(Add('value', Value));
+end;
+
+class function TContainerNetworkPolicyDomainSecretParams.New: TContainerNetworkPolicyDomainSecretParams;
+begin
+  Result := TContainerNetworkPolicyDomainSecretParams.Create;
+end;
+
+{ TContainerNetworkPolicyDisabledParams }
+
+function TContainerNetworkPolicyDisabledParams.&Type(
+  const Value: string): TContainerNetworkPolicyDisabledParams;
+begin
+  Result := TContainerNetworkPolicyDisabledParams(Add('type', Value));
+end;
+
+class function TContainerNetworkPolicyDisabledParams.New: TContainerNetworkPolicyDisabledParams;
+begin
+  Result := TContainerNetworkPolicyDisabledParams.Create.&Type();
+end;
+
+{ TContainerNetworkPolicyAllowlistParams }
+
+function TContainerNetworkPolicyAllowlistParams.&Type(
+  const Value: string): TContainerNetworkPolicyAllowlistParams;
+begin
+  Result := TContainerNetworkPolicyAllowlistParams(Add('type', Value));
+end;
+
+function TContainerNetworkPolicyAllowlistParams.AllowedDomains(
+  const Value: TArray<string>): TContainerNetworkPolicyAllowlistParams;
+begin
+  Result := TContainerNetworkPolicyAllowlistParams(Add('allowed_domains', Value));
+end;
+
+function TContainerNetworkPolicyAllowlistParams.DomainSecrets(
+  const Value: TArray<TContainerNetworkPolicyDomainSecretParams>): TContainerNetworkPolicyAllowlistParams;
+begin
+  var JSONArray := TJSONArray.Create;
+  for var Item in Value do
+    JSONArray.Add(Item.Detach);
+  Result := TContainerNetworkPolicyAllowlistParams(Add('domain_secrets', JSONArray));
+end;
+
+function TContainerNetworkPolicyAllowlistParams.DomainSecrets(
+  const Value: string): TContainerNetworkPolicyAllowlistParams;
+var
+  JSONArray: TJSONArray;
+begin
+  if TJSONHelper.TryGetArray(Value, JSONArray) then
+    Exit(TContainerNetworkPolicyAllowlistParams(Add('domain_secrets', JSONArray)));
+
+  raise TGenAIAPIException.Create('Invalid JSON Array');
+end;
+
+class function TContainerNetworkPolicyAllowlistParams.New: TContainerNetworkPolicyAllowlistParams;
+begin
+  Result := TContainerNetworkPolicyAllowlistParams.Create.&Type();
+end;
+
+{ TInlineSkillSourceParams }
+
+function TInlineSkillSourceParams.&Type(
+  const Value: string): TInlineSkillSourceParams;
+begin
+  Result := TInlineSkillSourceParams(Add('type', Value));
+end;
+
+function TInlineSkillSourceParams.MediaType(
+  const Value: string): TInlineSkillSourceParams;
+begin
+  Result := TInlineSkillSourceParams(Add('media_type', Value));
+end;
+
+function TInlineSkillSourceParams.Data(
+  const Value: string): TInlineSkillSourceParams;
+begin
+  Result := TInlineSkillSourceParams(Add('data', Value));
+end;
+
+class function TInlineSkillSourceParams.New: TInlineSkillSourceParams;
+begin
+  Result := TInlineSkillSourceParams.Create.&Type().MediaType();
+end;
+
+{ TSkillReferenceParams }
+
+function TSkillReferenceParams.&Type(
+  const Value: string): TSkillReferenceParams;
+begin
+  Result := TSkillReferenceParams(Add('type', Value));
+end;
+
+function TSkillReferenceParams.SkillId(
+  const Value: string): TSkillReferenceParams;
+begin
+  Result := TSkillReferenceParams(Add('skill_id', Value));
+end;
+
+function TSkillReferenceParams.Version(
+  const Value: string): TSkillReferenceParams;
+begin
+  Result := TSkillReferenceParams(Add('version', Value));
+end;
+
+class function TSkillReferenceParams.New: TSkillReferenceParams;
+begin
+  Result := TSkillReferenceParams.Create.&Type();
+end;
+
+{ TInlineSkillParams }
+
+function TInlineSkillParams.&Type(const Value: string): TInlineSkillParams;
+begin
+  Result := TInlineSkillParams(Add('type', Value));
+end;
+
+function TInlineSkillParams.Name(const Value: string): TInlineSkillParams;
+begin
+  Result := TInlineSkillParams(Add('name', Value));
+end;
+
+function TInlineSkillParams.Description(
+  const Value: string): TInlineSkillParams;
+begin
+  Result := TInlineSkillParams(Add('description', Value));
+end;
+
+function TInlineSkillParams.Source(
+  const Value: TInlineSkillSourceParams): TInlineSkillParams;
+begin
+  Result := TInlineSkillParams(Add('source', Value.Detach));
+end;
+
+class function TInlineSkillParams.New: TInlineSkillParams;
+begin
+  Result := TInlineSkillParams.Create.&Type();
+end;
+
+{ TLocalSkillParams }
+
+function TLocalSkillParams.Name(const Value: string): TLocalSkillParams;
+begin
+  Result := TLocalSkillParams(Add('name', Value));
+end;
+
+function TLocalSkillParams.Description(const Value: string): TLocalSkillParams;
+begin
+  Result := TLocalSkillParams(Add('description', Value));
+end;
+
+function TLocalSkillParams.Path(const Value: string): TLocalSkillParams;
+begin
+  Result := TLocalSkillParams(Add('path', Value));
+end;
+
+class function TLocalSkillParams.New: TLocalSkillParams;
+begin
+  Result := TLocalSkillParams.Create;
+end;
+
+{ TShellContainerReferenceParams }
+
+function TShellContainerReferenceParams.&Type(
+  const Value: string): TShellContainerReferenceParams;
+begin
+  Result := TShellContainerReferenceParams(Add('type', Value));
+end;
+
+function TShellContainerReferenceParams.ContainerId(
+  const Value: string): TShellContainerReferenceParams;
+begin
+  Result := TShellContainerReferenceParams(Add('container_id', Value));
+end;
+
+class function TShellContainerReferenceParams.New: TShellContainerReferenceParams;
+begin
+  Result := TShellContainerReferenceParams.Create.&Type();
+end;
+
+{ TShellLocalEnvironmentParams }
+
+function TShellLocalEnvironmentParams.&Type(
+  const Value: string): TShellLocalEnvironmentParams;
+begin
+  Result := TShellLocalEnvironmentParams(Add('type', Value));
+end;
+
+function TShellLocalEnvironmentParams.Skills(
+  const Value: TArray<TLocalSkillParams>): TShellLocalEnvironmentParams;
+begin
+  var JSONArray := TJSONArray.Create;
+  for var Item in Value do
+    JSONArray.Add(Item.Detach);
+  Result := TShellLocalEnvironmentParams(Add('skills', JSONArray));
+end;
+
+function TShellLocalEnvironmentParams.Skills(
+  const Value: string): TShellLocalEnvironmentParams;
+var
+  JSONArray: TJSONArray;
+begin
+  if TJSONHelper.TryGetArray(Value, JSONArray) then
+    Exit(TShellLocalEnvironmentParams(Add('skills', JSONArray)));
+
+  raise TGenAIAPIException.Create('Invalid JSON Array');
+end;
+
+class function TShellLocalEnvironmentParams.New: TShellLocalEnvironmentParams;
+begin
+  Result := TShellLocalEnvironmentParams.Create.&Type();
+end;
+
+{ TShellContainerAutoParams }
+
+function TShellContainerAutoParams.&Type(
+  const Value: string): TShellContainerAutoParams;
+begin
+  Result := TShellContainerAutoParams(Add('type', Value));
+end;
+
+function TShellContainerAutoParams.FileIds(
+  const Value: TArray<string>): TShellContainerAutoParams;
+begin
+  Result := TShellContainerAutoParams(Add('file_ids', Value));
+end;
+
+function TShellContainerAutoParams.MemoryLimit(
+  const Value: TContainerMemoryLimit): TShellContainerAutoParams;
+begin
+  Result := TShellContainerAutoParams(Add('memory_limit', Value.ToString));
+end;
+
+function TShellContainerAutoParams.MemoryLimit(
+  const Value: string): TShellContainerAutoParams;
+begin
+  Result := MemoryLimit(TContainerMemoryLimit.Create(Value));
+end;
+
+function TShellContainerAutoParams.NetworkPolicy(
+  const Value: TContainerNetworkPolicyParams): TShellContainerAutoParams;
+begin
+  Result := TShellContainerAutoParams(Add('network_policy', Value.Detach));
+end;
+
+function TShellContainerAutoParams.NetworkPolicy(
+  const Value: string): TShellContainerAutoParams;
+var
+  JSONObject: TJSONObject;
+begin
+  if TJSONHelper.TryGetObject(Value, JSONObject) then
+    Exit(TShellContainerAutoParams(Add('network_policy', JSONObject)));
+
+  raise TGenAIAPIException.Create('Invalid JSON Object');
+end;
+
+function TShellContainerAutoParams.Skills(
+  const Value: TArray<TContainerSkillParams>): TShellContainerAutoParams;
+begin
+  var JSONArray := TJSONArray.Create;
+  for var Item in Value do
+    JSONArray.Add(Item.Detach);
+  Result := TShellContainerAutoParams(Add('skills', JSONArray));
+end;
+
+function TShellContainerAutoParams.Skills(
+  const Value: string): TShellContainerAutoParams;
+var
+  JSONArray: TJSONArray;
+begin
+  if TJSONHelper.TryGetArray(Value, JSONArray) then
+    Exit(TShellContainerAutoParams(Add('skills', JSONArray)));
+
+  raise TGenAIAPIException.Create('Invalid JSON Array');
+end;
+
+class function TShellContainerAutoParams.New: TShellContainerAutoParams;
+begin
+  Result := TShellContainerAutoParams.Create.&Type();
+end;
+
+{ TFunctionShellToolParams }
+
+function TFunctionShellToolParams.&Type(
+  const Value: string): TFunctionShellToolParams;
+begin
+  Result := TFunctionShellToolParams(Add('type', Value));
+end;
+
+function TFunctionShellToolParams.Environment(
+  const Value: TShellEnvironmentParams): TFunctionShellToolParams;
+begin
+  Result := TFunctionShellToolParams(Add('environment', Value.Detach));
+end;
+
+function TFunctionShellToolParams.Environment(
+  const Value: string): TFunctionShellToolParams;
+var
+  JSONObject: TJSONObject;
+begin
+  if TJSONHelper.TryGetObject(Value, JSONObject) then
+    Exit(TFunctionShellToolParams(Add('environment', JSONObject)));
+
+  raise TGenAIAPIException.Create('Invalid JSON Object');
+end;
+
+class function TFunctionShellToolParams.New: TFunctionShellToolParams;
+begin
+  Result := TFunctionShellToolParams.Create.&Type();
+end;
+
+{ TAllowedToolsChoiceParams }
+
+function TAllowedToolsChoiceParams.&Type(
+  const Value: string): TAllowedToolsChoiceParams;
+begin
+  Result := TAllowedToolsChoiceParams(Add('type', Value));
+end;
+
+function TAllowedToolsChoiceParams.Mode(
+  const Value: TAllowedToolsMode): TAllowedToolsChoiceParams;
+begin
+  Result := TAllowedToolsChoiceParams(Add('mode', Value.ToString));
+end;
+
+function TAllowedToolsChoiceParams.Mode(
+  const Value: string): TAllowedToolsChoiceParams;
+begin
+  Result := Mode(TAllowedToolsMode.Create(Value));
+end;
+
+function TAllowedToolsChoiceParams.Tools(
+  const Value: TArray<TResponseToolParams>): TAllowedToolsChoiceParams;
+begin
+  var JSONArray := TJSONArray.Create;
+  for var Item in Value do
+    JSONArray.Add(Item.Detach);
+  Result := TAllowedToolsChoiceParams(Add('tools', JSONArray));
+end;
+
+function TAllowedToolsChoiceParams.Tools(
+  const Value: TJSONArray): TAllowedToolsChoiceParams;
+begin
+  Result := TAllowedToolsChoiceParams(Add('tools', Value));
+end;
+
+function TAllowedToolsChoiceParams.Tools(
+  const Value: string): TAllowedToolsChoiceParams;
+var
+  JSONArray: TJSONArray;
+begin
+  if TJSONHelper.TryGetArray(Value, JSONArray) then
+    Exit(TAllowedToolsChoiceParams(Add('tools', JSONArray)));
+
+  raise TGenAIAPIException.Create('Invalid JSON Array');
+end;
+
+class function TAllowedToolsChoiceParams.New: TAllowedToolsChoiceParams;
+begin
+  Result := TAllowedToolsChoiceParams.Create.&Type();
 end;
 
 end.

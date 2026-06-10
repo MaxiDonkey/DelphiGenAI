@@ -1,4 +1,4 @@
-unit GenAI.Responses.ImageHelper;
+﻿unit GenAI.Responses.ImageHelper;
 
 {-------------------------------------------------------------------------------
 

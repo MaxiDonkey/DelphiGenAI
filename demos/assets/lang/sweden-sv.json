@@ -1,0 +1,466 @@
+﻿{
+  "lang": "sv-SE",
+  "input": {
+    "placeholder": {
+      "askQuestion": "Ställ en fråga..."
+    },
+    "menu": {
+      "endpoint": "Slutpunkt",
+      "webResearch": "Webbsökning",
+      "thinking": "Resonemang",
+      "attachFiles": "Bifoga filer",
+      "knowledgeSearch": "Kunskapssökning",
+      "vision": "Syn",
+      "deepResearch": "Djupgående sökning",
+      "integration": "Integration",
+      "media": "Media",
+      "custom": "Anpassad",
+      "settings": "Inställningar",
+      "model": "Modell",
+      "project": "Projekt"
+    },
+    "thinking": {
+      "low": "Låg",
+      "medium": "Medel",
+      "high": "Hög"
+    },
+    "endpoint": {
+      "chatCompletion": "v1/chat/completions",
+      "chatResponse": "v1/chat/responses",
+      "message": "v1/message",
+      "generateContent": ":generateContent",
+      "interactions": "v1/interactions",
+      "conversation": "v1/conversation",
+      "provider": {
+        "chatCompletion": "OpenAI, DeepSeek, MistralAI",
+        "chatResponse": "OpenAI",
+        "message": "Claude",
+        "generateContent": "Gemini",
+        "interactions": "Gemini",
+        "conversation": "MistralAI"
+      }
+    },
+    "integration": {
+      "function": "Funktion",
+      "mcp": "MCP",
+      "jsCodeSandbox": "JS-sandlåda",
+      "skills": "Färdigheter",
+      "agents": "Agenter"
+    },
+    "media": {
+      "createImage": "Skapa en bild",
+      "createVideo": "Skapa en video",
+      "createAudio": "Skapa ljud",
+      "speechToText": "Tal till text",
+      "textToSpeech": "Text till tal"
+    },
+    "project": {
+      "add": "Lägg till projekt",
+      "none": "inget",
+      "noneUsed": "Inget projekt används",
+      "delete": "Ta bort"
+    },
+    "chips": {
+      "endpoint": "Slutpunkt: {title}",
+      "webResearch": "Webbsökning",
+      "thinking": "Resonemang: {title}",
+      "knowledgeSearch": "Kunskapssökning ({count})",
+      "deepResearch": "Djupgående sökning",
+      "filesAttached": "Bifogade filer ({count})",
+      "vision": "Syn ({count})",
+      "integrationFunction": "Integration: Funktion ({count})",
+      "integrationMcp": "Integration: MCP ({count})",
+      "integrationJsCodeSandbox": "Integration: JS-sandlåda ({count})",
+      "integrationSkills": "Integration: Färdigheter ({count})",
+      "integrationAgents": "Integration: Agenter ({count})",
+      "mediaCreateImage": "Media: Skapa en bild",
+      "mediaCreateVideo": "Media: Skapa en video",
+      "mediaCreateAudio": "Media: Skapa ljud",
+      "speechToText": "Tal till text ({count})",
+      "mediaTextToSpeech": "Media: Text till tal",
+      "custom": "Anpassad ({count})"
+    }
+  },
+  "requestParams": {
+    "panel": {
+      "title": "Inställningar",
+      "close": "Stäng",
+      "theme": {
+        "light": "Ljust",
+        "dark": "Mörkt"
+      }
+    },
+    "summary": {
+      "alwaysAvailable": "Alltid tillgängligt",
+      "enabled": "Aktiverat",
+      "disabled": "Inaktiverat",
+      "enabledDisabled": "{enabled} aktiverade / {disabled} inaktiverade"
+    },
+    "categories": {
+      "appSettings": {
+        "title": "Programinställningar",
+        "subtitle": "Allmänt",
+        "panelSubtitle": ""
+      },
+      "systemPrompt": {
+        "title": "Systemprompt"
+      },
+      "settings": {
+        "title": "Allmänna inställningar"
+      },
+      "sampling": {
+        "title": "Sampling"
+      },
+      "structuredOutput": {
+        "title": "Strukturerad utdata"
+      },
+      "vendorSettings": {
+        "title": "Leverantörsalternativ"
+      }
+    },
+    "items": {
+      "appSettings": {
+        "lookAndFeel": {
+          "label": "Utseende"
+        },
+        "language": {
+          "label": "Språk",
+          "placeholder": "Välj ett språk"
+        },
+        "scrollButtons": {
+          "label": "Rullningsknappar"
+        }
+      },
+      "systemPrompt": {
+        "systemPrompt": {
+          "label": "Systemprompt",
+          "labelWhenDisabled": "Inaktiverad",
+          "labelWhenEnabled": "Aktiverad",
+          "placeholder": "Ange systemprompten"
+        }
+      },
+      "settings": {
+        "temperature": {
+          "label": "Temperatur"
+        },
+        "maxTokens": {
+          "label": "Max antal tokens"
+        },
+        "stopStrings": {
+          "label": "Stoppsträngar",
+          "placeholder": "En stoppsträng per rad"
+        }
+      },
+      "sampling": {
+        "topK": {
+          "label": "Top-k"
+        },
+        "topP": {
+          "label": "Top-p"
+        },
+        "presencePenalty": {
+          "label": "Närvarostraff"
+        },
+        "randomSeed": {
+          "label": "Slumpmässigt frö"
+        }
+      },
+      "structuredOutput": {
+        "jsonSchema": {
+          "label": "JSON-schema",
+          "labelWhenDisabled": "Inaktiverat",
+          "labelWhenEnabled": "Aktiverat",
+          "placeholder": "Ange JSON-schemat",
+          "invalidJsonMessage": "Ogiltig JSON"
+        }
+      },
+      "vendorSettings": {
+        "parallelToolCalls": {
+          "label": "Parallella verktygsanrop"
+        },
+        "backgroundResponse": {
+          "label": "Bakgrundssvar"
+        },
+        "usingPreviousId": {
+          "label": "Använd föregående ID"
+        },
+        "store": {
+          "label": "Spara"
+        }
+      }
+    }
+  },
+  "filesDrawer": {
+    "aria": {
+      "leftPanel": "Vänster sidopanel"
+    },
+    "actions": {
+      "openPanel": "Öppna panel",
+      "newSession": "Ny session",
+      "closePanel": "Stäng panel",
+      "nextPage": "Nästa sida",
+      "more": "Mer",
+      "rename": "Byt namn",
+      "delete": "Ta bort"
+    }
+  },
+  "scroll": {
+    "top": "Rulla till toppen",
+    "bottom": "Rulla till botten"
+  },
+  "selector": {
+    "branchAfterMessage": "Skapa en gren efter detta meddelande",
+    "copyMessage": "Kopiera meddelande",
+    "deleteMessage": "Ta bort meddelande"
+  },
+  "confirmation": {
+    "title": "Bekräftelse",
+    "question": "Bekräfta.",
+    "yes": "Ja",
+    "no": "Nej"
+  },
+  "inputString": {
+    "title": "Inmatning",
+    "message": "Ange ett värde.",
+    "ok": "OK",
+    "cancel": "Avbryt"
+  },
+  "webDecisionDlg": {
+    "title": "Bekräftelse",
+    "message": "Bekräfta.",
+    "ok": "OK",
+    "cancel": "Avbryt",
+    "close": "Stäng"
+  },
+  "displayFile": {
+    "fallbackName": "Fil {index}",
+    "badge": {
+      "pdf": "PDF",
+      "sheet": "XLS",
+      "doc": "DOC",
+      "slide": "PPT",
+      "text": "TXT",
+      "pascal": "PAS",
+      "code": "</>",
+      "file": "FIL"
+    },
+    "status": {
+      "file": "FIL"
+    },
+    "debug": {
+      "error": "DisplayFile-fel: {error}"
+    }
+  },
+  "displayImage": {
+    "action": {
+      "close": "Stäng"
+    },
+    "error": {
+      "unavailable": "Bilden är inte tillgänglig"
+    },
+    "alt": {
+      "imageIndex": "Bild {index}"
+    },
+    "debug": {
+      "error": "DisplayImages-fel: {error}"
+    }
+  },
+  "display": {
+    "reasoning": {
+      "title": "Resonemang"
+    },
+    "toolGroup": {
+      "label": "Använda verktyg"
+    },
+    "code": {
+      "copy": "Kopiera",
+      "copied": "Kopierat",
+      "copyToClipboard": "Kopiera till urklipp"
+    }
+  },
+  "errors": {
+    "aria": {
+      "systemMessages": "Systemmeddelanden"
+    },
+    "action": {
+      "close": "Stäng"
+    }
+  },
+  "promptFile": {
+    "debug": {
+      "error": "PromptFile-fel: {error}"
+    }
+  },
+  "displayVideo": {
+    "fallbackName": "Video {index}",
+    "fallbackNameWithExtension": "Video {index}.{ext}",
+    "action": {
+      "open": "Öppna",
+      "close": "Stäng"
+    },
+    "debug": {
+      "error": "DisplayVideo-fel: {error}"
+    }
+  },
+  "displayAudio": {
+    "fallbackName": "Ljud {index}",
+    "fallbackNameWithExtension": "Ljud {index}.{ext}",
+    "status": {
+      "stop": "Stoppa",
+      "loading": "Laddar",
+      "unavailable": "Inte tillgängligt",
+      "pause": "Paus",
+      "playing": "Spelar upp"
+    },
+    "debug": {
+      "error": "DisplayAudio-fel: {error}"
+    }
+  },
+  "modelSelector": {
+    "panel": {
+      "title": "Välj standardmodeller",
+      "aria": {
+        "dialog": "Välj standardmodeller"
+      }
+    },
+    "actions": {
+      "close": "Stäng"
+    },
+    "defaults": {
+      "title": "Standardmodell",
+      "empty": "Ingen standardmodell för denna kategori."
+    },
+    "status": {
+      "notAssigned": "Inte tilldelad",
+      "noDefaultModel": "Ingen standardmodell"
+    },
+    "categories": {
+      "allModels": {
+        "label": "Modellista"
+      },
+      "textGeneration": {
+        "label": "Textgenerering"
+      },
+      "imageCreation": {
+        "label": "Bildskapande"
+      },
+      "videoCreation": {
+        "label": "Videoskapande"
+      },
+      "audioCreation": {
+        "label": "Ljudskapande"
+      },
+      "textToSpeech": {
+        "label": "Text till tal"
+      },
+      "deepResearch": {
+        "label": "Djupgående sökning"
+      }
+    },
+    "features": {
+      "webResearch": "Webbsökning",
+      "thinking": "Resonemang",
+      "attachFiles": "Bifoga filer",
+      "vision": "Syn",
+      "createImage": "Skapa en bild",
+      "createVideo": "Skapa en video",
+      "createAudio": "Skapa ljud",
+      "speechToText": "Tal till text",
+      "textToSpeech": "Text till tal",
+      "deepResearch": "Djupgående sökning"
+    }
+  },
+  "cardSelector": {
+    "panel": {
+      "title": "Välj ett objekt",
+      "ariaLabel": "Välj ett objekt",
+      "selectDialogTitle": "{selectPrefix} {dialogLabel}"
+    },
+    "actions": {
+      "selectPrefix": "Välj",
+      "close": "Stäng",
+      "edit": "Redigera",
+      "settings": "Inställningar",
+      "cancel": "Avbryt",
+      "select": "Välj"
+    },
+    "messages": {
+      "empty": "Inga objekt tillgängliga.",
+      "noComment": ""
+    },
+    "dialogs": {
+      "function": {
+        "label": "Funktion"
+      },
+      "mcp": {
+        "label": "MCP"
+      },
+      "skills": {
+        "label": "Färdigheter"
+      },
+      "agents": {
+        "label": "Agenter"
+      },
+      "custom": {
+        "label": "Anpassad"
+      }
+    }
+  },
+  "prompt": {
+    "toggleCollapse": "Fäll ihop eller visa prompt",
+    "summary": {
+      "open": "Öppna promptsammanfattning",
+      "close": "Stäng promptsammanfattning"
+    }
+  },
+  "more": {
+    "delete_qa": "Bekräfta borttagningen av den aktuella frågan och svaret, samt alla följande poster.",
+    "delete_chat_session": "Är du säker? #10#10Denna åtgärd är oåterkallelig och kommer att ta bort alla meddelanden i denna konversation.",
+    "aborted": "Åtgärd avbruten...",
+    "aborted_operation": "Åtgärd avbruten",
+    "model_file_not_found": "%s: fil skapad. #10Öppna denna fil och ange listan över tillgängliga modeller.",
+    "batch_begin_error": "Det gick inte att aktivera batchvisning.",
+    "batch_end_error": "Det gick inte att frigöra batchvisning.",
+    "focus_error": "Inmatningsbubblan kunde inte ta emot fokus.",
+    "stop_audio_media_error": "Det gick inte att stoppa ljudmediet.",
+    "stop_video_media_error": "Det gick inte att stoppa videomediet.",
+    "internal_theme_error": "Det går inte att uppdatera sidans tema.",
+    "deserialization_error": "Deserialiseringsfel: ogiltig JSON-inmatning %s",
+    "welcome": "Välkommen till din arbetsyta",
+    "structured_output_error": "Den strukturerade utdatan är ogiltig: redigera dess värde i inställningarna.",
+    "card_json_file_not_found": "Ingen JSON-fil stöder %s",
+    "models_categories_count_error": "Definiera kategorier för standardmodeller",
+    "invalid_categories_file_error": "Ogiltig JSON-fil för kategorier",
+    "text_generation_cant_handled_error": "Ingen standardmodell: textgenerering kan inte bearbetas",
+    "image_creation_aborted_error": "Ingen standardmodell konfigurerad: bildskapande avbrutet",
+    "video_creation_aborted_error": "Ingen standardmodell konfigurerad: videoskapande avbrutet",
+    "audio_creation_aborted_error": "Ingen standardmodell konfigurerad: ljudskapande avbrutet",
+    "stt_operation_aborted_error": "Ingen standardmodell konfigurerad: STT-operation avbruten",
+    "tts_operation_aborted_error": "Ingen standardmodell konfigurerad: TTS-operation avbruten",
+    "deep_research_operation_aborted_error": "Ingen standardmodell konfigurerad: djupgående sökning avbruten",
+    "missing_default_models_error": "Standardmodeller saknas för vissa kategorier. #10 Kontrollera modellinställningarna",
+    "api_key_empty_name_error": "Nyckelnamnet får inte vara tomt.",
+    "api_key_enter_dialog_prompt": "Ange API-nyckelvärdet för %s",
+    "api_key_not_found": "%s: API-nyckel hittades inte",
+    "api_key_deleted": "%s: API-nyckeln har tagits bort",
+    "api_key_exists": "%s: API-nyckeln finns",
+    "api_key_modified": "%s: API-nyckeln har ändrats.",
+    "api_key_inserted": "%s: API-nyckeln har infogats",
+    "web_decision_dlg_title": "Bekräftelse",
+    "web_decision_dlg_message": "Bekräfta.",
+    "web_decision_dlg_ok": "OK",
+    "web_decision_dlg_cancel": "Avbryt",
+    "web_decision_dlg_close": "Stäng",
+    "demo_anthropic_tool_confirmation_title": "Bekräftelse",
+    "demo_anthropic_tool_allow": "Tillåt",
+    "demo_anthropic_tool_deny": "Neka",
+    "demo_anthropic_tool_allow_call": "Tillåt detta verktygsanrop?",
+    "demo_anthropic_interrupted_by_user": "Avbrutet av användaren.",
+    "command_plugin_not_be_null": "Plugin får inte vara null",
+    "command_unknown": "Okänt kommando: /%s",
+    "command_action_unknown": "Okänd åtgärd: /%s %s",
+    "command_missing_action": "Saknad åtgärd för /%s",
+    "command_incorrect_number_of_arguments": "Felaktigt antal argument för /%s %s (mottagna %d)",
+    "command_no_plugin_for": "Inget plugin för /%s"
+  }
+}

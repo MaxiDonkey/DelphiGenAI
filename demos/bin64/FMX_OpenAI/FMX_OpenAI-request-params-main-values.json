@@ -1,0 +1,31 @@
+﻿{
+    "type": "request-params-main-values",
+    "look": "dark",
+    "language": [
+        "china-cn",
+        "denmark-da",
+        "dutch-nl",
+        "english-gb",
+        "english-us",
+        "finland-fi",
+        "french-ca",
+        "french-fr",
+        "german-de",
+        "greece-gr",
+        "italian-it",
+        "japan-jp",
+        "korea-kr",
+        "norway-no",
+        "polish-pl",
+        "portugal-br",
+        "portugal-pt",
+        "spanish-es",
+        "spanish-mx",
+        "sweden-sv",
+        "taiwan-tw",
+        "turkey-tr",
+        "ukraine-ua"
+    ],
+    "selected": "english-us",
+    "scroll": true
+}

@@ -1,0 +1,466 @@
+﻿{
+  "lang": "nl-NL",
+  "input": {
+    "placeholder": {
+      "askQuestion": "Stel een vraag..."
+    },
+    "menu": {
+      "endpoint": "Eindpunt",
+      "webResearch": "Webonderzoek",
+      "thinking": "Redenering",
+      "attachFiles": "Bestanden bijvoegen",
+      "knowledgeSearch": "Kennisonderzoek",
+      "vision": "Visie",
+      "deepResearch": "Diepgaand onderzoek",
+      "integration": "Integratie",
+      "media": "Media",
+      "custom": "Aangepast",
+      "settings": "Instellingen",
+      "model": "Model",
+      "project": "Project"
+    },
+    "thinking": {
+      "low": "Laag",
+      "medium": "Gemiddeld",
+      "high": "Hoog"
+    },
+    "endpoint": {
+      "chatCompletion": "v1/chat/completions",
+      "chatResponse": "v1/chat/responses",
+      "message": "v1/message",
+      "generateContent": ":generateContent",
+      "interactions": "v1/interactions",
+      "conversation": "v1/conversation",
+      "provider": {
+        "chatCompletion": "OpenAI, DeepSeek, MistralAI",
+        "chatResponse": "OpenAI",
+        "message": "Claude",
+        "generateContent": "Gemini",
+        "interactions": "Gemini",
+        "conversation": "MistralAI"
+      }
+    },
+    "integration": {
+      "function": "Functie",
+      "mcp": "MCP",
+      "jsCodeSandbox": "JS-sandbox",
+      "skills": "Vaardigheden",
+      "agents": "Agenten"
+    },
+    "media": {
+      "createImage": "Een afbeelding maken",
+      "createVideo": "Een video maken",
+      "createAudio": "Audio maken",
+      "speechToText": "Spraak naar tekst",
+      "textToSpeech": "Tekst naar spraak"
+    },
+    "project": {
+      "add": "Project toevoegen",
+      "none": "geen",
+      "noneUsed": "Geen project gebruikt",
+      "delete": "Verwijderen"
+    },
+    "chips": {
+      "endpoint": "Eindpunt: {title}",
+      "webResearch": "Webonderzoek",
+      "thinking": "Redenering: {title}",
+      "knowledgeSearch": "Kennisonderzoek ({count})",
+      "deepResearch": "Diepgaand onderzoek",
+      "filesAttached": "Bijgevoegde bestanden ({count})",
+      "vision": "Visie ({count})",
+      "integrationFunction": "Integratie: Functie ({count})",
+      "integrationMcp": "Integratie: MCP ({count})",
+      "integrationJsCodeSandbox": "Integratie: JS-sandbox ({count})",
+      "integrationSkills": "Integratie: Vaardigheden ({count})",
+      "integrationAgents": "Integratie: Agenten ({count})",
+      "mediaCreateImage": "Media: Een afbeelding maken",
+      "mediaCreateVideo": "Media: Een video maken",
+      "mediaCreateAudio": "Media: Audio maken",
+      "speechToText": "Spraak naar tekst ({count})",
+      "mediaTextToSpeech": "Media: Tekst naar spraak",
+      "custom": "Aangepast ({count})"
+    }
+  },
+  "requestParams": {
+    "panel": {
+      "title": "Instellingen",
+      "close": "Sluiten",
+      "theme": {
+        "light": "Licht",
+        "dark": "Donker"
+      }
+    },
+    "summary": {
+      "alwaysAvailable": "Altijd beschikbaar",
+      "enabled": "Ingeschakeld",
+      "disabled": "Uitgeschakeld",
+      "enabledDisabled": "{enabled} ingeschakeld / {disabled} uitgeschakeld"
+    },
+    "categories": {
+      "appSettings": {
+        "title": "Applicatie-instellingen",
+        "subtitle": "Algemeen",
+        "panelSubtitle": ""
+      },
+      "systemPrompt": {
+        "title": "Systeemprompt"
+      },
+      "settings": {
+        "title": "Algemene instellingen"
+      },
+      "sampling": {
+        "title": "Sampling"
+      },
+      "structuredOutput": {
+        "title": "Gestructureerde uitvoer"
+      },
+      "vendorSettings": {
+        "title": "Leveranciersopties"
+      }
+    },
+    "items": {
+      "appSettings": {
+        "lookAndFeel": {
+          "label": "Uiterlijk"
+        },
+        "language": {
+          "label": "Taal",
+          "placeholder": "Selecteer een taal"
+        },
+        "scrollButtons": {
+          "label": "Scrollknoppen"
+        }
+      },
+      "systemPrompt": {
+        "systemPrompt": {
+          "label": "Systeemprompt",
+          "labelWhenDisabled": "Uitgeschakeld",
+          "labelWhenEnabled": "Ingeschakeld",
+          "placeholder": "Voer de systeemprompt in"
+        }
+      },
+      "settings": {
+        "temperature": {
+          "label": "Temperatuur"
+        },
+        "maxTokens": {
+          "label": "Max. tokens"
+        },
+        "stopStrings": {
+          "label": "Stopreeksen",
+          "placeholder": "Eén stopreeks per regel"
+        }
+      },
+      "sampling": {
+        "topK": {
+          "label": "Top-k"
+        },
+        "topP": {
+          "label": "Top-p"
+        },
+        "presencePenalty": {
+          "label": "Aanwezigheidsstraf"
+        },
+        "randomSeed": {
+          "label": "Willekeurige seed"
+        }
+      },
+      "structuredOutput": {
+        "jsonSchema": {
+          "label": "JSON-schema",
+          "labelWhenDisabled": "Uitgeschakeld",
+          "labelWhenEnabled": "Ingeschakeld",
+          "placeholder": "Voer het JSON-schema in",
+          "invalidJsonMessage": "Ongeldige JSON"
+        }
+      },
+      "vendorSettings": {
+        "parallelToolCalls": {
+          "label": "Parallelle tool-aanroepen"
+        },
+        "backgroundResponse": {
+          "label": "Achtergrondantwoord"
+        },
+        "usingPreviousId": {
+          "label": "Vorige ID gebruiken"
+        },
+        "store": {
+          "label": "Opslaan"
+        }
+      }
+    }
+  },
+  "filesDrawer": {
+    "aria": {
+      "leftPanel": "Linkerzijpaneel"
+    },
+    "actions": {
+      "openPanel": "Paneel openen",
+      "newSession": "Nieuwe sessie",
+      "closePanel": "Paneel sluiten",
+      "nextPage": "Volgende pagina",
+      "more": "Meer",
+      "rename": "Naam wijzigen",
+      "delete": "Verwijderen"
+    }
+  },
+  "scroll": {
+    "top": "Naar boven scrollen",
+    "bottom": "Naar beneden scrollen"
+  },
+  "selector": {
+    "branchAfterMessage": "Maak een vertakking na dit bericht",
+    "copyMessage": "Bericht kopiëren",
+    "deleteMessage": "Bericht verwijderen"
+  },
+  "confirmation": {
+    "title": "Bevestiging",
+    "question": "Bevestig dit.",
+    "yes": "Ja",
+    "no": "Nee"
+  },
+  "inputString": {
+    "title": "Invoer",
+    "message": "Voer een waarde in.",
+    "ok": "OK",
+    "cancel": "Annuleren"
+  },
+  "webDecisionDlg": {
+    "title": "Bevestiging",
+    "message": "Bevestig dit.",
+    "ok": "OK",
+    "cancel": "Annuleren",
+    "close": "Sluiten"
+  },
+  "displayFile": {
+    "fallbackName": "Bestand {index}",
+    "badge": {
+      "pdf": "PDF",
+      "sheet": "XLS",
+      "doc": "DOC",
+      "slide": "PPT",
+      "text": "TXT",
+      "pascal": "PAS",
+      "code": "</>",
+      "file": "BESTAND"
+    },
+    "status": {
+      "file": "BESTAND"
+    },
+    "debug": {
+      "error": "DisplayFile-fout: {error}"
+    }
+  },
+  "displayImage": {
+    "action": {
+      "close": "Sluiten"
+    },
+    "error": {
+      "unavailable": "Afbeelding niet beschikbaar"
+    },
+    "alt": {
+      "imageIndex": "Afbeelding {index}"
+    },
+    "debug": {
+      "error": "DisplayImages-fout: {error}"
+    }
+  },
+  "display": {
+    "reasoning": {
+      "title": "Redenering"
+    },
+    "toolGroup": {
+      "label": "Gebruikte tools"
+    },
+    "code": {
+      "copy": "Kopiëren",
+      "copied": "Gekopieerd",
+      "copyToClipboard": "Naar klembord kopiëren"
+    }
+  },
+  "errors": {
+    "aria": {
+      "systemMessages": "Systeemberichten"
+    },
+    "action": {
+      "close": "Sluiten"
+    }
+  },
+  "promptFile": {
+    "debug": {
+      "error": "PromptFile-fout: {error}"
+    }
+  },
+  "displayVideo": {
+    "fallbackName": "Video {index}",
+    "fallbackNameWithExtension": "Video {index}.{ext}",
+    "action": {
+      "open": "Openen",
+      "close": "Sluiten"
+    },
+    "debug": {
+      "error": "DisplayVideo-fout: {error}"
+    }
+  },
+  "displayAudio": {
+    "fallbackName": "Audio {index}",
+    "fallbackNameWithExtension": "Audio {index}.{ext}",
+    "status": {
+      "stop": "Stoppen",
+      "loading": "Laden",
+      "unavailable": "Niet beschikbaar",
+      "pause": "Pauze",
+      "playing": "Afspelen"
+    },
+    "debug": {
+      "error": "DisplayAudio-fout: {error}"
+    }
+  },
+  "modelSelector": {
+    "panel": {
+      "title": "Standaardmodellen selecteren",
+      "aria": {
+        "dialog": "Standaardmodellen selecteren"
+      }
+    },
+    "actions": {
+      "close": "Sluiten"
+    },
+    "defaults": {
+      "title": "Standaardmodel",
+      "empty": "Geen standaardmodel voor deze categorie."
+    },
+    "status": {
+      "notAssigned": "Niet toegewezen",
+      "noDefaultModel": "Geen standaardmodel"
+    },
+    "categories": {
+      "allModels": {
+        "label": "Modellenlijst"
+      },
+      "textGeneration": {
+        "label": "Tekstgeneratie"
+      },
+      "imageCreation": {
+        "label": "Afbeelding maken"
+      },
+      "videoCreation": {
+        "label": "Video maken"
+      },
+      "audioCreation": {
+        "label": "Audio maken"
+      },
+      "textToSpeech": {
+        "label": "Tekst naar spraak"
+      },
+      "deepResearch": {
+        "label": "Diepgaand onderzoek"
+      }
+    },
+    "features": {
+      "webResearch": "Webonderzoek",
+      "thinking": "Redenering",
+      "attachFiles": "Bestanden bijvoegen",
+      "vision": "Visie",
+      "createImage": "Een afbeelding maken",
+      "createVideo": "Een video maken",
+      "createAudio": "Audio maken",
+      "speechToText": "Spraak naar tekst",
+      "textToSpeech": "Tekst naar spraak",
+      "deepResearch": "Diepgaand onderzoek"
+    }
+  },
+  "cardSelector": {
+    "panel": {
+      "title": "Een item selecteren",
+      "ariaLabel": "Een item selecteren",
+      "selectDialogTitle": "{selectPrefix} {dialogLabel}"
+    },
+    "actions": {
+      "selectPrefix": "Selecteren",
+      "close": "Sluiten",
+      "edit": "Bewerken",
+      "settings": "Instellingen",
+      "cancel": "Annuleren",
+      "select": "Selecteren"
+    },
+    "messages": {
+      "empty": "Geen items beschikbaar.",
+      "noComment": ""
+    },
+    "dialogs": {
+      "function": {
+        "label": "Functie"
+      },
+      "mcp": {
+        "label": "MCP"
+      },
+      "skills": {
+        "label": "Vaardigheden"
+      },
+      "agents": {
+        "label": "Agenten"
+      },
+      "custom": {
+        "label": "Aangepast"
+      }
+    }
+  },
+  "prompt": {
+    "toggleCollapse": "Prompt samenvouwen of uitvouwen",
+    "summary": {
+      "open": "Promptsamenvatting openen",
+      "close": "Promptsamenvatting sluiten"
+    }
+  },
+  "more": {
+    "delete_qa": "Bevestig de verwijdering van de huidige vraag en het huidige antwoord, evenals alle volgende items.",
+    "delete_chat_session": "Weet u het zeker? #10#10Deze actie is onomkeerbaar en verwijdert alle berichten in dit gesprek.",
+    "aborted": "Bewerking afgebroken...",
+    "aborted_operation": "Bewerking afgebroken",
+    "model_file_not_found": "%s: bestand aangemaakt. #10Open dit bestand en geef de lijst met beschikbare modellen op.",
+    "batch_begin_error": "Kan batchweergave niet inschakelen.",
+    "batch_end_error": "Kan batchweergave niet vrijgeven.",
+    "focus_error": "De invoerbel kon geen focus ontvangen.",
+    "stop_audio_media_error": "Kan audiomedia niet stoppen.",
+    "stop_video_media_error": "Kan videomedia niet stoppen.",
+    "internal_theme_error": "Kan paginathema niet bijwerken.",
+    "deserialization_error": "Deserialisatiefout: ongeldige JSON-invoer %s",
+    "welcome": "Welkom in uw werkruimte",
+    "structured_output_error": "De gestructureerde uitvoer is ongeldig: bewerk de waarde in de instellingen.",
+    "card_json_file_not_found": "Geen JSON-bestand ondersteunt %s",
+    "models_categories_count_error": "Definieer categorieën voor standaardmodellen",
+    "invalid_categories_file_error": "Ongeldig JSON-bestand voor categorieën",
+    "text_generation_cant_handled_error": "Geen standaardmodel: tekstgeneratie kan niet worden verwerkt",
+    "image_creation_aborted_error": "Geen standaardmodel geconfigureerd: afbeelding maken afgebroken",
+    "video_creation_aborted_error": "Geen standaardmodel geconfigureerd: video maken afgebroken",
+    "audio_creation_aborted_error": "Geen standaardmodel geconfigureerd: audio maken afgebroken",
+    "stt_operation_aborted_error": "Geen standaardmodel geconfigureerd: STT-bewerking afgebroken",
+    "tts_operation_aborted_error": "Geen standaardmodel geconfigureerd: TTS-bewerking afgebroken",
+    "deep_research_operation_aborted_error": "Geen standaardmodel geconfigureerd: diepgaand onderzoek afgebroken",
+    "missing_default_models_error": "Ontbrekende standaardmodellen voor sommige categorieën. #10 Controleer de modelinstellingen",
+    "api_key_empty_name_error": "De sleutelnaam mag niet leeg zijn.",
+    "api_key_enter_dialog_prompt": "Voer de API-sleutelwaarde in voor %s",
+    "api_key_not_found": "%s: API-sleutel niet gevonden",
+    "api_key_deleted": "%s: API-sleutel is verwijderd",
+    "api_key_exists": "%s: API-sleutel bestaat",
+    "api_key_modified": "%s: API-sleutel is gewijzigd.",
+    "api_key_inserted": "%s: API-sleutel is ingevoegd",
+    "web_decision_dlg_title": "Bevestiging",
+    "web_decision_dlg_message": "Bevestig dit.",
+    "web_decision_dlg_ok": "OK",
+    "web_decision_dlg_cancel": "Annuleren",
+    "web_decision_dlg_close": "Sluiten",
+    "demo_anthropic_tool_confirmation_title": "Bevestiging",
+    "demo_anthropic_tool_allow": "Toestaan",
+    "demo_anthropic_tool_deny": "Weigeren",
+    "demo_anthropic_tool_allow_call": "Deze tool-aanroep toestaan?",
+    "demo_anthropic_interrupted_by_user": "Onderbroken door de gebruiker.",
+    "command_plugin_not_be_null": "Plug-in mag niet null zijn",
+    "command_unknown": "Onbekend commando: /%s",
+    "command_action_unknown": "Onbekende actie: /%s %s",
+    "command_missing_action": "Ontbrekende actie voor /%s",
+    "command_incorrect_number_of_arguments": "Onjuist aantal argumenten voor /%s %s (ontvangen %d)",
+    "command_no_plugin_for": "Geen plug-in voor /%s"
+  }
+}

@@ -1,4 +1,4 @@
-unit GenAI.Responses;
+Ôªøunit GenAI.Responses;
 
 {-------------------------------------------------------------------------------
 
@@ -14,18 +14,52 @@ uses
   GenAI.API.Params, GenAI.API, GenAI.Types,
   GenAI.Async.Params, GenAI.Async.Support, GenAI.Async.Promise, GenAI.Chat.Parallel,
   GenAI.Responses.InputParams, GenAI.Responses.InputItemList, GenAI.Responses.OutputParams,
-  GenAI.Responses.Internal;
+  GenAI.Responses.Internal, GenAI.Responses.StreamCallbacks, GenAI.Responses.StreamEngine;
 
 type
-  /// <summary>
-  /// Provides methods to create, retrieve, delete, and list AI responses.
-  /// </summary>
-  /// <remarks>
-  /// TResponsesRoute is a subclass of TGenAIRoute and implements both synchronous and asynchronous
-  /// operations for interacting with the ìresponsesî endpoint of the API. It also supports
-  /// overloads that allow additional parameter configuration.
-  /// </remarks>
-  TResponsesRoute = class(TInternalResponseRoute)
+  TResponsesAbstractSupport = class(TGenAIRoute)
+  protected
+    function Create(ParamProc: TProc<TResponsesParams>): TResponse; virtual; abstract;
+    function Compact(ParamProc: TProc<TResponseCompactParams>): TResponseCompaction; virtual; abstract;
+    function CreateStream(ParamProc: TProc<TResponsesParams>; Event: TResponseEvent;
+      const StreamEvents: IResponsesEventEngineManager = nil): Boolean; virtual; abstract;
+    function Retrieve(const ResponseId: string): TResponse; overload; virtual; abstract;
+    function Retrieve(const ResponseId: string; const ParamProc: TProc<TURLIncludeParams>): TResponse; overload; virtual; abstract;
+    function Delete(const ResponseId: string): TResponseDelete; virtual; abstract;
+    function List(const ResponseId: string): TResponses; overload; virtual; abstract;
+    function List(const ResponseId: string; const ParamProc: TProc<TUrlResponseListParams>): TResponses; overload; virtual; abstract;
+    function Cancel(const ResponseId: string): TResponse; virtual; abstract;
+    procedure CreateParallel(ParamProc: TProc<TBundleParams>; const CallBacks: TFunc<TAsynBundleList>); virtual; abstract;
+  end;
+
+  TResponsesAsynchronousSupport = class(TResponsesAbstractSupport)
+  public
+    procedure AsynCreate(const ParamProc: TProc<TResponsesParams>;
+      const CallBacks: TFunc<TAsynResponse>);
+    procedure AsynCompact(const ParamProc: TProc<TResponseCompactParams>;
+      const CallBacks: TFunc<TAsynResponseCompaction>);
+    procedure AsynCreateStream(const ParamProc: TProc<TResponsesParams>;
+      const CallBacks: TFunc<TAsynResponseStream>); overload;
+    procedure AsynCreateStream(const ParamProc: TProc<TResponsesParams>;
+      const CallBacks: TFunc<TAsynResponseStream>;
+      const StreamEvents: IResponsesEventEngineManager); overload;
+    procedure AsynRetrieve(const ResponseId: string;
+      const CallBacks: TFunc<TAsynResponse>); overload;
+    procedure AsynRetrieve(const ResponseId: string;
+      const ParamProc: TProc<TURLIncludeParams>;
+      const CallBacks: TFunc<TAsynResponse>); overload;
+    procedure AsynDelete(const ResponseId: string;
+      const CallBacks: TFunc<TAsynResponseDelete>);
+    procedure AsynList(const ResponseId: string;
+      const CallBacks: TFunc<TAsynResponses>); overload;
+    procedure AsynList(const ResponseId: string;
+      const ParamProc: TProc<TUrlResponseListParams>;
+      const CallBacks: TFunc<TAsynResponses>); overload;
+    procedure AsynCancel(const ResponseId: string;
+      const CallBacks: TFunc<TAsynResponse>);
+  end;
+
+  TResponsesRoute = class(TResponsesAsynchronousSupport)
   public
     /// <summary>
     /// Asynchronously creates an AI response and returns a promise that resolves
@@ -57,7 +91,13 @@ type
       const CallBacks: TFunc<TPromiseResponse> = nil): TPromise<TResponse>;
 
     /// <summary>
-    /// Asynchronously creates a streaming AI response using the ìresponsesî endpoint and returns a promise
+    /// Asynchronously compacts a Responses API context.
+    /// </summary>
+    function AsyncAwaitCompact(const ParamProc: TProc<TResponseCompactParams>;
+      const CallBacks: TFunc<TPromiseResponseCompaction> = nil): TPromise<TResponseCompaction>;
+
+    /// <summary>
+    /// Asynchronously creates a streaming AI response using the ‚Äúresponses‚Äù endpoint and returns a promise
     /// that resolves with the completed stream event or rejects on error.
     /// </summary>
     /// <param name="ParamProc">
@@ -82,7 +122,54 @@ type
     /// OnProgress callbacks, and the promise itself settles only once the stream completes or fails.
     /// </remarks>
     function AsyncAwaitCreateStream(const ParamProc: TProc<TResponsesParams>;
-      const CallBacks: TFunc<TPromiseResponseStream>): TPromise<TResponseStream>;
+      const CallBacks: TFunc<TPromiseResponseStream>): TPromise<TResponseStream>; overload;
+
+    /// <summary>
+    /// Asynchronously creates a streaming AI response and resolves with the aggregated
+    /// <see cref="TResponsesEventData"/> buffer once the stream completes.
+    /// </summary>
+    /// <param name="ParamProc">
+    /// A procedure that configures the streaming request parameters via a <see cref="TResponsesParams"/> instance.
+    /// </param>
+    /// <param name="Callbacks">
+    /// A function returning a <see cref="TPromiseResponseStream"/> used to observe the stream lifecycle
+    /// (start, progress, error, cancellation) while the aggregated result is returned through the promise.
+    /// </param>
+    /// <param name="StreamEvents">
+    /// The event engine manager that aggregates and dispatches the fine-grained streaming events to the
+    /// per-event callbacks registered on its dispatcher.
+    /// </param>
+    /// <returns>
+    /// A <see cref="TPromise{TResponsesEventData}"/> that resolves with the aggregated buffer when the
+    /// stream completes, or rejects on error or cancellation.
+    /// </returns>
+    /// <remarks>
+    /// This is the primary integration entry point: it mirrors the Anthropic
+    /// <c>AsyncAwaitCreateStream(ParamProc, Callbacks, StreamEvents)</c> method. The buffer is aggregated
+    /// in <c>OnProgress</c> and resolved in <c>OnSuccess</c>, while <c>StreamEvents</c> drives the granular
+    /// per-event callbacks in the same order as the stream.
+    /// </remarks>
+    function AsyncAwaitCreateStream(const ParamProc: TProc<TResponsesParams>;
+      const Callbacks: TFunc<TPromiseResponseStream>;
+      const StreamEvents: IResponsesEventEngineManager): TPromise<TResponsesEventData>; overload;
+
+    /// <summary>
+    /// Asynchronously creates a streaming AI response driven by an event engine manager and resolves with
+    /// the aggregated <see cref="TResponsesEventData"/> buffer once the stream completes.
+    /// </summary>
+    /// <param name="ParamProc">
+    /// A procedure that configures the streaming request parameters via a <see cref="TResponsesParams"/> instance.
+    /// </param>
+    /// <param name="StreamEvents">
+    /// The event engine manager that aggregates and dispatches the fine-grained streaming events to the
+    /// per-event callbacks registered on its dispatcher.
+    /// </param>
+    /// <returns>
+    /// A <see cref="TPromise{TResponsesEventData}"/> that resolves with the aggregated buffer when the
+    /// stream completes, or rejects on error or cancellation.
+    /// </returns>
+    function AsyncAwaitCreateStream(const ParamProc: TProc<TResponsesParams>;
+      const StreamEvents: IResponsesEventEngineManager): TPromise<TResponsesEventData>; overload;
 
     /// <summary>
     /// Asynchronously creates multiple AI responses in parallel, returning a promise that resolves when all responses are completed.
@@ -334,7 +421,7 @@ type
     /// </returns>
     /// <remarks>
     /// <para>
-    /// This overload allows specifying URL query parametersósuch as pagination limits and orderingówhen fetching the input items
+    /// This overload allows specifying URL query parameters‚Äîsuch as pagination limits and ordering‚Äîwhen fetching the input items
     /// associated with the given AI response. Use <paramref name="ParamProc"/> to indicate which subset of items or which additional fields to include.
     /// </para>
     /// <para>
@@ -405,6 +492,11 @@ type
     function Create(ParamProc: TProc<TResponsesParams>): TResponse; override;
 
     /// <summary>
+    /// Compacts a Responses API context and returns the opaque items to replay.
+    /// </summary>
+    function Compact(ParamProc: TProc<TResponseCompactParams>): TResponseCompaction; override;
+
+    /// <summary>
     /// Synchronously creates a streaming AI response.
     /// </summary>
     /// <param name="ParamProc">
@@ -441,7 +533,8 @@ type
     /// end;
     /// </code>
     /// </remarks>
-    function CreateStream(ParamProc: TProc<TResponsesParams>; Event: TResponseEvent): Boolean; override;
+    function CreateStream(ParamProc: TProc<TResponsesParams>; Event: TResponseEvent;
+      const StreamEvents: IResponsesEventEngineManager = nil): Boolean; override;
 
     /// <summary>
     /// Synchronously retrieves an AI response by its ID.
@@ -468,7 +561,7 @@ type
     /// end;
     /// </code>
     /// </remarks>
-    function Retrieve(const ResponseId: string): TResponse; overload;
+    function Retrieve(const ResponseId: string): TResponse; overload; override;
 
     /// <summary>
     /// Synchronously retrieves an AI response by its ID with additional URL parameters.
@@ -503,7 +596,7 @@ type
     /// </code>
     /// </remarks>
     function Retrieve(const ResponseId: string;
-      const ParamProc: TProc<TURLIncludeParams>): TResponse; overload;
+      const ParamProc: TProc<TURLIncludeParams>): TResponse; overload; override;
 
     /// <summary>
     /// Synchronously deletes an AI response by its ID.
@@ -530,7 +623,7 @@ type
     /// end;
     /// </code>
     /// </remarks>
-    function Delete(const ResponseId: string): TResponseDelete;
+    function Delete(const ResponseId: string): TResponseDelete; override;
 
     /// <summary>
     /// Synchronously lists input items used to generate a specific AI response.
@@ -557,7 +650,7 @@ type
     /// end;
     /// </code>
     /// </remarks>
-    function List(const ResponseId: string): TResponses; overload;
+    function List(const ResponseId: string): TResponses; overload; override;
 
     /// <summary>
     /// Synchronously lists input items used to generate a specific AI response with additional URL parameters.
@@ -592,7 +685,7 @@ type
     /// </code>
     /// </remarks>
     function List(const ResponseId: string;
-      const ParamProc: TProc<TUrlResponseListParams>): TResponses; overload;
+      const ParamProc: TProc<TUrlResponseListParams>): TResponses; overload; override;
 
     /// <summary>
     /// Synchronously requests the cancellation of a background AI response and returns the updated response object.
@@ -602,7 +695,7 @@ type
     /// <c>background = true</c> are eligible for cancellation.
     /// </param>
     /// <returns>
-    /// A <see cref="TResponse"/> instance containing the serverís acknowledgement and the updated state
+    /// A <see cref="TResponse"/> instance containing the server‚Äôs acknowledgement and the updated state
     /// of the cancelled response.
     /// </returns>
     /// <remarks>
@@ -610,7 +703,7 @@ type
     /// If the response has already completed or is not eligible for cancellation, an exception will be raised
     /// with the error returned by the server.
     /// </remarks>
-    function Cancel(const ResponseId: string): TResponse;
+    function Cancel(const ResponseId: string): TResponse; override;
 
     /// <summary>
     /// Initiates parallel processing of "responses" prompts by creating multiple "responses"
@@ -633,256 +726,13 @@ type
     /// If an error occurs, the error handling callback will be triggered, and the rest of the tasks
     /// will continue processing. The success callback is triggered once all tasks are completed.
     /// </remarks>
-    procedure CreateParallel(ParamProc: TProc<TBundleParams>; const CallBacks: TFunc<TAsynBundleList>);   /// <summary>
-    /// Asynchronously creates a new AI response.
-    /// </summary>
-    /// <param name="ParamProc">
-    /// A procedure to configure the request parameters using a TResponsesParams instance.
-    /// </param>
-    /// <param name="CallBacks">
-    /// A callback function that returns a TAsynResponse instance, used to handle start, success, and error events.
-    /// </param>
-    /// <remarks>
-    /// Sends a non-blocking request to create an AI response.
-    ///
-    /// <code>
-    /// Client.Responses.AsynCreate(
-    ///   procedure (Params: TResponsesParams)
-    ///   begin
-    ///     Params.Model('gpt-4.1-mini');
-    ///     Params.Input('What is the difference between a mathematician and a physicist?');
-    ///   end,
-    ///   function : TAsynResponse
-    ///   begin
-    ///     Result.Sender := Self;
-    ///     Result.OnStart := procedure(Sender: TObject)
-    ///       begin
-    ///         // Initialization code
-    ///       end;
-    ///     Result.OnSuccess := procedure(Sender: TObject; Value: TResponse)
-    ///       begin
-    ///         // Process the created response
-    ///       end;
-    ///     Result.OnError := procedure(Sender: TObject; const ErrorMsg: string)
-    ///       begin
-    ///         // Handle any errors
-    ///       end;
-    ///   end);
-    /// </code>
-    /// </remarks>
-    procedure AsynCreate(const ParamProc: TProc<TResponsesParams>;
-      const CallBacks: TFunc<TAsynResponse>);
-
-    /// <summary>
-    /// Asynchronously creates a streamed AI response.
-    /// </summary>
-    /// <param name="ParamProc">
-    /// A procedure to configure the request parameters using a TResponsesParams instance.
-    /// </param>
-    /// <param name="Event">
-    /// A callback of type TResponseEvent that is invoked repeatedly as streaming data is received.
-    /// </param>
-    /// <returns>
-    /// True if the streaming response request was successfully initiated.
-    /// </returns>
-    /// <remarks>
-    /// Initiates a streaming request to receive incremental output from the AI.
-    ///
-    /// <code>
-    ///   Client.Responses.AsynCreateStream(
-    ///      procedure (Params: TResponsesParams)
-    ///      begin
-    ///        Params.Model('gpt-4.1-mini');
-    ///        Params.Input('What is the difference between a mathematician and a physicist?');
-    ///        Params.Stream;
-    ///      end,
-    ///      function : TAsynResponseStream
-    ///      begin
-    ///        Result.Sender := Self;
-    ///        Result.OnStart := StartCallback;
-    ///        Result.OnProgress := ProgressCallback;
-    ///        Result.OnError := ErrorCallback;
-    ///        Result.OnDoCancel := CancelCallback;
-    ///        Result.OnCancellation := CancellationCallback;
-    ///      end)
-    /// </code>
-    /// </remarks>
-    procedure AsynCreateStream(const ParamProc: TProc<TResponsesParams>;
-      const CallBacks: TFunc<TAsynResponseStream>);
-
-    /// <summary>
-    /// Asynchronously retrieves an AI response identified by its ID.
-    /// </summary>
-    /// <param name="ResponseId">
-    /// The unique identifier of the response to retrieve.
-    /// </param>
-    /// <param name="CallBacks">
-    /// A callback function that returns a TAsynResponse instance to handle the retrieval process.
-    /// </param>
-    /// <remarks>
-    /// Retrieves the specified response asynchronously.
-    ///
-    /// <code>
-    /// Client.Responses.AsynRetrieve('response_id_here',
-    ///   function : TAsynResponse
-    ///   begin
-    ///     Result.Sender := Self;
-    ///     Result.OnStart := StartCallback;
-    ///     Result.OnSuccess := SuccessCallback;
-    ///     Result.OnError := ErrorCallback;
-    ///   end);
-    /// </code>
-    /// </remarks>
-    procedure AsynRetrieve(const ResponseId: string;
-      const CallBacks: TFunc<TAsynResponse>); overload;
-
-    /// <summary>
-    /// Asynchronously retrieves an AI response by its ID with additional URL parameters.
-    /// </summary>
-    /// <param name="ResponseId">
-    /// The unique identifier of the response to retrieve.
-    /// </param>
-    /// <param name="ParamProc">
-    /// A procedure to configure additional URL parameters using a TURLIncludeParams instance.
-    /// </param>
-    /// <param name="CallBacks">
-    /// A callback function that returns a TAsynResponse instance to handle the retrieval process.
-    /// </param>
-    /// <remarks>
-    /// Retrieves the specified response asynchronously with extra URL configuration.
-    ///
-    /// <code>
-    /// Client.Responses.AsynRetrieve('response_id_here',
-    ///   procedure(Params: TURLIncludeParams)
-    ///   begin
-    ///     Params.Include(['file_search_result', 'input_image_url']);
-    ///   end,
-    ///   function : TAsynResponse
-    ///   begin
-    ///     Result.Sender := Self;
-    ///     Result.OnStart := StartCallback;
-    ///     Result.OnSuccess := SuccessCallback;
-    ///     Result.OnError := ErrorCallback;
-    ///   end);
-    /// </code>
-    /// </remarks>
-    procedure AsynRetrieve(const ResponseId: string;
-      const ParamProc: TProc<TURLIncludeParams>;
-      const CallBacks: TFunc<TAsynResponse>); overload;
-
-    /// <summary>
-    /// Asynchronously deletes an AI response identified by its ID.
-    /// </summary>
-    /// <param name="ResponseId">
-    /// The unique identifier of the response to delete.
-    /// </param>
-    /// <param name="CallBacks">
-    /// A callback function that returns a TAsynResponseDelete instance to handle deletion events.
-    /// </param>
-    /// <remarks>
-    /// Sends a non-blocking deletion request for the specified response.
-    ///
-    /// <code>
-    /// Client.Responses.AsynDelete('response_id_here',
-    ///   function : TAsynResponseDelete
-    ///   begin
-    ///     Result.Sender := Self;
-    ///     Result.OnStart := StartCallback;
-    ///     Result.OnSuccess := SuccessCallback;
-    ///     Result.OnError := ErrorCallback;
-    ///   end);
-    /// </code>
-    /// </remarks>
-    procedure AsynDelete(const ResponseId: string;
-      const CallBacks: TFunc<TAsynResponseDelete>);
-
-    /// <summary>
-    /// Asynchronously lists the input items used to generate a specific AI response.
-    /// </summary>
-    /// <param name="ResponseId">
-    /// The unique identifier of the response.
-    /// </param>
-    /// <param name="CallBacks">
-    /// A callback function that returns a TAsynResponses instance to handle the listing process.
-    /// </param>
-    /// <remarks>
-    /// Retrieves the input items associated with the given response asynchronously.
-    ///
-    /// <code>
-    /// Client.Responses.AsynList('response_id_here',
-    ///   function : TAsynResponses
-    ///   begin
-    ///     Result.Sender := Self;
-    ///     Result.OnStart := StartCallback;
-    ///     Result.OnSuccess := SuccessCallback;
-    ///     Result.OnError := ErrorCallback;
-    ///   end);
-    /// </code>
-    /// </remarks>
-    procedure AsynList(const ResponseId: string;
-      const CallBacks: TFunc<TAsynResponses>); overload;
-
-    /// <summary>
-    /// Asynchronously lists the input items used to generate a specific AI response with additional URL parameters.
-    /// </summary>
-    /// <param name="ResponseId">
-    /// The unique identifier of the response.
-    /// </param>
-    /// <param name="ParamProc">
-    /// A procedure to configure additional URL parameters using a TUrlResponseListParams instance.
-    /// </param>
-    /// <param name="CallBacks">
-    /// A callback function that returns a TAsynResponses instance to handle the listing process.
-    /// </param>
-    /// <remarks>
-    /// Retrieves the list of input items asynchronously with extra configuration.
-    ///
-    /// <code>
-    /// Client.Responses.AsynList('response_id_here',
-    ///   procedure (Params: TUrlResponseListParams)
-    ///   begin
-    ///     Params.Limit(15);
-    ///   end,
-    ///   function : TAsynResponses
-    ///   begin
-    ///     Result.Sender := Self;
-    ///     Result.OnStart := StartCallback;
-    ///     Result.OnSuccess := SuccessCallback;
-    ///     Result.OnError := ErrorCallback;
-    ///   end);
-    /// </code>
-    /// </remarks>
-    procedure AsynList(const ResponseId: string;
-      const ParamProc: TProc<TUrlResponseListParams>;
-      const CallBacks: TFunc<TAsynResponses>); overload;
-
-    /// <summary>
-    /// Asynchronously requests the cancellation of a background AI response using a callback-based pattern.
-    /// </summary>
-    /// <param name="ResponseId">
-    /// The unique identifier of the AI response to cancel. Only responses created with
-    /// <c>background = true</c> are eligible for cancellation.
-    /// </param>
-    /// <param name="CallBacks">
-    /// A function returning a <see cref="TAsynResponse"/> instance to handle lifecycle events:
-    /// <para>- <c>OnStart</c>: triggered before sending the cancellation request.</para>
-    /// <para>- <c>OnSuccess</c>: triggered when the server successfully processes the cancellation; receives the updated <c>TResponse</c>.</para>
-    /// <para>- <c>OnError</c>: triggered if the cancellation request fails; can return a string to override the error message.</para>
-    /// </param>
-    /// <remarks>
-    /// This method sends a non-blocking cancellation request to the <c>responses/{id}/cancel</c> endpoint,
-    /// invoking the provided callbacks during the request lifecycle. If the target response has already
-    /// completed or is not eligible for cancellation, the <c>OnError</c> callback will be triggered with
-    /// the server's error message.
-    /// </remarks>
-    procedure AsynCancel(const ResponseId: string;
-      const CallBacks: TFunc<TAsynResponse>);
+    procedure CreateParallel(ParamProc: TProc<TBundleParams>; const CallBacks: TFunc<TAsynBundleList>); override;
   end;
 
 implementation
 
 uses
-  System.StrUtils;
+  System.StrUtils, GenAI.API.Streams, GenAI.API.SSEDecoder, GenAI.Consts;
 
 { TResponsesRoute }
 
@@ -897,13 +747,25 @@ begin
     CallBacks);
 end;
 
+function TResponsesRoute.AsyncAwaitCompact(
+  const ParamProc: TProc<TResponseCompactParams>;
+  const CallBacks: TFunc<TPromiseResponseCompaction>): TPromise<TResponseCompaction>;
+begin
+  Result := TAsyncAwaitHelper.WrapAsyncAwait<TResponseCompaction>(
+    procedure(const CallBackParams: TFunc<TAsynResponseCompaction>)
+    begin
+      AsynCompact(ParamProc, CallBackParams);
+    end,
+    CallBacks);
+end;
+
 function TResponsesRoute.AsyncAwaitCreate(const ParamProc: TProc<TResponsesParams>;
   const CallBacks: TFunc<TPromiseResponse>): TPromise<TResponse>;
 begin
   Result := TAsyncAwaitHelper.WrapAsyncAwait<TResponse>(
     procedure(const CallBackParams: TFunc<TAsynResponse>)
     begin
-      InternalAsynCreate(ParamProc, CallBackParams);
+      AsynCreate(ParamProc, CallBackParams);
     end,
     CallBacks);
 end;
@@ -915,7 +777,7 @@ begin
   Result := TAsyncAwaitHelper.WrapAsyncAwait<TBundleList>(
     procedure(const CallBackParams: TFunc<TAsynBundleList>)
     begin
-      InternalCreateParallel(ParamProc, CallBackParams);
+      CreateParallel(ParamProc, CallBackParams);
     end,
     CallBacks);
 end;
@@ -927,7 +789,7 @@ begin
   Result := TPromise<TResponseStream>.Create(
     procedure(Resolve: TProc<TResponseStream>; Reject: TProc<Exception>)
     begin
-      InternalAsynCreateStream(ParamProc,
+      AsynCreateStream(ParamProc,
         function : TAsynResponseStream
         begin
           Result.Sender := CallBacks.Sender;
@@ -943,13 +805,20 @@ begin
               if (Event.&Type = TResponseStreamType.error) or
                  (Event.&Type = TResponseStreamType.failed) then
                 begin
-                  Reject(Exception.Create(Format('(%s) %s', [Event.Code, Event.Message])));
+                  var ErrorCode := Event.Code;
+                  var ErrorMessage := Event.Message;
+                  if Assigned(Event.Response) and Assigned(Event.Response.Error) then
+                    begin
+                      ErrorCode := Event.Response.Error.Code;
+                      ErrorMessage := Event.Response.Error.Message;
+                    end;
+                  Reject(Exception.Create(Format('(%s) %s', [ErrorCode, ErrorMessage])));
                 end;
 
               {--- Last event recieved }
               if Event.&Type = TResponseStreamType.completed then
                 begin
-                  Resolve(Event);
+                  Resolve(TApiDeserializer.Parse<TResponseStream>(Event.JSONResponse));
                 end;
             end;
 
@@ -980,6 +849,101 @@ begin
             end;
         end);
     end);
+end;
+
+function TResponsesRoute.AsyncAwaitCreateStream(
+  const ParamProc: TProc<TResponsesParams>;
+  const Callbacks: TFunc<TPromiseResponseStream>;
+  const StreamEvents: IResponsesEventEngineManager): TPromise<TResponsesEventData>;
+begin
+  Result := TPromise<TResponsesEventData>.Create(
+    procedure(Resolve: TProc<TResponsesEventData>; Reject: TProc<Exception>)
+    begin
+      var Buffer := TResponsesEventData.Empty;
+
+      AsynCreateStream(ParamProc,
+        function : TAsynResponseStream
+        begin
+          if Assigned(Callbacks) then
+            Result.Sender := Callbacks.Sender;
+
+          if Assigned(Callbacks) and Assigned(Callbacks.OnStart) then
+            Result.OnStart := Callbacks.OnStart;
+
+          Result.OnProgress :=
+            procedure (Sender: TObject; Event: TResponseStream)
+            begin
+              try
+                Buffer.Aggregate(Event,
+                  procedure
+                  begin
+                    var ErrMsg := EmptyStr;
+                    if Assigned(Event) and Assigned(Event.Response) and
+                       Assigned(Event.Response.Error) then
+                      ErrMsg := Format('(%s) %s',
+                        [Event.Response.Error.Code, Event.Response.Error.Message])
+                    else
+                    if Assigned(Event) then
+                      ErrMsg := Format('(%s) %s', [Event.Code, Event.Message]);
+
+                    if Assigned(Callbacks) and Assigned(Callbacks.OnError) then
+                      ErrMsg := Callbacks.OnError(Sender, ErrMsg);
+                    Reject(Exception.Create(ErrMsg));
+                  end);
+
+                if Assigned(Callbacks) and Assigned(Callbacks.OnProgress) then
+                  Callbacks.OnProgress(Sender, Event);
+              except
+                on E: Exception do
+                  Reject(Exception.Create(E.Message));
+              end;
+            end;
+
+          Result.OnSuccess :=
+            procedure (Sender: TObject)
+            begin
+              Resolve(Buffer);
+            end;
+
+          Result.OnError :=
+            procedure (Sender: TObject; Error: string)
+            begin
+              if Assigned(Callbacks) and Assigned(Callbacks.OnError) then
+                Error := Callbacks.OnError(Sender, Error);
+              Reject(Exception.Create(Error));
+            end;
+
+          Result.OnDoCancel :=
+            function : Boolean
+            begin
+              if Assigned(Callbacks) and Assigned(Callbacks.OnDoCancel) then
+                Result := Callbacks.OnDoCancel()
+              else
+                Result := False;
+            end;
+
+          Result.OnCancellation :=
+            procedure (Sender: TObject)
+            begin
+              var Error := 'aborted';
+              if Assigned(Callbacks) and Assigned(Callbacks.OnCancellation) then
+                begin
+                  var CallbackError := Callbacks.OnCancellation(Sender);
+                  if not CallbackError.IsEmpty then
+                    Error := CallbackError;
+                end;
+              Reject(Exception.Create(Error));
+            end;
+        end,
+        StreamEvents);
+    end);
+end;
+
+function TResponsesRoute.AsyncAwaitCreateStream(
+  const ParamProc: TProc<TResponsesParams>;
+  const StreamEvents: IResponsesEventEngineManager): TPromise<TResponsesEventData>;
+begin
+  Result := AsyncAwaitCreateStream(ParamProc, nil, StreamEvents);
 end;
 
 function TResponsesRoute.AsyncAwaitDelete(const ResponseId: string;
@@ -1039,7 +1003,9 @@ begin
     CallBacks);
 end;
 
-procedure TResponsesRoute.AsynCancel(const ResponseId: string;
+{ TResponsesAsynchronousSupport }
+
+procedure TResponsesAsynchronousSupport.AsynCancel(const ResponseId: string;
   const CallBacks: TFunc<TAsynResponse>);
 begin
   with TAsynCallBackExec<TAsynResponse, TResponse>.Create(CallBacks) do
@@ -1058,19 +1024,186 @@ begin
   end;
 end;
 
-procedure TResponsesRoute.AsynCreate(const ParamProc: TProc<TResponsesParams>;
+procedure TResponsesAsynchronousSupport.AsynCompact(
+  const ParamProc: TProc<TResponseCompactParams>;
+  const CallBacks: TFunc<TAsynResponseCompaction>);
+begin
+  with TAsynCallBackExec<TAsynResponseCompaction, TResponseCompaction>.Create(CallBacks) do
+  try
+    Sender := Use.Param.Sender;
+    OnStart := Use.Param.OnStart;
+    OnSuccess := Use.Param.OnSuccess;
+    OnError := Use.Param.OnError;
+    Run(
+      function: TResponseCompaction
+      begin
+        Result := Self.Compact(ParamProc);
+      end);
+  finally
+    Free;
+  end;
+end;
+
+procedure TResponsesAsynchronousSupport.AsynCreate(const ParamProc: TProc<TResponsesParams>;
   const CallBacks: TFunc<TAsynResponse>);
 begin
-  InternalAsynCreate(ParamProc, CallBacks);
+  with TAsynCallBackExec<TAsynResponse, TResponse>.Create(CallBacks) do
+  try
+    Sender := Use.Param.Sender;
+    OnStart := Use.Param.OnStart;
+    OnSuccess := Use.Param.OnSuccess;
+    OnError := Use.Param.OnError;
+    Run(
+      function: TResponse
+      begin
+        Result := Self.Create(ParamProc);
+      end);
+  finally
+    Free;
+  end;
 end;
 
-procedure TResponsesRoute.AsynCreateStream(const ParamProc: TProc<TResponsesParams>;
+procedure TResponsesAsynchronousSupport.AsynCreateStream(const ParamProc: TProc<TResponsesParams>;
   const CallBacks: TFunc<TAsynResponseStream>);
 begin
-  InternalAsynCreateStream(ParamProc, CallBacks);
+  AsynCreateStream(ParamProc, CallBacks, nil);
 end;
 
-procedure TResponsesRoute.AsynDelete(const ResponseId: string;
+procedure TResponsesAsynchronousSupport.AsynCreateStream(const ParamProc: TProc<TResponsesParams>;
+  const CallBacks: TFunc<TAsynResponseStream>;
+  const StreamEvents: IResponsesEventEngineManager);
+var
+  Sender: TObject;
+begin
+  var CallBackParams := TUseParamsFactory<TAsynResponseStream>.CreateInstance(CallBacks);
+
+  var OnStart := CallBackParams.Param.OnStart;
+  var OnSuccess := CallBackParams.Param.OnSuccess;
+  var OnProgress := CallBackParams.Param.OnProgress;
+  var OnError := CallBackParams.Param.OnError;
+  var CancelTag := 0;
+
+  {--- Cancellation sources: the dispatcher callbacks (event mode) and the
+       session callbacks (promise/async mode). They are CHAINED, not
+       overridden: this lets a consumer abort mid-response via the engine
+       while the promise pivot is still rejected (cancellation handled as an
+       error -> &Catch). }
+  var SessionSender := CallBackParams.Param.Sender;
+  var SessionOnCancellation := CallBackParams.Param.OnCancellation;
+  var SessionOnDoCancel := CallBackParams.Param.OnDoCancel;
+
+  var DispSender: TObject := nil;
+  var DispOnCancellation: TProc<TObject> := nil;
+  var DispOnDoCancel: TFunc<Boolean> := nil;
+  if Assigned(StreamEvents) then
+    begin
+      DispSender := StreamEvents.GetStreamEventDispatcher.CallBacks.Sender;
+      DispOnCancellation := StreamEvents.GetStreamEventDispatcher.CallBacks.OnCancellation;
+      DispOnDoCancel := StreamEvents.GetStreamEventDispatcher.CallBacks.OnDoCancel;
+    end;
+
+  if Assigned(DispSender) then
+    Sender := DispSender
+  else
+    Sender := SessionSender;
+
+  var Task: ITask := TTask.Create(
+    procedure()
+    begin
+      if not Assigned(Sender) then
+        Sender := Self;
+
+      if Assigned(OnStart) then
+        TThread.Queue(nil,
+          procedure
+          begin
+            OnStart(Sender);
+          end);
+      try
+        var Stop := False;
+
+        CreateStream(ParamProc,
+          procedure(var Response: TResponseStream; IsDone: Boolean; var Cancel: Boolean)
+          begin
+            if not Stop and
+               (Assigned(DispOnDoCancel) or Assigned(SessionOnDoCancel)) then
+              TThread.Queue(nil,
+                procedure
+                begin
+                  Stop := False;
+                  if Assigned(DispOnDoCancel) then
+                    Stop := DispOnDoCancel();
+                  if (not Stop) and Assigned(SessionOnDoCancel) then
+                    Stop := SessionOnDoCancel();
+                end);
+            if Stop then
+              begin
+                if (CancelTag = 0) and
+                   (Assigned(DispOnCancellation) or
+                    Assigned(SessionOnCancellation)) then
+                  TThread.Queue(nil,
+                    procedure
+                    begin
+                      if Assigned(DispOnCancellation) then
+                        DispOnCancellation(Sender);
+                      if Assigned(SessionOnCancellation) then
+                        SessionOnCancellation(Sender);
+                    end);
+                Inc(CancelTag);
+                Cancel := True;
+                Exit;
+              end;
+
+            if Assigned(Response) then
+              begin
+                var LocalResponse := Response;
+                Response := nil;
+
+                if Assigned(OnProgress) then
+                  TThread.Synchronize(TThread.Current,
+                    procedure
+                    begin
+                      try
+                        OnProgress(Sender, LocalResponse);
+                      finally
+                        LocalResponse.Free;
+                      end;
+                    end)
+                else
+                  LocalResponse.Free;
+              end
+            else if IsDone then
+              begin
+                if Assigned(OnSuccess) then
+                  TThread.Queue(nil,
+                    procedure
+                    begin
+                      OnSuccess(Sender);
+                    end);
+              end;
+          end,
+          StreamEvents);
+      except
+        on E: Exception do
+          begin
+            var Error := AcquireExceptionObject;
+            try
+              var ErrorMsg := (Error as Exception).Message;
+              if Assigned(OnError) then
+                TThread.Queue(nil,
+                  procedure
+                  begin
+                    OnError(Sender, ErrorMsg);
+                  end);
+            finally
+              Error.Free;
+            end;
+          end;
+      end;
+    end);
+  Task.Start;
+end;
+procedure TResponsesAsynchronousSupport.AsynDelete(const ResponseId: string;
   const CallBacks: TFunc<TAsynResponseDelete>);
 begin
   with TAsynCallBackExec<TAsynResponseDelete, TResponseDelete>.Create(CallBacks) do
@@ -1089,7 +1222,7 @@ begin
   end;
 end;
 
-procedure TResponsesRoute.AsynList(const ResponseId: string;
+procedure TResponsesAsynchronousSupport.AsynList(const ResponseId: string;
   const ParamProc: TProc<TUrlResponseListParams>;
   const CallBacks: TFunc<TAsynResponses>);
 begin
@@ -1109,7 +1242,7 @@ begin
   end;
 end;
 
-procedure TResponsesRoute.AsynList(const ResponseId: string;
+procedure TResponsesAsynchronousSupport.AsynList(const ResponseId: string;
   const CallBacks: TFunc<TAsynResponses>);
 begin
   with TAsynCallBackExec<TAsynResponses, TResponses>.Create(CallBacks) do
@@ -1128,7 +1261,7 @@ begin
   end;
 end;
 
-procedure TResponsesRoute.AsynRetrieve(const ResponseId: string;
+procedure TResponsesAsynchronousSupport.AsynRetrieve(const ResponseId: string;
   const ParamProc: TProc<TURLIncludeParams>;
   const CallBacks: TFunc<TAsynResponse>);
 begin
@@ -1148,7 +1281,7 @@ begin
   end;
 end;
 
-procedure TResponsesRoute.AsynRetrieve(const ResponseId: string;
+procedure TResponsesAsynchronousSupport.AsynRetrieve(const ResponseId: string;
   const CallBacks: TFunc<TAsynResponse>);
 begin
   with TAsynCallBackExec<TAsynResponse, TResponse>.Create(CallBacks) do
@@ -1167,44 +1300,295 @@ begin
   end;
 end;
 
+{ TResponsesRoute }
+
 function TResponsesRoute.Cancel(const ResponseId: string): TResponse;
 begin
-  Result := API.Post<TResponse>('responses/' + ResponseId + '/cancel',
-    [
-     ['instructions', '*', 'content'],
-     ['instructions', '*', 'output', '[]'],
-     ['instructions'],
-     ['tools', '*', 'container', '{}']
-    ]);
+  Result := API.Post<TResponse>('responses/' + ResponseId + '/cancel');
+end;
+
+function TResponsesRoute.Compact(
+  ParamProc: TProc<TResponseCompactParams>): TResponseCompaction;
+begin
+  Result := API.Post<TResponseCompaction, TResponseCompactParams>('responses/compact', ParamProc);
 end;
 
 function TResponsesRoute.Create(ParamProc: TProc<TResponsesParams>): TResponse;
 begin
-  Result := API.Post<TResponse, TResponsesParams>('responses', ParamProc,
-    [
-     ['instructions', '*', 'content'],
-     ['instructions', '*', 'output', '[]'],
-     ['instructions'],
-     ['tools', '*', 'container', '{}']
-    ]);
+  Result := API.Post<TResponse, TResponsesParams>('responses', ParamProc);
 end;
 
 procedure TResponsesRoute.CreateParallel(ParamProc: TProc<TBundleParams>;
   const CallBacks: TFunc<TAsynBundleList>);
+var
+  Tasks: TArray<ITask>;
+  BundleParams: TBundleParams;
+  ReasoningEffort: string;
 begin
-  InternalCreateParallel(ParamProc, CallBacks);
-end;
+  BundleParams := TBundleParams.Create;
+  try
+    if not Assigned(ParamProc) then
+      raise Exception.Create('The lambda can''t be null');
 
+    ParamProc(BundleParams);
+    var Bundle := TBundleList.Create;
+    var Ranking := 0;
+    var ErrorExists := False;
+    var Prompts := BundleParams.GetPrompt;
+    var Counter := Length(Prompts);
+
+    if IsReasoningModel(BundleParams.GetModel) then
+      ReasoningEffort := BundleParams.GetReasoningEffort
+    else
+      ReasoningEffort := EmptyStr;
+
+    if Assigned(CallBacks.OnStart) then
+      CallBacks.OnStart(CallBacks.Sender);
+
+    SetLength(Tasks, Length(Prompts));
+    for var index := 0 to Pred(Length(Prompts)) do
+      begin
+        Tasks[index] := TTask.Run(
+          procedure
+          begin
+            var Buffer := Bundle.Add(index + 1);
+            Buffer.Prompt := Prompts[index];
+            try
+              var Response := Create(
+                procedure(Params: TResponsesParams)
+                begin
+                  Params.Model(BundleParams.GetModel);
+
+                  if not ReasoningEffort.IsEmpty then
+                    Params.Reasoning(TReasoningParams.New.Effort(ReasoningEffort));
+
+                  Params.Instructions(BundleParams.GetSystem);
+                  Params.Input(Buffer.Prompt);
+
+                  if not BundleParams.GetSearchSize.IsEmpty then
+                    begin
+                      var SearchWeb := TResponseWebSearchParams.New.SearchContextSize(BundleParams.GetSearchSize);
+
+                      if not BundleParams.GetCity.IsEmpty or
+                         not BundleParams.GetCountry.IsEmpty then
+                        begin
+                          var Locate := TResponseUserLocationParams.New;
+
+                          if not BundleParams.GetCity.IsEmpty then
+                            Locate.City(BundleParams.GetCity);
+
+                          if not BundleParams.GetCountry.IsEmpty then
+                            Locate.Country(BundleParams.GetCountry);
+
+                          SearchWeb.UserLocation(Locate);
+                        end;
+
+                      Params.Tools([SearchWeb]);
+                    end;
+
+                  Params.Store(False);
+                end);
+              Inc(Ranking);
+              Buffer.FinishIndex := Ranking;
+
+              for var Item in Response.Output do
+                for var SubItem in Item.Content do
+                  Buffer.Response := Buffer.Response + SubItem.Text + #10;
+
+              Buffer.Chat := Response;
+            except
+              on E: Exception do
+                begin
+                  var Error := AcquireExceptionObject;
+                  ErrorExists := True;
+                  try
+                    var ErrorMsg := (Error as Exception).Message;
+                    if Assigned(CallBacks.OnError) then
+                      TThread.Queue(nil,
+                        procedure
+                        begin
+                          CallBacks.OnError(CallBacks.Sender, ErrorMsg);
+                        end);
+                  finally
+                    Error.Free;
+                  end;
+                end;
+            end;
+          end);
+
+        if ErrorExists then
+          Continue;
+
+        TTaskHelper.ContinueWith(Tasks[Index],
+          procedure
+          begin
+            Dec(Counter);
+            if Counter = 0 then
+              begin
+                try
+                  if not ErrorExists and Assigned(CallBacks.OnSuccess) then
+                    CallBacks.OnSuccess(CallBacks.Sender, Bundle);
+                finally
+                  Bundle.Free;
+                end;
+              end;
+          end);
+        Sleep(30);
+      end;
+  finally
+    BundleParams.Free;
+  end;
+end;
 function TResponsesRoute.CreateStream(ParamProc: TProc<TResponsesParams>;
-  Event: TResponseEvent): Boolean;
+  Event: TResponseEvent; const StreamEvents: IResponsesEventEngineManager): Boolean;
+var
+  Response: TLockedMemoryStream;
+  RetPos: Int64;
+  Decoder: TSSEDecoder;
+  DoneSent: Boolean;
+  AbortFlag: Boolean;
+  Buffer: TResponsesEventData;
 begin
-  Result := InternalCreateStream(ParamProc, Event,
-    [
-     ['response', 'instructions', '*', 'content'],
-     ['response', 'instructions', '*', 'output', '[]'],
-     ['response', 'instructions'],
-     ['tools', '*', 'container', '{}']
-    ]);
+  Buffer := TResponsesEventData.Empty;
+  Response := TLockedMemoryStream.Create;
+  try
+    RetPos := 0;
+    DoneSent := False;
+    AbortFlag := False;
+
+    var EmitDone :=
+      procedure(var AAbort: Boolean)
+      var
+        Content: TResponseStream;
+      begin
+        if DoneSent then
+          Exit;
+
+        DoneSent := True;
+        Content := nil;
+        if Assigned(Event) then
+          Event(Content, True, AAbort);
+      end;
+
+    Decoder := TSSEDecoder.Create(
+      procedure(const Data: string; var AAbort: Boolean)
+      var
+        Line: string;
+        Content: TResponseStream;
+        CurrentType: TResponseStreamType;
+        IsTerminal: Boolean;
+      begin
+        Content := nil;
+
+        if AAbort or DoneSent then
+          Exit;
+
+        Line := Data.Trim;
+        if Line.IsEmpty then
+          Exit;
+
+        if SameText(Line, '[DONE]') then
+          begin
+            EmitDone(AAbort);
+            Exit;
+          end;
+
+        try
+          try
+            Content := TApiDeserializer.Parse<TResponseStream>(Line);
+          except
+            Content := nil;
+          end;
+
+          if Assigned(Content) then
+            begin
+              CurrentType := Content.EventType;
+              if CurrentType = TResponseStreamType.sdk_unknown then
+                CurrentType := Content.&Type;
+
+              IsTerminal :=
+                (CurrentType = TResponseStreamType.completed) or
+                (CurrentType = TResponseStreamType.failed) or
+                (CurrentType = TResponseStreamType.incomplete) or
+                (CurrentType = TResponseStreamType.error);
+
+              {--- Event mode: aggregate into the buffer and dispatch the
+                   granular per-event callbacks before the session callback. }
+              if Assigned(StreamEvents) then
+                StreamEvents.AggregateStreamEvents(Content, Buffer);
+
+              if Assigned(Event) then
+                Event(Content, IsTerminal, AAbort);
+
+              if IsTerminal and not AAbort then
+                EmitDone(AAbort);
+            end;
+        finally
+          Content.Free;
+        end;
+      end
+    );
+
+    var Drain :=
+      procedure(var Abort: Boolean)
+      var
+        Bytes: TBytes;
+        Snap: Int64;
+      begin
+        Snap := RetPos;
+        try
+          while Response.ExtractDelta(RetPos, Bytes) do
+            begin
+              if Length(Bytes) = 0 then
+                Continue;
+
+              Decoder.Feed(Bytes, Abort);
+
+              if Abort then
+                Exit;
+            end;
+        except
+          RetPos := Snap;
+          raise;
+        end;
+      end;
+
+    try
+      Result := API.Post<TResponsesParams>(
+        'responses',
+        ParamProc,
+        Response,
+        procedure(const Sender: TObject; AContentLength: Int64; AReadCount: Int64; var AAbort: Boolean)
+        begin
+          if DoneSent then
+            begin
+              AAbort := True;
+              Exit;
+            end;
+
+          Drain(AAbort);
+
+          if AAbort then
+            AbortFlag := True;
+        end
+      );
+    finally
+      if not DoneSent and not AbortFlag then
+        begin
+          Drain(AbortFlag);
+          Decoder.Flush(AbortFlag);
+        end;
+
+      if not DoneSent and not AbortFlag then
+        EmitDone(AbortFlag);
+
+      Decoder.Free;
+      Drain := nil;
+      EmitDone := nil;
+    end;
+  finally
+    Response.Free;
+  end;
 end;
 
 function TResponsesRoute.Delete(const ResponseId: string): TResponseDelete;
@@ -1215,41 +1599,23 @@ end;
 function TResponsesRoute.List(const ResponseId: string;
   const ParamProc: TProc<TUrlResponseListParams>): TResponses;
 begin
-  Result := API.Get<TResponses, TUrlResponseListParams>('responses/' + ResponseId + '/input_items', ParamProc,
-    [
-      ['data', '*', 'output', '[]']
-    ]);
+  Result := API.Get<TResponses, TUrlResponseListParams>('responses/' + ResponseId + '/input_items', ParamProc);
 end;
 
 function TResponsesRoute.List(const ResponseId: string): TResponses;
 begin
-  Result := API.Get<TResponses>('responses/' + ResponseId + '/input_items',
-    [
-      ['data', '*', 'output', '[]']
-    ]);
+  Result := API.Get<TResponses>('responses/' + ResponseId + '/input_items');
 end;
 
 function TResponsesRoute.Retrieve(const ResponseId: string;
   const ParamProc: TProc<TURLIncludeParams>): TResponse;
 begin
-  Result := API.Get<TResponse, TURLIncludeParams>('responses/' + ResponseID, ParamProc,
-    [
-     ['instructions', '*', 'content'],
-     ['instructions', '*', 'output', '[]'],
-     ['instructions'],
-     ['tools', '*', 'container', '{}']
-    ]);
+  Result := API.Get<TResponse, TURLIncludeParams>('responses/' + ResponseID, ParamProc);
 end;
 
 function TResponsesRoute.Retrieve(const ResponseId: string): TResponse;
 begin
-  Result := API.Get<TResponse>('responses/' + ResponseID,
-    [
-     ['instructions', '*', 'content'],
-     ['instructions', '*', 'output', '[]'],
-     ['instructions'],
-     ['tools', '*', 'container', '{}']
-    ]);
+  Result := API.Get<TResponse>('responses/' + ResponseID);
 end;
 
 end.

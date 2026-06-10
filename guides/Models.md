@@ -18,15 +18,21 @@ The list of available models can be retrieved from the Models API response. The 
 
   TutorialHub.JSONRequestClear;
 
-  //Asynchronous example
-  Client.Models.AsynList(
-    function : TAsynModels
-    begin
-      Result.Sender := TutorialHub;
-      Result.OnStart := Start;
-      Result.OnSuccess := Display;
-      Result.OnError := Display;
-    end);
+  //Asynchronous promise example
+  var Promise := Client.Models.AsyncAwaitList;
+
+  Promise
+    .&Then<TModels>(
+      function (Value: TModels): TModels
+      begin
+        Display(TutorialHub, Value);
+        Result := Value;
+      end)
+    .&Catch(
+      procedure (E: Exception)
+      begin
+        Display(TutorialHub, E.Message);
+      end);
 
   //Synchronous example
 //  var Value := Client.Models.List;
@@ -35,22 +41,6 @@ The list of available models can be retrieved from the Models API response. The 
 //  finally
 //    Value.Free;
 //  end;
-
-  //Asynchronous promise example
-//  var Promise := Client.Models.AsyncAwaitList;
-//
-//  Promise
-//    .&Then<TModels>(
-//      function (Value: TModels): TModels
-//      begin
-//        Display(TutorialHub, Value);
-//        Result := Value;
-//      end)
-//    .&Catch(
-//      procedure (E: Exception)
-//      begin
-//        Display(TutorialHub, E.Message);
-//      end);
 ```
 
 <br/>
@@ -65,15 +55,21 @@ Retrieve a model using its ID.
   TutorialHub.JSONRequestClear;
   TutorialHub.ModelId := '...the id tio retrieve...';
 
-  //Asynchronous example
-  Client.Models.AsynRetrieve(TutorialHub.ModelId,
-    function : TAsynModel
-    begin
-      Result.Sender := TutorialHub;
-      Result.OnStart := Start;
-      Result.OnSuccess := Display;
-      Result.OnError := Display;
-    end);
+  //Asynchronous promise example
+  var Promise := Client.Models.AsyncAwaitRetrieve(TutorialHub.ModelId);
+
+  Promise
+    .&Then<string>(
+      function (Value: TModel): string
+      begin
+        Result := Value.Id;
+        Display(TutorialHub, Value);
+      end)
+    .&Catch(
+      procedure (E: Exception)
+      begin
+        Display(TutorialHub, E.Message);
+      end);
 
   //Synchronous example
 //  var Value := Client.Models.Retrieve(TutorialHub.ModelId);
@@ -82,22 +78,6 @@ Retrieve a model using its ID.
 //  finally
 //    Value.Free;
 //  end;
-
-  //Asynchronous promise example
-//  var Promise := Client.Models.AsyncAwaitRetrieve(TutorialHub.ModelId);
-//
-//  Promise
-//    .&Then<string>(
-//      function (Value: TModel): string
-//      begin
-//        Result := Value.Id;
-//        Display(TutorialHub, Value);
-//      end)
-//    .&Catch(
-//      procedure (E: Exception)
-//      begin
-//        Display(TutorialHub, E.Message);
-//      end);
 ```
 
 <br/>
@@ -112,15 +92,21 @@ Deleting a model is only possible if the model is one of your fine-tuned models.
   TutorialHub.JSONRequestClear;
   TutorialHub.ModelId := '...Id of the model to delete...';
 
-  //Asynchronous example
-  Client.Models.AsynDelete(TutorialHub.ModelId,
-    function : TAsynDeletion
-    begin
-      Result.Sender := TutorialHub;
-      Result.OnStart := Start;
-      Result.OnSuccess := Display;
-      Result.OnError := Display;
-    end);
+  //Asynchronous promise example
+  var Promise := Client.Models.AsyncAwaitDelete(TutorialHub.ModelId);
+
+  Promise
+    .&Then<string>(
+      function (Value: TDeletion): string
+      begin
+        Result := Value.Id;
+        Display(TutorialHub, Value);
+      end)
+    .&Catch(
+      procedure (E: Exception)
+      begin
+        Display(TutorialHub, E.Message);
+      end);
 
   //Synchronous example
 //  var Value := Client.Models.Delete(TutorialHub.ModelId);
@@ -129,22 +115,6 @@ Deleting a model is only possible if the model is one of your fine-tuned models.
 //  finally
 //    Value.Free;
 //  end;
-
-  //Asynchronous promise example
-//  var Promise := Client.Models.AsyncAwaitDelete(TutorialHub.ModelId);
-//
-//  Promise
-//    .&Then<string>(
-//      function (Value: TDeletion): string
-//      begin
-//        Result := Value.Id;
-//        Display(TutorialHub, Value);
-//      end)
-//    .&Catch(
-//      procedure (E: Exception)
-//      begin
-//        Display(TutorialHub, E.Message);
-//      end);
 ```
 
 <br/>

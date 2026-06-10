@@ -1,4 +1,4 @@
-unit GenAI.API;
+ï»¿unit GenAI.API;
 
 {-------------------------------------------------------------------------------
 
@@ -26,15 +26,23 @@ interface
 
     This approach adheres to the SOLID principles of dependency inversion, contributing
     to a robust, modular, and adaptable software architecture.
+
+    --- DESERIALIZATION ---
+    The legacy JSON path-normalization has been removed, but the JSON shield
+    mechanism is preserved (MetadataManager / MetadataAsObject): free-form fields listed
+    in PROTECTED_FIELD cannot always be bound to a fixed class, so their nested JSON is
+    shielded before object mapping. Deserialization is performed in two steps (see Parse):
+    object mapping, then raw-JSON binding to every TJSONFingerprint followed by
+    InternalFinalizeDeserialize.
   *)
 {$ENDREGION}
 
 uses
   System.SysUtils, System.Classes, System.Net.HttpClient, System.Net.URLClient,
   System.Net.Mime, System.JSON,
-  GenAI.API.Params, GenAI.API.Utils, GenAI.Errors,
-  GenAI.Exceptions, GenAI.HttpClientInterface, GenAI.HttpClientAPI, GenAI.Monitoring,
-  GenAI.API.Normalizer;
+  GenAI.API.Params, GenAI.API.JSONShield, GenAI.Errors, GenAI.Exceptions,
+  GenAI.HttpClientInterface, GenAI.HttpClientAPI, GenAI.Monitoring,
+  GenAI.Api.JsonFingerprintBinder, GenAI.API.Streams;
 
 type
   /// <summary>
@@ -255,7 +263,9 @@ type
   /// by parsing error data and raising appropriate exceptions.
   /// </remarks>
   TApiDeserializer = class(TApiHttpHandler)
-  class var Metadata: ICustomFieldsPrepare;
+  strict private
+    class var FMetadataManager: ICustomFieldsPrepare;
+    class var FMetadataAsObject: Boolean;
   protected
     /// <summary>
     /// Parses the error data from the API response.
@@ -283,43 +293,240 @@ type
     procedure RaiseError(Code: Int64; Error: TErrorCore); virtual;
 
     /// <summary>
-    /// Deserializes the API response into a strongly typed object.
+    /// Deserializes an HTTP response payload into a strongly typed Delphi object, or raises
+    /// a structured exception when the response represents an API error.
     /// </summary>
-    /// <param name="T">
-    /// The type of the object to deserialize into. It must be a class with a parameterless constructor.
-    /// </param>
+    /// <typeparam name="T">
+    /// The target type to deserialize into. Must be a class type with a parameterless constructor.
+    /// </typeparam>
     /// <param name="Code">
-    /// The HTTP status code of the API response.
+    /// The HTTP status code returned by the server.
+    /// </param>
+    /// <param name="Payload">
+    /// The original JSON payload associated with the request (for example, the request body).
+    /// This value is propagated to <c>JSONPayload</c> when <typeparamref name="T"/> inherits
+    /// from <c>TJSONFingerprint</c>.
     /// </param>
     /// <param name="ResponseText">
-    /// The response body as a JSON string.
+    /// The response body as a JSON string (success payload or error payload).
+    /// </param>
+    /// <param name="DisabledShield">
+    /// When <c>True</c>, disables JSON shield preprocessing and performs a direct JSON-to-object
+    /// conversion (see <c>Parse{T}</c>). When <c>False</c> (default), parsing follows the global
+    /// shield configuration (<c>MetadataAsObject</c>/<c>MetadataManager</c>).
     /// </param>
     /// <returns>
-    /// A deserialized object of type <c>T</c>.
+    /// A deserialized instance of <typeparamref name="T"/> when <paramref name="Code"/> indicates success (2xx).
+    /// <para>
+    /// If <typeparamref name="T"/> inherits from <c>TJSONFingerprint</c>, the original JSON payload is
+    /// normalized (formatted) and stored in <c>JSONResponse</c>, then propagated to nested fingerprint
+    /// instances in the object graph.
+    /// </para>
     /// </returns>
-    /// <exception cref="GenAIInvalidResponseError">
-    /// Raised if the response is non-compliant or deserialization fails.
+    /// <remarks>
+    /// <para>
+    /// Success path: for HTTP status codes in the range 200..299, this method maps
+    /// <paramref name="ResponseText"/> into <typeparamref name="T"/> by calling <c>Parse{T}</c>.
+    /// </para>
+    /// <para>
+    /// Error path: for any non-2xx code, this method delegates to <c>DeserializeErrorData</c>,
+    /// which attempts to parse the API error payload and raises an appropriate <c>TGenAIException</c>
+    /// subtype. This method does not return normally in that case.
+    /// </para>
+    /// <para>
+    /// This method does not validate transport-level concerns (timeouts, connectivity). It only
+    /// interprets the HTTP status code and JSON payload already obtained by the caller.
+    /// </para>
+    /// </remarks>
+    /// <exception cref="TGenAIException">
+    /// Raised when the server returns a structured error payload that can be parsed and mapped to a known error type.
     /// </exception>
-    function Deserialize<T: class, constructor>(const Code: Int64; const ResponseText: string): T;
+    /// <exception cref="TGenAIAPIException">
+    /// Raised when the server returns an error payload that is not parseable as a structured error object.
+    /// </exception>
+    /// <exception cref="TGenAIInvalidResponseError">
+    /// Raised when the JSON success payload cannot be mapped to <typeparamref name="T"/> under the active
+    /// parsing mode (for example JSON shield preprocessing requirements not satisfied).
+    /// </exception>
+    function Deserialize<T: class, constructor>(const Code: Int64;
+      const Payload: string;
+      const ResponseText: string;
+      DisabledShield: Boolean = False): T;
   public
     class constructor Create;
 
     /// <summary>
-    /// Deserializes the API response into a strongly typed object.
+    /// Gets or sets whether protected free-form fields are expected as JSON objects or arrays.
     /// </summary>
-    /// <param name="T">
-    /// The type of the object to deserialize into. It must be a class with a parameterless constructor.
+    /// <remarks>
+    /// When set to <c>True</c>, deserialization expects the fields listed in <c>PROTECTED_FIELD</c>
+    /// to be represented as proper JSON objects or arrays and mapped directly to the corresponding
+    /// Delphi types.
+    /// <para>
+    /// When set to <c>False</c> (default), protected free-form fields are shielded through
+    /// <see cref="MetadataManager"/> before the final object mapping occurs. This mode is intended
+    /// for schemas that vary across response types and cannot be bound reliably to a single class.
+    /// </para>
+    /// <para>
+    /// The property name is kept for compatibility with the earlier metadata-specific API surface.
+    /// </para>
+    /// <para>
+    /// This setting is process-wide (static) and affects all calls that use <see cref="Parse{T}(string)"/> and
+    /// <see cref="Deserialize{T}(Int64,string)"/> within this unit.
+    /// </para>
+    /// </remarks>
+    class property MetadataAsObject: Boolean read FMetadataAsObject write FMetadataAsObject;
+
+    /// <summary>
+    /// Gets or sets the global JSON shield preprocessor used during deserialization.
+    /// </summary>
+    /// <remarks>
+    /// This property holds an implementation of <c>ICustomFieldsPrepare</c> responsible for preparing and/or
+    /// transforming JSON payloads before they are mapped to Delphi objects.
+    /// <para>
+    /// When <see cref="MetadataAsObject"/> is <c>False</c> (default), the deserializer invokes
+    /// <c>MetadataManager.Convert(...)</c> to shield protected fields listed in <c>PROTECTED_FIELD</c>
+    /// when they contain variable or untyped nested JSON structures.
+    /// </para>
+    /// <para>
+    /// When <see cref="MetadataAsObject"/> is <c>True</c>, the shield preprocessor is typically not
+    /// required because protected fields are expected to be represented as proper JSON objects or arrays
+    /// and mapped directly to Delphi types.
+    /// </para>
+    /// <para>
+    /// The property name is kept for compatibility with the earlier metadata-specific API surface.
+    /// </para>
+    /// <para>
+    /// This setting is process-wide (static). Assigning a new manager affects all subsequent calls to
+    /// <see cref="Parse{T}(string)"/> and <see cref="Deserialize{T}(Int64,string)"/> within this unit.
+    /// </para>
+    /// <para>
+    /// If set to <c>nil</c>, and <see cref="MetadataAsObject"/> is <c>False</c>, deserialization may fail for
+    /// responses that rely on JSON shield preprocessing.
+    /// </para>
+    /// </remarks>
+    class property MetadataManager: ICustomFieldsPrepare read FMetadataManager write FMetadataManager;
+
+    /// <summary>
+    /// Parses a JSON payload and maps it to a strongly typed Delphi object, with optional
+    /// JSON shield preprocessing and JSON fingerprint propagation.
+    /// </summary>
+    /// <typeparam name="T">
+    /// The target type to deserialize into. Must be a class type with a parameterless constructor.
+    /// </typeparam>
+    /// <param name="Value">
+    /// The JSON payload to parse and deserialize.
     /// </param>
-    /// <param name="ResponseText">
-    /// The response body as a JSON string.
+    /// <param name="Payload">
+    /// The original JSON payload associated with the request (for example, the request body).
+    /// This value is propagated to <c>JSONPayload</c> when <typeparamref name="T"/> inherits
+    /// from <c>TJSONFingerprint</c>.
+    /// </param>
+    /// <param name="DisabledShield">
+    /// When <c>True</c>, bypasses the JSON shield preprocessing pipeline and performs a direct
+    /// JSON-to-object conversion using <c>TJson.JsonToObject&lt;T&gt;</c>.
+    /// When <c>False</c> (default), parsing behavior depends on the global shield configuration
+    /// (<see cref="MetadataAsObject"/> / <see cref="MetadataManager"/>).
     /// </param>
     /// <returns>
-    /// A deserialized object of type <c>T</c>.
+    /// An instance of <typeparamref name="T"/> populated from <paramref name="Value"/>.
+    /// <para>
+    /// If <typeparamref name="T"/> inherits from <c>TJSONFingerprint</c>, the JSON payload is
+    /// normalized (formatted) and stored in <c>JSONResponse</c>, then propagated to all nested
+    /// <c>TJSONFingerprint</c> instances in the object graph.
+    /// </para>
+    /// <para>
+    /// The provided <paramref name="Payload"/> is assigned to <c>JSONPayload</c> on the root
+    /// fingerprint instance.
+    /// </para>
     /// </returns>
-    /// <exception cref="GenAIInvalidResponseError">
-    /// Raised if the response is non-compliant or deserialization fails.
+    /// <remarks>
+    /// <para>
+    /// Parsing behavior follows these rules:
+    /// </para>
+    /// <para>
+    /// If <paramref name="DisabledShield"/> is <c>True</c>, JSON shield handling is skipped and
+    /// the JSON payload is deserialized directly.
+    /// </para>
+    /// <para>
+    /// If <paramref name="DisabledShield"/> is <c>False</c> and <see cref="MetadataAsObject"/> is
+    /// <c>True</c>, protected fields are expected to be valid JSON objects or arrays and are mapped
+    /// directly to Delphi types.
+    /// </para>
+    /// <para>
+    /// If <paramref name="DisabledShield"/> is <c>False</c> and <see cref="MetadataAsObject"/> is
+    /// <c>False</c>, <see cref="MetadataManager"/> is used to shield the protected fields listed in
+    /// <c>PROTECTED_FIELD</c> before deserialization. If <see cref="MetadataManager"/> is <c>nil</c>
+    /// in this mode, deserialization fails.
+    /// </para>
+    /// <para>
+    /// JSON fingerprint propagation is RTTI-based, cycle-safe, and applies only to fields
+    /// (properties are not evaluated).
+    /// </para>
+    /// <para>
+    /// This method is a pure deserialization utility. It does not interpret HTTP status codes
+    /// and does not perform API error handling.
+    /// </para>
+    /// </remarks>
+    /// <exception cref="TGenAIInvalidResponseError">
+    /// Raised when JSON shield preprocessing is required but <see cref="MetadataManager"/> is <c>nil</c>,
+    /// or when the JSON payload cannot be mapped to <typeparamref name="T"/> under the active mode.
     /// </exception>
-    class function Parse<T: class, constructor>(const Value: string): T;
+    /// <exception cref="System.Exception">
+    /// Raised when JSON parsing, shield conversion, or fingerprint post-processing fails.
+    /// Any partially created instance is freed before the exception is re-raised.
+    /// </exception>
+    class function Parse<T: class, constructor>(const Value: string;
+      const Payload: string;
+      DisabledShield: Boolean = False): T; overload;
+
+    /// <summary>
+    /// Parses a JSON payload and maps it to a strongly typed Delphi object, with optional
+    /// JSON shield preprocessing and JSON fingerprint propagation.
+    /// </summary>
+    /// <typeparam name="T">
+    /// The target type to deserialize into. Must be a class type with a parameterless constructor.
+    /// </typeparam>
+    /// <param name="Value">
+    /// The JSON payload to parse and deserialize.
+    /// </param>
+    /// <param name="DisabledShield">
+    /// When <c>True</c>, bypasses the JSON shield preprocessing pipeline and performs a direct
+    /// JSON-to-object conversion using <c>TJson.JsonToObject&lt;T&gt;</c>.
+    /// When <c>False</c> (default), parsing behavior depends on the global shield configuration
+    /// (<see cref="MetadataAsObject"/> / <see cref="MetadataManager"/>).
+    /// </param>
+    /// <returns>
+    /// An instance of <typeparamref name="T"/> populated from <paramref name="Value"/>.
+    /// <para>
+    /// If <typeparamref name="T"/> inherits from <c>TJSONFingerprint</c>, the JSON payload is
+    /// normalized (formatted) and stored in <c>JSONResponse</c>, then propagated to all nested
+    /// <c>TJSONFingerprint</c> instances in the object graph.
+    /// </para>
+    /// <para>
+    /// The request payload string associated with the operation is not available in this overload,
+    /// so <c>JSONPayload</c> (if present) is left empty.
+    /// </para>
+    /// </returns>
+    /// <remarks>
+    /// <para>
+    /// This overload is a convenience wrapper for <c>Parse&lt;T&gt;(Value, '', DisabledShield)</c>.
+    /// </para>
+    /// <para>
+    /// This method is a pure deserialization utility. It does not interpret HTTP status codes
+    /// and does not perform API error handling.
+    /// </para>
+    /// </remarks>
+    /// <exception cref="TGenAIInvalidResponseError">
+    /// Raised when JSON shield preprocessing is required but <see cref="MetadataManager"/> is <c>nil</c>,
+    /// or when the JSON payload cannot be mapped to <typeparamref name="T"/> under the active mode.
+    /// </exception>
+    /// <exception cref="System.Exception">
+    /// Raised when JSON parsing, shield conversion, or fingerprint post-processing fails.
+    /// Any partially created instance is freed before the exception is re-raised.
+    /// </exception>
+    class function Parse<T: class, constructor>(const Value: string;
+      DisabledShield: Boolean = False): T; overload;
   end;
 
   /// <summary>
@@ -333,8 +540,8 @@ type
   /// </remarks>
   TGenAIAPI = class(TApiDeserializer)
   private
-    function MockJsonResponse(const FieldName: string; Response: TStringStream): string; overload;
-    function MockJsonFile(const FieldName: string; Response: TStringStream): string;
+    function MockJsonResponse(const FieldName: string; Response: TStream): string; overload;
+    function MockJsonFile(const FieldName: string; Response: TStream): string;
   public
     /// <summary>
     /// Initializes a new instance of the <c>TGenAIAPI</c> class with an API key.
@@ -362,30 +569,6 @@ type
     function Get<TResult: class, constructor>(const Endpoint: string): TResult; overload;
 
     /// <summary>
-    /// Sends a GET request without parameters, optionally normalizes a sub-tree of the JSON
-    /// response, and deserializes the result into a strongly typed object.
-    /// </summary>
-    /// <typeparam name="TResult">
-    /// The target type to deserialize into. Must be a class with a parameterless constructor.
-    /// </typeparam>
-    /// <param name="Endpoint">
-    /// The relative API endpoint (e.g., <c>"models"</c>).
-    /// </param>
-    /// <param name="Path">
-    /// A normalization path specification consumed by the JSON normalizer to project or extract a
-    /// specific sub-tree before deserialization (e.g., flattening or selecting nested fields). Pass an
-    /// empty array to deserialize the raw payload.
-    /// </param>
-    /// <returns>
-    /// An instance of <c>TResult</c> populated from the (optionally normalized) JSON response.
-    /// </returns>
-    /// <remarks>
-    /// Sends a GET request to the specified endpoint with standard headers, applies JSON normalization
-    /// using <c>Path</c>, and deserializes the resulting JSON into <c>TResult</c>.
-    /// </remarks>
-    function Get<TResult: class, constructor>(const Endpoint: string; const Path: TArray<TArray<string>>): TResult; overload;
-
-    /// <summary>
     /// Sends a GET request with parameters and returns a strongly typed object.
     /// </summary>
     /// <typeparam name="TResult">
@@ -407,38 +590,6 @@ type
     /// Raised if the response cannot be deserialized or is non-compliant.
     /// </exception>
     function Get<TResult: class, constructor; TParams: TUrlParam>(const Endpoint: string; ParamProc: TProc<TParams>): TResult; overload;
-
-    /// <summary>
-    /// Sends a GET request with URL parameters, optionally normalizes a sub-tree of the JSON
-    /// response, and deserializes the result into a strongly typed object.
-    /// </summary>
-    /// <typeparam name="TResult">
-    /// The target type to deserialize into. Must be a class with a parameterless constructor.
-    /// </typeparam>
-    /// <typeparam name="TParams">
-    /// The URL-parameter builder type (derives from <c>TUrlParam</c>) used to construct the query string.
-    /// </typeparam>
-    /// <param name="Endpoint">
-    /// The relative API endpoint (e.g., <c>"models"</c>).
-    /// </param>
-    /// <param name="ParamProc">
-    /// A procedure that configures an instance of <c>TParams</c>; its <c>Value</c> is appended to the
-    /// endpoint as the query string. Can be <c>nil</c> if no parameters are needed.
-    /// </param>
-    /// <param name="Path">
-    /// A normalization path specification consumed by the JSON normalizer to project or extract a
-    /// specific sub-tree before deserialization (e.g., flattening or selecting nested fields). Pass an
-    /// empty array to deserialize the raw payload.
-    /// </param>
-    /// <returns>
-    /// An instance of <c>TResult</c> populated from the (optionally normalized) JSON response.
-    /// </returns>
-    /// <remarks>
-    /// Builds the request URL via <c>BuildUrl(Endpoint, Params.Value)</c>, issues the GET with standard
-    /// headers, applies JSON normalization using <c>Path</c>, then deserializes the resulting JSON into
-    /// <c>TResult</c>.
-    /// </remarks>
-    function Get<TResult: class, constructor; TParams: TUrlParam>(const Endpoint: string; ParamProc: TProc<TParams>; const Path: TArray<TArray<string>>): TResult; overload;
 
     /// <summary>
     /// Issues a GET request to the specified API <paramref name="Endpoint"/> and returns
@@ -533,7 +684,7 @@ type
     /// A callback procedure to configure the request parameters.
     /// </param>
     /// <param name="Response">
-    /// A string stream where the response will be written.
+    /// A stream where the response will be written.
     /// </param>
     /// <param name="Event">
     /// A callback procedure for handling the received data during streaming.
@@ -573,6 +724,34 @@ type
     function Post<TParams: TJSONParam>(const Endpoint: string; ParamProc: TProc<TParams>; Response: TStream; Event: TReceiveDataCallback): Boolean; overload;
 
     /// <summary>
+    /// Sends a POST request with parameters and streams the response into a locked memory stream.
+    /// </summary>
+    /// <typeparam name="TParams">
+    /// The type of the parameters object for the request.
+    /// </typeparam>
+    /// <param name="Endpoint">
+    /// The relative endpoint to send the POST request to.
+    /// </param>
+    /// <param name="ParamProc">
+    /// A callback procedure to configure the request parameters.
+    /// </param>
+    /// <param name="Response">
+    /// A locked memory stream where the response will be written.
+    /// </param>
+    /// <param name="Event">
+    /// A callback procedure for handling received data during streaming.
+    /// </param>
+    /// <returns>
+    /// A boolean value indicating whether the request was successful.
+    /// </returns>
+    /// <remarks>
+    /// Use this overload for SSE or other incremental streams. The callback can call
+    /// <c>Response.ExtractDelta(...)</c> to atomically retrieve only the bytes appended since
+    /// the previous callback, then pass those bytes to <c>TSSEDecoder.Feed</c>.
+    /// </remarks>
+    function Post<TParams: TJSONParam>(const Endpoint: string; ParamProc: TProc<TParams>; Response: TLockedMemoryStream; Event: TReceiveDataCallback): Boolean; overload;
+
+    /// <summary>
     /// Sends a POST request with parameters and returns a strongly typed object.
     /// </summary>
     /// <typeparam name="TResult">
@@ -599,84 +778,6 @@ type
     function Post<TResult: class, constructor; TParams: TJSONParam>(const Endpoint: string; ParamProc: TProc<TParams>; const RawByteFieldName: string = ''): TResult; overload;
 
     /// <summary>
-    /// Sends a POST request to <paramref name="Endpoint"/> with URL query parameters and a JSON body,
-    /// then optionally normalizes a sub-tree of the JSON response before deserializing it into
-    /// <typeparamref name="TResult"/>.
-    /// </summary>
-    /// <typeparam name="TResult">
-    /// The target type to deserialize the response into. Must be a class with a parameterless constructor.
-    /// </typeparam>
-    /// <typeparam name="TUrlParams">
-    /// The URL-parameter builder type (derives from <c>TUrlParam</c>) used to construct the query string.
-    /// </typeparam>
-    /// <typeparam name="TParams">
-    /// The JSON-parameter builder type (derives from <c>TJSONParam</c>) used to construct the request body.
-    /// </typeparam>
-    /// <param name="Endpoint">
-    /// The relative API endpoint (for example, <c>"responses"</c>).
-    /// The final URL is produced by appending the query string from <typeparamref name="TUrlParams"/>.
-    /// </param>
-    /// <param name="UrlProc">
-    /// A configuration procedure that initializes an instance of <typeparamref name="TUrlParams"/>.
-    /// Its <c>Value</c> is appended to <paramref name="Endpoint"/> as the query string.
-    /// </param>
-    /// <param name="ParamProc">
-    /// A configuration procedure that initializes an instance of <typeparamref name="TParams"/> to build
-    /// the JSON request body. Can be <c>nil</c> if no JSON body is required.
-    /// </param>
-    /// <param name="Path">
-    /// A normalization path specification consumed by the JSON normalizer to project or extract a specific
-    /// sub-tree of the response prior to deserialization (e.g., flattening or selecting nested fields).
-    /// Pass an empty array to deserialize the raw payload.
-    /// </param>
-    /// <returns>
-    /// An instance of <typeparamref name="TResult"/> populated from the (optionally normalized) JSON response.
-    /// </returns>
-    /// <remarks>
-    /// <para>
-    /// The method builds the request URL via <c>BuildUrl(Endpoint, UrlParams.Value)</c>, constructs the JSON body
-    /// from <typeparamref name="TParams"/>, posts with JSON headers, applies normalization using
-    /// <paramref name="Path"/>, and deserializes the resulting JSON into <typeparamref name="TResult"/>.
-    /// </para>
-    /// <para>
-    /// Custom headers configured on the API instance are reset after the request completes.
-    /// Monitoring counters are updated on entry and exit.
-    /// </para>
-    /// </remarks>
-    function Post<TResult: class, constructor; TUrlParams: TUrlParam; TParams: TJSONParam>(const Endpoint: string; UrlProc: TProc<TUrlParams>; ParamProc: TProc<TParams>; const Path: TArray<TArray<string>>): TResult; overload;
-
-    /// <summary>
-    /// Sends a POST request with JSON parameters, optionally normalizes a sub-tree of the JSON
-    /// response, and deserializes the result into a strongly typed object.
-    /// </summary>
-    /// <typeparam name="TResult">
-    /// The target type to deserialize into. Must be a class with a parameterless constructor.
-    /// </typeparam>
-    /// <typeparam name="TParams">
-    /// The JSON-parameter builder type (derives from <c>TJSONParam</c>) used to construct the request body.
-    /// </typeparam>
-    /// <param name="Endpoint">
-    /// The relative API endpoint (e.g., <c>"responses"</c>).
-    /// </param>
-    /// <param name="ParamProc">
-    /// A procedure that configures an instance of <c>TParams</c> to define the request body.
-    /// Can be <c>nil</c> if no parameters are required.
-    /// </param>
-    /// <param name="Path">
-    /// A normalization path specification consumed by the JSON normalizer to project or extract a
-    /// specific sub-tree before deserialization (e.g., flattening or selecting nested fields). Pass an
-    /// empty array to deserialize the raw payload.
-    /// </param>
-    /// <returns>
-    /// An instance of <c>TResult</c> populated from the (optionally normalized) JSON response.
-    /// </returns>
-    /// <remarks>
-    /// Builds the request body from <c>TParams</c>, sends the POST request with JSON headers, applies
-    /// JSON normalization using <c>Path</c>, and deserializes the resulting JSON into <c>TResult</c>.
-    /// </remarks>
-    function Post<TResult: class, constructor; TParams: TJSONParam>(const Endpoint: string; ParamProc: TProc<TParams>; const Path: TArray<TArray<string>>): TResult; overload;
-
-    /// <summary>
     /// Sends a POST request to the specified API endpoint.
     /// </summary>
     /// <typeparam name="TResult">
@@ -689,30 +790,6 @@ type
     /// A deserialized object of type <c>TResult</c> containing the API response.
     /// </returns>
     function Post<TResult: class, constructor>(const Endpoint: string): TResult; overload;
-
-    /// <summary>
-    /// Sends a POST request without parameters, optionally normalizes a sub-tree of the JSON
-    /// response, and deserializes the result into a strongly typed object.
-    /// </summary>
-    /// <typeparam name="TResult">
-    /// The target type to deserialize into. Must be a class with a parameterless constructor.
-    /// </typeparam>
-    /// <param name="Endpoint">
-    /// The relative API endpoint (e.g., <c>"responses"</c>).
-    /// </param>
-    /// <param name="Path">
-    /// A normalization path specification consumed by the JSON normalizer to project or extract a
-    /// specific sub-tree before deserialization (e.g., flattening or selecting nested fields). Pass an
-    /// empty array to deserialize the raw payload.
-    /// </param>
-    /// <returns>
-    /// An instance of <c>TResult</c> populated from the (optionally normalized) JSON response.
-    /// </returns>
-    /// <remarks>
-    /// Sends a POST request to the specified endpoint with standard headers, applies JSON normalization
-    /// using <c>Path</c>, and deserializes the resulting JSON into <c>TResult</c>.
-    /// </remarks>
-    function Post<TResult: class, constructor>(const Endpoint: string; const Path: TArray<TArray<string>>): TResult; overload;
 
     /// <summary>
     /// Sends a PATCH request with parameters and returns a strongly typed object.
@@ -756,6 +833,29 @@ type
     /// Raised if the response cannot be deserialized or is non-compliant.
     /// </exception>
     function PostForm<TResult: class, constructor; TParams: TMultipartFormData, constructor>(const Endpoint: string; ParamProc: TProc<TParams>): TResult; overload;
+
+    /// <summary>
+    /// Sends a POST request with multipart form data and streams the response.
+    /// </summary>
+    /// <typeparam name="TParams">
+    /// The type of the multipart form data parameters object.
+    /// </typeparam>
+    /// <param name="Endpoint">
+    /// The relative endpoint to send the POST request to.
+    /// </param>
+    /// <param name="ParamProc">
+    /// A callback procedure to configure the multipart form data parameters.
+    /// </param>
+    /// <param name="Response">
+    /// A stream where the response will be written.
+    /// </param>
+    /// <param name="Event">
+    /// A callback procedure for handling received data during streaming.
+    /// </param>
+    /// <returns>
+    /// A boolean value indicating whether the request was successful.
+    /// </returns>
+    function PostForm<TParams: TMultipartFormData, constructor>(const Endpoint: string; ParamProc: TProc<TParams>; Response: TStream; Event: TReceiveDataCallback): Boolean; overload;
   end;
 
   /// <summary>
@@ -789,15 +889,13 @@ type
     constructor CreateRoute(AAPI: TGenAIAPI); reintroduce; virtual;
   end;
 
-var
-  MetadataAsObject: Boolean = False;
-
 implementation
 
 uses
-  System.StrUtils, REST.Json, GenAI.NetEncoding.Base64, System.DateUtils;
+  System.StrUtils, REST.Json, GenAI.Net.MediaCodec, System.DateUtils,
+  GenAI.API.JsonSafeReader;
 
-{TGenAIAPI}
+{ TGenAIAPI }
 
 constructor TGenAIAPI.Create(const LocalLMS: Boolean);
 begin
@@ -809,9 +907,8 @@ begin
     end
 end;
 
-function TGenAIAPI.Post<TParams>(const Endpoint: string;
-  ParamProc: TProc<TParams>; Response: TStream;
-  Event: TReceiveDataCallback): Boolean;
+function TGenAIAPI.Post<TParams>(const Endpoint: string; ParamProc: TProc<TParams>;
+  Response: TStream; Event: TReceiveDataCallback): Boolean;
 var
   Params: TParams;
 begin
@@ -824,16 +921,17 @@ begin
     var Http := NewHttpClient;
     var Code := Http.Post(BuildUrl(Endpoint), Params.JSON, Response, BuildJsonHeaders, Event);
 
-    Result := (Code > 200) and (Code < 299);
     case Code of
       200..299:
         Result := True;
       else
         begin
+          Result := False;
           Response.Position := 0;
           var ErrBytes: TBytes;
           SetLength(ErrBytes, Response.Size);
-          Response.ReadBuffer(ErrBytes, Length(ErrBytes));
+          if Length(ErrBytes) > 0 then
+            Response.ReadBuffer(ErrBytes[0], Length(ErrBytes));
           DeserializeErrorData(Code, TEncoding.UTF8.GetString(ErrBytes));
         end;
     end;
@@ -844,8 +942,16 @@ begin
   end;
 end;
 
+function TGenAIAPI.Post<TParams>(const Endpoint: string; ParamProc: TProc<TParams>;
+  Response: TLockedMemoryStream; Event: TReceiveDataCallback): Boolean;
+begin
+  Result := Post<TParams>(Endpoint, ParamProc, TStream(Response), Event);
+end;
+
 function TGenAIAPI.Post<TResult, TParams>(const Endpoint: string; ParamProc: TProc<TParams>;
   const RawByteFieldName: string): TResult;
+var
+  JSONPayload: string;
 begin
   Monitoring.Inc;
   var Response := TStringStream.Create('', TEncoding.UTF8);
@@ -853,6 +959,7 @@ begin
   try
     if Assigned(ParamProc) then
       ParamProc(Params);
+    JSONPayload := Params.ToJsonString;
 
     var Http := NewHttpClient;
     var Code := Http.Post(BuildUrl(Endpoint), Params.JSON, Response, BuildJsonHeaders, nil);
@@ -861,13 +968,14 @@ begin
       200..299:
         begin
           if RawByteFieldName.IsEmpty then
-            Result := Deserialize<TResult>(Code, Response.DataString)
+            Result := Deserialize<TResult>(Code, JSONPayload, Response.DataString)
           else
-            {--- When a raw byte file is sent as the sole response }
-            Result := Deserialize<TResult>(Code, MockJsonResponse(RawByteFieldName, Response));
+            {--- When a raw byte file is returned as the sole response: the synthetic JSON is clean,
+                 so JSON shield pre-processing is disabled. }
+            Result := Deserialize<TResult>(Code, JSONPayload, MockJsonResponse(RawByteFieldName, Response), True);
         end;
       else
-        Result := Deserialize<TResult>(Code, Response.DataString)
+        Result := Deserialize<TResult>(Code, JSONPayload, Response.DataString)
     end;
   finally
     Params.Free;
@@ -877,7 +985,8 @@ begin
   end;
 end;
 
-function TGenAIAPI.Post<TParams>(const Endpoint: string; ParamProc: TProc<TParams>; Response: TStringStream; Event: TReceiveDataCallback): Boolean;
+function TGenAIAPI.Post<TParams>(const Endpoint: string; ParamProc: TProc<TParams>;
+  Response: TStringStream; Event: TReceiveDataCallback): Boolean;
 begin
   Monitoring.Inc;
   var Params := TParams.Create;
@@ -911,99 +1020,6 @@ begin
   end;
 end;
 
-function TGenAIAPI.Post<TResult, TParams>(const Endpoint: string;
-  ParamProc: TProc<TParams>; const Path: TArray<TArray<string>>): TResult;
-begin
-  Monitoring.Inc;
-  var Response := TStringStream.Create('', TEncoding.UTF8);
-  var Params := TParams.Create;
-  try
-    if Assigned(ParamProc) then
-      ParamProc(Params);
-
-    var Http := NewHttpClient;
-    var Code := Http.Post(BuildUrl(Endpoint), Params.JSON, Response, BuildJsonHeaders, nil);
-
-    case Code of
-      200..299:
-        begin
-          if Length(Path) = 0 then
-            Result := Deserialize<TResult>(Code, Response.DataString)
-          else
-            begin
-              var S := TJSONNormalizer.Normalize(Response.DataString, Path);
-              Result := Deserialize<TResult>(Code, S);
-            end;
-        end;
-      else
-        Result := Deserialize<TResult>(Code, Response.DataString)
-    end;
-  finally
-    Params.Free;
-    Response.Free;
-    ResetCustomHeader;
-    Monitoring.Dec;
-  end;
-end;
-
-function TGenAIAPI.Post<TResult, TUrlParams, TParams>(const Endpoint: string;
-  UrlProc: TProc<TUrlParams>;
-  ParamProc: TProc<TParams>;
-  const Path: TArray<TArray<string>>): TResult;
-begin
-  Monitoring.Inc;
-  var Response := TStringStream.Create('', TEncoding.UTF8);
-  var UrlParams := TUrlParams.Create;
-  var Params := TParams.Create;
-  try
-    if Assigned(UrlProc) then
-      UrlProc(UrlParams);
-    if Assigned(ParamProc) then
-      ParamProc(Params);
-
-    var Http := NewHttpClient;
-    var Code := Http.Post(BuildUrl(Endpoint, UrlParams.Value), Params.JSON, Response, BuildJsonHeaders, nil);
-
-    case Code of
-      200..299:
-        begin
-          if Length(Path) = 0 then
-            Result := Deserialize<TResult>(Code, Response.DataString)
-          else
-            begin
-              var S := TJSONNormalizer.Normalize(Response.DataString, Path);
-              Result := Deserialize<TResult>(Code, S);
-            end;
-        end;
-      else
-        Result := Deserialize<TResult>(Code, Response.DataString)
-    end;
-  finally
-    Params.Free;
-    UrlParams.Free;
-    Response.Free;
-    ResetCustomHeader;
-    Monitoring.Dec;
-  end;
-end;
-
-function TGenAIAPI.Post<TResult>(const Endpoint: string;
-  const Path: TArray<TArray<string>>): TResult;
-begin
-  Monitoring.Inc;
-  var Response := TStringStream.Create('', TEncoding.UTF8);
-  try
-    var Http := NewHttpClient;
-    var Code := Http.Post(BuildUrl(Endpoint), Response, BuildHeaders);
-    var S := TJSONNormalizer.Normalize(Response.DataString, Path);
-    Result := Deserialize<TResult>(Code, S);
-  finally
-    Response.Free;
-    ResetCustomHeader;
-    Monitoring.Dec;
-  end;
-end;
-
 function TGenAIAPI.Post<TResult>(const Endpoint: string): TResult;
 begin
   Monitoring.Inc;
@@ -1011,7 +1027,7 @@ begin
   try
     var Http := NewHttpClient;
     var Code := Http.Post(BuildUrl(Endpoint), Response, BuildHeaders);
-    Result := Deserialize<TResult>(Code, Response.DataString);
+    Result := Deserialize<TResult>(Code, '', Response.DataString);
   finally
     Response.Free;
     ResetCustomHeader;
@@ -1026,7 +1042,7 @@ begin
   try
     var Http := NewHttpClient;
     var Code := Http.Delete(BuildUrl(Endpoint), Response, BuildHeaders);
-    Result := Deserialize<TResult>(Code, Response.DataString);
+    Result := Deserialize<TResult>(Code, '', Response.DataString);
   finally
     Response.Free;
     ResetCustomHeader;
@@ -1045,7 +1061,7 @@ begin
 
     var Http := NewHttpClient;
     var Code := Http.Post(BuildUrl(Endpoint), Params, Response, BuildHeaders);
-    Result := Deserialize<TResult>(Code, Response.DataString);
+    Result := Deserialize<TResult>(Code, '', Response.DataString);
   finally
     Params.Free;
     Response.Free;
@@ -1054,8 +1070,41 @@ begin
   end;
 end;
 
-function TGenAIAPI.Get<TResult, TParams>(const Endpoint: string;
-  ParamProc: TProc<TParams>): TResult;
+function TGenAIAPI.PostForm<TParams>(const Endpoint: string;
+  ParamProc: TProc<TParams>; Response: TStream;
+  Event: TReceiveDataCallback): Boolean;
+begin
+  Monitoring.Inc;
+  var Params := TParams.Create;
+  try
+    if Assigned(ParamProc) then
+      ParamProc(Params);
+
+    var Http := NewHttpClient;
+    var Code := Http.Post(BuildUrl(Endpoint), Params, Response, BuildHeaders, Event);
+
+    case Code of
+      200..299:
+        Result := True;
+    else
+      begin
+        Result := False;
+        Response.Position := 0;
+        var ErrBytes: TBytes;
+        SetLength(ErrBytes, Response.Size);
+        if Length(ErrBytes) > 0 then
+          Response.ReadBuffer(ErrBytes[0], Length(ErrBytes));
+        DeserializeErrorData(Code, TEncoding.UTF8.GetString(ErrBytes));
+      end;
+    end;
+  finally
+    Params.Free;
+    ResetCustomHeader;
+    Monitoring.Dec;
+  end;
+end;
+
+function TGenAIAPI.Get<TResult, TParams>(const Endpoint: string; ParamProc: TProc<TParams>): TResult;
 begin
   Monitoring.Inc;
   var Response := TStringStream.Create('', TEncoding.UTF8);
@@ -1066,49 +1115,10 @@ begin
 
     var Http := NewHttpClient;
     var Code := Http.Get(BuildUrl(Endpoint, Params.Value), Response, BuildHeaders);
-    Result := Deserialize<TResult>(Code, Response.DataString);
+    Result := Deserialize<TResult>(Code, '', Response.DataString);
   finally
     Response.Free;
     Params.Free;
-    ResetCustomHeader;
-    Monitoring.Dec;
-  end;
-end;
-
-function TGenAIAPI.Get<TResult, TParams>(const Endpoint: string;
-  ParamProc: TProc<TParams>; const Path: TArray<TArray<string>>): TResult;
-begin
-   Monitoring.Inc;
-  var Response := TStringStream.Create('', TEncoding.UTF8);
-  var Params := TParams.Create;
-  try
-    if Assigned(ParamProc) then
-      ParamProc(Params);
-
-    var Http := NewHttpClient;
-    var Code := Http.Get(BuildUrl(Endpoint, Params.Value), Response, BuildHeaders);
-    var S := TJSONNormalizer.Normalize(Response.DataString, Path);
-    Result := Deserialize<TResult>(Code, S);
-  finally
-    Response.Free;
-    Params.Free;
-    ResetCustomHeader;
-    Monitoring.Dec;
-  end;
-end;
-
-function TGenAIAPI.Get<TResult>(const Endpoint: string;
-  const Path: TArray<TArray<string>>): TResult;
-begin
-  Monitoring.Inc;
-  var Response := TStringStream.Create('', TEncoding.UTF8);
-  try
-    var Http := NewHttpClient;
-    var Code := Http.Get(BuildUrl(Endpoint), Response, BuildHeaders);
-    var S := TJSONNormalizer.Normalize(Response.DataString, Path);
-    Result := Deserialize<TResult>(Code, Response.DataString);
-  finally
-    Response.Free;
     ResetCustomHeader;
     Monitoring.Dec;
   end;
@@ -1153,7 +1163,7 @@ begin
   try
     var Http := NewHttpClient;
     var Code := Http.Get(BuildUrl(Endpoint), Response, BuildHeaders);
-    Result := Deserialize<TResult>(Code, Response.DataString);
+    Result := Deserialize<TResult>(Code, '', Response.DataString);
   finally
     Response.Free;
     ResetCustomHeader;
@@ -1161,13 +1171,14 @@ begin
   end;
 end;
 
-function TGenAIAPI.GetFile<TResult>(const Endpoint: string; const JSONFieldName: string):TResult;
+function TGenAIAPI.GetFile<TResult>(const Endpoint: string; const JSONFieldName: string): TResult;
 begin
   Monitoring.Inc;
-  var Stream := TStringStream.Create;
+  var Stream := TMemoryStream.Create;
   try
     var Code := GetFile(Endpoint, Stream);
-    Result := Deserialize<TResult>(Code, MockJsonFile(JSONFieldName, Stream));
+    {--- The synthetic base64 JSON is clean: disable JSON shield pre-processing. }
+    Result := Deserialize<TResult>(Code, '', MockJsonFile(JSONFieldName, Stream), True);
   finally
     Stream.Free;
     ResetCustomHeader;
@@ -1201,26 +1212,19 @@ begin
   end;
 end;
 
-function TGenAIAPI.MockJsonFile(const FieldName: string;
-  Response: TStringStream): string;
+function TGenAIAPI.MockJsonFile(const FieldName: string; Response: TStream): string;
 begin
   Response.Position := 0;
-  var Data := TStringStream.Create(BytesToString(Response.Bytes).TrimRight([#0]));
-  try
-    Result := Format('{"%s":"%s"}', [FieldName, EncodeBase64(Data)]);
-  finally
-    Data.Free;
-  end;
+  Result := Format('{"%s":"%s"}', [FieldName, TMediaCodec.EncodeBase64(Response)]);
 end;
 
-function TGenAIAPI.MockJsonResponse(const FieldName: string;
-  Response: TStringStream): string;
+function TGenAIAPI.MockJsonResponse(const FieldName: string; Response: TStream): string;
 begin
-  Result := Format('{"%s":"%s"}', [FieldName, BytesToBase64(Response.Bytes)]);
+  Response.Position := 0;
+  Result := Format('{"%s":"%s"}', [FieldName, TMediaCodec.EncodeBase64(Response)]);
 end;
 
-function TGenAIAPI.Patch<TResult, TParams>(const Endpoint: string;
-  ParamProc: TProc<TParams>): TResult;
+function TGenAIAPI.Patch<TResult, TParams>(const Endpoint: string; ParamProc: TProc<TParams>): TResult;
 begin
   Monitoring.Inc;
   var Response := TStringStream.Create('', TEncoding.UTF8);
@@ -1231,7 +1235,7 @@ begin
 
     var Http := NewHttpClient;
     var Code := Http.Patch(BuildUrl(Endpoint), Params.JSON, Response, BuildJsonHeaders);
-    Result := Deserialize<TResult>(Code, Response.DataString);
+    Result := Deserialize<TResult>(Code, '', Response.DataString);
   finally
     Params.Free;
     Response.Free;
@@ -1265,10 +1269,9 @@ begin
   Result := FBaseUrl.TrimRight(['/']) + '/' + Endpoint.TrimLeft(['/']);
 end;
 
-function TGenAIConfiguration.BuildUrl(const Endpoint,
-  Parameters: string): string;
+function TGenAIConfiguration.BuildUrl(const Endpoint, Parameters: string): string;
 begin
-  Result := BuildUrl(EndPoint) + Parameters;
+  Result := BuildUrl(Endpoint) + Parameters;
 end;
 
 constructor TGenAIConfiguration.Create;
@@ -1329,19 +1332,23 @@ end;
 
 class constructor TApiDeserializer.Create;
 begin
-  Metadata := TDeserializationPrepare.CreateInstance;
+  {--- JSON shield mechanism preserved: free-form fields are pre-processed as strings by default. }
+  FMetadataManager := TDeserializationPrepare.CreateInstance;
+  FMetadataAsObject := False;
 end;
 
-function TApiDeserializer.Deserialize<T>(const Code: Int64;
-  const ResponseText: string): T;
+function TApiDeserializer.Deserialize<T>(const Code: Int64; const Payload, ResponseText: string;
+  DisabledShield: Boolean): T;
 begin
   Result := nil;
   case Code of
     200..299:
       try
-        Result := Parse<T>(ResponseText);
+        Result := Parse<T>(ResponseText, Payload, DisabledShield);
       except
-        Result := nil;
+        on E: Exception do
+          raise TGenAIInvalidResponseError.Create(Code,
+            Format('Non-compliant response: %s (%s)', [E.Message, E.ClassName]));
       end;
     else
       DeserializeErrorData(Code, ResponseText);
@@ -1350,8 +1357,7 @@ begin
     raise TGenAIInvalidResponseError.Create(Code, 'Non-compliant response');
 end;
 
-procedure TApiDeserializer.DeserializeErrorData(const Code: Int64;
-  const ResponseText: string);
+procedure TApiDeserializer.DeserializeErrorData(const Code: Int64; const ResponseText: string);
 var
   Error: TError;
 begin
@@ -1373,38 +1379,76 @@ begin
   end;
 end;
 
-class function TApiDeserializer.Parse<T>(const Value: string): T;
-{$REGION 'Dev note'}
-  {--- NOTE
-    - If Metadata are to be treated  as objects, a dedicated  TMetadata class is required, containing
-    all the properties corresponding to the specified JSON fields.
-
-    - However, if Metadata are  not treated  as objects, they will be temporarily handled as a string
-    and subsequently converted back into a valid JSON string during the deserialization process using
-    the Revert method of the interceptor.
-
-    By default, Metadata are  treated as strings rather  than objects to handle  cases where multiple
-    classes to be deserialized may contain variable data structures.
-    Refer to the global variable MetadataAsObject. }
-{$ENDREGION}
+class function TApiDeserializer.Parse<T>(const Value: string; DisabledShield: Boolean): T;
 begin
-  case MetadataAsObject of
-    True:
-      Result := TJson.JsonToObject<T>(Value);
-    else
-      Result := TJson.JsonToObject<T>(Metadata.Convert(Value));
-  end;
+  Result := Parse<T>(Value, '', DisabledShield);
+end;
 
-  {--- Add JSON response if class inherits from TJSONFingerprint class. }
-  if Assigned(Result) and T.InheritsFrom(TJSONFingerprint) then
-    begin
-      var JSONValue := TJSONObject.ParseJSONValue(Value);
-      try
-        (Result as TJSONFingerprint).JSONResponse := JSONValue.Format();
-      finally
-        JSONValue.Free;
+class function TApiDeserializer.Parse<T>(const Value, Payload: string; DisabledShield: Boolean): T;
+{$REGION 'Dev note'}
+  (*
+    Two-step (double) deserialization:
+
+    Step 1 - Map the payload to the object graph. Unless DisabledShield is True (direct parse) or
+             MetadataAsObject is True (protected fields expected as proper objects/arrays),
+             free-form fields are shielded as strings by MetadataManager.Convert before
+             TJson.JsonToObject.
+
+    Step 2 - If T is a TJSONFingerprint, the formatted raw JSON is stored on JSONResponse and bound
+             to every fingerprint in the graph via TJSONFingerprintBinder.Bind. Then JSONPayload is
+             set and InternalFinalizeDeserialize runs the per-DTO post-processing (AfterDeserialize),
+             where each object can re-parse its own JSONResponse to rebuild polymorphic / streaming
+             content that RTTI cannot resolve. Formatting is best-effort and falls back to the raw
+             vendor payload without breaking the deserialization flow.
+
+    Exception safety: on any failure after allocation, the partially created instance is freed before
+    re-raising, to avoid leaks.
+  *)
+{$ENDREGION}
+var
+  Obj: TObject;
+begin
+  Result := Default(T);
+  try
+    if DisabledShield then
+      Result := TJson.JsonToObject<T>(Value)
+    else
+      case FMetadataAsObject of
+        True:
+          Result := TJson.JsonToObject<T>(Value);
+      else
+        begin
+          if FMetadataManager = nil then
+            raise TGenAIInvalidResponseError.Create(0,
+              'MetadataManager is nil while MetadataAsObject = False');
+          Result := TJson.JsonToObject<T>(FMetadataManager.Convert(Value));
+        end;
       end;
-    end;
+
+    {--- Two-step finalization for fingerprint classes. }
+    if Assigned(Result) and (Result is TJSONFingerprint) then
+      begin
+        var Formatted := Value;
+        try
+          var Reader := TJsonReader.Parse(Value);
+          if Reader.IsValid then
+            Formatted := Reader.Format();
+        except
+          Formatted := Value;
+        end;
+
+        (Result as TJSONFingerprint).JSONResponse := Formatted;
+        TJSONFingerprintBinder.Bind(Result, Formatted);
+
+        (Result as TJSONFingerprint).JSONPayload := Payload;
+        (Result as TJSONFingerprint).InternalFinalizeDeserialize;
+      end;
+  except
+    Obj := TObject(Result);
+    if Obj <> nil then
+      Obj.Free;
+    raise;
+  end;
 end;
 
 procedure TApiDeserializer.RaiseError(Code: Int64; Error: TErrorCore);
@@ -1430,8 +1474,6 @@ end;
 constructor TApiHttpHandler.Create;
 begin
   inherited Create;
-
-  {--- TEMPLATE de config, exposé via IGemini.HttpClient }
   FHttpClient := THttpClientAPI.CreateInstance(VerifyApiSettings);
 end;
 
@@ -1464,4 +1506,3 @@ end;
 initialization
   TGenAIAPI.LocalUrlBase := 'http://127.0.0.1:1234/v1';
 end.
-

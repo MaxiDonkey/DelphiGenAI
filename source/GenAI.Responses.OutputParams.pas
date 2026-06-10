@@ -35,8 +35,8 @@ type
 
   TResponseError = class
   private
-    FCode    : string;
-    FMessage : string;
+    FCode: string;
+    FMessage: string;
   public
     /// <summary>
     /// The error code for the response.
@@ -55,7 +55,7 @@ type
 
   TResponseIncompleteDetails = class
   private
-    FReason : string;
+    FReason: string;
   public
     /// <summary>
     /// The reason why the response is incomplete.
@@ -69,9 +69,9 @@ type
 
   TTopLogProb = class
   private
-    FBytes   : TArray<double>;
-    FLogprob : Double;
-    FToken   : string;
+    FBytes: TArray<double>;
+    FLogprob: Double;
+    FToken: string;
   public
     property Bytes: TArray<double> read FBytes write FBytes;
     property Logprob: Double read FLogprob write FLogprob;
@@ -80,11 +80,11 @@ type
 
   TLogProb = class
   private
-    FBytes       : TArray<double>;
-    FLogprob     : Double;
-    FToken       : string;
+    FBytes: TArray<double>;
+    FLogprob: Double;
+    FToken: string;
     [JsonNameAttribute('top_logprobs')]
-    FTopLogprobs : TArray<TTopLogProb>;
+    FTopLogprobs: TArray<TTopLogProb>;
   public
     property Bytes: TArray<double> read FBytes write FBytes;
     property Logprob: Double read FLogprob write FLogprob;
@@ -99,8 +99,8 @@ type
 
   TDragPath = class
   private
-    FX : Int64;
-    FY : Int64;
+    FX: Int64;
+    FY: Int64;
   public
     property X: Int64 read FX write FX;
     property Y: Int64 read FY write FY;
@@ -108,13 +108,12 @@ type
 
   TInstructionsResults = class
   private
-    [JsonReflectAttribute(ctString, rtString, TMetadataInterceptor)]
-    FAttributes : string;
+    FAttributes: string;
     [JsonNameAttribute('file_id')]
-    FFileId     : string;
-    FFilename   : string;
-    FScore      : Double;
-    FText       : string;
+    FFileId: string;
+    FFilename: string;
+    FScore: Double;
+    FText: string;
   public
     /// <summary>
     /// Set of 16 key-value pairs that can be attached to an object. This can be useful for storing additional
@@ -224,7 +223,6 @@ type
     FPattern          : string;
     //Local shell call
     FCommand          : TArray<string>;
-    [JsonReflectAttribute(ctString, rtString, TMetadataInterceptor)]
     FEnv              : string;
     [JsonNameAttribute('timeout_ms')]
     FTimeoutMs        : Int64;
@@ -371,7 +369,6 @@ type
 
   TInstructionsTools = class
   private
-    [JsonReflectAttribute(ctString, rtString, TMetadataInterceptor)]
     [JsonNameAttribute('input_schema')]
     FInputSchema : string;
     FName        : string;
@@ -854,7 +851,7 @@ type
   TResponseMessageContentCommon = class
   private
     [JsonReflectAttribute(ctString, rtString, TResponseContentTypeInterceptor)]
-    FType : TResponseContentType;
+    FType: TResponseContentType;
   public
     /// <summary>
     /// The type of the output text. One of output_text or refusal
@@ -864,8 +861,8 @@ type
 
   TResponseMessageContent = class(TResponseMessageContentCommon)
   private
-    FAnnotations : TArray<TResponseMessageAnnotation>;
-    FText        : string;
+    FAnnotations: TArray<TResponseMessageAnnotation>;
+    FText: string;
     FLogprobs: TArray<TLogProb>;
   public
     /// <summary>
@@ -888,26 +885,19 @@ type
 
   TResponseMessageRefusal = class(TResponseMessageContent)
   private
-    FRefusal : string;
+    FRefusal: string;
   public
     /// <summary>
     /// The refusal explanationfrom the model.
     /// </summary>
     property Refusal: string read FRefusal write FRefusal;
   end;
-
-  {$REGION 'Dev note'}
-  {--- This class is made up of the following classes:
-     TResponseMessageContentCommon,
-     TResponseMessageContent,
-     TResponseMessageRefusal }
-  {$ENDREGION}
   TResponseContent = class(TResponseMessageRefusal);
 
   TResponseReasoningSummary = class
   private
-    FText : string;
-    FType : string;
+    FText: string;
+    FType: string;
   public
     /// <summary>
     /// A short summary of the reasoning used by the model when generating the response.
@@ -923,8 +913,8 @@ type
   TResponseRankingOptions = class
   private
     [JsonNameAttribute('score_threshold')]
-    FScoreThreshold : Double;
-    FRanker         : string;
+    FScoreThreshold: Double;
+    FRanker: string;
   public
     /// <summary>
     /// The ranker to use for the file search.
@@ -941,7 +931,7 @@ type
   TResponseFileSearchFiltersCommon = class
   private
     [JsonReflectAttribute(ctString, rtString, TResponseToolsFilterTypeInterceptor)]
-    FType : TResponseToolsFilterType;
+    FType: TResponseToolsFilterType;
   public
     /// <summary>
     /// Specifies the comparison operator or the type of operation
@@ -984,13 +974,6 @@ type
   public
     property AllowedDomains: TArray<string> read FAllowedDomains write FAllowedDomains;
   end;
-
-  {$REGION 'Dev note'}
-  {--- This class is made up of the following classes:
-    TResponseFileSearchFiltersCommon,
-    TResponseFileSearchFiltersComparaison,
-    TResponseFileSearchFiltersCompound }
-  {$ENDREGION}
   TResponseFileSearchFilters = class(TWebSearchFilter);
 
   TResponseWebSearchLocation = class
@@ -1031,25 +1014,12 @@ type
 
     {$REGION 'output'}
 
-      {$REGION 'Dev note'}
-(******************************************************************************
-
-  TResponseOutput :
-  ================
-
-  To enable optimal automatic deserialization, you need to set up a hierarchy
-  of successive classes. However, this does make the code heavier if you want
-  to maintain the wrapper’s overall architectural principles.
-
-*******************************************************************************)
-      {$ENDREGION}
-
   TResponseOutputCommon = class
   private
     [JsonReflectAttribute(ctString, rtString, TResponseTypesInterceptor)]
-    FType   : TResponseTypes;
-    FId     : string;
-    FStatus : string;
+    FType: TResponseTypes;
+    FId: string;
+    FStatus: string;
   public
     /// <summary>
     /// The unique ID of the output message.
@@ -1070,8 +1040,8 @@ type
   TResponseOutputMessage = class(TResponseOutputCommon)
   private
     [JsonReflectAttribute(ctString, rtString, TRoleInterceptor)]
-    FRole    : TRole;
-    FContent : TArray<TResponseContent>;
+    FRole: TRole;
+    FContent: TArray<TResponseContent>;
   public
     /// <summary>
     /// The content of the output message.
@@ -1088,8 +1058,8 @@ type
 
   TResponseOutputFileSearch = class(TResponseOutputMessage)
   private
-    FQueries : TArray<string>;
-    FResults : TArray<TFileSearchResult>;
+    FQueries: TArray<string>;
+    FResults: TArray<TFileSearchResult>;
   public
     /// <summary>
     /// The queries used to search for files.
@@ -1107,9 +1077,9 @@ type
   TResponseOutputFunction = class(TResponseOutputFileSearch)
   private
     [JsonNameAttribute('call_id')]
-    FCallId    : string;
-    FArguments : string;
-    FName      : string;
+    FCallId: string;
+    FArguments: string;
+    FName: string;
   public
     /// <summary>
     /// A JSON string of the arguments to pass to the function.
@@ -1129,7 +1099,7 @@ type
 
   TResponseOutputWebSearch = class(TResponseOutputFunction)
   private
-    FAction : TAction;
+    FAction: TAction;
   public
     /// <summary>
     /// Action to execute on computer
@@ -1142,7 +1112,7 @@ type
   TResponseOutputComputer = class(TResponseOutputWebSearch)
   private
     [JsonNameAttribute('pending_safety_checks')]
-    FPendingSafetyChecks : TArray<TPendingSafetyChecks>;
+    FPendingSafetyChecks: TArray<TPendingSafetyChecks>;
   public
     /// <summary>
     /// The pending safety checks for the computer call.
@@ -1155,9 +1125,9 @@ type
   TResponseOutputReasoning = class(TResponseOutputComputer)
   private
     [JsonNameAttribute('encrypted_content')]
-    FEncryptedContent : string;
-    FSummary          : TArray<TResponseReasoningSummary>;
-    FContent          : TArray<TResponseReasoningSummary>;
+    FEncryptedContent: string;
+    FSummary: TArray<TResponseReasoningSummary>;
+    FContent: TArray<TResponseReasoningSummary>;
   public
     /// <summary>
     /// Reasoning text contents.
@@ -1180,7 +1150,7 @@ type
 
   TResponseOutputImageGeneration = class(TResponseOutputReasoning)
   private
-    FResult : string;
+    FResult: string;
   public
     function GetStream: TStream;
 
@@ -1194,9 +1164,9 @@ type
 
   TResponseCodeInterpreterOutput = class
   private
-    FType : string;
-    FLogs : string;
-    FUrl  : string;
+    FType: string;
+    FLogs: string;
+    FUrl: string;
   public
     property &Type: string read FType write FType;
     property Logs: string read FLogs write FLogs;
@@ -1206,9 +1176,9 @@ type
   TResponseOutputCodeInterpreter = class(TResponseOutputImageGeneration)
   private
     [JsonNameAttribute('container_id')]
-    FContainerId : string;
-    FCode        : string;
-    FOutputs     : TArray<TResponseCodeInterpreterOutput>;
+    FContainerId: string;
+    FCode: string;
+    FOutputs: TArray<TResponseCodeInterpreterOutput>;
   public
     /// <summary>
     /// The code to run.
@@ -1234,11 +1204,12 @@ type
   TResponseOutputMCPTool = class(TResponseOutputLocalShell)
   private
     [JsonNameAttribute('server_label')]
-    FServerLabel : string;
+    FServerLabel: string;
     [JsonNameAttribute('approval_request_id')]
     FApprovalRequestId: string;
-    FError       : string;
-    FOutput      : string;
+    FError: string;
+    [JSONMarshalled(False)]
+    FOutput: string;
   public
     /// <summary>
     /// The label of the MCP server running the tool.
@@ -1264,7 +1235,7 @@ type
 
   TResponseOutputMCPList = class(TResponseOutputMCPTool)
   private
-    FTools : TArray<TMCPListTool>;
+    FTools: TArray<TMCPListTool>;
   public
     property Tools: TArray<TMCPListTool> read FTools write FTools;
 
@@ -1276,7 +1247,7 @@ type
 
   TResponseCustomTool = class(TResponseMCPApproval)
   private
-    FInput : string;
+    FInput: string;
   public
     /// <summary>
     /// The input for the custom tool call generated by the model.
@@ -1284,24 +1255,175 @@ type
     property Input: string read FInput write FInput;
   end;
 
-  {$REGION 'Dev note'}
-  {--- This class is made up of the following classes:
-    TResponseOutputCommon,
-    TResponseOutputMessage,
-    TResponseOutputFileSearch,
-    TResponseOutputFunction,
-    TResponseOutputWebSearch,
-    TResponseOutputComputer,
-    TResponseOutputReasoning,
-    TResponseOutputImageGeneration,
-    TResponseOutputCodeInterpreter,
-    TResponseOutputLocalShell,
-    TResponseOutputMCPTool,
-    TResponseOutputMCPList,
-    TResponseMCPApproval
-  }
-  {$ENDREGION}
-  TResponseOutput = class(TResponseCustomTool);
+  /// <summary>
+  /// The file operation carried by an apply_patch_call output item.
+  /// </summary>
+  TResponseApplyPatchOperation = class
+  private
+    FType: string;
+    FPath: string;
+    FDiff: string;
+  public
+    /// <summary>
+    /// The operation type. One of create_file, delete_file or update_file.
+    /// </summary>
+    property &Type: string read FType write FType;
+
+    /// <summary>
+    /// Path of the file targeted by the operation.
+    /// </summary>
+    property Path: string read FPath write FPath;
+
+    /// <summary>
+    /// Diff to apply (create_file and update_file).
+    /// </summary>
+    property Diff: string read FDiff write FDiff;
+  end;
+
+  /// <summary>
+  /// The action carried by a shell_call output item. Rebuilt from the raw JSON because the
+  /// <c>action</c> key is polymorphic across output item types.
+  /// </summary>
+  TResponseShellAction = class
+  private
+    FCommands: TArray<string>;
+    [JsonNameAttribute('timeout_ms')]
+    FTimeoutMs: Int64;
+    [JsonNameAttribute('max_output_length')]
+    FMaxOutputLength: Int64;
+  public
+    /// <summary>
+    /// The commands to run.
+    /// </summary>
+    property Commands: TArray<string> read FCommands write FCommands;
+
+    /// <summary>
+    /// Optional timeout in milliseconds for the commands.
+    /// </summary>
+    property TimeoutMs: Int64 read FTimeoutMs write FTimeoutMs;
+
+    /// <summary>
+    /// Optional maximum output length for the commands.
+    /// </summary>
+    property MaxOutputLength: Int64 read FMaxOutputLength write FMaxOutputLength;
+  end;
+
+  /// <summary>
+  /// The outcome of a single shell_call_output entry.
+  /// </summary>
+  TResponseShellOutcome = class
+  private
+    FType: string;
+    [JsonNameAttribute('exit_code')]
+    FExitCode: Int64;
+  public
+    /// <summary>
+    /// The outcome type. One of timeout or exit.
+    /// </summary>
+    property &Type: string read FType write FType;
+
+    /// <summary>
+    /// The exit code of the command (exit outcome).
+    /// </summary>
+    property ExitCode: Int64 read FExitCode write FExitCode;
+  end;
+
+  /// <summary>
+  /// A single entry of a shell_call_output output array. Rebuilt from the raw JSON because the
+  /// <c>output</c> key is polymorphic across output item types.
+  /// </summary>
+  TResponseShellOutput = class
+  private
+    FOutcome: TResponseShellOutcome;
+    FStdout: string;
+    FStderr: string;
+    [JsonNameAttribute('created_by')]
+    FCreatedBy: string;
+  public
+    /// <summary>
+    /// The outcome of the command.
+    /// </summary>
+    property Outcome: TResponseShellOutcome read FOutcome write FOutcome;
+
+    /// <summary>
+    /// The standard output produced by the command.
+    /// </summary>
+    property Stdout: string read FStdout write FStdout;
+
+    /// <summary>
+    /// The standard error produced by the command.
+    /// </summary>
+    property Stderr: string read FStderr write FStderr;
+
+    /// <summary>
+    /// The identifier of the actor that created the entry.
+    /// </summary>
+    property CreatedBy: string read FCreatedBy write FCreatedBy;
+
+    destructor Destroy; override;
+  end;
+
+  TResponseOutput = class(TResponseCustomTool)
+  private
+    [JsonNameAttribute('created_by')]
+    FCreatedBy: string;
+    FExecution: string;
+    FOperation: TResponseApplyPatchOperation;
+    [JsonNameAttribute('max_output_length')]
+    FMaxOutputLength: Int64;
+    {--- Polymorphic fields rebuilt in TResponse.ContentUpdate (conflicting JSON keys). }
+    [JSONMarshalled(False)]
+    FShellAction: TResponseShellAction;
+    [JSONMarshalled(False)]
+    FShellOutput: TArray<TResponseShellOutput>;
+    [JSONMarshalled(False)]
+    FSearchArguments: string;
+    [JSONMarshalled(False)]
+    FSearchTools: string;
+  public
+    /// <summary>
+    /// The identifier of the actor that created this item (populated on newer item types such as
+    /// shell_call, apply_patch_call, tool_search_call and compaction).
+    /// </summary>
+    property CreatedBy: string read FCreatedBy write FCreatedBy;
+
+    /// <summary>
+    /// Whether a tool search was performed server-side or client-side. One of server or client.
+    /// </summary>
+    property Execution: string read FExecution write FExecution;
+
+    /// <summary>
+    /// The file operation of an apply_patch_call item.
+    /// </summary>
+    property Operation: TResponseApplyPatchOperation read FOperation write FOperation;
+
+    /// <summary>
+    /// The maximum output length for a shell_call_output item.
+    /// </summary>
+    property MaxOutputLength: Int64 read FMaxOutputLength write FMaxOutputLength;
+
+    /// <summary>
+    /// The action of a shell_call item. Rebuilt from the raw JSON.
+    /// </summary>
+    property ShellAction: TResponseShellAction read FShellAction write FShellAction;
+
+    /// <summary>
+    /// The output entries of a shell_call_output item. Rebuilt from the raw JSON.
+    /// </summary>
+    property ShellOutput: TArray<TResponseShellOutput> read FShellOutput write FShellOutput;
+
+    /// <summary>
+    /// The raw JSON arguments object of a tool_search_call item. Rebuilt from the raw JSON.
+    /// </summary>
+    property SearchArguments: string read FSearchArguments write FSearchArguments;
+
+    /// <summary>
+    /// The raw JSON array of loaded tool definitions of a tool_search_output item. Rebuilt from the raw JSON.
+    /// </summary>
+    property SearchTools: string read FSearchTools write FSearchTools;
+
+    destructor Destroy; override;
+  end;
 
     {$ENDREGION}
 
@@ -1309,10 +1431,9 @@ type
 
   TPrompt = class
   private
-    [JsonReflectAttribute(ctString, rtString, TMetadataInterceptor)]
-    FVariables : string;
-    FId        : string;
-    FVersion   : string;
+    FVariables: string;
+    FId: string;
+    FVersion: string;
   public
     /// <summary>
     /// The unique identifier of the prompt template to use.
@@ -1338,8 +1459,8 @@ type
   TResponseReasoning = class
   private
     [JsonReflectAttribute(ctString, rtString, TReasoningEffortInterceptor)]
-    FEffort  : TReasoningEffort;
-    FSummary : string;
+    FEffort: TReasoningEffort;
+    FSummary: string;
   public
     /// <summary>
     /// o-series models only
@@ -1364,7 +1485,7 @@ type
   TResponseTextFormatCommon = class
   private
     [JsonReflectAttribute(ctString, rtString, TResponseFormatTypeInterceptor)]
-    FType : TResponseFormatType;
+    FType: TResponseFormatType;
   public
     /// <summary>
     /// The type of response format being defined. One of text, json_schema, json_object
@@ -1380,11 +1501,10 @@ type
 
   TResponseFormatJSONSchema = class(TResponseFormatJSONObject)
   private
-    [JsonReflectAttribute(ctString, rtString, TMetadataInterceptor)]
-    FSchema      : string;
-    FName        : string;
-    FDescription : string;
-    FStrict      : Boolean;
+    FSchema: string;
+    FName: string;
+    FDescription: string;
+    FStrict: Boolean;
   public
     /// <summary>
     /// The name of the response format. Must be a-z, A-Z, 0-9, or contain underscores and dashes, with a maximum
@@ -1418,7 +1538,7 @@ type
 
   TResponseToolContainer = class
   private
-    FType : string;
+    FType: string;
     [JsonNameAttribute('file_ids')]
     FFileIds: TArray<string>;
   public
@@ -1432,21 +1552,13 @@ type
     /// </summary>
     property FileIds: TArray<string> read FFileIds write FFileIds;
   end;
-
-  {$REGION 'Dev note'}
-  {--- This class is made up of the following classes:
-    TResponseTextFormatCommon,
-    TResponseFormatText,
-    TResponseFormatJSONObject,
-    TResponseFormatJSONSchema }
-  {$ENDREGION}
   TResponseTextFormat = class(TResponseFormatJSONSchema);
 
   TResponseText = class
   private
     [JsonReflectAttribute(ctString, rtString, TVerbosityTypeInterceptor)]
-    FVerbosity : TVerbosityType;
-    FFormat    : TResponseTextFormat;
+    FVerbosity: TVerbosityType;
+    FFormat: TResponseTextFormat;
   public
     /// <summary>
     /// An object specifying the format that the model must output.
@@ -1465,9 +1577,9 @@ type
 
   TCustomToolFormat = class
   private
-    FType        : string;
-    FDefinition  : string;
-    FSyntax      : string;
+    FType: string;
+    FDefinition: string;
+    FSyntax: string;
   public
     /// <summary>
     /// Unconstrained text format "text" or Grammar format "grammar".
@@ -1492,7 +1604,7 @@ type
   TResponseToolCommon = class
   private
     [JsonReflectAttribute(ctString, rtString, TResponseToolsTypeInterceptor)]
-    FType : TResponseToolsType;
+    FType: TResponseToolsType;
   public
     /// <summary>
     /// The type of the tool
@@ -1503,12 +1615,12 @@ type
   TResponseToolFileSearch = class(TResponseToolCommon)
   private
     [JsonNameAttribute('vector_store_ids')]
-    FVectorStoreIds : TArray<string>;
-    FFilters        : TResponseFileSearchFilters;
+    FVectorStoreIds: TArray<string>;
+    FFilters: TResponseFileSearchFilters;
     [JsonNameAttribute('max_num_results')]
-    FMaxNumResults  : Int64;
+    FMaxNumResults: Int64;
     [JsonNameAttribute('ranking_options')]
-    FRankingOptions : TResponseRankingOptions;
+    FRankingOptions: TResponseRankingOptions;
   public
     /// <summary>
     /// The IDs of the vector stores to search.
@@ -1535,11 +1647,10 @@ type
 
   TResponseToolFunction = class(TResponseToolFileSearch)
   private
-    [JsonReflectAttribute(ctString, rtString, TMetadataInterceptor)]
-    FParameters  : string;
-    FName        : string;
-    FStrict      : Boolean;
-    FDescription : string;
+    FParameters: string;
+    FName: string;
+    FStrict: Boolean;
+    FDescription: string;
   public
     /// <summary>
     /// The name of the function to call.
@@ -1565,10 +1676,10 @@ type
   TResponseToolComputerUse = class(TResponseToolFunction)
   private
     [JsonNameAttribute('display_height')]
-    FDisplayHeight : Int64;
+    FDisplayHeight: Int64;
     [JsonNameAttribute('display_width')]
-    FDisplayWidth  : Int64;
-    FEnvironment   : string;
+    FDisplayWidth: Int64;
+    FEnvironment: string;
   public
     /// <summary>
     /// The height of the computer display.
@@ -1590,9 +1701,9 @@ type
   private
     [JsonReflectAttribute(ctString, rtString, TReasoningEffortInterceptor)]
     [JsonNameAttribute('search_context_size')]
-    FSearchContextSize : TReasoningEffort;
+    FSearchContextSize: TReasoningEffort;
     [JsonNameAttribute('user_location')]
-    FUserLocation      : TResponseWebSearchLocation;
+    FUserLocation: TResponseWebSearchLocation;
   public
     /// <summary>
     /// High level guidance for the amount of context window space to use for the search. One of low, medium, or high.
@@ -1611,14 +1722,13 @@ type
   TResponseMCPTool = class(TResponseToolWebSearch)
   private
     [JsonNameAttribute('server_label')]
-    FServerLabel   : string;
-    FAuthorization : string;
+    FServerLabel: string;
+    FAuthorization: string;
     [JsonNameAttribute('connector_id')]
-    FConnectorId   : string;
+    FConnectorId: string;
     [JsonNameAttribute('server_url')]
-    FServerUrl     : string;
-    [JsonReflectAttribute(ctString, rtString, TMetadataInterceptor)]
-    FHeaders       : string;
+    FServerUrl: string;
+    FHeaders: string;
   public
     /// <summary>
     /// A label for this MCP server, used to identify it in tool calls.
@@ -1640,28 +1750,28 @@ type
     /// <remarks>
     /// Currently supported connector_id values are:
     /// <para>
-    /// • Dropbox: connector_dropbox
+    /// � Dropbox: connector_dropbox
     /// </para>
     /// <para>
-    /// • Gmail: connector_gmail
+    /// � Gmail: connector_gmail
     /// </para>
     /// <para>
-    /// • Google Calendar: connector_googlecalendar
+    /// � Google Calendar: connector_googlecalendar
     /// </para>
     /// <para>
-    /// • Google Drive: connector_googledrive
+    /// � Google Drive: connector_googledrive
     /// </para>
     /// <para>
-    /// • Microsoft Teams: connector_microsoftteams
+    /// � Microsoft Teams: connector_microsoftteams
     /// </para>
     /// <para>
-    /// • Outlook Calendar: connector_outlookcalendar
+    /// � Outlook Calendar: connector_outlookcalendar
     /// </para>
     /// <para>
-    /// • Outlook Email: connector_outlookemail
+    /// � Outlook Email: connector_outlookemail
     /// </para>
     /// <para>
-    /// • SharePoint: connector_sharepoint
+    /// � SharePoint: connector_sharepoint
     /// </para>
     /// </remarks>
     property ConnectorId: string read FConnectorId write FConnectorId;
@@ -1798,19 +1908,38 @@ type
   TResponseToolWebSearchPreview = class(TCustomTool)
   end;
 
-    {$REGION 'Dev note'}
-  {--- This class is made up of the following classes:
-    TResponseToolCommon,
-    TResponseToolFileSearch,
-    TResponseToolFunction,
-    TResponseToolComputerUse,
-    TResponseToolWebSearch,
-    TResponseMCPTool,
-    TResponseCodeInterpreter,
-    TResponseImageGenerationTool,
-    TResponseLocalShellTool}
-    {$ENDREGION}
-  TResponseTool = class(TResponseToolWebSearchPreview);
+  TResponseTool = class(TResponseToolWebSearchPreview)
+  private
+    {--- Polymorphic fields rebuilt in TResponse.ContentUpdate (conflicting JSON keys). }
+    [JSONMarshalled(False)]
+    FShellEnvironment: string;
+    [JSONMarshalled(False)]
+    FNamespaceTools: string;
+    [JSONMarshalled(False)]
+    FToolSearchParameters: string;
+    [JSONMarshalled(False)]
+    FExecution: string;
+  public
+    /// <summary>
+    /// The raw JSON environment object of a shell tool. Rebuilt from the raw JSON.
+    /// </summary>
+    property ShellEnvironment: string read FShellEnvironment write FShellEnvironment;
+
+    /// <summary>
+    /// The raw JSON array of tools contained in a namespace tool. Rebuilt from the raw JSON.
+    /// </summary>
+    property NamespaceTools: string read FNamespaceTools write FNamespaceTools;
+
+    /// <summary>
+    /// The raw JSON parameters object of a tool_search tool. Rebuilt from the raw JSON.
+    /// </summary>
+    property ToolSearchParameters: string read FToolSearchParameters write FToolSearchParameters;
+
+    /// <summary>
+    /// Where the tool search is executed (tool_search tool). One of server or client.
+    /// </summary>
+    property Execution: string read FExecution write FExecution;
+  end;
 
     {$ENDREGION}
 
@@ -1884,22 +2013,115 @@ type
 
     {$ENDREGION}
 
+  /// <summary>
+  /// A compacted response returned by POST /responses/compact.
+  /// </summary>
+  TResponseCompaction = class(TJSONFingerprint)
+  private
+    [JsonNameAttribute('created_at')]
+    FCreatedAt : Int64;
+    FId        : string;
+    FObject    : string;
+    FOutput    : TArray<TResponseItem>;
+    FUsage     : TResponseUsage;
+    function GetCreatedAtAsString: string;
+  public
+    property CreatedAt: Int64 read FCreatedAt write FCreatedAt;
+    property CreatedAtAsString: string read GetCreatedAtAsString;
+    property Id: string read FId write FId;
+    property &Object: string read FObject write FObject;
+    property Output: TArray<TResponseItem> read FOutput write FOutput;
+    property Usage: TResponseUsage read FUsage write FUsage;
+
+    destructor Destroy; override;
+  end;
+
+    {$REGION 'response tool_choice'}
+
+  /// <summary>
+  /// Rehydrated representation of the response <c>tool_choice</c> field.
+  /// </summary>
+  /// <remarks>
+  /// <para>
+  /// <c>tool_choice</c> is polymorphic: it can be a bare string (<c>none</c>, <c>auto</c> or
+  /// <c>required</c>) or an object (function, mcp, custom, allowed_tools or a hosted tool).
+  /// Because it cannot be deserialized directly into a single typed field, it is rebuilt from the
+  /// raw JSON during <see cref="TResponse.ContentUpdate"/>.
+  /// </para>
+  /// <para>
+  /// When the API returned a bare string, only <c>Value</c> is populated. When it returned an
+  /// object, <c>Type</c> and the relevant fields are populated and <c>Value</c> is empty.
+  /// </para>
+  /// </remarks>
+  TResponseToolChoice = class
+  private
+    FType: string;
+    FName: string;
+    [JsonNameAttribute('server_label')]
+    FServerLabel: string;
+    FMode: string;
+    [JSONMarshalled(False)]
+    FValue: string;
+    [JSONMarshalled(False)]
+    FTools: string;
+  public
+    /// <summary>
+    /// The type discriminator when <c>tool_choice</c> is an object (e.g. function, mcp, custom,
+    /// allowed_tools, file_search, web_search_preview, computer_use_preview). Empty when it was a
+    /// bare string.
+    /// </summary>
+    property &Type: string read FType write FType;
+
+    /// <summary>
+    /// The name of the function, MCP or custom tool to call.
+    /// </summary>
+    property Name: string read FName write FName;
+
+    /// <summary>
+    /// The label of the MCP server (mcp tool choice).
+    /// </summary>
+    property ServerLabel: string read FServerLabel write FServerLabel;
+
+    /// <summary>
+    /// The mode of the allowed_tools choice. One of auto or required.
+    /// </summary>
+    property Mode: string read FMode write FMode;
+
+    /// <summary>
+    /// The raw JSON array of tool definitions for the allowed_tools choice.
+    /// </summary>
+    property Tools: string read FTools write FTools;
+
+    /// <summary>
+    /// The bare-string choice (none, auto or required) when <c>tool_choice</c> was a string.
+    /// Empty when it was an object.
+    /// </summary>
+    property Value: string read FValue write FValue;
+  end;
+
+    {$ENDREGION}
+
   TResponse = class(TJSONFingerprint)
   private
     FBackground               : Boolean;
     FConversation             : TConversation;
     [JsonNameAttribute('created_at')]
-    FCreatedAt                : TInt64OrNull;
+    FCreatedAt                : Int64;
+    [JsonNameAttribute('completed_at')]
+    FCompletedAt              : Int64;
     FError                    : TResponseError;
     FId                       : string;
     [JsonNameAttribute('incomplete_details')]
     FIncompleteDetails        : TResponseIncompleteDetails;
+    {--- instructions is polymorphic (string or array) so it cannot be deserialized directly.
+         It is rebuilt from the raw JSONResponse in ContentUpdate. }
+    [JSONMarshalled(False)]
     FInstructions             : TArray<TInstructions>;
+    FInstructionsText         : string;
     [JsonNameAttribute('max_output_tokens')]
     FMaxOutputTokens          : Int64;
     [JsonNameAttribute('max_tool_calls')]
     FMaxToolCalls             : Int64;
-    [JsonReflectAttribute(ctString, rtString, TMetadataInterceptor)]
     FMetadata                 : string;
     FModel                    : string;
     FObject                   : string;
@@ -1911,6 +2133,8 @@ type
     FPrompt                   : TPrompt;
     [JsonNameAttribute('prompt_cache_key')]
     FPromptCacheKey           : string;
+    [JsonNameAttribute('prompt_cache_retention')]
+    FPromptCacheRetention     : string;
     FReasoning                : TResponseReasoning;
     [JsonNameAttribute('safety_identifier')]
     FSafetyIdentifier         : string;
@@ -1920,9 +2144,10 @@ type
     FStatus                   : TResponseStatus;
     FTemperature              : Double;
     FText                     : TResponseText;
-    {--- tool_choice string or object :
-          - polymorphic deserialization cannot be directly achieved
-          - Access to field contents from JSONResponse string possible}
+    {--- tool_choice is polymorphic (string or object) so it cannot be deserialized directly.
+         It is rebuilt from the raw JSONResponse in ContentUpdate (see FToolChoice). }
+    [JSONMarshalled(False)]
+    FToolChoice               : TResponseToolChoice;
     FTools                    : TArray<TResponseTool>;
     [JsonNameAttribute('top_logprobs')]
     FTopLogprobs              : Int64;
@@ -1933,6 +2158,9 @@ type
     FUser                     : string; //deprecated;
   protected
     function GetCreatedAtAsString: string;
+    function GetCompletedAtAsString: string;
+    procedure AfterDeserialize; override;
+    procedure ContentUpdate; override;
   public
     /// <summary>
     /// Whether to run the model response in the background.
@@ -1944,12 +2172,22 @@ type
     /// <summary>
     /// Unix timestamp (in seconds) of when this Response was created.
     /// </summary>
-    property CreatedAt: TInt64OrNull read FCreatedAt write FCreatedAt;
+    property CreatedAt: Int64 read FCreatedAt write FCreatedAt;
 
     /// <summary>
     /// Unix timestamp as string of when this Response was created.
     /// </summary>
     property CreatedAtAsString: string read GetCreatedAtAsString;
+
+    /// <summary>
+    /// Unix timestamp (in seconds) of when this Response was completed.
+    /// </summary>
+    property CompletedAt: Int64 read FCompletedAt write FCompletedAt;
+
+    /// <summary>
+    /// Unix timestamp as string of when this Response was completed.
+    /// </summary>
+    property CompletedAtAsString: string read GetCompletedAtAsString;
 
     /// <summary>
     /// An error object returned when the model fails to generate a Response.
@@ -1974,6 +2212,11 @@ type
     /// to the next response. This makes it simple to swap out system (or developer) messages in new responses.
     /// </remarks>
     property Instructions: TArray<TInstructions> read FInstructions write FInstructions;
+
+    /// <summary>
+    /// The instructions when the API returns the compact textual form.
+    /// </summary>
+    property InstructionsText: string read FInstructionsText write FInstructionsText;
 
     /// <summary>
     /// An upper bound for the number of tokens that can be generated for a response, including visible output tokens
@@ -2042,6 +2285,11 @@ type
     property PromptCacheKey: string read FPromptCacheKey write FPromptCacheKey;
 
     /// <summary>
+    /// The retention policy for the prompt cache. One of in_memory or 24h.
+    /// </summary>
+    property PromptCacheRetention: string read FPromptCacheRetention write FPromptCacheRetention;
+
+    /// <summary>
     /// o-series models only
     /// </summary>
     property Reasoning: TResponseReasoning read FReasoning write FReasoning;
@@ -2100,6 +2348,15 @@ type
     /// </para>
     /// </summary>
     property Text: TResponseText read FText write FText;
+
+    /// <summary>
+    /// How the model selected which tool (or tools) to use when generating the response.
+    /// </summary>
+    /// <remarks>
+    /// Rebuilt from the raw JSON after deserialization because <c>tool_choice</c> is polymorphic
+    /// (a bare string or an object). See <see cref="TResponseToolChoice"/>.
+    /// </remarks>
+    property ToolChoice: TResponseToolChoice read FToolChoice;
 
     /// <summary>
     /// An array of tools the model may call while generating a response. You can specify which tool to use by setting the
@@ -2328,33 +2585,67 @@ type
   /// <summary>
   /// response.in_progress : Emitted when the response is in progress.
   /// </summary>
-  TResponseInProgress = class(TResponseCreated)
-    {--- This class does not introduce any new functionality; all methods and properties
-         are inherited from its ancestor. }
+  TResponseInProgress = class(TResponseStreamingCommon)
+  private
+    FResponse : TResponse;
+  public
+    /// <summary>
+    /// The response depending of the type value (created, in_prgress, completed, failed or incomplete).
+    /// </summary>
+    property Response: TResponse read FResponse write FResponse;
+
+    destructor Destroy; override;
   end;
 
   /// <summary>
   /// response.completed : Emitted when the model response is complete.
   /// </summary>
-  TResponseCompleted = class(TResponseInProgress)
+  TResponseCompleted = class(TResponseStreamingCommon)
+  private
+    FResponse : TResponse;
+  public
+    /// <summary>
+    /// The response depending of the type value (created, in_prgress, completed, failed or incomplete).
+    /// </summary>
+    property Response: TResponse read FResponse write FResponse;
+
+    destructor Destroy; override;
   end;
 
   /// <summary>
   /// response.failed : An event that is emitted when a response fails.
   /// </summary>
-  TResponseFailed = class(TResponseCompleted)
+  TResponseFailed = class(TResponseStreamingCommon)
+  private
+    FResponse : TResponse;
+  public
+    /// <summary>
+    /// The response depending of the type value (created, in_prgress, completed, failed or incomplete).
+    /// </summary>
+    property Response: TResponse read FResponse write FResponse;
+
+    destructor Destroy; override;
   end;
 
   /// <summary>
   /// response.incomplete : An event that is emitted when a response finishes as incomplete.
   /// </summary>
-  TResponseIncomplete = class(TResponseFailed)
+  TResponseIncomplete = class(TResponseStreamingCommon)
+  private
+    FResponse : TResponse;
+  public
+    /// <summary>
+    /// The response depending of the type value (created, in_prgress, completed, failed or incomplete).
+    /// </summary>
+    property Response: TResponse read FResponse write FResponse;
+
+    destructor Destroy; override;
   end;
 
   /// <summary>
   /// response.output_item.added : Emitted when a new output item is added.
   /// </summary>
-  TResponseOutputItemAdded = class(TResponseIncomplete)
+  TResponseOutputItemAdded = class(TResponseStreamingCommon)
   private
     [JsonNameAttribute('output_index')]
     FOutputIndex : Integer;
@@ -2376,13 +2667,29 @@ type
   /// <summary>
   /// response.output_item.done : Emitted when an output item is marked done.
   /// </summary>
-  TResponseOutputItemDone = class(TResponseOutputItemAdded)
+  TResponseOutputItemDone = class(TResponseStreamingCommon)
+  private
+    [JsonNameAttribute('output_index')]
+    FOutputIndex : Integer;
+    FItem        : TResponseOutput;
+  public
+    /// <summary>
+    /// The output item that was marked done.
+    /// </summary>
+    property Item: TResponseOutput read FItem write FItem;
+
+    /// <summary>
+    /// The index of the output item that was marked done.
+    /// </summary>
+    property OutputIndex: Integer read FOutputIndex write FOutputIndex;
+
+    destructor Destroy; override;
   end;
 
   /// <summary>
   /// response.content_part.added : Emitted when a new content part is added.
   /// </summary>
-  TResponseContentpartAdded = class(TResponseOutputItemDone)
+  TResponseContentpartAdded = class(TResponseStreamingCommon)
   private
     [JsonNameAttribute('content_index')]
     FContentIndex  : Int64;
@@ -2418,17 +2725,68 @@ type
   /// <summary>
   /// response.content_part.done : Emitted when a content part is done.
   /// </summary>
-  TResponseContentpartDone = class(TResponseContentpartAdded)
+  TResponseContentpartDone = class(TResponseStreamingCommon)
+  private
+    [JsonNameAttribute('content_index')]
+    FContentIndex  : Int64;
+    [JsonNameAttribute('item_id')]
+    FItemId        : string;
+    [JsonNameAttribute('output_index')]
+    FOutputIndex   : Int64;
+    FPart          : TResponseContent;
+  public
+    /// <summary>
+    /// The index of the content part that was added.
+    /// </summary>
+    property ContentIndex: Int64 read FContentIndex write FContentIndex;
+
+    /// <summary>
+    /// The ID of the output item that the content part was added to.
+    /// </summary>
+    property ItemId: string read FItemId write FItemId;
+
+    /// <summary>
+    /// The index of the output item that the content part was added to.
+    /// </summary>
+    property OutputIndex: Int64 read FOutputIndex write FOutputIndex;
+
+    /// <summary>
+    /// The content part that was added.
+    /// </summary>
+    property Part: TResponseContent read FPart write FPart;
+
+    destructor Destroy; override;
   end;
 
   /// <summary>
   /// response.output_text.delta : Emitted when there is an additional text delta.
   /// </summary>
-  TResponseOutputTextDelta = class(TResponseContentpartDone)
+  TResponseOutputTextDelta = class(TResponseStreamingCommon)
   private
-    FDelta : string;
-    FLogprobs: TArray<TResponseOutputLogprob>;
+    [JsonNameAttribute('content_index')]
+    FContentIndex : Int64;
+    [JsonNameAttribute('item_id')]
+    FItemId       : string;
+    [JsonNameAttribute('output_index')]
+    FOutputIndex  : Int64;
+    FDelta        : string;
+    FLogprobs     : TArray<TResponseOutputLogprob>;
   public
+    /// <summary>
+    /// The index of the content part that was added.
+    /// </summary>
+    property ContentIndex: Int64 read FContentIndex write FContentIndex;
+
+    /// <summary>
+    /// The ID of the output item that the content part was added to.
+    /// </summary>
+    property ItemId: string read FItemId write FItemId;
+
+    /// <summary>
+    /// The index of the output item that the content part was added to.
+    /// </summary>
+    property OutputIndex: Int64 read FOutputIndex write FOutputIndex;
+
     /// <summary>
     /// The text delta that was added.
     /// </summary>
@@ -2445,12 +2803,33 @@ type
   /// <summary>
   /// response.output_text.annotation.added : Emitted when a text annotation is added.
   /// </summary>
-  TResponseOutputTextAnnotationAdded = class(TResponseOutputTextDelta)
+  TResponseOutputTextAnnotationAdded = class(TResponseStreamingCommon)
   private
-    FAnnotation: TResponseMessageAnnotation;
+    [JsonNameAttribute('content_index')]
+    FContentIndex    : Int64;
+    [JsonNameAttribute('item_id')]
+    FItemId          : string;
+    [JsonNameAttribute('output_index')]
+    FOutputIndex     : Int64;
+    FAnnotation      : TResponseMessageAnnotation;
     [JsonNameAttribute('annotation_index')]
-    FAnnotationIndex: Int64;
+    FAnnotationIndex : Int64;
   public
+    /// <summary>
+    /// The index of the content part that was added.
+    /// </summary>
+    property ContentIndex: Int64 read FContentIndex write FContentIndex;
+
+    /// <summary>
+    /// The ID of the output item that the content part was added to.
+    /// </summary>
+    property ItemId: string read FItemId write FItemId;
+
+    /// <summary>
+    /// The index of the output item that the content part was added to.
+    /// </summary>
+    property OutputIndex: Int64 read FOutputIndex write FOutputIndex;
+
     /// <summary>
     /// The index of the annotation within the content part.
     /// </summary>
@@ -2467,29 +2846,81 @@ type
   /// <summary>
   /// response.output_text.done : Emitted when text content is finalized.
   /// </summary>
-  TResponseOutputTextDone = class(TResponseOutputTextAnnotationAdded)
+  TResponseOutputTextDone = class(TResponseStreamingCommon)
   private
-    FText : string;
+    [JsonNameAttribute('content_index')]
+    FContentIndex : Int64;
+    [JsonNameAttribute('item_id')]
+    FItemId       : string;
+    [JsonNameAttribute('output_index')]
+    FOutputIndex  : Int64;
+    FLogprobs     : TArray<TResponseOutputLogprob>;
+    FText         : string;
   public
+    /// <summary>
+    /// The index of the content part that was added.
+    /// </summary>
+    property ContentIndex: Int64 read FContentIndex write FContentIndex;
+
+    /// <summary>
+    /// The ID of the output item that the content part was added to.
+    /// </summary>
+    property ItemId: string read FItemId write FItemId;
+
+    /// <summary>
+    /// The index of the output item that the content part was added to.
+    /// </summary>
+    property OutputIndex: Int64 read FOutputIndex write FOutputIndex;
+
+    /// <summary>
+    /// The log probabilities of the tokens in the delta.
+    /// </summary>
+    property Logprobs: TArray<TResponseOutputLogprob> read FLogprobs write FLogprobs;
+
     /// <summary>
     /// The text content that is finalized.
     /// </summary>
     property Text: string read FText write FText;
+
+    destructor Destroy; override;
   end;
 
   /// <summary>
   /// response.refusal.delta : Emitted when there is a partial refusal text.
   /// </summary>
-  TResponseRefusalDelta = class(TResponseOutputTextDone)
+  TResponseRefusalDelta = class(TResponseStreamingCommon)
+  private
+    [JsonNameAttribute('content_index')]
+    FContentIndex : Int64;
+    [JsonNameAttribute('item_id')]
+    FItemId       : string;
+    [JsonNameAttribute('output_index')]
+    FOutputIndex  : Int64;
+    FDelta        : string;
+  public
+    property ContentIndex: Int64 read FContentIndex write FContentIndex;
+    property ItemId: string read FItemId write FItemId;
+    property OutputIndex: Int64 read FOutputIndex write FOutputIndex;
+    property Delta: string read FDelta write FDelta;
   end;
 
   /// <summary>
   /// response.refusal.done : Emitted when refusal text is finalized.
   /// </summary>
-  TResponseRefusalDone = class(TResponseRefusalDelta)
+  TResponseRefusalDone = class(TResponseStreamingCommon)
   private
-    FRefusal : string;
+    [JsonNameAttribute('content_index')]
+    FContentIndex : Int64;
+    [JsonNameAttribute('item_id')]
+    FItemId       : string;
+    [JsonNameAttribute('output_index')]
+    FOutputIndex  : Int64;
+    FRefusal      : string;
   public
+    property ContentIndex: Int64 read FContentIndex write FContentIndex;
+    property ItemId: string read FItemId write FItemId;
+    property OutputIndex: Int64 read FOutputIndex write FOutputIndex;
+
     /// <summary>
     /// The refusal text that is finalized.
     /// </summary>
@@ -2499,16 +2930,33 @@ type
   /// <summary>
   /// response.function_call_arguments.delta : Emitted when there is a partial function-call arguments delta.
   /// </summary>
-  TResponseFunctionCallArgumentsDelta = class(TResponseRefusalDone)
+  TResponseFunctionCallArgumentsDelta = class(TResponseStreamingCommon)
+  private
+    [JsonNameAttribute('item_id')]
+    FItemId      : string;
+    [JsonNameAttribute('output_index')]
+    FOutputIndex : Int64;
+    FDelta       : string;
+  public
+    property ItemId: string read FItemId write FItemId;
+    property OutputIndex: Int64 read FOutputIndex write FOutputIndex;
+    property Delta: string read FDelta write FDelta;
   end;
 
   /// <summary>
   /// response.function_call_arguments.done : Emitted when function-call arguments are finalized.
   /// </summary>
-  TResponseFunctionCallArgumentsDone = class(TResponseFunctionCallArgumentsDelta)
+  TResponseFunctionCallArgumentsDone = class(TResponseStreamingCommon)
   private
+    [JsonNameAttribute('item_id')]
+    FItemId      : string;
+    [JsonNameAttribute('output_index')]
+    FOutputIndex : Int64;
     FArguments : string;
   public
+    property ItemId: string read FItemId write FItemId;
+    property OutputIndex: Int64 read FOutputIndex write FOutputIndex;
+
     /// <summary>
     /// The function-call arguments.
     /// </summary>
@@ -2518,43 +2966,43 @@ type
   /// <summary>
   /// response.file_search_call.in_progress : Emitted when a file search call is initiated.
   /// </summary>
-  TResponseFileSearchCallInprogress = class(TResponseFunctionCallArgumentsDone)
+  TResponseFileSearchCallInprogress = class(TResponseStreamingCommon)
   end;
 
   /// <summary>
   /// response.file_search_call.searching : Emitted when a file search is currently searching.
   /// </summary>
-  TResponseFileSearchCallSearching = class(TResponseFileSearchCallInprogress)
+  TResponseFileSearchCallSearching = class(TResponseStreamingCommon)
   end;
 
   /// <summary>
   /// response.file_search_call.completed : Emitted when a file search call is completed (results found).
   /// </summary>
-  TResponseFileSearchCallCompleted = class(TResponseFileSearchCallSearching)
+  TResponseFileSearchCallCompleted = class(TResponseStreamingCommon)
   end;
 
   /// <summary>
   /// response.web_search_call.in_progress : Emitted when a web search call is initiated.
   /// </summary>
-  TResponseWebSearchCallInprogress = class(TResponseFileSearchCallCompleted)
+  TResponseWebSearchCallInprogress = class(TResponseStreamingCommon)
   end;
 
   /// <summary>
   /// response.web_search_call.searching : Emitted when a web search call is executing.
   /// </summary>
-  TResponseWebSearchCallSearching = class(TResponseWebSearchCallInprogress)
+  TResponseWebSearchCallSearching = class(TResponseStreamingCommon)
   end;
 
   /// <summary>
   /// response.web_search_call.completed : Emitted when a web search call is completed.
   /// </summary>
-  TResponseWebSearchCallCompleted = class(TResponseWebSearchCallSearching)
+  TResponseWebSearchCallCompleted = class(TResponseStreamingCommon)
   end;
 
   /// <summary>
   /// Emitted when a new reasoning summary part is added.
   /// </summary>
-  TResponseReasoningSummaryPartAdded = class(TResponseWebSearchCallCompleted)
+  TResponseReasoningSummaryPartAdded = class(TResponseStreamingCommon)
   private
     [JsonNameAttribute('summary_index')]
     FSummaryIndex : Int64;
@@ -2565,55 +3013,100 @@ type
   /// <summary>
   /// Emitted when a reasoning summary part is completed.
   /// </summary>
-  TResponseReasoningSummaryPartDone = class(TResponseReasoningSummaryPartAdded)
+  TResponseReasoningSummaryPartDone = class(TResponseStreamingCommon)
+  private
+    [JsonNameAttribute('summary_index')]
+    FSummaryIndex : Int64;
+  public
+    property SummaryIndex: Int64 read FSummaryIndex write FSummaryIndex;
   end;
 
   /// <summary>
   /// Emitted when a delta is added to a reasoning summary text.
   /// </summary>
-  TResponseReasoningSummaryTextDelta = class(TResponseReasoningSummaryPartDone)
+  TResponseReasoningSummaryTextDelta = class(TResponseStreamingCommon)
+  private
+    [JsonNameAttribute('summary_index')]
+    FSummaryIndex : Int64;
+    FDelta        : string;
+  public
+    property SummaryIndex: Int64 read FSummaryIndex write FSummaryIndex;
+    property Delta: string read FDelta write FDelta;
   end;
 
   /// <summary>
   /// Emitted when a reasoning summary text is completed.
   /// </summary>
-  TResponseReasoningSummaryTextDone = class(TResponseReasoningSummaryTextDelta)
+  TResponseReasoningSummaryTextDone = class(TResponseStreamingCommon)
+  private
+    [JsonNameAttribute('summary_index')]
+    FSummaryIndex : Int64;
+    FText         : string;
+  public
+    property SummaryIndex: Int64 read FSummaryIndex write FSummaryIndex;
+    property Text: string read FText write FText;
   end;
 
   /// <summary>
   /// Emitted when a delta is added to a reasoning text.
   /// </summary>
-  TResponseReasoningTextDelta = class(TResponseReasoningSummaryTextDone)
+  TResponseReasoningTextDelta = class(TResponseStreamingCommon)
+  private
+    [JsonNameAttribute('content_index')]
+    FContentIndex : Int64;
+    [JsonNameAttribute('item_id')]
+    FItemId       : string;
+    [JsonNameAttribute('output_index')]
+    FOutputIndex  : Int64;
+    FDelta        : string;
+  public
+    property ContentIndex: Int64 read FContentIndex write FContentIndex;
+    property ItemId: string read FItemId write FItemId;
+    property OutputIndex: Int64 read FOutputIndex write FOutputIndex;
+    property Delta: string read FDelta write FDelta;
   end;
 
   /// <summary>
   /// Emitted when a reasoning text is completed.
   /// </summary>
-  TResponseReasoningTextDone = class(TResponseReasoningTextDelta)
+  TResponseReasoningTextDone = class(TResponseStreamingCommon)
+  private
+    [JsonNameAttribute('content_index')]
+    FContentIndex : Int64;
+    [JsonNameAttribute('item_id')]
+    FItemId       : string;
+    [JsonNameAttribute('output_index')]
+    FOutputIndex  : Int64;
+    FText         : string;
+  public
+    property ContentIndex: Int64 read FContentIndex write FContentIndex;
+    property ItemId: string read FItemId write FItemId;
+    property OutputIndex: Int64 read FOutputIndex write FOutputIndex;
+    property Text: string read FText write FText;
   end;
 
   /// <summary>
   /// Emitted when an image generation tool call has completed and the final image is available.
   /// </summary>
-  TResponseImageGenerationCallCompleted = class(TResponseReasoningTextDone)
+  TResponseImageGenerationCallCompleted = class(TResponseStreamingCommon)
   end;
 
   /// <summary>
   /// Emitted when an image generation tool call is actively generating an image (intermediate state).
   /// </summary>
-  TResponseImageGenerationCallGenerating = class(TResponseImageGenerationCallCompleted)
+  TResponseImageGenerationCallGenerating = class(TResponseStreamingCommon)
   end;
 
   /// <summary>
   /// Emitted when an image generation tool call is in progress.
   /// </summary>
-  TResponseImageGenerationCallInProgress = class(TResponseImageGenerationCallGenerating)
+  TResponseImageGenerationCallInProgress = class(TResponseStreamingCommon)
   end;
 
   /// <summary>
   /// Emitted when a partial image is available during image generation streaming.
   /// </summary>
-  TResponseImageGenerationCallPartialImage = class(TResponseImageGenerationCallInProgress)
+  TResponseImageGenerationCallPartialImage = class(TResponseStreamingCommon)
   private
     [JsonNameAttribute('partial_image_b64')]
     FPartialImageB64   : string;
@@ -2636,103 +3129,145 @@ type
   /// <summary>
   /// Emitted when there is a delta (partial update) to the arguments of an MCP tool call.
   /// </summary>
-  TResponseMcpCallArgumentsDelta = class(TResponseImageGenerationCallPartialImage)
+  TResponseMcpCallArgumentsDelta = class(TResponseStreamingCommon)
+  private
+    FDelta : string;
+  public
+    property Delta: string read FDelta write FDelta;
   end;
 
   /// <summary>
   /// Emitted when the arguments for an MCP tool call are finalized.
   /// </summary>
-  TResponseMcpCallArgumentsDone = class(TResponseMcpCallArgumentsDelta)
+  TResponseMcpCallArgumentsDone = class(TResponseStreamingCommon)
+  private
+    FArguments : string;
+  public
+    property Arguments: string read FArguments write FArguments;
   end;
 
   /// <summary>
   /// Emitted when an MCP tool call has completed successfully.
   /// </summary>
-  TResponseMcpCallCompleted = class(TResponseMcpCallArgumentsDone)
+  TResponseMcpCallCompleted = class(TResponseStreamingCommon)
   end;
 
   /// <summary>
   /// Emitted when an MCP tool call has failed.
   /// </summary>
-  TResponseMcpCallFailed = class(TResponseMcpCallCompleted)
+  TResponseMcpCallFailed = class(TResponseStreamingCommon)
+  private
+    FCode    : string;
+    FMessage : string;
+  public
+    property Code: string read FCode write FCode;
+    property Message: string read FMessage write FMessage;
   end;
 
   /// <summary>
   /// Emitted when an MCP tool call is in progress.
   /// </summary>
-  TResponseMcpCallInProgress = class(TResponseMcpCallFailed)
+  TResponseMcpCallInProgress = class(TResponseStreamingCommon)
   end;
 
   /// <summary>
   /// Emitted when the list of available MCP tools has been successfully retrieved.
   /// </summary>
-  TResponseMcpListToolsCompleted = class(TResponseMcpCallInProgress)
+  TResponseMcpListToolsCompleted = class(TResponseStreamingCommon)
   end;
 
   /// <summary>
   /// Emitted when the attempt to list available MCP tools has failed.
   /// </summary>
-  TResponseMcpListToolsFailed = class(TResponseMcpListToolsCompleted)
+  TResponseMcpListToolsFailed = class(TResponseStreamingCommon)
+  private
+    FCode    : string;
+    FMessage : string;
+  public
+    property Code: string read FCode write FCode;
+    property Message: string read FMessage write FMessage;
   end;
 
   /// <summary>
   /// Emitted when the system is in the process of retrieving the list of available MCP tools.
   /// </summary>
-  TResponseMcpListToolsInProgress = class(TResponseMcpListToolsFailed)
+  TResponseMcpListToolsInProgress = class(TResponseStreamingCommon)
   end;
 
   /// <summary>
   /// Emitted when a code interpreter call is in progress.
   /// </summary>
-  TResponseCodeInterpreterCallInProgress = class(TResponseMcpListToolsInProgress)
+  TResponseCodeInterpreterCallInProgress = class(TResponseStreamingCommon)
   end;
 
   /// <summary>
   /// Emitted when the code interpreter is actively interpreting the code snippet.
   /// </summary>
-  TResponseCodeInterpreterCallInterpreting = class(TResponseCodeInterpreterCallInProgress)
+  TResponseCodeInterpreterCallInterpreting = class(TResponseStreamingCommon)
   end;
 
   /// <summary>
   /// Emitted when the code interpreter call is completed.
   /// </summary>
-  TResponseCodeInterpreterCallCompleted = class(TResponseCodeInterpreterCallInterpreting)
+  TResponseCodeInterpreterCallCompleted = class(TResponseStreamingCommon)
   end;
 
   /// <summary>
   /// Emitted when a partial code snippet is streamed by the code interpreter.
   /// </summary>
-  TResponseCodeInterpreterCallCodeDelta = class(TResponseCodeInterpreterCallCompleted)
+  TResponseCodeInterpreterCallCodeDelta = class(TResponseStreamingCommon)
+  private
+    FDelta : string;
+  public
+    property Delta: string read FDelta write FDelta;
   end;
 
   /// <summary>
   /// Emitted when the code snippet is finalized by the code interpreter.
   /// </summary>
-  TResponseCodeInterpreterCallCodeDone = class(TResponseCodeInterpreterCallCodeDelta)
+  TResponseCodeInterpreterCallCodeDone = class(TResponseStreamingCommon)
+  private
+    FCode : string;
+  public
+    property Code: string read FCode write FCode;
   end;
 
   /// <summary>
   /// Emitted when a response is queued and waiting to be processed.
   /// </summary>
-  TResponseQueued = class(TResponseCodeInterpreterCallCodeDone)
+  TResponseQueued = class(TResponseStreamingCommon)
+  private
+    FResponse : TResponse;
+  public
+    property Response: TResponse read FResponse write FResponse;
+
+    destructor Destroy; override;
   end;
 
   /// <summary>
   /// Event representing a delta (partial update) to the input of a custom tool call.
   /// </summary>
-  TResponseCustomToolCallInputDelta = class(TResponseQueued)
+  TResponseCustomToolCallInputDelta = class(TResponseStreamingCommon)
+  private
+    FDelta : string;
+  public
+    property Delta: string read FDelta write FDelta;
   end;
 
   /// <summary>
   /// Event indicating that input for a custom tool call is complete.
   /// </summary>
-  TResponseCustomToolCallInputDone = class(TResponseCustomToolCallInputDelta)
+  TResponseCustomToolCallInputDone = class(TResponseStreamingCommon)
+  private
+    FInput : string;
+  public
+    property Input: string read FInput write FInput;
   end;
 
   /// <summary>
   /// response.error: Emitted when an error occurs.
   /// </summary>
-  TResponseStreamError = class(TResponseCustomToolCallInputDone)
+  TResponseStreamError = class(TResponseStreamingCommon)
   private
     FCode    : string;
     FMessage : string;
@@ -2756,439 +3291,220 @@ type
 
     {$ENDREGION}
 
-    {$REGION 'Dev note'}
-(*
-   Streaming events:
-  ================
+  TResponseStream = class(TResponseStreamingCommon)
+  private
+    FResponse : TResponse;
+    [JsonNameAttribute('output_index')]
+    FOutputIndex : Int64;
+    FItem : TResponseOutput;
+    [JsonNameAttribute('content_index')]
+    FContentIndex : Int64;
+    [JsonNameAttribute('item_id')]
+    FItemId : string;
+    FPart : TResponseContent;
+    FDelta : string;
+    FLogprobs : TArray<TResponseOutputLogprob>;
+    FAnnotation : TResponseMessageAnnotation;
+    [JsonNameAttribute('annotation_index')]
+    FAnnotationIndex : Int64;
+    FText : string;
+    FRefusal : string;
+    FArguments : string;
+    [JsonNameAttribute('summary_index')]
+    FSummaryIndex : Int64;
+    [JsonNameAttribute('partial_image_b64')]
+    FPartialImageB64 : string;
+    [JsonNameAttribute('partial_image_index')]
+    FPartialImageIndex : Int64;
+    FInput : string;
+    FCode : string;
+    FMessage : string;
+    FParam : string;
+    [JSONMarshalled(False)]
+    FCreatedEvent: TResponseCreated;
+    [JSONMarshalled(False)]
+    FInProgressEvent: TResponseInProgress;
+    [JSONMarshalled(False)]
+    FCompletedEvent: TResponseCompleted;
+    [JSONMarshalled(False)]
+    FFailedEvent: TResponseFailed;
+    [JSONMarshalled(False)]
+    FIncompleteEvent: TResponseIncomplete;
+    [JSONMarshalled(False)]
+    FOutputItemAddedEvent: TResponseOutputItemAdded;
+    [JSONMarshalled(False)]
+    FOutputItemDoneEvent: TResponseOutputItemDone;
+    [JSONMarshalled(False)]
+    FContentPartAddedEvent: TResponseContentpartAdded;
+    [JSONMarshalled(False)]
+    FContentPartDoneEvent: TResponseContentpartDone;
+    [JSONMarshalled(False)]
+    FOutputTextDeltaEvent: TResponseOutputTextDelta;
+    [JSONMarshalled(False)]
+    FOutputTextDoneEvent: TResponseOutputTextDone;
+    [JSONMarshalled(False)]
+    FRefusalDeltaEvent: TResponseRefusalDelta;
+    [JSONMarshalled(False)]
+    FRefusalDoneEvent: TResponseRefusalDone;
+    [JSONMarshalled(False)]
+    FFunctionCallArgumentsDeltaEvent: TResponseFunctionCallArgumentsDelta;
+    [JSONMarshalled(False)]
+    FFunctionCallArgumentsDoneEvent: TResponseFunctionCallArgumentsDone;
+    [JSONMarshalled(False)]
+    FFileSearchCallInProgressEvent: TResponseFileSearchCallInprogress;
+    [JSONMarshalled(False)]
+    FFileSearchCallSearchingEvent: TResponseFileSearchCallSearching;
+    [JSONMarshalled(False)]
+    FFileSearchCallCompletedEvent: TResponseFileSearchCallCompleted;
+    [JSONMarshalled(False)]
+    FWebSearchCallInProgressEvent: TResponseWebSearchCallInprogress;
+    [JSONMarshalled(False)]
+    FWebSearchCallSearchingEvent: TResponseWebSearchCallSearching;
+    [JSONMarshalled(False)]
+    FWebSearchCallCompletedEvent: TResponseWebSearchCallCompleted;
+    [JSONMarshalled(False)]
+    FReasoningSummaryPartAddedEvent: TResponseReasoningSummaryPartAdded;
+    [JSONMarshalled(False)]
+    FReasoningSummaryPartDoneEvent: TResponseReasoningSummaryPartDone;
+    [JSONMarshalled(False)]
+    FReasoningSummaryTextDeltaEvent: TResponseReasoningSummaryTextDelta;
+    [JSONMarshalled(False)]
+    FReasoningSummaryTextDoneEvent: TResponseReasoningSummaryTextDone;
+    [JSONMarshalled(False)]
+    FReasoningTextDeltaEvent: TResponseReasoningTextDelta;
+    [JSONMarshalled(False)]
+    FReasoningTextDoneEvent: TResponseReasoningTextDone;
+    [JSONMarshalled(False)]
+    FImageGenerationCallCompletedEvent: TResponseImageGenerationCallCompleted;
+    [JSONMarshalled(False)]
+    FImageGenerationCallGeneratingEvent: TResponseImageGenerationCallGenerating;
+    [JSONMarshalled(False)]
+    FImageGenerationCallInProgressEvent: TResponseImageGenerationCallInProgress;
+    [JSONMarshalled(False)]
+    FImageGenerationCallPartialImageEvent: TResponseImageGenerationCallPartialImage;
+    [JSONMarshalled(False)]
+    FMcpCallArgumentsDeltaEvent: TResponseMcpCallArgumentsDelta;
+    [JSONMarshalled(False)]
+    FMcpCallArgumentsDoneEvent: TResponseMcpCallArgumentsDone;
+    [JSONMarshalled(False)]
+    FMcpCallCompletedEvent: TResponseMcpCallCompleted;
+    [JSONMarshalled(False)]
+    FMcpCallFailedEvent: TResponseMcpCallFailed;
+    [JSONMarshalled(False)]
+    FMcpCallInProgressEvent: TResponseMcpCallInProgress;
+    [JSONMarshalled(False)]
+    FMcpListToolsCompletedEvent: TResponseMcpListToolsCompleted;
+    [JSONMarshalled(False)]
+    FMcpListToolsFailedEvent: TResponseMcpListToolsFailed;
+    [JSONMarshalled(False)]
+    FMcpListToolsInProgressEvent: TResponseMcpListToolsInProgress;
+    [JSONMarshalled(False)]
+    FCodeInterpreterCallInProgressEvent: TResponseCodeInterpreterCallInProgress;
+    [JSONMarshalled(False)]
+    FCodeInterpreterCallInterpretingEvent: TResponseCodeInterpreterCallInterpreting;
+    [JSONMarshalled(False)]
+    FCodeInterpreterCallCompletedEvent: TResponseCodeInterpreterCallCompleted;
+    [JSONMarshalled(False)]
+    FCodeInterpreterCallCodeDeltaEvent: TResponseCodeInterpreterCallCodeDelta;
+    [JSONMarshalled(False)]
+    FCodeInterpreterCallCodeDoneEvent: TResponseCodeInterpreterCallCodeDone;
+    [JSONMarshalled(False)]
+    FOutputTextAnnotationAddedEvent: TResponseOutputTextAnnotationAdded;
+    [JSONMarshalled(False)]
+    FQueuedEvent: TResponseQueued;
+    [JSONMarshalled(False)]
+    FCustomToolCallInputDeltaEvent: TResponseCustomToolCallInputDelta;
+    [JSONMarshalled(False)]
+    FCustomToolCallInputDoneEvent: TResponseCustomToolCallInputDone;
+    [JSONMarshalled(False)]
+    FErrorEvent: TResponseStreamError;
+    [JSONMarshalled(False)]
+    FEventType: TResponseStreamType;
+  protected
+    procedure StreamEventBuilder; override;
+    procedure AfterDeserialize; override;
+  public
+    function GetStream: TStream;
+    destructor Destroy; override;
 
-   Stream Chat Completions in real time. Receive chunks of completions returned
-   from the model using server-sent events.
-
-        1- response.created
-        2- response.in_progress
-        3- response.completed
-        4- response.failed
-        5- response.incomplete
-        6- response.output_item.added
-        7- response.output_item.done
-        8- response.content_part.added
-        9- response.content_part.done
-        10- response.output_text.delta
-        11- response.output_text.done
-        12- response.refusal.delta
-        13- response.refusal.done
-        14- response.function_call_arguments.delta
-        15- response.function_call_arguments.done
-        16- response.file_search_call.in_progress
-        17- response.file_search_call.searching
-        18- response.file_search_call.completed
-        19- response.web_search_call.in_progress
-        20- response.web_search_call.searching
-        21- response.web_search_call.completed
-        22- response.reasoning_summary_part.added
-        23- response.reasoning_summary_part.done
-        24- response.reasoning_summary_text.delta
-        25- response.reasoning_summary_text.done
-        26- response.reasoning_text.delta
-        27- response.reasoning_text.done
-        28- response.image_generation_call.completed
-        29- response.image_generation_call.generating
-        30- response.image_generation_call.in_progress
-        31- response.image_generation_call.partial_image
-        32- response.mcp_call_arguments.delta
-        33- response.mcp_call_arguments.done
-        34- response.mcp_call.completed
-        35- response.mcp_call.failed
-        36- response.mcp_call.in_progress
-        37- response.mcp_list_tools.completed
-        38- response.mcp_list_tools.failed
-        39- response.mcp_list_tools.in_progress
-        40- response.code_interpreter_call.in_progress
-        41- response.code_interpreter_call.interpreting
-        42- response.code_interpreter_call.completed
-        43- response.code_interpreter_call_code.delta
-        44- response.code_interpreter_call_code.done
-        45- response.output_text.annotation.added
-        46- response.queued
-        47- response.custom_tool_call_input.delta
-        48- response.custom_tool_call_input.done
-        49- error
-
-   - This class is made up of the following classes:
-       TResponseStreamingCommon,
-       TResponseCreated,
-       TResponseInProgress,
-       TResponseCompleted,
-       TResponseFailed,
-       TResponseIncomplete,
-       TResponseOutputItemAdded,
-       TResponseOutputItemDone,
-       TResponseContentpartAdded,
-       TResponseContentpartDone,
-       TResponseOutputTextDelta,
-       TResponseOutputTextDone,
-       TResponseRefusalDelta,
-       TResponseRefusalDone,
-       TResponseFunctionCallArgumentsDelta,
-       TResponseFunctionCallArgumentsDone,
-       TResponseFileSearchCallInprogress,
-       TResponseFileSearchCallSearching,
-       TResponseFileSearchCallCompleted,
-       TResponseWebSearchCallInprogress,
-       TResponseWebSearchCallSearching,
-       TResponseWebSearchCallCompleted,
-       TResponseReasoningSummaryPartAdded,
-       TResponseReasoningSummaryPartDone,
-       TResponseReasoningSummaryTextDelta,
-       TResponseReasoningSummaryTextDone,
-       TResponseReasoningTextDelta,
-       TResponseReasoningTextDone,
-       TResponseReasoningSummaryTextDone,
-       TResponseImageGenerationCallCompleted,
-       TResponseImageGenerationCallGenerating,
-       TResponseImageGenerationCallInProgress,
-       TResponseImageGenerationCallPartialImage,
-       TResponseMcpCallArgumentsDelta,
-       TResponseMcpCallArgumentsDone,
-       TResponseMcpCallCompleted,
-       TResponseMcpCallFailed,
-       TResponseMcpCallInProgress,
-       TResponseMcpListToolsCompleted,
-       TResponseMcpListToolsFailed,
-       TResponseMcpListToolsInProgress,
-       TResponseCodeInterpreterCallInProgress,
-       TResponseCodeInterpreterCallInterpreting,
-       TResponseCodeInterpreterCallCompleted,
-       TResponseCodeInterpreterCallCodeDelta,
-       TResponseCodeInterpreterCallCodeDone,
-       TResponseQueued,
-       TResponseCustomToolCallInputDelta,
-       TResponseCustomToolCallInputDone,
-       TResponseStreamError
-*)
-    {$ENDREGION}
-  TResponseStream = class(TResponseStreamError);
+    property Response: TResponse read FResponse write FResponse;
+    property OutputIndex: Int64 read FOutputIndex write FOutputIndex;
+    property Item: TResponseOutput read FItem write FItem;
+    property ContentIndex: Int64 read FContentIndex write FContentIndex;
+    property ItemId: string read FItemId write FItemId;
+    property Part: TResponseContent read FPart write FPart;
+    property Delta: string read FDelta write FDelta;
+    property Logprobs: TArray<TResponseOutputLogprob> read FLogprobs write FLogprobs;
+    property Annotation: TResponseMessageAnnotation read FAnnotation write FAnnotation;
+    property AnnotationIndex: Int64 read FAnnotationIndex write FAnnotationIndex;
+    property Text: string read FText write FText;
+    property Refusal: string read FRefusal write FRefusal;
+    property Arguments: string read FArguments write FArguments;
+    property SummaryIndex: Int64 read FSummaryIndex write FSummaryIndex;
+    property PartialImageB64: string read FPartialImageB64 write FPartialImageB64;
+    property PartialImageIndex: Int64 read FPartialImageIndex write FPartialImageIndex;
+    property Input: string read FInput write FInput;
+    property Code: string read FCode write FCode;
+    property Message: string read FMessage write FMessage;
+    property Param: string read FParam write FParam;
+    property EventType: TResponseStreamType read FEventType write FEventType;
+    property CreatedEvent: TResponseCreated read FCreatedEvent write FCreatedEvent;
+    property InProgressEvent: TResponseInProgress read FInProgressEvent write FInProgressEvent;
+    property CompletedEvent: TResponseCompleted read FCompletedEvent write FCompletedEvent;
+    property FailedEvent: TResponseFailed read FFailedEvent write FFailedEvent;
+    property IncompleteEvent: TResponseIncomplete read FIncompleteEvent write FIncompleteEvent;
+    property OutputItemAddedEvent: TResponseOutputItemAdded read FOutputItemAddedEvent write FOutputItemAddedEvent;
+    property OutputItemDoneEvent: TResponseOutputItemDone read FOutputItemDoneEvent write FOutputItemDoneEvent;
+    property ContentPartAddedEvent: TResponseContentpartAdded read FContentPartAddedEvent write FContentPartAddedEvent;
+    property ContentPartDoneEvent: TResponseContentpartDone read FContentPartDoneEvent write FContentPartDoneEvent;
+    property OutputTextDeltaEvent: TResponseOutputTextDelta read FOutputTextDeltaEvent write FOutputTextDeltaEvent;
+    property OutputTextDoneEvent: TResponseOutputTextDone read FOutputTextDoneEvent write FOutputTextDoneEvent;
+    property RefusalDeltaEvent: TResponseRefusalDelta read FRefusalDeltaEvent write FRefusalDeltaEvent;
+    property RefusalDoneEvent: TResponseRefusalDone read FRefusalDoneEvent write FRefusalDoneEvent;
+    property FunctionCallArgumentsDeltaEvent: TResponseFunctionCallArgumentsDelta read FFunctionCallArgumentsDeltaEvent write FFunctionCallArgumentsDeltaEvent;
+    property FunctionCallArgumentsDoneEvent: TResponseFunctionCallArgumentsDone read FFunctionCallArgumentsDoneEvent write FFunctionCallArgumentsDoneEvent;
+    property FileSearchCallInProgressEvent: TResponseFileSearchCallInprogress read FFileSearchCallInProgressEvent write FFileSearchCallInProgressEvent;
+    property FileSearchCallSearchingEvent: TResponseFileSearchCallSearching read FFileSearchCallSearchingEvent write FFileSearchCallSearchingEvent;
+    property FileSearchCallCompletedEvent: TResponseFileSearchCallCompleted read FFileSearchCallCompletedEvent write FFileSearchCallCompletedEvent;
+    property WebSearchCallInProgressEvent: TResponseWebSearchCallInprogress read FWebSearchCallInProgressEvent write FWebSearchCallInProgressEvent;
+    property WebSearchCallSearchingEvent: TResponseWebSearchCallSearching read FWebSearchCallSearchingEvent write FWebSearchCallSearchingEvent;
+    property WebSearchCallCompletedEvent: TResponseWebSearchCallCompleted read FWebSearchCallCompletedEvent write FWebSearchCallCompletedEvent;
+    property ReasoningSummaryPartAddedEvent: TResponseReasoningSummaryPartAdded read FReasoningSummaryPartAddedEvent write FReasoningSummaryPartAddedEvent;
+    property ReasoningSummaryPartDoneEvent: TResponseReasoningSummaryPartDone read FReasoningSummaryPartDoneEvent write FReasoningSummaryPartDoneEvent;
+    property ReasoningSummaryTextDeltaEvent: TResponseReasoningSummaryTextDelta read FReasoningSummaryTextDeltaEvent write FReasoningSummaryTextDeltaEvent;
+    property ReasoningSummaryTextDoneEvent: TResponseReasoningSummaryTextDone read FReasoningSummaryTextDoneEvent write FReasoningSummaryTextDoneEvent;
+    property ReasoningTextDeltaEvent: TResponseReasoningTextDelta read FReasoningTextDeltaEvent write FReasoningTextDeltaEvent;
+    property ReasoningTextDoneEvent: TResponseReasoningTextDone read FReasoningTextDoneEvent write FReasoningTextDoneEvent;
+    property ImageGenerationCallCompletedEvent: TResponseImageGenerationCallCompleted read FImageGenerationCallCompletedEvent write FImageGenerationCallCompletedEvent;
+    property ImageGenerationCallGeneratingEvent: TResponseImageGenerationCallGenerating read FImageGenerationCallGeneratingEvent write FImageGenerationCallGeneratingEvent;
+    property ImageGenerationCallInProgressEvent: TResponseImageGenerationCallInProgress read FImageGenerationCallInProgressEvent write FImageGenerationCallInProgressEvent;
+    property ImageGenerationCallPartialImageEvent: TResponseImageGenerationCallPartialImage read FImageGenerationCallPartialImageEvent write FImageGenerationCallPartialImageEvent;
+    property McpCallArgumentsDeltaEvent: TResponseMcpCallArgumentsDelta read FMcpCallArgumentsDeltaEvent write FMcpCallArgumentsDeltaEvent;
+    property McpCallArgumentsDoneEvent: TResponseMcpCallArgumentsDone read FMcpCallArgumentsDoneEvent write FMcpCallArgumentsDoneEvent;
+    property McpCallCompletedEvent: TResponseMcpCallCompleted read FMcpCallCompletedEvent write FMcpCallCompletedEvent;
+    property McpCallFailedEvent: TResponseMcpCallFailed read FMcpCallFailedEvent write FMcpCallFailedEvent;
+    property McpCallInProgressEvent: TResponseMcpCallInProgress read FMcpCallInProgressEvent write FMcpCallInProgressEvent;
+    property McpListToolsCompletedEvent: TResponseMcpListToolsCompleted read FMcpListToolsCompletedEvent write FMcpListToolsCompletedEvent;
+    property McpListToolsFailedEvent: TResponseMcpListToolsFailed read FMcpListToolsFailedEvent write FMcpListToolsFailedEvent;
+    property McpListToolsInProgressEvent: TResponseMcpListToolsInProgress read FMcpListToolsInProgressEvent write FMcpListToolsInProgressEvent;
+    property CodeInterpreterCallInProgressEvent: TResponseCodeInterpreterCallInProgress read FCodeInterpreterCallInProgressEvent write FCodeInterpreterCallInProgressEvent;
+    property CodeInterpreterCallInterpretingEvent: TResponseCodeInterpreterCallInterpreting read FCodeInterpreterCallInterpretingEvent write FCodeInterpreterCallInterpretingEvent;
+    property CodeInterpreterCallCompletedEvent: TResponseCodeInterpreterCallCompleted read FCodeInterpreterCallCompletedEvent write FCodeInterpreterCallCompletedEvent;
+    property CodeInterpreterCallCodeDeltaEvent: TResponseCodeInterpreterCallCodeDelta read FCodeInterpreterCallCodeDeltaEvent write FCodeInterpreterCallCodeDeltaEvent;
+    property CodeInterpreterCallCodeDoneEvent: TResponseCodeInterpreterCallCodeDone read FCodeInterpreterCallCodeDoneEvent write FCodeInterpreterCallCodeDoneEvent;
+    property OutputTextAnnotationAddedEvent: TResponseOutputTextAnnotationAdded read FOutputTextAnnotationAddedEvent write FOutputTextAnnotationAddedEvent;
+    property QueuedEvent: TResponseQueued read FQueuedEvent write FQueuedEvent;
+    property CustomToolCallInputDeltaEvent: TResponseCustomToolCallInputDelta read FCustomToolCallInputDeltaEvent write FCustomToolCallInputDeltaEvent;
+    property CustomToolCallInputDoneEvent: TResponseCustomToolCallInputDone read FCustomToolCallInputDoneEvent write FCustomToolCallInputDoneEvent;
+    property ErrorEvent: TResponseStreamError read FErrorEvent write FErrorEvent;
+  end;
 
   {$ENDREGION}
 
 implementation
 
-{$REGION 'Dev note'}
-
-(*
-
-    GenAI.Responses.OutputParams — Inheritance Documentation
-    ========================================================
-    Language: Delphi / Object Pascal
-    Context: Response output/data models for the GenAI framework
-
-
-    INTRODUCTION
-    ------------
-
-    This document maps the inheritance trees in unit GenAI.Responses.OutputParams
-    and briefly explains each family. Indentation with |__ denotes inheritance
-    (child derives from parent).
-
-    Legend:
-    - Families are grouped by purpose (instructions, outputs, tools, streaming, …).
-    - “Standalone” classes are data holders (inherit TObject implicitly).
-
-
-    ---------------------------------------------------------
-    1) BASIC RESPONSE METADATA
-    ---------------------------------------------------------
-
-    TJSONFingerprint
-      |__ TResponse
-
-    Explanation:
-    - TResponse is the top-level envelope of a model run: configuration, outputs,
-      tools, usage, and errors. It owns most other structures.
-
-    Standalone helpers used by TResponse:
-    - TConversation
-    - TResponseError
-    - TResponseIncompleteDetails
-    - TPrompt
-    - TResponseReasoning
-    - TResponseUsage
-    - TInputTokensDetails
-    - TOutputTokensDetails
-
-
-    ---------------------------------------------------------
-    2) LOGPROB OBJECTS (OUTPUT SIDE)
-    ---------------------------------------------------------
-
-    TTopLogProb
-    TLogProb
-
-    Explanation:
-    - Classic token log-prob containers. TLogProb has an array of TTopLogProb.
-
-
-    ---------------------------------------------------------
-    3) INSTRUCTIONS (REQUEST/INTERNAL PIPELINE SIDE)
-    ---------------------------------------------------------
-
-    Atomic types:
-    - TDragPath
-    - TInstructionsResults
-    - TInstructionsOutput
-    - TInstructionsSafetyChecks
-    - TInstructionsReasoningSummary
-    - TInstructionsOutputs
-    - TInstructionsTools
-    - TInstructionsAnnotation
-
-    Action (sum-type flattened into one class):
-    - TInstructionsAction  (search/open/find/shell + mouse/keyboard/scroll/type)
-
-    Message-like content:
-    TInstructionsContentInputMessage
-      |__ TInstructionsContent
-
-    Core instruction container:
-    TInstructionsCommon
-      |__ TInputOutputMessage
-            |__ TInstructions
-
-    Explanation:
-    - TInstructionsCommon is the polymorphic base for everything the model may
-      emit/need while orchestrating tool calls, reasoning parts, and content chunks.
-    - TInputOutputMessage adds Content[]; TInstructions is the exposed alias.
-
-
-    ---------------------------------------------------------
-    4) OUTPUT MESSAGE CONTENT (ASSISTANT TEXT / REFUSAL)
-    ---------------------------------------------------------
-
-    TResponseMessageContentCommon
-      |__ TResponseMessageContent
-            |__ TResponseMessageRefusal
-                  |__ TResponseContent
-
-    Explanation:
-    - Uniform shape of assistant text sections (annotations, logprobs, refusal).
-
-
-    ---------------------------------------------------------
-    5) FILE/WEB SEARCH FILTERS
-    ---------------------------------------------------------
-
-    TResponseFileSearchFiltersCommon
-      |__ TResponseFileSearchFiltersComparaison
-            |__ TResponseFileSearchFiltersCompound
-                  |__ TWebSearchFilter
-                        |__ TResponseFileSearchFilters
-
-    Explanation:
-    - Filter composition for vector-store/file search and web search constraints.
-
-
-    ---------------------------------------------------------
-    6) WEB SEARCH LOCATION
-    ---------------------------------------------------------
-
-    TResponseWebSearchLocation  (standalone data class)
-
-
-    ---------------------------------------------------------
-    7) RESPONSE OUTPUT CHAIN (PRIMARY OUT ITEMS)
-    ---------------------------------------------------------
-
-    TResponseOutputCommon
-      |__ TResponseOutputMessage
-            |__ TResponseOutputFileSearch
-                  |__ TResponseOutputFunction
-                        |__ TResponseOutputWebSearch
-                              |__ TResponseOutputComputer
-                                    |__ TResponseOutputReasoning
-                                          |__ TResponseOutputImageGeneration
-                                                |__ TResponseOutputCodeInterpreter
-                                                      |__ TResponseOutputLocalShell
-                                                            |__ TResponseOutputMCPTool
-                                                                  |__ TResponseOutputMCPList
-                                                                        |__ TResponseMCPApproval
-                                                                              |__ TResponseCustomTool
-                                                                                    |__ TResponseOutput
-
-    Explanation (left → right gains capability):
-    - Message text → file search results → function calls → web/computer actions
-      → reasoning payload → image outputs → code interpreter → local shell
-      → MCP calls/list/approval → custom tool IO → final TResponseOutput leaf.
-
-    Related small types used above:
-    - TResponseCodeInterpreterOutput (per-output artifact/log container)
-
-
-    ---------------------------------------------------------
-    8) TEXT RESPONSE FORMATTING (STRICT JSON, GRAMMARS, ETC.)
-    ---------------------------------------------------------
-
-    TResponseTextFormatCommon
-      |__ TResponseFormatText
-            |__ TResponseFormatJSONObject
-                  |__ TResponseFormatJSONSchema
-                        |__ TResponseTextFormat
-
-    TResponseText  (holds Verbosity + Format)
-
-    Custom tool input grammar:
-    - TCustomToolFormat (standalone holder)
-
-    Explanation:
-    - Controls text vs JSON-object vs JSON-schema strict output; carries verbosity.
-
-
-    ---------------------------------------------------------
-    9) RESPONSE TOOLS CONFIGURATION (WHAT THE MODEL MAY CALL)
-    ---------------------------------------------------------
-
-    TResponseToolCommon
-      |__ TResponseToolFileSearch
-            |__ TResponseToolFunction
-                  |__ TResponseToolComputerUse
-                        |__ TResponseToolWebSearch
-                              |__ TResponseMCPTool
-                                    |__ TResponseCodeInterpreter
-                                          |__ TResponseImageGenerationTool
-                                                |__ TResponseLocalShellTool
-                                                      |__ TCustomTool
-                                                            |__ TResponseToolWebSearchPreview
-                                                                  |__ TResponseTool
-
-    Additional helper types used here:
-    - TResponseToolContainer (files available to code interpreter)
-    - TInputImageMask (for image inpainting/editing parameters)
-
-    Explanation:
-    - This chain defines capabilities offered to the model at run time:
-      vector search, functions, remote computer control, web search, MCP servers,
-      code interpreter sandboxes, image generation, local shell, and custom tools.
-
-
-    ---------------------------------------------------------
-    10) URL PARAM BUILDERS (FLUENT HELPERS)
-    ---------------------------------------------------------
-
-    TUrlParam
-      |__ TUrlIncludeParams
-      |__ TUrlResponseListParams
-
-    Explanation:
-    - Helpers to build query strings for REST endpoints (include/after/limit/order).
-
-
-    ---------------------------------------------------------
-    11) RESPONSE DELETE RESULT
-    ---------------------------------------------------------
-
-    TJSONFingerprint
-      |__ TResponseDelete
-
-    Explanation:
-    - Minimal envelope for a delete acknowledgment (id/object/deleted).
-
-
-    ---------------------------------------------------------
-    12) STREAMING EVENTS (SERVER-SENT EVENTS)
-    ---------------------------------------------------------
-
-    Base: TJSONFingerprint
-     → TResponseStreamingCommon
-        - Creation & lifecycle:
-          → TResponseCreated
-          → TResponseInProgress
-          → TResponseCompleted
-          → TResponseFailed
-          → TResponseIncomplete
-          → TResponseQueued
-        - Output item streaming:
-          → TResponseOutputItemAdded
-          → TResponseOutputItemDone
-          → TResponseContentpartAdded
-          → TResponseContentpartDone
-        - Text & annotations:
-          → TResponseOutputTextDelta
-          → TResponseOutputTextAnnotationAdded
-          → TResponseOutputTextDone
-          → TResponseRefusalDelta
-          → TResponseRefusalDone
-        - Function calls:
-          → TResponseFunctionCallArgumentsDelta
-          → TResponseFunctionCallArgumentsDone
-        - File & web search:
-          → TResponseFileSearchCallInprogress
-          → TResponseFileSearchCallSearching
-          → TResponseFileSearchCallCompleted
-          → TResponseWebSearchCallInprogress
-          → TResponseWebSearchCallSearching
-          → TResponseWebSearchCallCompleted
-        - Reasoning:
-          → TResponseReasoningSummaryPartAdded
-          → TResponseReasoningSummaryPartDone
-          → TResponseReasoningSummaryTextDelta
-          → TResponseReasoningSummaryTextDone
-          → TResponseReasoningTextDelta
-          → TResponseReasoningTextDone
-        - Image generation:
-          → TResponseImageGenerationCallCompleted
-          → TResponseImageGenerationCallGenerating
-          → TResponseImageGenerationCallInProgress
-          → TResponseImageGenerationCallPartialImage
-        - MCP calls:
-          → TResponseMcpCallArgumentsDelta
-          → TResponseMcpCallArgumentsDone
-          → TResponseMcpCallCompleted
-          → TResponseMcpCallFailed
-          → TResponseMcpCallInProgress
-          → TResponseMcpListToolsCompleted
-          → TResponseMcpListToolsFailed
-          → TResponseMcpListToolsInProgress
-        - Code interpreter:
-          → TResponseCodeInterpreterCallInProgress
-          → TResponseCodeInterpreterCallInterpreting
-          → TResponseCodeInterpreterCallCompleted
-          → TResponseCodeInterpreterCallCodeDelta
-          → TResponseCodeInterpreterCallCodeDone
-        - Custom tool I/O:
-          → TResponseCustomToolCallInputDelta
-          → TResponseCustomToolCallInputDone
-        - Terminal states:
-          → TResponseStreamError
-          → TResponseStream
-
-    Auxiliary logprob items for streaming:
-    - TResponseOutputLogprobItem
-    - TResponseOutputLogprob
-
-    Explanation:
-    - Linearized SSE event taxonomy from creation → progress → content deltas
-      (text/refusal/arguments) → tool calls (file/web/MCP) → reasoning/image/code
-      interpreter → queue/custom tools → terminal/error.
-
-
-    ---------------------------------------------------------
-    13) OTHER STANDALONE DATA HOLDERS
-    ---------------------------------------------------------
-
-    - TResponseWebSearchLocation (approx user locale for web search)
-    - TResponseCodeInterpreterOutput (per CI artifact)
-    - TResponseToolContainer (code interpreter file context)
-    - TInputImageMask (image inpainting mask)
-    - TCustomToolFormat (grammar or free text)
-    - TResponseRankingOptions
-    - TResponseWebSearchLocation (listed earlier)
-    - TResponseReasoningSummary
-
-    Explanation:
-    - These enrich the main classes with parameters and nested payloads.
-
-*)
-
-{$ENDREGION}
+uses
+  System.DateUtils, GenAI.API.JsonSafeReader;
 
 { TResponseMessageContent }
 
@@ -3257,6 +3573,28 @@ begin
   inherited;
 end;
 
+{ TResponseShellOutput }
+
+destructor TResponseShellOutput.Destroy;
+begin
+  if Assigned(FOutcome) then
+    FOutcome.Free;
+  inherited;
+end;
+
+{ TResponseOutput }
+
+destructor TResponseOutput.Destroy;
+begin
+  if Assigned(FOperation) then
+    FOperation.Free;
+  if Assigned(FShellAction) then
+    FShellAction.Free;
+  for var Item in FShellOutput do
+    Item.Free;
+  inherited;
+end;
+
 { TResponseText }
 
 destructor TResponseText.Destroy;
@@ -3306,6 +3644,420 @@ begin
   inherited;
 end;
 
+{ TResponseStream }
+
+function TResponseStream.GetStream: TStream;
+begin
+  Result := TImageHelper.Create(FPartialImageB64).GetStream;
+end;
+
+destructor TResponseStream.Destroy;
+begin
+  FResponse.Free;
+  FItem.Free;
+  FPart.Free;
+  for var Item in FLogprobs do
+    Item.Free;
+  FAnnotation.Free;
+  FCreatedEvent.Free;
+  FInProgressEvent.Free;
+  FCompletedEvent.Free;
+  FFailedEvent.Free;
+  FIncompleteEvent.Free;
+  FOutputItemAddedEvent.Free;
+  FOutputItemDoneEvent.Free;
+  FContentPartAddedEvent.Free;
+  FContentPartDoneEvent.Free;
+  FOutputTextDeltaEvent.Free;
+  FOutputTextDoneEvent.Free;
+  FRefusalDeltaEvent.Free;
+  FRefusalDoneEvent.Free;
+  FFunctionCallArgumentsDeltaEvent.Free;
+  FFunctionCallArgumentsDoneEvent.Free;
+  FFileSearchCallInProgressEvent.Free;
+  FFileSearchCallSearchingEvent.Free;
+  FFileSearchCallCompletedEvent.Free;
+  FWebSearchCallInProgressEvent.Free;
+  FWebSearchCallSearchingEvent.Free;
+  FWebSearchCallCompletedEvent.Free;
+  FReasoningSummaryPartAddedEvent.Free;
+  FReasoningSummaryPartDoneEvent.Free;
+  FReasoningSummaryTextDeltaEvent.Free;
+  FReasoningSummaryTextDoneEvent.Free;
+  FReasoningTextDeltaEvent.Free;
+  FReasoningTextDoneEvent.Free;
+  FImageGenerationCallCompletedEvent.Free;
+  FImageGenerationCallGeneratingEvent.Free;
+  FImageGenerationCallInProgressEvent.Free;
+  FImageGenerationCallPartialImageEvent.Free;
+  FMcpCallArgumentsDeltaEvent.Free;
+  FMcpCallArgumentsDoneEvent.Free;
+  FMcpCallCompletedEvent.Free;
+  FMcpCallFailedEvent.Free;
+  FMcpCallInProgressEvent.Free;
+  FMcpListToolsCompletedEvent.Free;
+  FMcpListToolsFailedEvent.Free;
+  FMcpListToolsInProgressEvent.Free;
+  FCodeInterpreterCallInProgressEvent.Free;
+  FCodeInterpreterCallInterpretingEvent.Free;
+  FCodeInterpreterCallCompletedEvent.Free;
+  FCodeInterpreterCallCodeDeltaEvent.Free;
+  FCodeInterpreterCallCodeDoneEvent.Free;
+  FOutputTextAnnotationAddedEvent.Free;
+  FQueuedEvent.Free;
+  FCustomToolCallInputDeltaEvent.Free;
+  FCustomToolCallInputDoneEvent.Free;
+  FErrorEvent.Free;
+  inherited;
+end;
+
+procedure TResponseStream.AfterDeserialize;
+begin
+  StreamEventBuilder;
+end;
+
+procedure TResponseStream.StreamEventBuilder;
+var
+  ParsedType: TResponseStreamType;
+  Reader: TJsonReader;
+
+  procedure RehydrateOutputItem(const Item: TResponseOutput; const Path: string);
+  begin
+    if not Assigned(Item) then
+      Exit;
+
+    case Item.&Type of
+      TResponseTypes.function_call_output,
+      TResponseTypes.custom_tool_call_output,
+      TResponseTypes.mcp_call,
+      TResponseTypes.mcp_approval_response:
+        if Reader.IsStringNode(Path + '.output') then
+          Item.FOutput := Reader.AsString(Path + '.output');
+
+      TResponseTypes.shell_call,
+      TResponseTypes.local_shell_call:
+        if Reader.IsObjectNode(Path + '.action') then
+          begin
+            FreeAndNil(Item.FShellAction);
+            Item.FShellAction := TApiDeserializer.Parse<TResponseShellAction>(
+              Reader.ExtractSubJson(Path + '.action'));
+          end;
+
+      TResponseTypes.shell_call_output,
+      TResponseTypes.local_shell_call_output:
+        begin
+          var OutputPath := Path + '.output';
+          if Reader.IsStringNode(OutputPath) then
+            Item.FOutput := Reader.AsString(OutputPath)
+          else
+          if Reader.IsArrayNode(OutputPath) then
+            begin
+              for var Existing in Item.FShellOutput do
+                Existing.Free;
+              Item.FShellOutput := nil;
+
+              var Cnt := Reader.Count(OutputPath);
+              for var I := 0 to Cnt - 1 do
+                Item.FShellOutput := Item.FShellOutput + [TApiDeserializer.Parse<TResponseShellOutput>(
+                  Reader.ExtractSubJson(System.SysUtils.Format('%s[%d]', [OutputPath, I])))];
+            end;
+        end;
+
+      TResponseTypes.tool_search_call:
+        if Reader.IsObjectNode(Path + '.arguments') then
+          Item.FSearchArguments := Reader.ExtractSubJson(Path + '.arguments');
+
+      TResponseTypes.tool_search_output:
+        Item.FSearchTools := Reader.ArrayText(Path + '.tools');
+    end;
+  end;
+begin
+  if JSONResponse.Trim.IsEmpty then
+    Exit;
+
+  Reader := TJsonReader.Parse(JSONResponse);
+  if not Reader.IsValid then
+    Exit;
+
+  TResponseStreamType.TryToParse(Reader.AsString('type'), ParsedType);
+  FEventType := ParsedType;
+  Self.&Type := ParsedType;
+  RehydrateOutputItem(FItem, 'item');
+
+  case FEventType of
+    TResponseStreamType.created:
+      begin
+        FreeAndNil(FCreatedEvent);
+        FCreatedEvent := TApiDeserializer.Parse<TResponseCreated>(JSONResponse);
+      end;
+    TResponseStreamType.in_progress:
+      begin
+        FreeAndNil(FInProgressEvent);
+        FInProgressEvent := TApiDeserializer.Parse<TResponseInProgress>(JSONResponse);
+      end;
+    TResponseStreamType.completed:
+      begin
+        FreeAndNil(FCompletedEvent);
+        FCompletedEvent := TApiDeserializer.Parse<TResponseCompleted>(JSONResponse);
+      end;
+    TResponseStreamType.failed:
+      begin
+        FreeAndNil(FFailedEvent);
+        FFailedEvent := TApiDeserializer.Parse<TResponseFailed>(JSONResponse);
+      end;
+    TResponseStreamType.incomplete:
+      begin
+        FreeAndNil(FIncompleteEvent);
+        FIncompleteEvent := TApiDeserializer.Parse<TResponseIncomplete>(JSONResponse);
+      end;
+    TResponseStreamType.output_item_added:
+      begin
+        FreeAndNil(FOutputItemAddedEvent);
+        FOutputItemAddedEvent := TApiDeserializer.Parse<TResponseOutputItemAdded>(JSONResponse);
+        RehydrateOutputItem(FOutputItemAddedEvent.Item, 'item');
+      end;
+    TResponseStreamType.output_item_done:
+      begin
+        FreeAndNil(FOutputItemDoneEvent);
+        FOutputItemDoneEvent := TApiDeserializer.Parse<TResponseOutputItemDone>(JSONResponse);
+        RehydrateOutputItem(FOutputItemDoneEvent.Item, 'item');
+      end;
+    TResponseStreamType.content_part_added:
+      begin
+        FreeAndNil(FContentPartAddedEvent);
+        FContentPartAddedEvent := TApiDeserializer.Parse<TResponseContentpartAdded>(JSONResponse);
+      end;
+    TResponseStreamType.content_part_done:
+      begin
+        FreeAndNil(FContentPartDoneEvent);
+        FContentPartDoneEvent := TApiDeserializer.Parse<TResponseContentpartDone>(JSONResponse);
+      end;
+    TResponseStreamType.output_text_delta:
+      begin
+        FreeAndNil(FOutputTextDeltaEvent);
+        FOutputTextDeltaEvent := TApiDeserializer.Parse<TResponseOutputTextDelta>(JSONResponse);
+      end;
+    TResponseStreamType.output_text_done:
+      begin
+        FreeAndNil(FOutputTextDoneEvent);
+        FOutputTextDoneEvent := TApiDeserializer.Parse<TResponseOutputTextDone>(JSONResponse);
+      end;
+    TResponseStreamType.refusal_delta:
+      begin
+        FreeAndNil(FRefusalDeltaEvent);
+        FRefusalDeltaEvent := TApiDeserializer.Parse<TResponseRefusalDelta>(JSONResponse);
+      end;
+    TResponseStreamType.refusal_done:
+      begin
+        FreeAndNil(FRefusalDoneEvent);
+        FRefusalDoneEvent := TApiDeserializer.Parse<TResponseRefusalDone>(JSONResponse);
+      end;
+    TResponseStreamType.function_call_arguments_delta:
+      begin
+        FreeAndNil(FFunctionCallArgumentsDeltaEvent);
+        FFunctionCallArgumentsDeltaEvent := TApiDeserializer.Parse<TResponseFunctionCallArgumentsDelta>(JSONResponse);
+      end;
+    TResponseStreamType.function_call_arguments_done:
+      begin
+        FreeAndNil(FFunctionCallArgumentsDoneEvent);
+        FFunctionCallArgumentsDoneEvent := TApiDeserializer.Parse<TResponseFunctionCallArgumentsDone>(JSONResponse);
+      end;
+    TResponseStreamType.file_search_call_in_progress:
+      begin
+        FreeAndNil(FFileSearchCallInProgressEvent);
+        FFileSearchCallInProgressEvent := TApiDeserializer.Parse<TResponseFileSearchCallInprogress>(JSONResponse);
+      end;
+    TResponseStreamType.file_search_call_searching:
+      begin
+        FreeAndNil(FFileSearchCallSearchingEvent);
+        FFileSearchCallSearchingEvent := TApiDeserializer.Parse<TResponseFileSearchCallSearching>(JSONResponse);
+      end;
+    TResponseStreamType.file_search_call_completed:
+      begin
+        FreeAndNil(FFileSearchCallCompletedEvent);
+        FFileSearchCallCompletedEvent := TApiDeserializer.Parse<TResponseFileSearchCallCompleted>(JSONResponse);
+      end;
+    TResponseStreamType.web_search_call_in_progress:
+      begin
+        FreeAndNil(FWebSearchCallInProgressEvent);
+        FWebSearchCallInProgressEvent := TApiDeserializer.Parse<TResponseWebSearchCallInprogress>(JSONResponse);
+      end;
+    TResponseStreamType.web_search_call_searching:
+      begin
+        FreeAndNil(FWebSearchCallSearchingEvent);
+        FWebSearchCallSearchingEvent := TApiDeserializer.Parse<TResponseWebSearchCallSearching>(JSONResponse);
+      end;
+    TResponseStreamType.web_search_call_completed:
+      begin
+        FreeAndNil(FWebSearchCallCompletedEvent);
+        FWebSearchCallCompletedEvent := TApiDeserializer.Parse<TResponseWebSearchCallCompleted>(JSONResponse);
+      end;
+    TResponseStreamType.reasoning_summary_part_added:
+      begin
+        FreeAndNil(FReasoningSummaryPartAddedEvent);
+        FReasoningSummaryPartAddedEvent := TApiDeserializer.Parse<TResponseReasoningSummaryPartAdded>(JSONResponse);
+      end;
+    TResponseStreamType.reasoning_summary_part_done:
+      begin
+        FreeAndNil(FReasoningSummaryPartDoneEvent);
+        FReasoningSummaryPartDoneEvent := TApiDeserializer.Parse<TResponseReasoningSummaryPartDone>(JSONResponse);
+      end;
+    TResponseStreamType.reasoning_summary_text_delta:
+      begin
+        FreeAndNil(FReasoningSummaryTextDeltaEvent);
+        FReasoningSummaryTextDeltaEvent := TApiDeserializer.Parse<TResponseReasoningSummaryTextDelta>(JSONResponse);
+      end;
+    TResponseStreamType.reasoning_summary_text_done:
+      begin
+        FreeAndNil(FReasoningSummaryTextDoneEvent);
+        FReasoningSummaryTextDoneEvent := TApiDeserializer.Parse<TResponseReasoningSummaryTextDone>(JSONResponse);
+      end;
+    TResponseStreamType.reasoning_text_delta:
+      begin
+        FreeAndNil(FReasoningTextDeltaEvent);
+        FReasoningTextDeltaEvent := TApiDeserializer.Parse<TResponseReasoningTextDelta>(JSONResponse);
+      end;
+    TResponseStreamType.reasoning_text_done:
+      begin
+        FreeAndNil(FReasoningTextDoneEvent);
+        FReasoningTextDoneEvent := TApiDeserializer.Parse<TResponseReasoningTextDone>(JSONResponse);
+      end;
+    TResponseStreamType.image_generation_call_completed:
+      begin
+        FreeAndNil(FImageGenerationCallCompletedEvent);
+        FImageGenerationCallCompletedEvent := TApiDeserializer.Parse<TResponseImageGenerationCallCompleted>(JSONResponse);
+      end;
+    TResponseStreamType.image_generation_call_generating:
+      begin
+        FreeAndNil(FImageGenerationCallGeneratingEvent);
+        FImageGenerationCallGeneratingEvent := TApiDeserializer.Parse<TResponseImageGenerationCallGenerating>(JSONResponse);
+      end;
+    TResponseStreamType.image_generation_call_in_progress:
+      begin
+        FreeAndNil(FImageGenerationCallInProgressEvent);
+        FImageGenerationCallInProgressEvent := TApiDeserializer.Parse<TResponseImageGenerationCallInProgress>(JSONResponse);
+      end;
+    TResponseStreamType.image_generation_call_partial_image:
+      begin
+        FreeAndNil(FImageGenerationCallPartialImageEvent);
+        FImageGenerationCallPartialImageEvent := TApiDeserializer.Parse<TResponseImageGenerationCallPartialImage>(JSONResponse);
+      end;
+    TResponseStreamType.mcp_call_arguments_delta:
+      begin
+        FreeAndNil(FMcpCallArgumentsDeltaEvent);
+        FMcpCallArgumentsDeltaEvent := TApiDeserializer.Parse<TResponseMcpCallArgumentsDelta>(JSONResponse);
+      end;
+    TResponseStreamType.mcp_call_arguments_done:
+      begin
+        FreeAndNil(FMcpCallArgumentsDoneEvent);
+        FMcpCallArgumentsDoneEvent := TApiDeserializer.Parse<TResponseMcpCallArgumentsDone>(JSONResponse);
+      end;
+    TResponseStreamType.mcp_call_completed:
+      begin
+        FreeAndNil(FMcpCallCompletedEvent);
+        FMcpCallCompletedEvent := TApiDeserializer.Parse<TResponseMcpCallCompleted>(JSONResponse);
+      end;
+    TResponseStreamType.mcp_call_failed:
+      begin
+        FreeAndNil(FMcpCallFailedEvent);
+        FMcpCallFailedEvent := TApiDeserializer.Parse<TResponseMcpCallFailed>(JSONResponse);
+      end;
+    TResponseStreamType.mcp_call_in_progress:
+      begin
+        FreeAndNil(FMcpCallInProgressEvent);
+        FMcpCallInProgressEvent := TApiDeserializer.Parse<TResponseMcpCallInProgress>(JSONResponse);
+      end;
+    TResponseStreamType.mcp_list_tools_completed:
+      begin
+        FreeAndNil(FMcpListToolsCompletedEvent);
+        FMcpListToolsCompletedEvent := TApiDeserializer.Parse<TResponseMcpListToolsCompleted>(JSONResponse);
+      end;
+    TResponseStreamType.mcp_list_tools_failed:
+      begin
+        FreeAndNil(FMcpListToolsFailedEvent);
+        FMcpListToolsFailedEvent := TApiDeserializer.Parse<TResponseMcpListToolsFailed>(JSONResponse);
+      end;
+    TResponseStreamType.mcp_list_tools_in_progress:
+      begin
+        FreeAndNil(FMcpListToolsInProgressEvent);
+        FMcpListToolsInProgressEvent := TApiDeserializer.Parse<TResponseMcpListToolsInProgress>(JSONResponse);
+      end;
+    TResponseStreamType.code_interpreter_call_in_progress:
+      begin
+        FreeAndNil(FCodeInterpreterCallInProgressEvent);
+        FCodeInterpreterCallInProgressEvent := TApiDeserializer.Parse<TResponseCodeInterpreterCallInProgress>(JSONResponse);
+      end;
+    TResponseStreamType.code_interpreter_call_interpreting:
+      begin
+        FreeAndNil(FCodeInterpreterCallInterpretingEvent);
+        FCodeInterpreterCallInterpretingEvent := TApiDeserializer.Parse<TResponseCodeInterpreterCallInterpreting>(JSONResponse);
+      end;
+    TResponseStreamType.code_interpreter_call_completed:
+      begin
+        FreeAndNil(FCodeInterpreterCallCompletedEvent);
+        FCodeInterpreterCallCompletedEvent := TApiDeserializer.Parse<TResponseCodeInterpreterCallCompleted>(JSONResponse);
+      end;
+    TResponseStreamType.code_interpreter_call_code_delta:
+      begin
+        FreeAndNil(FCodeInterpreterCallCodeDeltaEvent);
+        FCodeInterpreterCallCodeDeltaEvent := TApiDeserializer.Parse<TResponseCodeInterpreterCallCodeDelta>(JSONResponse);
+      end;
+    TResponseStreamType.code_interpreter_call_code_done:
+      begin
+        FreeAndNil(FCodeInterpreterCallCodeDoneEvent);
+        FCodeInterpreterCallCodeDoneEvent := TApiDeserializer.Parse<TResponseCodeInterpreterCallCodeDone>(JSONResponse);
+      end;
+    TResponseStreamType.output_text_annotation_added:
+      begin
+        FreeAndNil(FOutputTextAnnotationAddedEvent);
+        FOutputTextAnnotationAddedEvent := TApiDeserializer.Parse<TResponseOutputTextAnnotationAdded>(JSONResponse);
+      end;
+    TResponseStreamType.queued:
+      begin
+        FreeAndNil(FQueuedEvent);
+        FQueuedEvent := TApiDeserializer.Parse<TResponseQueued>(JSONResponse);
+      end;
+    TResponseStreamType.custom_tool_call_input_delta:
+      begin
+        FreeAndNil(FCustomToolCallInputDeltaEvent);
+        FCustomToolCallInputDeltaEvent := TApiDeserializer.Parse<TResponseCustomToolCallInputDelta>(JSONResponse);
+      end;
+    TResponseStreamType.custom_tool_call_input_done:
+      begin
+        FreeAndNil(FCustomToolCallInputDoneEvent);
+        FCustomToolCallInputDoneEvent := TApiDeserializer.Parse<TResponseCustomToolCallInputDone>(JSONResponse);
+      end;
+    TResponseStreamType.error:
+      begin
+        FreeAndNil(FErrorEvent);
+        FErrorEvent := TApiDeserializer.Parse<TResponseStreamError>(JSONResponse);
+      end;
+  end;
+end;
+
+function UnixTimeToISO8601UTC(const Value: Int64): string;
+begin
+  if Value <= 0 then
+    Exit('');
+  Result := FormatDateTime('yyyy-mm-dd"T"hh:nn:ss"Z"', UnixToDateTime(Value, True));
+end;
+
+{ TResponseCompaction }
+
+destructor TResponseCompaction.Destroy;
+begin
+  for var Item in FOutput do
+    Item.Free;
+  if Assigned(FUsage) then
+    FUsage.Free;
+  inherited;
+end;
+
+function TResponseCompaction.GetCreatedAtAsString: string;
+begin
+  Result := UnixTimeToISO8601UTC(FCreatedAt);
+end;
+
 { TResponse }
 
 destructor TResponse.Destroy;
@@ -3330,17 +4082,183 @@ begin
     FPrompt.Free;
   for var Item in FInstructions do
     Item.Free;
+  if Assigned(FToolChoice) then
+    FToolChoice.Free;
   inherited;
+end;
+
+procedure TResponse.AfterDeserialize;
+begin
+  inherited;
+  ContentUpdate;
+end;
+
+procedure TResponse.ContentUpdate;
+begin
+  inherited;
+
+  if JSONResponse.Trim.IsEmpty then
+    Exit;
+
+  var Reader := TJsonReader.Parse(JSONResponse);
+  if not Reader.IsValid then
+    Exit;
+
+  FreeAndNil(FToolChoice);
+
+  for var Item in FInstructions do
+    Item.Free;
+  FInstructions := nil;
+  FInstructionsText := '';
+
+  {--- instructions as plain text. }
+  if Reader.IsStringNode('instructions') then
+    FInstructionsText := Reader.AsString('instructions')
+  {--- instructions as a structured input list. }
+  else if Reader.IsArrayNode('instructions') then
+    begin
+      var Cnt := Reader.Count('instructions');
+      for var I := 0 to Cnt - 1 do
+        FInstructions := FInstructions + [TApiDeserializer.Parse<TInstructions>(
+          Reader.ExtractSubJson(System.SysUtils.Format('instructions[%d]', [I])))];
+    end;
+
+  {--- tool_choice as a bare string: none, auto or required. }
+  if Reader.IsStringNode('tool_choice') then
+    begin
+      FToolChoice := TResponseToolChoice.Create;
+      FToolChoice.Value := Reader.AsString('tool_choice');
+    end
+  {--- tool_choice as an object: rehydrate the typed fields, then attach the raw
+       tools array (which cannot be mapped to a scalar field). }
+  else if Reader.IsObjectNode('tool_choice') then
+    begin
+      FToolChoice := TApiDeserializer.Parse<TResponseToolChoice>(Reader.ExtractSubJson('tool_choice'));
+      FToolChoice.Tools := Reader.ArrayText('tool_choice.tools');
+    end;
+
+  {--- Rebuild the polymorphic output items whose JSON keys (action, output, arguments, tools)
+       conflict across item types and therefore cannot be mapped directly. }
+  for var I := 0 to High(FOutput) do
+    begin
+      if not Assigned(FOutput[I]) then
+        Continue;
+
+      case FOutput[I].&Type of
+        TResponseTypes.function_call_output,
+        TResponseTypes.custom_tool_call_output,
+        TResponseTypes.mcp_call,
+        TResponseTypes.mcp_approval_response:
+          if Reader.IsStringNode(System.SysUtils.Format('output[%d].output', [I])) then
+            FOutput[I].FOutput := Reader.AsString(System.SysUtils.Format('output[%d].output', [I]));
+
+        TResponseTypes.shell_call,
+        TResponseTypes.local_shell_call:
+          if Reader.IsObjectNode(System.SysUtils.Format('output[%d].action', [I])) then
+            FOutput[I].ShellAction := TApiDeserializer.Parse<TResponseShellAction>(
+              Reader.ExtractSubJson(System.SysUtils.Format('output[%d].action', [I])));
+
+        TResponseTypes.shell_call_output,
+        TResponseTypes.local_shell_call_output:
+          begin
+            var OutputPath := System.SysUtils.Format('output[%d].output', [I]);
+            if Reader.IsStringNode(OutputPath) then
+              FOutput[I].FOutput := Reader.AsString(OutputPath)
+            else
+            if Reader.IsArrayNode(OutputPath) then
+              begin
+                var Outputs: TArray<TResponseShellOutput> := nil;
+                var Cnt := Reader.Count(OutputPath);
+                for var J := 0 to Cnt - 1 do
+                  Outputs := Outputs + [TApiDeserializer.Parse<TResponseShellOutput>(
+                    Reader.ExtractSubJson(System.SysUtils.Format('%s[%d]', [OutputPath, J])))];
+                FOutput[I].ShellOutput := Outputs;
+              end;
+          end;
+
+        TResponseTypes.tool_search_call:
+          if Reader.IsObjectNode(System.SysUtils.Format('output[%d].arguments', [I])) then
+            FOutput[I].SearchArguments := Reader.ExtractSubJson(System.SysUtils.Format('output[%d].arguments', [I]));
+
+        TResponseTypes.tool_search_output:
+          FOutput[I].SearchTools := Reader.ArrayText(System.SysUtils.Format('output[%d].tools', [I]));
+      end;
+    end;
+
+  {--- Rebuild the polymorphic echoed tools whose JSON keys (environment, tools, parameters)
+       conflict across tool types. }
+  for var I := 0 to High(FTools) do
+    begin
+      if not Assigned(FTools[I]) then
+        Continue;
+
+      case FTools[I].&Type of
+        TResponseToolsType.shell:
+          if Reader.IsObjectNode(System.SysUtils.Format('tools[%d].environment', [I])) then
+            FTools[I].ShellEnvironment := Reader.ExtractSubJson(System.SysUtils.Format('tools[%d].environment', [I]));
+
+        TResponseToolsType.namespace:
+          FTools[I].NamespaceTools := Reader.ArrayText(System.SysUtils.Format('tools[%d].tools', [I]));
+
+        TResponseToolsType.tool_search:
+          begin
+            if Reader.IsObjectNode(System.SysUtils.Format('tools[%d].parameters', [I])) then
+              FTools[I].ToolSearchParameters := Reader.ExtractSubJson(System.SysUtils.Format('tools[%d].parameters', [I]));
+            FTools[I].Execution := Reader.AsString(System.SysUtils.Format('tools[%d].execution', [I]));
+          end;
+      end;
+    end;
 end;
 
 function TResponse.GetCreatedAtAsString: string;
 begin
-  Result := TInt64OrNull(FCreatedAt).ToUtcDateString;
+  Result := UnixTimeToISO8601UTC(FCreatedAt);
+end;
+
+function TResponse.GetCompletedAtAsString: string;
+begin
+  Result := UnixTimeToISO8601UTC(FCompletedAt);
 end;
 
 { TResponseCreated }
 
 destructor TResponseCreated.Destroy;
+begin
+  if Assigned(FResponse) then
+    FResponse.Free;
+  inherited;
+end;
+
+{ TResponseInProgress }
+
+destructor TResponseInProgress.Destroy;
+begin
+  if Assigned(FResponse) then
+    FResponse.Free;
+  inherited;
+end;
+
+{ TResponseCompleted }
+
+destructor TResponseCompleted.Destroy;
+begin
+  if Assigned(FResponse) then
+    FResponse.Free;
+  inherited;
+end;
+
+{ TResponseFailed }
+
+destructor TResponseFailed.Destroy;
+begin
+  if Assigned(FResponse) then
+    FResponse.Free;
+  inherited;
+end;
+
+{ TResponseIncomplete }
+
+destructor TResponseIncomplete.Destroy;
 begin
   if Assigned(FResponse) then
     FResponse.Free;
@@ -3356,9 +4274,27 @@ begin
   inherited;
 end;
 
+{ TResponseOutputItemDone }
+
+destructor TResponseOutputItemDone.Destroy;
+begin
+  if Assigned(FItem) then
+    FItem.Free;
+  inherited;
+end;
+
 { TResponseContentpartAdded }
 
 destructor TResponseContentpartAdded.Destroy;
+begin
+  if Assigned(FPart) then
+    FPart.Free;
+  inherited;
+end;
+
+{ TResponseContentpartDone }
+
+destructor TResponseContentpartDone.Destroy;
 begin
   if Assigned(FPart) then
     FPart.Free;
@@ -3539,12 +4475,30 @@ begin
   inherited;
 end;
 
+{ TResponseOutputTextDone }
+
+destructor TResponseOutputTextDone.Destroy;
+begin
+  for var Item in FLogprobs do
+    Item.Free;
+  inherited;
+end;
+
 { TResponseOutputTextAnnotationAdded }
 
 destructor TResponseOutputTextAnnotationAdded.Destroy;
 begin
    if Assigned(FAnnotation) then
     FAnnotation.Free;
+  inherited;
+end;
+
+{ TResponseQueued }
+
+destructor TResponseQueued.Destroy;
+begin
+  if Assigned(FResponse) then
+    FResponse.Free;
   inherited;
 end;
 

@@ -1,0 +1,98 @@
+﻿{
+    "categoryConfigMode": "replace",
+    "categories": [
+        {
+            "id": "allModels",
+            "label": "Model list",
+            "badge": "",
+            "sourceCategoryId": "none",
+            "featureLabels": [
+                "All"
+            ],
+            "model": "",
+            "visible": true
+        },
+        {
+            "id": "textGeneration",
+            "label": "Text Generation",
+            "badge": "",
+            "sourceCategoryId": "text",
+            "featureLabels": [
+                "Thinking",
+                "Attach files",
+                "Web research",
+                "Vision"
+            ],
+            "model": "gpt-5.5",
+            "visible": true
+        },
+        {
+            "id": "imageCreation",
+            "label": "Image Creation",
+            "badge": "",
+            "sourceCategoryId": "image",
+            "featureLabels": [
+                "Create Image",
+                "Vision"
+            ],
+            "model": "gpt-image-2",
+            "visible": true
+        },
+        {
+            "id": "videoCreation",
+            "label": "Video Creation",
+            "badge": "",
+            "sourceCategoryId": "image",
+            "featureLabels": [
+                "Create Video"
+            ],
+            "model": "",
+            "visible": false
+        },
+        {
+            "id": "audioCreation",
+            "label": "Audio creation",
+            "badge": "",
+            "sourceCategoryId": "audio",
+            "featureLabels": [
+                "Create Audio"
+            ],
+            "model": "",
+            "visible": false
+        },
+        {
+            "id": "textToSpeech",
+            "label": "Text to speech",
+            "badge": "",
+            "sourceCategoryId": "audio",
+            "featureLabels": [
+                "Text to speech"
+            ],
+            "model": "gpt-4o-mini-tts",
+            "visible": true
+        },
+        {
+            "id": "speechToText",
+            "label": "Speech to text",
+            "badge": "",
+            "sourceCategoryId": "audio",
+            "featureLabels": [
+                "Speech to text"
+            ],
+            "model": "gpt-4o-transcribe",
+            "visible": true
+        },
+        {
+            "id": "deepResearch",
+            "label": "Deep Research",
+            "badge": "",
+            "sourceCategoryId": "deepResearch",
+            "featureLabels": [
+                "Deep Research"
+            ],
+            "model": "gpt-5.5",
+            "visible": false
+        }
+    ],
+    "type": "model-selector-set-runtime-config"
+}
